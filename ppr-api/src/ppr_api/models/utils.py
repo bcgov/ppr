@@ -24,62 +24,63 @@ import pytz
 from datedelta import datedelta
 from flask import current_app
 
+# from ppr_api.utils.logging import logger
 
 # Local timzone
-LOCAL_TZ = pytz.timezone('America/Los_Angeles')
+LOCAL_TZ = pytz.timezone("America/Los_Angeles")
 
 # API draft types
-DRAFT_TYPE_AMENDMENT = 'AMENDMENT_STATEMENT'
-DRAFT_TYPE_CHANGE = 'CHANGE_STATEMENT'
-DRAFT_TYPE_FINANCING = 'FINANCING_STATEMENT'
+DRAFT_TYPE_AMENDMENT = "AMENDMENT_STATEMENT"
+DRAFT_TYPE_CHANGE = "CHANGE_STATEMENT"
+DRAFT_TYPE_FINANCING = "FINANCING_STATEMENT"
 
 # DB party types
-PARTY_DEBTOR_BUS = 'DB'
-PARTY_DEBTOR_IND = 'DI'
-PARTY_REGISTERING = 'RG'
-PARTY_SECURED = 'SP'
+PARTY_DEBTOR_BUS = "DB"
+PARTY_DEBTOR_IND = "DI"
+PARTY_REGISTERING = "RG"
+PARTY_SECURED = "SP"
 
 # DB registration class types
-REG_CLASS_AMEND = 'AMENDMENT'
-REG_CLASS_AMEND_COURT = 'COURTORDER'
-REG_CLASS_CHANGE = 'CHANGE'
-REG_CLASS_CROWN = 'CROWNLIEN'
-REG_CLASS_DISCHARGE = 'DISCHARGE'
-REG_CLASS_FINANCING = 'PPSALIEN'
-REG_CLASS_MISC = 'MISCLIEN'
-REG_CLASS_PPSA = 'PPSALIEN'
-REG_CLASS_RENEWAL = 'RENEWAL'
+REG_CLASS_AMEND = "AMENDMENT"
+REG_CLASS_AMEND_COURT = "COURTORDER"
+REG_CLASS_CHANGE = "CHANGE"
+REG_CLASS_CROWN = "CROWNLIEN"
+REG_CLASS_DISCHARGE = "DISCHARGE"
+REG_CLASS_FINANCING = "PPSALIEN"
+REG_CLASS_MISC = "MISCLIEN"
+REG_CLASS_PPSA = "PPSALIEN"
+REG_CLASS_RENEWAL = "RENEWAL"
 
 # DB registration types
-REG_TYPE_AMEND = 'AM'
-REG_TYPE_AMEND_COURT = 'CO'
-REG_TYPE_DISCHARGE = 'DC'
-REG_TYPE_RENEWAL = 'RE'
-REG_TYPE_REPAIRER_LIEN = 'RL'
-REG_TYPE_MARRIAGE_SEPARATION = 'FR'
-REG_TYPE_LAND_TAX_MH = 'LT'
-REG_TYPE_TAX_MH = 'MH'
-REG_TYPE_OTHER = 'OT'
-REG_TYPE_SECURITY_AGREEMENT = 'SA'
-REG_TYPE_SECURITIES_NOTICE = 'SE'
+REG_TYPE_AMEND = "AM"
+REG_TYPE_AMEND_COURT = "CO"
+REG_TYPE_DISCHARGE = "DC"
+REG_TYPE_RENEWAL = "RE"
+REG_TYPE_REPAIRER_LIEN = "RL"
+REG_TYPE_MARRIAGE_SEPARATION = "FR"
+REG_TYPE_LAND_TAX_MH = "LT"
+REG_TYPE_TAX_MH = "MH"
+REG_TYPE_OTHER = "OT"
+REG_TYPE_SECURITY_AGREEMENT = "SA"
+REG_TYPE_SECURITIES_NOTICE = "SE"
 # New amendment change types
-REG_TYPE_AMEND_ADDITION_COLLATERAL = 'AA'
-REG_TYPE_AMEND_DEBTOR_RELEASE = 'AR'
-REG_TYPE_AMEND_DEBTOR_TRANSFER = 'AD'
-REG_TYPE_AMEND_PARIAL_DISCHARGE = 'AP'
-REG_TYPE_AMEND_SP_TRANSFER = 'AS'
-REG_TYPE_AMEND_SUBSTITUTION_COLLATERAL = 'AU'
-REG_TYPE_AMEND_SECURITIES_ADD = 'A1'
-REG_TYPE_AMEND_SECURITIES_DELETE = 'A2'
-REG_TYPE_AMEND_SECURITIES = 'A3'
+REG_TYPE_AMEND_ADDITION_COLLATERAL = "AA"
+REG_TYPE_AMEND_DEBTOR_RELEASE = "AR"
+REG_TYPE_AMEND_DEBTOR_TRANSFER = "AD"
+REG_TYPE_AMEND_PARIAL_DISCHARGE = "AP"
+REG_TYPE_AMEND_SP_TRANSFER = "AS"
+REG_TYPE_AMEND_SUBSTITUTION_COLLATERAL = "AU"
+REG_TYPE_AMEND_SECURITIES_ADD = "A1"
+REG_TYPE_AMEND_SECURITIES_DELETE = "A2"
+REG_TYPE_AMEND_SECURITIES = "A3"
 
-SEARCH_MATCH_EXACT = 'EXACT'
-SEARCH_MATCH_SIMILAR = 'SIMILAR'
+SEARCH_MATCH_EXACT = "EXACT"
+SEARCH_MATCH_SIMILAR = "SIMILAR"
 
 # DB state types
-STATE_DISCHARGED = 'HDC'
-STATE_ACTIVE = 'ACT'
-STATE_EXPIRED = 'HEX'
+STATE_DISCHARGED = "HDC"
+STATE_ACTIVE = "ACT"
+STATE_EXPIRED = "HEX"
 
 # Financing statement, registraiton constants
 LIFE_INFINITE = 99
@@ -89,126 +90,121 @@ MAX_ACCOUNT_REGISTRATIONS_DEFAULT = 1000  # Use when not paging.
 
 # Legacy registration types not allowed with new financing statements.
 REG_TYPE_NEW_FINANCING_EXCLUDED = {
-    'SS': 'SS',
-    'MR': 'MR',
-    'CC': 'CC',
-    'DP': 'DP',
-    'HR': 'HR',
-    'MI': 'MI',
-    'TA': 'TA',
-    'TF': 'TF',
-    'TG': 'TG',
-    'TL': 'TL',
-    'TM': 'TM'
+    "SS": "SS",
+    "MR": "MR",
+    "CC": "CC",
+    "DP": "DP",
+    "HR": "HR",
+    "MI": "MI",
+    "TA": "TA",
+    "TF": "TF",
+    "TG": "TG",
+    "TL": "TL",
+    "TM": "TM",
 }
 
 # Mapping from API draft type to DB registration class
 DRAFT_TYPE_TO_REG_CLASS = {
-    'AMENDMENT_STATEMENT': 'AMENDMENT',
-    'CHANGE_STATEMENT': 'CHANGE',
-    'FINANCING_STATEMENT': 'PPSALIEN'
+    "AMENDMENT_STATEMENT": "AMENDMENT",
+    "CHANGE_STATEMENT": "CHANGE",
+    "FINANCING_STATEMENT": "PPSALIEN",
 }
 
 # Mapping from DB registration class to API draft type
 REG_CLASS_TO_DRAFT_TYPE = {
-    'AMENDMENT': 'AMENDMENT_STATEMENT',
-    'COURTORDER': 'AMENDMENT_STATEMENT',
-    'CHANGE': 'CHANGE_STATEMENT',
-    'CROWNIEN': 'FINANCING_STATEMENT',
-    'MISCLIEN': 'FINANCING_STATEMENT',
-    'PPSALIEN': 'FINANCING_STATEMENT'
+    "AMENDMENT": "AMENDMENT_STATEMENT",
+    "COURTORDER": "AMENDMENT_STATEMENT",
+    "CHANGE": "CHANGE_STATEMENT",
+    "CROWNIEN": "FINANCING_STATEMENT",
+    "MISCLIEN": "FINANCING_STATEMENT",
+    "PPSALIEN": "FINANCING_STATEMENT",
 }
 
 # Mapping from DB registration class to API statement type
 REG_CLASS_TO_STATEMENT_TYPE = {
-    'AMENDMENT': 'AMENDMENT_STATEMENT',
-    'COURTORDER': 'AMENDMENT_STATEMENT',
-    'CROWNLIEN': 'FINANCING_STATEMENT',
-    'CHANGE': 'CHANGE_STATEMENT',
-    'RENEWAL': 'RENEWAL_STATEMENT',
-    'DISCHARGE': 'DISCHARGE_STATEMENT',
-    'MISCLIEN': 'FINANCING_STATEMENT',
-    'PPSALIEN': 'FINANCING_STATEMENT'
+    "AMENDMENT": "AMENDMENT_STATEMENT",
+    "COURTORDER": "AMENDMENT_STATEMENT",
+    "CROWNLIEN": "FINANCING_STATEMENT",
+    "CHANGE": "CHANGE_STATEMENT",
+    "RENEWAL": "RENEWAL_STATEMENT",
+    "DISCHARGE": "DISCHARGE_STATEMENT",
+    "MISCLIEN": "FINANCING_STATEMENT",
+    "PPSALIEN": "FINANCING_STATEMENT",
 }
 
 # Default mapping from registration class to registration type
-REG_CLASS_TO_REG_TYPE = {
-    'AMENDMENT': 'AM',
-    'COURTORDER': 'CO',
-    'DISCHARGE': 'DC',
-    'RENEWAL': 'RE'
-}
+REG_CLASS_TO_REG_TYPE = {"AMENDMENT": "AM", "COURTORDER": "CO", "DISCHARGE": "DC", "RENEWAL": "RE"}
 
 # Mapping from registration type to registration class
 REG_TYPE_TO_REG_CLASS = {
-    'AM': 'AMENDMENT',
-    'AA': 'AMENDMENT',
-    'AR': 'AMENDMENT',
-    'AD': 'AMENDMENT',
-    'AP': 'AMENDMENT',
-    'AS': 'AMENDMENT',
-    'AU': 'AMENDMENT',
-    'CO': 'COURTORDER',
-    'AC': 'CHANGE',
-    'DR': 'CHANGE',
-    'DT': 'CHANGE',
-    'PD': 'CHANGE',
-    'ST': 'CHANGE',
-    'SU': 'CHANGE',
-    'CC': 'CROWNLIEN',
-    'CT': 'CROWNLIEN',
-    'DP': 'CROWNLIEN',
-    'ET': 'CROWNLIEN',
-    'FO': 'CROWNLIEN',
-    'FT': 'CROWNLIEN',
-    'HR': 'CROWNLIEN',
-    'IP': 'CROWNLIEN',
-    'IT': 'CROWNLIEN',
-    'LO': 'CROWNLIEN',
-    'MD': 'CROWNLIEN',
-    'MI': 'CROWNLIEN',
-    'MR': 'CROWNLIEN',
-    'OT': 'CROWNLIEN',
-    'PG': 'CROWNLIEN',
-    'PS': 'CROWNLIEN',
-    'PT': 'CROWNLIEN',
-    'RA': 'CROWNLIEN',
-    'SC': 'CROWNLIEN',
-    'SS': 'CROWNLIEN',
-    'TL': 'CROWNLIEN',
-    'SV': 'CROWNLIEN',
-    'TO': 'CROWNLIEN',
-    'DC': 'DISCHARGE',
-    'HN': 'MISCLIEN',
-    'ML': 'MISCLIEN',
-    'MN': 'MISCLIEN',
-    'SE': 'MISCLIEN',
-    'PN': 'MISCLIEN',
-    'WL': 'MISCLIEN',
-    'FA': 'PPSALIEN',
-    'FL': 'PPSALIEN',
-    'FR': 'PPSALIEN',
-    'FS': 'PPSALIEN',
-    'LT': 'PPSALIEN',
-    'MH': 'PPSALIEN',
-    'RL': 'PPSALIEN',
-    'SA': 'PPSALIEN',
-    'SG': 'PPSALIEN',
-    'TA': 'PPSALIEN',
-    'TF': 'PPSALIEN',
-    'TG': 'PPSALIEN',
-    'TM': 'PPSALIEN',
-    'RE': 'RENEWAL'
+    "AM": "AMENDMENT",
+    "AA": "AMENDMENT",
+    "AR": "AMENDMENT",
+    "AD": "AMENDMENT",
+    "AP": "AMENDMENT",
+    "AS": "AMENDMENT",
+    "AU": "AMENDMENT",
+    "CO": "COURTORDER",
+    "AC": "CHANGE",
+    "DR": "CHANGE",
+    "DT": "CHANGE",
+    "PD": "CHANGE",
+    "ST": "CHANGE",
+    "SU": "CHANGE",
+    "CC": "CROWNLIEN",
+    "CT": "CROWNLIEN",
+    "DP": "CROWNLIEN",
+    "ET": "CROWNLIEN",
+    "FO": "CROWNLIEN",
+    "FT": "CROWNLIEN",
+    "HR": "CROWNLIEN",
+    "IP": "CROWNLIEN",
+    "IT": "CROWNLIEN",
+    "LO": "CROWNLIEN",
+    "MD": "CROWNLIEN",
+    "MI": "CROWNLIEN",
+    "MR": "CROWNLIEN",
+    "OT": "CROWNLIEN",
+    "PG": "CROWNLIEN",
+    "PS": "CROWNLIEN",
+    "PT": "CROWNLIEN",
+    "RA": "CROWNLIEN",
+    "SC": "CROWNLIEN",
+    "SS": "CROWNLIEN",
+    "TL": "CROWNLIEN",
+    "SV": "CROWNLIEN",
+    "TO": "CROWNLIEN",
+    "DC": "DISCHARGE",
+    "HN": "MISCLIEN",
+    "ML": "MISCLIEN",
+    "MN": "MISCLIEN",
+    "SE": "MISCLIEN",
+    "PN": "MISCLIEN",
+    "WL": "MISCLIEN",
+    "FA": "PPSALIEN",
+    "FL": "PPSALIEN",
+    "FR": "PPSALIEN",
+    "FS": "PPSALIEN",
+    "LT": "PPSALIEN",
+    "MH": "PPSALIEN",
+    "RL": "PPSALIEN",
+    "SA": "PPSALIEN",
+    "SG": "PPSALIEN",
+    "TA": "PPSALIEN",
+    "TF": "PPSALIEN",
+    "TG": "PPSALIEN",
+    "TM": "PPSALIEN",
+    "RE": "RENEWAL",
 }
 
 # Map from API search type to DB search type
 TO_DB_SEARCH_TYPE = {
-    'AIRCRAFT_DOT': 'AC',
-    'BUSINESS_DEBTOR': 'BS',
-    'INDIVIDUAL_DEBTOR': 'IS',
-    'MHR_NUMBER': 'MH',
-    'REGISTRATION_NUMBER': 'RG',
-    'SERIAL_NUMBER': 'SS'
+    "AIRCRAFT_DOT": "AC",
+    "BUSINESS_DEBTOR": "BS",
+    "INDIVIDUAL_DEBTOR": "IS",
+    "MHR_NUMBER": "MH",
+    "REGISTRATION_NUMBER": "RG",
+    "SERIAL_NUMBER": "SS",
 }
 
 # Account financing statement/registration list queries.
@@ -426,14 +422,14 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
 ORDER BY r.registration_ts DESC
 """
 
-QUERY_ACCOUNT_DRAFTS_LIMIT = ' FETCH FIRST :max_results_size ROWS ONLY'
-QUERY_ACCOUNT_DRAFTS_DEFAULT_ORDER = ' ORDER BY create_ts DESC'
+QUERY_ACCOUNT_DRAFTS_LIMIT = " FETCH FIRST :max_results_size ROWS ONLY"
+QUERY_ACCOUNT_DRAFTS_DEFAULT_ORDER = " ORDER BY create_ts DESC"
 QUERY_ACCOUNT_DRAFTS_DOC_NUM_CLAUSE = " AND document_number LIKE :doc_num || '%'"
 QUERY_ACCOUNT_DRAFTS_CLIENT_REF_CLAUSE = " AND client_reference_id LIKE '%' || :client_reference_id || '%'"
 QUERY_ACCOUNT_DRAFTS_CLIENT_REF_CLAUSE_NEW = " AND client_reference_id ILIKE '%' || :client_reference_id || '%'"
 QUERY_ACCOUNT_DRAFTS_REG_NAME_CLAUSE = " AND registering_name LIKE '%' || :registering_name || '%'"
 QUERY_ACCOUNT_DRAFTS_REG_NAME_CLAUSE_NEW = " AND registering_name ILIKE '%' || :registering_name || '%'"
-QUERY_ACCOUNT_DRAFTS_REG_TYPE_CLAUSE = ' AND registration_type = :registration_type'
+QUERY_ACCOUNT_DRAFTS_REG_TYPE_CLAUSE = " AND registration_type = :registration_type"
 QUERY_ACCOUNT_DRAFTS_DATE_CLAUSE = """
  AND create_ts BETWEEN (TO_TIMESTAMP(:start_date_time, 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc') AND
                        (TO_TIMESTAMP(:end_date_time, 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc')
@@ -451,7 +447,7 @@ SELECT document_number, create_ts, registration_type, registration_type_cl, regi
                       AND uer.account_id = adv.account_id
                       AND uer.removed_ind = 'Y')
 """
-QUERY_ACCOUNT_DRAFTS_FILTER = 'SELECT * FROM (' + QUERY_ACCOUNT_DRAFTS_BASE + ') AS q WHERE account_id = :query_account'
+QUERY_ACCOUNT_DRAFTS_FILTER = "SELECT * FROM (" + QUERY_ACCOUNT_DRAFTS_BASE + ") AS q WHERE account_id = :query_account"
 QUERY_ACCOUNT_DRAFTS = QUERY_ACCOUNT_DRAFTS_BASE + QUERY_ACCOUNT_DRAFTS_DEFAULT_ORDER + QUERY_ACCOUNT_DRAFTS_LIMIT
 
 QUERY_ACCOUNT_REG_TOTAL = """
@@ -520,27 +516,29 @@ ORDER BY registration_ts DESC
 """
 
 # Error messages
-ERR_FINANCING_NOT_FOUND = '{code}: no Financing Statement found for registration number {registration_num}.'
-ERR_REGISTRATION_NOT_FOUND = '{code}: no registration found for registration number {registration_num}.'
-ERR_FINANCING_HISTORICAL = \
-    '{code}: the Financing Statement for registration number {registration_num} has expired or been discharged.'
-ERR_REGISTRATION_ACCOUNT = '{code}: the account ID {account_id} does not match registration number {registration_num}.'
-ERR_REGISTRATION_MISMATCH = \
-    '{code}: the registration {registration_num} does not match the Financing Statement registration {base_reg_num}.'
-ERR_DRAFT_NOT_FOUND = '{code}: no Draft Statement found for Document ID {document_number}.'
-ERR_DRAFT_USED = '{code}: Draft Statement for Document ID {document_number} has been used.'
-ERR_SEARCH_TOO_OLD = '{code}: search get details search ID {search_id} timestamp too old: must be after {min_ts}.'
-ERR_SEARCH_COMPLETE = '{code}: search select results failed: results already provided for search ID {search_id}.'
-ERR_SEARCH_NOT_FOUND = '{code}: search select results failed: invalid search ID {search_id}.'
+ERR_FINANCING_NOT_FOUND = "{code}: no Financing Statement found for registration number {registration_num}."
+ERR_REGISTRATION_NOT_FOUND = "{code}: no registration found for registration number {registration_num}."
+ERR_FINANCING_HISTORICAL = (
+    "{code}: the Financing Statement for registration number {registration_num} has expired or been discharged."
+)
+ERR_REGISTRATION_ACCOUNT = "{code}: the account ID {account_id} does not match registration number {registration_num}."
+ERR_REGISTRATION_MISMATCH = (
+    "{code}: the registration {registration_num} does not match the Financing Statement registration {base_reg_num}."
+)
+ERR_DRAFT_NOT_FOUND = "{code}: no Draft Statement found for Document ID {document_number}."
+ERR_DRAFT_USED = "{code}: Draft Statement for Document ID {document_number} has been used."
+ERR_SEARCH_TOO_OLD = "{code}: search get details search ID {search_id} timestamp too old: must be after {min_ts}."
+ERR_SEARCH_COMPLETE = "{code}: search select results failed: results already provided for search ID {search_id}."
+ERR_SEARCH_NOT_FOUND = "{code}: search select results failed: invalid search ID {search_id}."
 
-SEARCH_RESULTS_DOC_NAME = 'search-results-report-{search_id}.pdf'
-MAIL_DOC_NAME = 'PPRVER.{rep_date}.{registration_id}.{party_id}.PDF'
-GO_LIVE_DATE = date.fromisoformat('2022-01-25')
+SEARCH_RESULTS_DOC_NAME = "search-results-report-{search_id}.pdf"
+MAIL_DOC_NAME = "PPRVER.{rep_date}.{registration_id}.{party_id}.PDF"
+GO_LIVE_DATE = date.fromisoformat("2022-01-25")
 
 
 def get_max_registrations_size():
     """Get the configurable results maximum size for account registrations."""
-    return int(current_app.config.get('ACCOUNT_REGISTRATIONS_MAX_RESULTS'))
+    return int(current_app.config.get("ACCOUNT_REGISTRATIONS_MAX_RESULTS"))
 
 
 def format_ts(time_stamp):
@@ -659,7 +657,7 @@ def expiry_dt_from_registration(registration_ts, life_years: int):
     offset = _datetime.fromtimestamp(base_time) - _datetime.utcfromtimestamp(base_time)
     base_ts = reg_local_ts + offset
     base_date = date(base_ts.year, base_ts.month, base_ts.day)
-    # current_app.logger.info('Adjusted local reg Date: ' + base_date.isoformat())
+    # logger.info('Adjusted local reg Date: ' + base_date.isoformat())
     # Naive time
     expiry_time = time(23, 59, 59, tzinfo=None)
     expiry_reg = _datetime.combine(base_date, expiry_time)
@@ -668,7 +666,7 @@ def expiry_dt_from_registration(registration_ts, life_years: int):
         local_ts = LOCAL_TZ.localize(expiry_reg)
         # Add years
         future_ts = local_ts + datedelta(years=life_years)
-        # current_app.logger.info('Local expiry timestamp: ' + future_ts.isoformat())
+        # logger.info('Local expiry timestamp: ' + future_ts.isoformat())
         # Return as UTC
         return _datetime.utcfromtimestamp(future_ts.timestamp()).replace(tzinfo=timezone.utc)
 
@@ -676,7 +674,7 @@ def expiry_dt_from_registration(registration_ts, life_years: int):
     future_ts = expiry_reg + timedelta(days=REPAIRER_LIEN_DAYS)
     # Explicitly set to local timezone which will adjust for daylight savings.
     local_ts = LOCAL_TZ.localize(future_ts)
-    # current_app.logger.info('Local expiry timestamp: ' + local_ts.isoformat())
+    # logger.info('Local expiry timestamp: ' + local_ts.isoformat())
     # Return as UTC before formatting
     return _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)
 
@@ -720,9 +718,9 @@ def to_local_expiry_report(expiry_date_time: str):
     """Create an expiry timestamp adjusted from UTC to the local timezone."""
     utc_ts: _datetime = ts_from_iso_format(expiry_date_time)
     offset: int = 7 if utc_ts.hour == 6 else 8
-    # current_app.logger.info('UTC ts: ' + utc_ts.isoformat() + ' offset=' + str(offset))
+    # logger.info('UTC ts: ' + utc_ts.isoformat() + ' offset=' + str(offset))
     local_ts = utc_ts - timedelta(hours=offset)
-    # current_app.logger.info('Local expiry timestamp: ' + local_ts.isoformat())
+    # logger.info('Local expiry timestamp: ' + local_ts.isoformat())
     return local_ts
 
 
@@ -734,31 +732,34 @@ def today_local():
 def get_doc_storage_name(registration):
     """Get a document storage name from the registration in the format YYYY/MM/DD/reg_class-reg_id-reg_num.pdf."""
     name = registration.registration_ts.isoformat()[:10]
-    name = name.replace('-', '/') + '/' + registration.registration_type_cl.lower()
-    name += '-' + str(registration.id) + '-' + registration.registration_num + '.pdf'
+    name = name.replace("-", "/") + "/" + registration.registration_type_cl.lower()
+    name += "-" + str(registration.id) + "-" + registration.registration_num + ".pdf"
     return name
 
 
 def get_search_doc_storage_name(search_request):
     """Get a search document storage name in the format YYYY/MM/DD/search-results-report-search_id.pdf."""
     name = search_request.search_ts.isoformat()[:10]
-    name = name.replace('-', '/') + '/' + SEARCH_RESULTS_DOC_NAME.format(search_id=search_request.id)
+    name = name.replace("-", "/") + "/" + SEARCH_RESULTS_DOC_NAME.format(search_id=search_request.id)
     return name
 
 
 def get_mail_doc_storage_name(registration_ts, registration_id, party_id):
     """Get a document storage name in the format YYYY/MM/DD/PUBVER.YYYYMMDD.reg_id.party_id.PDF."""
     iso_date: str = registration_ts.isoformat()[:10]
-    name = iso_date.replace('-', '/') + '/'
-    rep_date: str = iso_date.replace('-', '')
+    name = iso_date.replace("-", "/") + "/"
+    rep_date: str = iso_date.replace("-", "")
     name += MAIL_DOC_NAME.format(rep_date=rep_date, registration_id=registration_id, party_id=party_id)
     return name
 
 
 def is_historical(financing_statement, create: bool):
     """Check if a financing statement is in a historical, non-viewable state."""
-    if financing_statement.state_type == STATE_ACTIVE and financing_statement.expire_date and \
-            financing_statement.expire_date < _datetime.utcnow():
+    if (
+        financing_statement.state_type == STATE_ACTIVE
+        and financing_statement.expire_date
+        and financing_statement.expire_date.timestamp() < now_ts().timestamp()
+    ):
         financing_statement.state_type = STATE_EXPIRED
     if financing_statement.state_type == STATE_ACTIVE:
         return False
@@ -771,9 +772,11 @@ def is_historical(financing_statement, create: bool):
         for reg in reversed(financing_statement.registration):
             if reg.registration_type_cl == REG_CLASS_DISCHARGE and reg.registration_ts.timestamp() < historical_ts:
                 return True
-    if financing_statement.state_type == STATE_EXPIRED and \
-       financing_statement.expire_date and \
-       financing_statement.expire_date.timestamp() < historical_ts:
+    if (
+        financing_statement.state_type == STATE_EXPIRED
+        and financing_statement.expire_date
+        and financing_statement.expire_date.timestamp() < historical_ts
+    ):
         return True
 
     return False
@@ -791,34 +794,39 @@ def is_change(registration_class):
 
 def cleanup_amendment(json_data):
     """Delete empty amendment add/remove arrays."""
-    if 'addVehicleCollateral' in json_data and not json_data['addVehicleCollateral']:
-        del json_data['addVehicleCollateral']
-    if 'deleteVehicleCollateral' in json_data and not json_data['deleteVehicleCollateral']:
-        del json_data['deleteVehicleCollateral']
-    if 'addGeneralCollateral' in json_data and not json_data['addGeneralCollateral']:
-        del json_data['addGeneralCollateral']
-    if 'deleteGeneralCollateral' in json_data and not json_data['deleteGeneralCollateral']:
-        del json_data['deleteGeneralCollateral']
-    if 'addSecuredParties' in json_data and not json_data['addSecuredParties']:
-        del json_data['addSecuredParties']
-    if 'deleteSecuredParties' in json_data and not json_data['deleteSecuredParties']:
-        del json_data['deleteSecuredParties']
-    if 'addDebtors' in json_data and not json_data['addDebtors']:
-        del json_data['addDebtors']
-    if 'deleteDebtors' in json_data and not json_data['deleteDebtors']:
-        del json_data['deleteDebtors']
+    if "addVehicleCollateral" in json_data and not json_data["addVehicleCollateral"]:
+        del json_data["addVehicleCollateral"]
+    if "deleteVehicleCollateral" in json_data and not json_data["deleteVehicleCollateral"]:
+        del json_data["deleteVehicleCollateral"]
+    if "addGeneralCollateral" in json_data and not json_data["addGeneralCollateral"]:
+        del json_data["addGeneralCollateral"]
+    if "deleteGeneralCollateral" in json_data and not json_data["deleteGeneralCollateral"]:
+        del json_data["deleteGeneralCollateral"]
+    if "addSecuredParties" in json_data and not json_data["addSecuredParties"]:
+        del json_data["addSecuredParties"]
+    if "deleteSecuredParties" in json_data and not json_data["deleteSecuredParties"]:
+        del json_data["deleteSecuredParties"]
+    if "addDebtors" in json_data and not json_data["addDebtors"]:
+        del json_data["addDebtors"]
+    if "deleteDebtors" in json_data and not json_data["deleteDebtors"]:
+        del json_data["deleteDebtors"]
     return json_data
 
 
 def amendment_securities_change_type(json_data: dict) -> str:
     """Try to assign a securities act notice specific amendment change type based on the request data."""
-    if json_data.get('addVehicleCollateral') or json_data.get('deleteVehicleCollateral') or \
-            json_data.get('addGeneralCollateral') or json_data.get('deleteGeneralCollateral') or \
-            json_data.get('addDebtors') or json_data.get('deleteDebtors'):
+    if (  # pylint: disable=too-many-boolean-expressions
+        json_data.get("addVehicleCollateral")
+        or json_data.get("deleteVehicleCollateral")
+        or json_data.get("addGeneralCollateral")
+        or json_data.get("deleteGeneralCollateral")
+        or json_data.get("addDebtors")
+        or json_data.get("deleteDebtors")
+    ):
         return REG_TYPE_AMEND
-    if json_data.get('addSecuritiesActNotices') and not json_data.get('deleteSecuritiesActNotices'):
+    if json_data.get("addSecuritiesActNotices") and not json_data.get("deleteSecuritiesActNotices"):
         return REG_TYPE_AMEND_SECURITIES_ADD
-    if not json_data.get('addSecuritiesActNotices') and json_data.get('deleteSecuritiesActNotices'):
+    if not json_data.get("addSecuritiesActNotices") and json_data.get("deleteSecuritiesActNotices"):
         return REG_TYPE_AMEND_SECURITIES_DELETE
     return REG_TYPE_AMEND_SECURITIES
 
@@ -826,42 +834,80 @@ def amendment_securities_change_type(json_data: dict) -> str:
 def amendment_change_type(json_data: dict) -> str:
     # pylint: disable=too-many-boolean-expressions
     """Try to assign a more specific amendment change type based on the request data."""
-    if 'courtOrderInformation' in json_data:
+    if "courtOrderInformation" in json_data:
         return REG_TYPE_AMEND_COURT
-    if 'addTrustIndenture' in json_data or 'removeTrustIndenture' in json_data:
+    if "addTrustIndenture" in json_data or "removeTrustIndenture" in json_data:
         return REG_TYPE_AMEND
-    if json_data.get('deleteSecuritiesActNotices') or json_data.get('addSecuritiesActNotices'):
+    if json_data.get("deleteSecuritiesActNotices") or json_data.get("addSecuritiesActNotices"):
         return amendment_securities_change_type(json_data)
-    change_type = json_data['changeType']
-    if 'addVehicleCollateral' not in json_data and 'deleteVehicleCollateral' not in json_data and \
-            'addGeneralCollateral' not in json_data and 'deleteGeneralCollateral' not in json_data:
-        if 'addDebtors' not in json_data and 'deleteDebtors' not in json_data and \
-                'addSecuredParties' in json_data and 'deleteSecuredParties' in json_data and \
-                len(json_data['addSecuredParties']) == 1 and len(json_data['deleteSecuredParties']) == 1:
+    change_type = json_data["changeType"]
+    if (
+        "addVehicleCollateral" not in json_data
+        and "deleteVehicleCollateral" not in json_data
+        and "addGeneralCollateral" not in json_data
+        and "deleteGeneralCollateral" not in json_data
+    ):
+        if (
+            "addDebtors" not in json_data
+            and "deleteDebtors" not in json_data
+            and "addSecuredParties" in json_data
+            and "deleteSecuredParties" in json_data
+            and len(json_data["addSecuredParties"]) == 1
+            and len(json_data["deleteSecuredParties"]) == 1
+        ):
             change_type = REG_TYPE_AMEND_SP_TRANSFER
-        if 'addSecuredParties' not in json_data and 'deleteSecuredParties' not in json_data and \
-                'addDebtors' in json_data and 'deleteDebtors' in json_data and \
-                len(json_data['addDebtors']) == 1 and len(json_data['deleteDebtors']) == 1:
+        if (
+            "addSecuredParties" not in json_data
+            and "deleteSecuredParties" not in json_data
+            and "addDebtors" in json_data
+            and "deleteDebtors" in json_data
+            and len(json_data["addDebtors"]) == 1
+            and len(json_data["deleteDebtors"]) == 1
+        ):
             change_type = REG_TYPE_AMEND_DEBTOR_TRANSFER
-        if 'addSecuredParties' not in json_data and 'deleteSecuredParties' not in json_data and \
-                'addDebtors' not in json_data and 'deleteDebtors' in json_data and \
-                len(json_data['deleteDebtors']) == 1:
+        if (
+            "addSecuredParties" not in json_data
+            and "deleteSecuredParties" not in json_data
+            and "addDebtors" not in json_data
+            and "deleteDebtors" in json_data
+            and len(json_data["deleteDebtors"]) == 1
+        ):
             change_type = REG_TYPE_AMEND_DEBTOR_RELEASE
-    if 'addSecuredParties' not in json_data and 'deleteSecuredParties' not in json_data and \
-       'addDebtors' not in json_data and 'deleteDebtors' not in json_data:
-        if 'addVehicleCollateral' not in json_data and 'addGeneralCollateral' not in json_data and \
-                ('deleteVehicleCollateral' in json_data or 'deleteGeneralCollateral' in json_data):
+    if (
+        "addSecuredParties" not in json_data
+        and "deleteSecuredParties" not in json_data
+        and "addDebtors" not in json_data
+        and "deleteDebtors" not in json_data
+    ):
+        if (
+            "addVehicleCollateral" not in json_data
+            and "addGeneralCollateral" not in json_data
+            and ("deleteVehicleCollateral" in json_data or "deleteGeneralCollateral" in json_data)
+        ):
             change_type = REG_TYPE_AMEND_PARIAL_DISCHARGE
-        if ('addVehicleCollateral' in json_data or 'addGeneralCollateral' in json_data) and \
-                'deleteVehicleCollateral' not in json_data and 'deleteGeneralCollateral' not in json_data:
+        if (
+            ("addVehicleCollateral" in json_data or "addGeneralCollateral" in json_data)
+            and "deleteVehicleCollateral" not in json_data
+            and "deleteGeneralCollateral" not in json_data
+        ):
             change_type = REG_TYPE_AMEND_ADDITION_COLLATERAL
-        if 'addVehicleCollateral' in json_data and 'deleteVehicleCollateral' in json_data and \
-                len(json_data['addVehicleCollateral']) == 1 and len(json_data['deleteVehicleCollateral']) == 1 and \
-                'addGeneralCollateral' not in json_data and 'deleteGeneralCollateral' not in json_data:
+        if (
+            "addVehicleCollateral" in json_data
+            and "deleteVehicleCollateral" in json_data
+            and len(json_data["addVehicleCollateral"]) == 1
+            and len(json_data["deleteVehicleCollateral"]) == 1
+            and "addGeneralCollateral" not in json_data
+            and "deleteGeneralCollateral" not in json_data
+        ):
             change_type = REG_TYPE_AMEND_SUBSTITUTION_COLLATERAL
-        if 'addGeneralCollateral' in json_data and 'deleteGeneralCollateral' in json_data and \
-                len(json_data['addGeneralCollateral']) == 1 and len(json_data['deleteGeneralCollateral']) == 1 and \
-                'addVehicleCollateral' not in json_data and 'deleteVehicleCollateral' not in json_data:
+        if (
+            "addGeneralCollateral" in json_data
+            and "deleteGeneralCollateral" in json_data
+            and len(json_data["addGeneralCollateral"]) == 1
+            and len(json_data["deleteGeneralCollateral"]) == 1
+            and "addVehicleCollateral" not in json_data
+            and "deleteVehicleCollateral" not in json_data
+        ):
             change_type = REG_TYPE_AMEND_SUBSTITUTION_COLLATERAL
 
     return change_type
@@ -889,5 +935,5 @@ def report_retry_elapsed(last_ts: _datetime):
     """Check that a sufficient delay has elapsed since the last report request."""
     now = now_ts()
     test_ts = (last_ts + timedelta(minutes=15)).replace(tzinfo=timezone.utc)
-    # current_app.logger.info('Comparing now ' + now.isoformat() + ' with last ts ' + test_ts.isoformat())
+    # logger.info('Comparing now ' + now.isoformat() + ' with last ts ' + test_ts.isoformat())
     return now > test_ts

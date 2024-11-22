@@ -12,17 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Endpoints to check and manage the health of the service."""
-from flask import Blueprint, current_app, jsonify
-from ppr_api.models import db
+from flask import Blueprint, jsonify
 from sqlalchemy import exc, text
 
+from ppr_api.models import db
+from ppr_api.utils.logging import logger
 
-bp = Blueprint('OPS1', __name__, url_prefix='/ops')  # pylint: disable=invalid-name
+bp = Blueprint("OPS1", __name__, url_prefix="/ops")  # pylint: disable=invalid-name
 
-SQL = text('select 1')
+SQL = text("select 1")
 
 
-@bp.route('/healthz')
+@bp.route("/healthz")
 def healthz():
     """Status check to verify the service and required dependencies are still working.
 
@@ -31,17 +32,17 @@ def healthz():
     try:
         db.session.execute(SQL)
     except exc.SQLAlchemyError as db_exception:
-        current_app.logger.error('DB connection pool unhealthy:' + str(db_exception))
-        return {'message': 'api is down'}, 500
-    except Exception as default_exception:   # noqa: B902; log error
-        current_app.logger.error('DB connection pool query failed:' + str(default_exception))
-        return {'message': 'api is down'}, 500
+        logger.error("DB connection pool unhealthy:" + str(db_exception))
+        return {"message": "api is down"}, 500
+    except Exception as default_exception:  # noqa: B902; log error
+        logger.error("DB connection pool query failed:" + str(default_exception))
+        return {"message": "api is down"}, 500
 
     # made it here, so all checks passed
-    return jsonify({'message': 'api is healthy'}), 200
+    return jsonify({"message": "api is healthy"}), 200
 
 
-@bp.route('/readyz')
+@bp.route("/readyz")
 def readyz():
     """Status check to verify the service is ready to respond."""
-    return jsonify({'message': 'api is ready'}), 200
+    return jsonify({"message": "api is ready"}), 200

@@ -15,6 +15,7 @@
 from http import HTTPStatus
 
 from flask import current_app, jsonify, request
+
 from ppr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from ppr_api.models import EventTracking, MailReport, Party, Registration, VerificationReport
 from ppr_api.models import utils as model_utils
@@ -24,66 +25,68 @@ from ppr_api.services.payment import TransactionTypes
 from ppr_api.services.payment.exceptions import SBCPaymentException
 from ppr_api.services.queue_service import GoogleQueueService
 from ppr_api.utils.base import BaseEnum
+from ppr_api.utils.logging import logger
 from ppr_api.utils.validators import financing_validator, party_validator, registration_validator
-
 
 # Resource error messages
 # Model business error messages in models.utils.py
-ACCOUNT_REQUIRED = '{code}: Account-Id header required.'
-UNAUTHORIZED = '{code}: authorization failure submitting a request for {account_id}.'
-CROWN_CHARGE_FORBIDDEN = '{code}: the account ID {account_id} is not authorized to access a Crown Charge registration.'
-ACCOUNT_ACCESS = '{code}: the account ID {account_id} cannot access statement information for ' + \
-                 'registration number {registration_num}.'
-STAFF_SEARCH_BCOL_FAS = '{code}: provide either a BCOL Account Number or a Routing Slip Number but not both.'
-SBC_SEARCH_NO_PAYMENT = '{code}: provide either a BCOL Account Number or a Routing Slip Number.'
-DATABASE = '{code}: {context} database error for {account_id}.'
-NOT_FOUND = '{code}: no {item} found for {key}.'
-PATH_PARAM = '{code}: a {param_name} path parameter is required.'
-PATH_MISMATCH = '{code}: the path value ({path_value}) does not match the data {description} value ({data_value}).'
-HISTORICAL = '{code}: the Financing Statement for registration number {reg_num} has been discharged.'
-DEBTOR_NAME = '{code}: No match found for the provided debtor name and registration.'
-REPORT = '{code}: error generating report. Detail: {detail}'
-DEFAULT = '{code}: error processing request.'
-PAYMENT = '{code}:{status} payment error for account {account_id}.'
+ACCOUNT_REQUIRED = "{code}: Account-Id header required."
+UNAUTHORIZED = "{code}: authorization failure submitting a request for {account_id}."
+CROWN_CHARGE_FORBIDDEN = "{code}: the account ID {account_id} is not authorized to access a Crown Charge registration."
+ACCOUNT_ACCESS = (
+    "{code}: the account ID {account_id} cannot access statement information for "
+    + "registration number {registration_num}."
+)
+STAFF_SEARCH_BCOL_FAS = "{code}: provide either a BCOL Account Number or a Routing Slip Number but not both."
+SBC_SEARCH_NO_PAYMENT = "{code}: provide either a BCOL Account Number or a Routing Slip Number."
+DATABASE = "{code}: {context} database error for {account_id}."
+NOT_FOUND = "{code}: no {item} found for {key}."
+PATH_PARAM = "{code}: a {param_name} path parameter is required."
+PATH_MISMATCH = "{code}: the path value ({path_value}) does not match the data {description} value ({data_value})."
+HISTORICAL = "{code}: the Financing Statement for registration number {reg_num} has been discharged."
+DEBTOR_NAME = "{code}: No match found for the provided debtor name and registration."
+REPORT = "{code}: error generating report. Detail: {detail}"
+DEFAULT = "{code}: error processing request."
+PAYMENT = "{code}:{status} payment error for account {account_id}."
 
-PARTY_REGISTERING = 'RG'
-PARTY_SECURED = 'SP'
+PARTY_REGISTERING = "RG"
+PARTY_SECURED = "SP"
 
-CERTIFIED_PARAM = 'certified'
-ROUTING_SLIP_PARAM = 'routingSlipNumber'
-DAT_NUMBER_PARAM = 'datNumber'
-BCOL_NUMBER_PARAM = 'bcolAccountNumber'
+CERTIFIED_PARAM = "certified"
+ROUTING_SLIP_PARAM = "routingSlipNumber"
+DAT_NUMBER_PARAM = "datNumber"
+BCOL_NUMBER_PARAM = "bcolAccountNumber"
 
-REG_STAFF_DESC = 'BC Registries Staff'
-SBC_STAFF_DESC = 'SBC Staff'
-BCOL_STAFF_DESC = 'BC Online Help'
+REG_STAFF_DESC = "BC Registries Staff"
+SBC_STAFF_DESC = "SBC Staff"
+BCOL_STAFF_DESC = "BC Online Help"
 # Account registration request parameters
-FROM_UI_PARAM = 'fromUI'
-PAGE_NUM_PARAM = 'pageNumber'
-SORT_DIRECTION_PARAM = 'sortDirection'
-SORT_CRITERIA_PARAM = 'sortCriteriaName'
-REG_NUMBER_PARAM = 'registrationNumber'
-REG_TYPE_PARAM = 'registrationType'
-START_TS_PARAM = 'startDateTime'
-END_TS_PARAM = 'endDateTime'
-STATUS_PARAM = 'statusType'
-CLIENT_REF_PARAM = 'clientReferenceId'
-REGISTER_NAME_PARAM = 'registeringName'
+FROM_UI_PARAM = "fromUI"
+PAGE_NUM_PARAM = "pageNumber"
+SORT_DIRECTION_PARAM = "sortDirection"
+SORT_CRITERIA_PARAM = "sortCriteriaName"
+REG_NUMBER_PARAM = "registrationNumber"
+REG_TYPE_PARAM = "registrationType"
+START_TS_PARAM = "startDateTime"
+END_TS_PARAM = "endDateTime"
+STATUS_PARAM = "statusType"
+CLIENT_REF_PARAM = "clientReferenceId"
+REGISTER_NAME_PARAM = "registeringName"
 
 
 class CallbackExceptionCodes(BaseEnum):
     """Render an Enum of exception codes to facilitate source of exception."""
 
-    UNKNOWN_ID = '01'
-    MAX_RETRIES = '02'
-    INVALID_ID = '03'
-    DEFAULT = '04'
-    REPORT_DATA_ERR = '05'
-    REPORT_ERR = '06'
-    STORAGE_ERR = '07'
-    NOTIFICATION_ERR = '08'
-    FILE_TRANSFER_ERR = '09'
-    SETUP_ERR = '10'
+    UNKNOWN_ID = "01"
+    MAX_RETRIES = "02"
+    INVALID_ID = "03"
+    DEFAULT = "04"
+    REPORT_DATA_ERR = "05"
+    REPORT_ERR = "06"
+    STORAGE_ERR = "07"
+    NOTIFICATION_ERR = "08"
+    FILE_TRANSFER_ERR = "09"
+    SETUP_ERR = "10"
 
 
 def serialize(errors):
@@ -91,79 +94,79 @@ def serialize(errors):
     error_message = []
     if errors:
         for error in errors:
-            error_message.append('Schema validation: ' + error.message + '.')
+            error_message.append("Schema validation: " + error.message + ".")
     return error_message
 
 
 def get_account_id(req):
     """Get account ID from request headers."""
-    return req.headers.get('Account-Id')
+    return req.headers.get("Account-Id")
 
 
 def get_staff_account_id(req):
     """Get reg staff account ID from request headers."""
-    return req.headers.get('Staff-Account-Id')
+    return req.headers.get("Staff-Account-Id")
 
 
 def is_pdf(req):
     """Check if request headers Accept is application/pdf."""
-    accept = req.headers.get('Accept')
-    return accept and accept.upper() == 'APPLICATION/PDF'
+    accept = req.headers.get("Accept")
+    return accept and accept.upper() == "APPLICATION/PDF"
 
 
 def get_apikey(req):
     """Get gateway api key from request headers."""
-    return req.headers.get('x-apikey')
+    return req.headers.get("x-apikey")
 
 
 def account_required_response():
     """Build account required error response."""
     message = ACCOUNT_REQUIRED.format(code=ResourceErrorCodes.ACCOUNT_REQUIRED_ERR.value)
-    return jsonify({'message': message}), HTTPStatus.BAD_REQUEST
+    return jsonify({"message": message}), HTTPStatus.BAD_REQUEST
 
 
 def error_response(status_code, message):
     """Build generic error response."""
-    return jsonify({'message': message}), status_code
+    return jsonify({"message": message}), status_code
 
 
 def bad_request_response(message):
     """Build generic bad request response."""
-    return jsonify({'message': message}), HTTPStatus.BAD_REQUEST
+    return jsonify({"message": message}), HTTPStatus.BAD_REQUEST
 
 
 def staff_payment_bcol_fas():
     """Build staff payment info error response."""
     message = STAFF_SEARCH_BCOL_FAS.format(code=ResourceErrorCodes.VALIDATION_ERR.value)
-    return jsonify({'message': message}), HTTPStatus.BAD_REQUEST
+    return jsonify({"message": message}), HTTPStatus.BAD_REQUEST
 
 
 def sbc_payment_invalid():
     """Build sbc payment info error response."""
     message = SBC_SEARCH_NO_PAYMENT.format(code=ResourceErrorCodes.VALIDATION_ERR.value)
-    return jsonify({'message': message}), HTTPStatus.BAD_REQUEST
+    return jsonify({"message": message}), HTTPStatus.BAD_REQUEST
 
 
 def validation_error_response(errors, cause, additional_msg: str = None):
     """Build a schema validation error response."""
-    message = ResourceErrorCodes.VALIDATION_ERR.value + ': ' + cause
+    message = ResourceErrorCodes.VALIDATION_ERR.value + ": " + cause
     details = serialize(errors)
     if additional_msg:
-        details.append('Additional validation: ' + additional_msg)
-    return jsonify({'message': message, 'detail': details}), HTTPStatus.BAD_REQUEST
+        details.append("Additional validation: " + additional_msg)
+    return jsonify({"message": message, "detail": details}), HTTPStatus.BAD_REQUEST
 
 
 def db_exception_response(exception, account_id: str, context: str):
     """Build a database error response."""
     message = DATABASE.format(code=ResourceErrorCodes.DATABASE_ERR.value, context=context, account_id=account_id)
-    current_app.logger.error(message)
-    return jsonify({'message': message, 'detail': str(exception)}), HTTPStatus.INTERNAL_SERVER_ERROR
+    logger.error(message)
+    return jsonify({"message": message, "detail": str(exception)}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 
 def business_exception_response(exception):
     """Build business exception error response."""
-    current_app.logger.error(str(exception))
-    return jsonify({'message': exception.error}), exception.status_code
+    logger.error(str(exception))
+    return jsonify({"message": exception.error}), exception.status_code
 
 
 def pay_exception_response(exception: SBCPaymentException, account_id: str = None):
@@ -171,92 +174,98 @@ def pay_exception_response(exception: SBCPaymentException, account_id: str = Non
     status = exception.status_code
     message = PAYMENT.format(code=ResourceErrorCodes.PAY_ERR.value, status=status, account_id=account_id)
     if exception.json_data:
-        detail = exception.json_data.get('detail', '')
-        err_type = exception.json_data.get('type', '')
-        return jsonify({'message': message, 'status_code': status, 'type': err_type, 'detail': detail}), \
-            HTTPStatus.PAYMENT_REQUIRED
+        detail = exception.json_data.get("detail", "")
+        err_type = exception.json_data.get("type", "")
+        return (
+            jsonify({"message": message, "status_code": status, "type": err_type, "detail": detail}),
+            HTTPStatus.PAYMENT_REQUIRED,
+        )
 
-    current_app.logger.error(str(exception))
-    return jsonify({'message': message, 'detail': str(exception)}), HTTPStatus.PAYMENT_REQUIRED
+    logger.error(str(exception))
+    return jsonify({"message": message, "detail": str(exception)}), HTTPStatus.PAYMENT_REQUIRED
 
 
 def default_exception_response(exception):
     """Build default 500 exception error response."""
     message = DEFAULT.format(code=ResourceErrorCodes.DEFAULT_ERR.value)
     try:
-        current_app.logger.error(str(exception))
-        return jsonify({'message': message, 'detail': str(exception)}), HTTPStatus.INTERNAL_SERVER_ERROR
+        logger.error(str(exception))
+        return jsonify({"message": message, "detail": str(exception)}), HTTPStatus.INTERNAL_SERVER_ERROR
     except TypeError:
-        return jsonify({'message': message, 'detail': 'Not available.'}), HTTPStatus.INTERNAL_SERVER_ERROR
+        return jsonify({"message": message, "detail": "Not available."}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 
 def service_exception_response(message):
     """Build 500 exception error response."""
-    return jsonify({'message': message}), HTTPStatus.INTERNAL_SERVER_ERROR
+    return jsonify({"message": message}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 
 def not_found_error_response(item, key):
     """Build a not found error response."""
     message = NOT_FOUND.format(code=ResourceErrorCodes.NOT_FOUND_ERR.value, item=item, key=key)
-    current_app.logger.info(str(HTTPStatus.NOT_FOUND.value) + ': ' + message)
-    return jsonify({'message': message}), HTTPStatus.NOT_FOUND
+    logger.info(str(HTTPStatus.NOT_FOUND.value) + ": " + message)
+    return jsonify({"message": message}), HTTPStatus.NOT_FOUND
 
 
 def duplicate_error_response(message):
     """Build a duplicate request error response."""
-    err_msg = ResourceErrorCodes.DUPLICATE_ERR.value + ': ' + message
-    current_app.logger.info(str(HTTPStatus.CONFLICT.value) + ': ' + message)
-    return jsonify({'message': err_msg}), HTTPStatus.CONFLICT
+    err_msg = ResourceErrorCodes.DUPLICATE_ERR.value + ": " + message
+    logger.info(str(HTTPStatus.CONFLICT.value) + ": " + message)
+    return jsonify({"message": err_msg}), HTTPStatus.CONFLICT
 
 
 def unauthorized_error_response(account_id):
     """Build an unauthorized error response."""
     message = UNAUTHORIZED.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR.value, account_id=account_id)
-    current_app.logger.info(str(HTTPStatus.UNAUTHORIZED.value) + ': ' + message)
-    return jsonify({'message': message}), HTTPStatus.UNAUTHORIZED
+    logger.info(str(HTTPStatus.UNAUTHORIZED.value) + ": " + message)
+    return jsonify({"message": message}), HTTPStatus.UNAUTHORIZED
 
 
 def cc_forbidden_error_response(account_id):
     """Build a crown charge registration class access forbidden error response."""
     message = CROWN_CHARGE_FORBIDDEN.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR.value, account_id=account_id)
-    current_app.logger.info(str(HTTPStatus.FORBIDDEN.value) + ': ' + message)
-    return jsonify({'message': message}), HTTPStatus.FORBIDDEN
+    logger.info(str(HTTPStatus.FORBIDDEN.value) + ": " + message)
+    return jsonify({"message": message}), HTTPStatus.FORBIDDEN
 
 
 def path_param_error_response(param_name):
     """Build a bad request param missing error response."""
     message = PATH_PARAM.format(code=ResourceErrorCodes.PATH_PARAM_ERR.value, param_name=param_name)
-    current_app.logger.info(str(HTTPStatus.BAD_REQUEST.value) + ': ' + message)
-    return jsonify({'message': message}), HTTPStatus.BAD_REQUEST
+    logger.info(str(HTTPStatus.BAD_REQUEST.value) + ": " + message)
+    return jsonify({"message": message}), HTTPStatus.BAD_REQUEST
 
 
 def unprocessable_error_response(description):
     """Build an unprocessable entity error response."""
-    message = f'The {description} request could not be processed (no change/results).'
-    current_app.logger.info(str(HTTPStatus.UNPROCESSABLE_ENTITY.value) + ': ' + message)
-    return jsonify({'message': message}), HTTPStatus.UNPROCESSABLE_ENTITY
+    message = f"The {description} request could not be processed (no change/results)."
+    logger.info(str(HTTPStatus.UNPROCESSABLE_ENTITY.value) + ": " + message)
+    return jsonify({"message": message}), HTTPStatus.UNPROCESSABLE_ENTITY
 
 
 def path_data_mismatch_error_response(path_value, description, data_value):
     """Build a bad request path param - payload data mismatch error."""
-    message = PATH_MISMATCH.format(code=ResourceErrorCodes.DATA_MISMATCH_ERR.value, path_value=path_value,
-                                   description=description, data_value=data_value)
-    current_app.logger.info(str(HTTPStatus.BAD_REQUEST.value) + ': ' + message)
-    return jsonify({'message': message}), HTTPStatus.BAD_REQUEST
+    message = PATH_MISMATCH.format(
+        code=ResourceErrorCodes.DATA_MISMATCH_ERR.value,
+        path_value=path_value,
+        description=description,
+        data_value=data_value,
+    )
+    logger.info(str(HTTPStatus.BAD_REQUEST.value) + ": " + message)
+    return jsonify({"message": message}), HTTPStatus.BAD_REQUEST
 
 
 def historical_error_response(reg_num):
     """Build a bad request financing statement discharged (non-staff) error response."""
     message = HISTORICAL.format(code=ResourceErrorCodes.HISTORICAL_ERR.value, reg_num=reg_num)
-    current_app.logger.info(str(HTTPStatus.BAD_REQUEST.value) + ': ' + message)
-    return jsonify({'message': message}), HTTPStatus.BAD_REQUEST
+    logger.info(str(HTTPStatus.BAD_REQUEST.value) + ": " + message)
+    return jsonify({"message": message}), HTTPStatus.BAD_REQUEST
 
 
 def base_debtor_invalid_response():
     """Build an error response for no match on base debtor name."""
     message = DEBTOR_NAME.format(code=ResourceErrorCodes.DEBTOR_NAME_ERR.value)
-    current_app.logger.info(str(HTTPStatus.BAD_REQUEST.value) + ': ' + message)
-    return jsonify({'message': message}), HTTPStatus.BAD_REQUEST
+    logger.info(str(HTTPStatus.BAD_REQUEST.value) + ": " + message)
+    return jsonify({"message": message}), HTTPStatus.BAD_REQUEST
 
 
 def validate_financing(json_data: dict, account_id: str) -> str:
@@ -284,11 +293,8 @@ def validate_delete_ids(json_data, financing_statement):
     """Perform non-schema extra validation on a change amendment delete party, collateral ID's."""
     error_msg = party_validator.validate_party_ids(json_data, financing_statement)
     error_msg += registration_validator.validate_collateral(json_data, financing_statement)
-    if error_msg != '':
-        raise BusinessException(
-            error=error_msg,
-            status_code=HTTPStatus.BAD_REQUEST
-        )
+    if error_msg != "":
+        raise BusinessException(error=error_msg, status_code=HTTPStatus.BAD_REQUEST)
 
 
 def get_account_name(token: str, account_id: str = None):  # pylint: disable=too-many-return-statements; added staff
@@ -302,15 +308,15 @@ def get_account_name(token: str, account_id: str = None):  # pylint: disable=too
             return BCOL_STAFF_DESC
 
         orgs = user_orgs(token)
-        if orgs and 'orgs' in orgs and orgs['orgs']:
-            if (len(orgs['orgs']) == 1 or not account_id or not account_id.isdigit()):
-                return orgs['orgs'][0]['name']
-            for org in orgs['orgs']:
-                if org['id'] == int(account_id):
-                    return org['name']
+        if orgs and "orgs" in orgs and orgs["orgs"]:
+            if len(orgs["orgs"]) == 1 or not account_id or not account_id.isdigit():
+                return orgs["orgs"][0]["name"]
+            for org in orgs["orgs"]:
+                if org["id"] == int(account_id):
+                    return org["name"]
         return None
     except Exception as err:  # pylint: disable=broad-except # noqa F841;
-        current_app.logger.error('get_account_name failed: ' + str(err))
+        logger.error("get_account_name failed: " + str(err))
         return None
 
 
@@ -323,18 +329,22 @@ def check_access_financing(token: str, staff: bool, account_id: str, statement):
     access = False
     if account_name:
         for party in statement.registration[0].parties:
-            if party.party_type in (PARTY_REGISTERING, PARTY_SECURED) and \
-                    party.business_name and party.business_name == account_name:
+            if (
+                party.party_type in (PARTY_REGISTERING, PARTY_SECURED)
+                and party.business_name
+                and party.business_name == account_name
+            ):
                 access = True
             elif party.client_code and party.client_code.name == account_name:
                 access = True
     if not access:
         reg_num = statement.registration[0].registration_num
-        current_app.logger.error('Account name ' + account_name + ' cannot access registration ' + reg_num)
+        logger.error("Account name " + account_name + " cannot access registration " + reg_num)
         raise BusinessException(
-            error=ACCOUNT_ACCESS.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR.value,
-                                        account_id=account_id, registration_num=reg_num),
-            status_code=HTTPStatus.UNAUTHORIZED
+            error=ACCOUNT_ACCESS.format(
+                code=ResourceErrorCodes.UNAUTHORIZED_ERR.value, account_id=account_id, registration_num=reg_num
+            ),
+            status_code=HTTPStatus.UNAUTHORIZED,
         )
 
 
@@ -347,18 +357,22 @@ def check_access_registration(token: str, staff: bool, account_id: str, statemen
     access = False
     if account_name:
         for party in statement.financing_statement.parties:
-            if party.party_type in (PARTY_REGISTERING, PARTY_SECURED) and \
-                    party.business_name and party.business_name == account_name:
+            if (
+                party.party_type in (PARTY_REGISTERING, PARTY_SECURED)
+                and party.business_name
+                and party.business_name == account_name
+            ):
                 access = True
             elif party.client_code and party.client_code.name == account_name:
                 access = True
     if not access:
         reg_num = statement.registration_num
-        current_app.logger.error('Account name ' + account_name + ' cannot access registration ' + reg_num)
+        logger.error("Account name " + account_name + " cannot access registration " + reg_num)
         raise BusinessException(
-            error=ACCOUNT_ACCESS.format(code=ResourceErrorCodes.UNAUTHORIZED_ERR.value,
-                                        account_id=account_id, registration_num=reg_num),
-            status_code=HTTPStatus.UNAUTHORIZED
+            error=ACCOUNT_ACCESS.format(
+                code=ResourceErrorCodes.UNAUTHORIZED_ERR.value, account_id=account_id, registration_num=reg_num
+            ),
+            status_code=HTTPStatus.UNAUTHORIZED,
         )
 
 
@@ -370,13 +384,14 @@ def no_fee_amendment(registration_type: str) -> bool:
         if reg_type.value == registration_type:
             return True
     for reg_type in CrownChargeTypes:
-        if reg_type.value == registration_type and \
-                registration_type not in (CrownChargeTypes.CORP_TAX.value,
-                                          CrownChargeTypes.CONSUMPTION_TAX.value,
-                                          CrownChargeTypes.MINERAL_TAX.value,
-                                          CrownChargeTypes.SOCIAL_TAX.value,
-                                          CrownChargeTypes.HOTEL_TAX.value,
-                                          CrownChargeTypes.MINING_TAX.value):
+        if reg_type.value == registration_type and registration_type not in (
+            CrownChargeTypes.CORP_TAX.value,
+            CrownChargeTypes.CONSUMPTION_TAX.value,
+            CrownChargeTypes.MINERAL_TAX.value,
+            CrownChargeTypes.SOCIAL_TAX.value,
+            CrownChargeTypes.HOTEL_TAX.value,
+            CrownChargeTypes.MINING_TAX.value,
+        ):
             return True
     return False
 
@@ -384,10 +399,10 @@ def no_fee_amendment(registration_type: str) -> bool:
 def build_staff_registration_payment(req: request, pay_trans_type: str, fee_quantity: int):
     """Extract payment information from request parameters."""
     payment_info = {
-        'transactionType': pay_trans_type,
-        'feeQuantity': fee_quantity,
-        'waiveFees': False,
-        'accountId': get_staff_account_id(req)
+        "transactionType": pay_trans_type,
+        "feeQuantity": fee_quantity,
+        "waiveFees": False,
+        "accountId": get_staff_account_id(req),
     }
 
     routing_slip = req.args.get(ROUTING_SLIP_PARAM)
@@ -400,39 +415,36 @@ def build_staff_registration_payment(req: request, pay_trans_type: str, fee_quan
     if dat_number is not None:
         payment_info[DAT_NUMBER_PARAM] = str(dat_number)
     if not routing_slip and not bcol_number:
-        payment_info['waiveFees'] = True
+        payment_info["waiveFees"] = True
 
     return payment_info
 
 
 def get_payment_details(registration):
     """Extract the payment details value from the registration request."""
-    label = ' Registration:'
+    label = " Registration:"
     value = registration.base_registration_num
     if registration.registration_type_cl == model_utils.REG_CLASS_DISCHARGE:
-        label = 'Discharge' + label
+        label = "Discharge" + label
     elif registration.registration_type_cl == model_utils.REG_CLASS_RENEWAL:
-        label = 'Renew' + label
-        value += ' for '
+        label = "Renew" + label
+        value += " for "
         if registration.life == 0:
-            value += str(model_utils.REPAIRER_LIEN_DAYS) + ' days'
+            value += str(model_utils.REPAIRER_LIEN_DAYS) + " days"
         elif registration.life == model_utils.LIFE_INFINITE:
-            value += 'infinity'
+            value += "infinity"
         elif registration.life == 1:
-            value += str(registration.life) + ' year'
+            value += str(registration.life) + " year"
         else:
-            value += str(registration.life) + ' years'
+            value += str(registration.life) + " years"
     elif registration.registration_type_cl == model_utils.REG_CLASS_AMEND:
-        label = 'Amendment of' + label
+        label = "Amendment of" + label
     elif registration.registration_type_cl == model_utils.REG_CLASS_AMEND_COURT:
-        label = 'Court Order Amendment of' + label
+        label = "Court Order Amendment of" + label
     elif registration.registration_type_cl == model_utils.REG_CLASS_CHANGE:
-        label = 'Change' + label
+        label = "Change" + label
 
-    details = {
-        'label': label,
-        'value': value
-    }
+    details = {"label": label, "value": value}
     return details
 
 
@@ -459,22 +471,22 @@ def get_payment_type_financing(registration):
 
 def get_payment_details_financing(registration):
     """Extract the payment details value from the request financing statement."""
-    length = ' Length: '
+    length = " Length: "
     if registration.registration_type == model_utils.REG_TYPE_REPAIRER_LIEN:
-        length += str(model_utils.REPAIRER_LIEN_DAYS) + ' days'
+        length += str(model_utils.REPAIRER_LIEN_DAYS) + " days"
     elif registration.life == model_utils.LIFE_INFINITE:
-        length += 'infinite'
+        length += "infinite"
     elif registration.life == 1:
-        length += str(registration.life) + ' year'
+        length += str(registration.life) + " year"
     else:
-        length += str(registration.life) + ' years'
+        length += str(registration.life) + " years"
 
     if not registration.reg_type:
         registration.get_registration_type()
 
     details = {
-        'label': 'Register Financing Statement ' + registration.registration_num + ' Type:',
-        'value': registration.reg_type.registration_desc + length
+        "label": "Register Financing Statement " + registration.registration_num + " Type:",
+        "value": registration.reg_type.registration_desc + length,
     }
     return details
 
@@ -482,22 +494,18 @@ def get_payment_details_financing(registration):
 def enqueue_verification_report(registration_id: int, party_id: int):
     """Add the mail verification report request to the mail verification queue."""
     try:
-        payload = {
-            'registrationId': registration_id,
-            'partyId': party_id
-        }
-        apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+        payload = {"registrationId": registration_id, "partyId": party_id}
+        apikey = current_app.config.get("SUBSCRIPTION_API_KEY")
         if apikey:
-            payload['apikey'] = apikey
+            payload["apikey"] = apikey
         GoogleQueueService().publish_verification_report(payload)
-        current_app.logger.info(f'Enqueue mail verification report successful for id={registration_id}.')
+        logger.info(f"Enqueue mail verification report successful for id={registration_id}.")
     except Exception as err:  # noqa: B902; do not alter app processing
-        msg = f'Enqueue mail verification report failed for id={registration_id}, party={party_id}: ' + str(err)
-        current_app.logger.error(msg)
-        EventTracking.create(registration_id,
-                             EventTracking.EventTrackingTypes.SURFACE_MAIL,
-                             int(HTTPStatus.INTERNAL_SERVER_ERROR),
-                             msg)
+        msg = f"Enqueue mail verification report failed for id={registration_id}, party={party_id}: " + str(err)
+        logger.error(msg)
+        EventTracking.create(
+            registration_id, EventTracking.EventTrackingTypes.SURFACE_MAIL, int(HTTPStatus.INTERNAL_SERVER_ERROR), msg
+        )
 
 
 def enqueue_registration_report(registration: Registration, json_data: dict, report_type: str):
@@ -505,31 +513,33 @@ def enqueue_registration_report(registration: Registration, json_data: dict, rep
     try:
         if json_data and report_type:
             # Signal registration report request is pending: record exists but no doc_storage_url.
-            verification_report: VerificationReport = VerificationReport(create_ts=registration.registration_ts,
-                                                                         registration_id=registration.id,
-                                                                         report_data=json_data,
-                                                                         report_type=report_type)
+            verification_report: VerificationReport = VerificationReport(
+                create_ts=registration.registration_ts,
+                registration_id=registration.id,
+                report_data=json_data,
+                report_type=report_type,
+            )
             verification_report.save()
 
-        payload = {
-            'registrationId': registration.id
-        }
-        apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+        payload = {"registrationId": registration.id}
+        apikey = current_app.config.get("SUBSCRIPTION_API_KEY")
         if apikey:
-            payload['apikey'] = apikey
+            payload["apikey"] = apikey
         GoogleQueueService().publish_registration_report(payload)
-        current_app.logger.info(f'Enqueue registration report successful for id={registration.id}.')
+        logger.info(f"Enqueue registration report successful for id={registration.id}.")
     except DatabaseException as db_err:
         # Just log, do not return an error response.
-        msg = f'Enqueue registration report db error for id={registration.id}: ' + str(db_err)
-        current_app.logger.error(msg)
+        msg = f"Enqueue registration report db error for id={registration.id}: " + str(db_err)
+        logger.error(msg)
     except Exception as err:  # noqa: B902; do not alter app processing
-        msg = f'Enqueue registration report failed for id={registration.id}: ' + str(err)
-        current_app.logger.error(msg)
-        EventTracking.create(registration.id,
-                             EventTracking.EventTrackingTypes.REGISTRATION_REPORT,
-                             int(HTTPStatus.INTERNAL_SERVER_ERROR),
-                             msg)
+        msg = f"Enqueue registration report failed for id={registration.id}: " + str(err)
+        logger.error(msg)
+        EventTracking.create(
+            registration.id,
+            EventTracking.EventTrackingTypes.REGISTRATION_REPORT,
+            int(HTTPStatus.INTERNAL_SERVER_ERROR),
+            msg,
+        )
 
 
 def find_secured_party(registration: Registration, party_id: int):
@@ -544,19 +554,20 @@ def find_secured_parties(registration: Registration):
     """Find secured parties that are active at the time of the registration."""
     parties = []
     for party in registration.financing_statement.parties:
-        if party.party_type == Party.PartyTypes.SECURED_PARTY.value and \
-                (not party.registration_id_end or party.registration_id_end >= registration.id):
+        if party.party_type == Party.PartyTypes.SECURED_PARTY.value and (
+            not party.registration_id_end or party.registration_id_end >= registration.id
+        ):
             parties.append(party)
     return parties
 
 
 def same_party(party_1: dict, party_2: dict) -> bool:
     """Check that party name and address are identical (registering party is also secured party)."""
-    if party_1['address'] != party_2['address']:
+    if party_1["address"] != party_2["address"]:
         return False
-    if 'businessName' in party_1 and 'businessName' in party_2 and party_1['businessName'] == party_2['businessName']:
+    if "businessName" in party_1 and "businessName" in party_2 and party_1["businessName"] == party_2["businessName"]:
         return True
-    if 'personName' in party_1 and 'personName' in party_2 and party_1['personName'] == party_2['personName']:
+    if "personName" in party_1 and "personName" in party_2 and party_1["personName"] == party_2["personName"]:
         return True
     return False
 
@@ -574,38 +585,40 @@ def queue_secured_party_verification(registration: Registration):
         # Skip mailing verification statement if the secured party is also the registration registering party.
         for party in parties:
             if same_party(registering_json, party.json):
-                msg = f'Queue secured party verification stmt skipped for id={registration_id}, partyId={party.id}.'
-                current_app.logger.info(msg)
+                msg = f"Queue secured party verification stmt skipped for id={registration_id}, partyId={party.id}."
+                logger.info(msg)
             else:
                 # Setup mail report.
                 statement_type = model_utils.REG_CLASS_TO_STATEMENT_TYPE[registration.registration_type_cl]
-                reg_num_key = 'dischargeRegistrationNumber'
+                reg_num_key = "dischargeRegistrationNumber"
                 if statement_type == model_utils.DRAFT_TYPE_AMENDMENT:
-                    reg_num_key = 'amendmentRegistrationNumber'
+                    reg_num_key = "amendmentRegistrationNumber"
                 report_data = registration.verification_json(reg_num_key)
                 cover_data = party.json
-                cover_data['statementType'] = statement_type
-                cover_data['partyType'] = party.party_type
-                cover_data['createDateTime'] = report_data['createDateTime']
-                cover_data['registrationNumber'] = registration.registration_num
-                report_data['cover'] = cover_data
-                mail_report: MailReport = MailReport(create_ts=registration.registration_ts,
-                                                     registration_id=registration_id,
-                                                     party_id=party.id,
-                                                     report_data=report_data)
+                cover_data["statementType"] = statement_type
+                cover_data["partyType"] = party.party_type
+                cover_data["createDateTime"] = report_data["createDateTime"]
+                cover_data["registrationNumber"] = registration.registration_num
+                report_data["cover"] = cover_data
+                mail_report: MailReport = MailReport(
+                    create_ts=registration.registration_ts,
+                    registration_id=registration_id,
+                    party_id=party.id,
+                    report_data=report_data,
+                )
                 mail_report.save()
-                current_app.logger.debug(f'queueing reg_id={registration_id} party id={party.id}')
+                logger.debug(f"queueing reg_id={registration_id} party id={party.id}")
                 enqueue_verification_report(registration_id, party.id)
     except Exception as err:  # noqa: B902; do not alter app processing
-        msg = f'Queue secured party verification stmt failed for id={registration_id}: ' + str(err)
-        current_app.logger.error(msg)
+        msg = f"Queue secured party verification stmt failed for id={registration_id}: " + str(err)
+        logger.error(msg)
 
 
 def get_account_registration_params(req: request, params: AccountRegistrationParams) -> AccountRegistrationParams:
     """Extract account registration query parameters from the request."""
     params.from_ui = req.args.get(FROM_UI_PARAM, False)
     params.page_number = int(req.args.get(PAGE_NUM_PARAM, -1))
-    params.sort_direction = req.args.get(SORT_DIRECTION_PARAM, 'desc')
+    params.sort_direction = req.args.get(SORT_DIRECTION_PARAM, "desc")
     params.sort_criteria = req.args.get(SORT_CRITERIA_PARAM, None)
     params.registration_number = req.args.get(REG_NUMBER_PARAM, None)
     params.registration_type = req.args.get(REG_TYPE_PARAM, None)
@@ -629,7 +642,7 @@ def valid_api_key(req) -> bool:
     key = get_apikey(req)
     if not key:
         return False
-    apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+    apikey = current_app.config.get("SUBSCRIPTION_API_KEY")
     if not apikey:
         return True
     return key == apikey

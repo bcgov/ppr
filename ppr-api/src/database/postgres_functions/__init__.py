@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Export all of the Postgres db functions."""
+from .business_name_strip_designation import business_name_strip_designation
 from .get_draft_document_number import get_draft_document_number
 from .get_registration_num import get_registration_num
 from .sim_number import sim_number
@@ -29,3 +30,12 @@ from .searchkey_mhr import searchkey_mhr
 from .searchkey_name_match import searchkey_name_match
 from .searchkey_nickname_match import searchkey_nickname_match
 from .searchkey_vehicle import searchkey_vehicle
+from .get_mhr_draft_number import get_mhr_draft_number
+from .get_mhr_number import get_mhr_number
+from .get_mhr_doc_reg_number import get_mhr_doc_reg_number
+from .get_mhr_doc_manufacturer_id import get_mhr_doc_manufacturer_id
+from .get_mhr_doc_qualified_id import get_mhr_doc_qualified_id
+from .get_mhr_doc_gov_agent_id import get_mhr_doc_gov_agent_id
+from .mhr_name_compressed_key import mhr_name_compressed_key
+from .mhr_serial_compressed_key import mhr_serial_compressed_key
+from .get_mhr_doc_staff_id import get_mhr_doc_staff_id

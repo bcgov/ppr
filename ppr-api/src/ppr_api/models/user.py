@@ -16,9 +16,10 @@
 Actual user data is kept in the OIDC and IDP services, this data is
 here as a convenience for audit and db reporting.
 """
-from flask import current_app
+
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import utils as model_utils
+from ppr_api.utils.logging import logger
 
 from .db import db
 
@@ -27,9 +28,9 @@ class User(db.Model):
     """Used to hold the audit information for a User of this service."""
 
     __versioned__ = {}
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
-    id = db.mapped_column(db.Integer, db.Sequence('user_id_seq'), primary_key=True)
+    id = db.mapped_column(db.Integer, db.Sequence("user_id_seq"), primary_key=True)
     creation_date = db.mapped_column(db.DateTime, nullable=False)
     username = db.mapped_column(db.String(1000), index=True, nullable=False)
     sub = db.mapped_column(db.String(36), unique=True, nullable=False)
@@ -42,7 +43,7 @@ class User(db.Model):
     login_source = db.mapped_column(db.String(200), nullable=True)
 
     # Relationships - UserProfile
-    user_profile = db.relationship('UserProfile', back_populates='user', uselist=False)
+    user_profile = db.relationship("UserProfile", back_populates="user", uselist=False)
 
     @property
     def display_name(self):
@@ -51,16 +52,16 @@ class User(db.Model):
         If there is actual name info, return that; otherwise username.
         """
         if self.firstname or self.lastname:
-            return ' '.join([self.firstname, self.lastname]).strip()
+            return " ".join([self.firstname, self.lastname]).strip()
 
         # parse off idir\ or @idir
-        if self.username[:4] == 'idir':
+        if self.username[:4] == "idir":
             return self.username[5:]
-        if self.username[-4:] == 'idir':
+        if self.username[-4:] == "idir":
             return self.username[:-5]
 
         # do not show services card usernames
-        if self.username[:4] == 'bcsc':
+        if self.username[:4] == "bcsc":
             return None
 
         return self.username if self.username else None
@@ -74,10 +75,13 @@ class User(db.Model):
     @classmethod
     def find_by_jwt_token(cls, token: dict, account_id: str = None):
         """Return a User if they exist and match the provided JWT."""
-        current_app.logger.debug(f'Running query to look up user profile for account {account_id}.')
+        logger.debug(f"Running query to look up user profile for account {account_id}.")
         # return db.session.query(User).filter(User.idp_userid == token['idp_userid']).one_or_none()
-        return db.session.query(User).filter((User.idp_userid == token['idp_userid']) |
-                                             (User.sub == token['sub'])).one_or_none()
+        return (
+            db.session.query(User)
+            .filter((User.idp_userid == token["idp_userid"]) | (User.sub == token["sub"]))
+            .one_or_none()
+        )
 
     @classmethod
     def create_from_jwt_token(cls, token: dict, account_id: str = None):
@@ -90,24 +94,24 @@ class User(db.Model):
             # TODO: schema doesn't parse from token need to figure that out ... LATER!
             # s = KeycloakUserSchema()
             # u = s.load(data=token, partial=True)
-            firstname = token.get('given_name', None)
+            firstname = token.get("given_name", None)
             if not firstname:
-                firstname = token.get('firstname', None)
-            lastname = token.get('family_name', None)
+                firstname = token.get("firstname", None)
+            lastname = token.get("family_name", None)
             if not lastname:
-                lastname = token.get('lastname', None)
+                lastname = token.get("lastname", None)
             user = User(
-                username=token.get('username', None),
+                username=token.get("username", None),
                 firstname=firstname,
                 lastname=lastname,
-                iss=token['iss'],
-                sub=token['sub'],
+                iss=token["iss"],
+                sub=token["sub"],
                 account_id=account_id,
-                idp_userid=token['idp_userid'],
-                login_source=token['loginSource']
+                idp_userid=token["idp_userid"],
+                login_source=token["loginSource"],
             )
             user.creation_date = model_utils.now_ts()
-            current_app.logger.debug('Creating user from JWT:{}; User:{}'.format(token, user))
+            logger.debug("Creating user from JWT:{}; User:{}".format(token, user))
             db.session.add(user)
             db.session.commit()
             return user
@@ -119,18 +123,19 @@ class User(db.Model):
         # GET existing or CREATE new user based on the JWT info
         try:
             user = User.find_by_jwt_token(jwt_oidc_token)
-            current_app.logger.debug(f'finding user: {jwt_oidc_token}')
+            logger.debug(f"finding user: {jwt_oidc_token}")
             if not user:
-                current_app.logger.debug(f'didnt find user, attempting to create new user:{jwt_oidc_token}')
+                logger.debug(f"didnt find user, attempting to create new user:{jwt_oidc_token}")
                 user = User.create_from_jwt_token(jwt_oidc_token, account_id)
 
             return user
         except Exception as err:  # noqa: B902; just logging and wrapping as BusinessException
-            current_app.logger.error(err.with_traceback(None))
-            raise BusinessException('unable_to_get_or_create_user',
-                                    '{"code": "unable_to_get_or_create_user",'
-                                    '"description": "Unable to get or create user from the JWT, ABORT"}'
-                                    )
+            logger.error(err.with_traceback(None))
+            raise BusinessException(
+                "unable_to_get_or_create_user",
+                '{"code": "unable_to_get_or_create_user",'
+                '"description": "Unable to get or create user from the JWT, ABORT"}',
+            ) from err
 
     @classmethod
     def find_by_username(cls, username):

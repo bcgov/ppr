@@ -21,7 +21,7 @@ import json
 import pytest
 
 from ppr_api.models import MailReport
-from ppr_api.models.utils import format_ts, now_ts, ts_from_iso_format
+from ppr_api.models.utils import format_ts, now_ts, ts_from_iso_format, now_ts_offset
 
 
 TEST_REPORT_DATA = {
@@ -174,7 +174,7 @@ def test_find_list_by_timestamp(session, desc, has_data, start_ts, end_ts, job_i
     if start_ts:
         start = ts_from_iso_format(start_ts)
     if desc in ('Valid range', 'Valid range with job id'):
-        end = now_ts()
+        end = now_ts_offset(1, True)
     elif end_ts:
         end = ts_from_iso_format(end_ts)
     list_json = MailReport.find_list_by_timestamp(start, end, job_id)

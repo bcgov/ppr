@@ -41,6 +41,7 @@ from mhr_api.services.authz import (
     is_all_staff_account,
     is_bcol_help,
     is_reg_staff_account,
+    is_sbc_office_account,
     is_staff,
 )
 from mhr_api.services.document_storage.storage_service import DocumentTypes, GoogleStorageService
@@ -226,7 +227,7 @@ def get_registrations(mhr_number: str):  # pylint: disable=too-many-return-state
             )
 
         if current_param and response_json.get("permitStatus", "") == MhrNoteStatusTypes.ACTIVE:
-            if is_all_staff_account(account_id):
+            if is_all_staff_account(account_id) or is_sbc_office_account(jwt.get_token_auth_header(), account_id, jwt):
                 response_json["changePermit"] = True
             else:
                 response_json["changePermit"] = get_change_permit(registration, account_id)

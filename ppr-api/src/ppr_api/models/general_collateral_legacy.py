@@ -19,9 +19,8 @@ from ppr_api.utils.base import BaseEnum
 
 from .db import db
 
-
-STATUS_ADDED = 'A'
-STATUS_DELETED = 'D'
+STATUS_ADDED = "A"
+STATUS_DELETED = "D"
 
 
 class GeneralCollateralLegacy(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -33,56 +32,60 @@ class GeneralCollateralLegacy(db.Model):  # pylint: disable=too-many-instance-at
         ADDED = STATUS_ADDED
         DELETED = STATUS_DELETED
 
-    __tablename__ = 'general_collateral_legacy'
+    __tablename__ = "general_collateral_legacy"
 
-    id = db.mapped_column('id', db.Integer, db.Sequence('general_id_seq'), primary_key=True)
-    description = db.mapped_column('description', db.Text, nullable=False)
+    id = db.mapped_column("id", db.Integer, db.Sequence("general_id_seq"), primary_key=True)
+    description = db.mapped_column("description", db.Text, nullable=False)
     # A - added, D - removed/deleted, or null if neither
-    status = db.mapped_column('status', db.String(1), nullable=True)
+    status = db.mapped_column("status", db.String(1), nullable=True)
 
     # parent keys
-    registration_id = db.mapped_column('registration_id', db.Integer,
-                                       db.ForeignKey('registrations.id'), nullable=False, index=True)
-    financing_id = db.mapped_column('financing_id', db.Integer,
-                                    db.ForeignKey('financing_statements.id'), nullable=False, index=True)
-    registration_id_end = db.mapped_column('registration_id_end', db.Integer, nullable=True, index=True)
+    registration_id = db.mapped_column(
+        "registration_id", db.Integer, db.ForeignKey("registrations.id"), nullable=False, index=True
+    )
+    financing_id = db.mapped_column(
+        "financing_id", db.Integer, db.ForeignKey("financing_statements.id"), nullable=False, index=True
+    )
+    registration_id_end = db.mapped_column("registration_id_end", db.Integer, nullable=True, index=True)
 
     # Relationships - Registration
-    registration = db.relationship('Registration', foreign_keys=[registration_id],
-                                   back_populates='general_collateral_legacy', cascade='all, delete', uselist=False)
+    registration = db.relationship(
+        "Registration",
+        foreign_keys=[registration_id],
+        back_populates="general_collateral_legacy",
+        cascade="all, delete",
+        uselist=False,
+    )
 
     # Relationships - FinancingStatement
-    financing_statement = db.relationship('FinancingStatement', foreign_keys=[financing_id],
-                                          back_populates='general_collateral_legacy',
-                                          cascade='all, delete', uselist=False)
+    financing_statement = db.relationship(
+        "FinancingStatement",
+        foreign_keys=[financing_id],
+        back_populates="general_collateral_legacy",
+        cascade="all, delete",
+        uselist=False,
+    )
 
     @property
     def current_json(self) -> dict:
         """Generate a Financing Statement current view of the general collateral as json/dict."""
-        collateral = {
-            'collateralId': self.id,
-            'addedDateTime': ''
-        }
+        collateral = {"collateralId": self.id, "addedDateTime": ""}
         if self.status and self.status == STATUS_ADDED:
-            collateral['descriptionAdd'] = self.description
+            collateral["descriptionAdd"] = self.description
         elif self.status and self.status == STATUS_DELETED:
-            collateral['descriptionDelete'] = self.description
+            collateral["descriptionDelete"] = self.description
         else:
-            collateral['description'] = self.description
+            collateral["description"] = self.description
         if self.registration:
-            collateral['addedDateTime'] = model_utils.format_ts(self.registration.registration_ts)
+            collateral["addedDateTime"] = model_utils.format_ts(self.registration.registration_ts)
         return collateral
 
     @property
     def json(self) -> dict:
         """Generate the default view of the general collateral as json/a dict."""
-        collateral = {
-            'collateralId': self.id,
-            'description': self.description,
-            'addedDateTime': ''
-        }
+        collateral = {"collateralId": self.id, "description": self.description, "addedDateTime": ""}
         if self.registration:
-            collateral['addedDateTime'] = model_utils.format_ts(self.registration.registration_ts)
+            collateral["addedDateTime"] = model_utils.format_ts(self.registration.registration_ts)
         return collateral
 
     @classmethod
@@ -90,8 +93,11 @@ class GeneralCollateralLegacy(db.Model):  # pylint: disable=too-many-instance-at
         """Return a general collateral object by collateral ID."""
         collateral = None
         if collateral_id:
-            collateral = db.session.query(GeneralCollateralLegacy) \
-                    .filter(GeneralCollateralLegacy.id == collateral_id).one_or_none()
+            collateral = (
+                db.session.query(GeneralCollateralLegacy)
+                .filter(GeneralCollateralLegacy.id == collateral_id)
+                .one_or_none()
+            )
 
         return collateral
 
@@ -100,9 +106,12 @@ class GeneralCollateralLegacy(db.Model):  # pylint: disable=too-many-instance-at
         """Return a list of general collateral objects by registration ID."""
         collateral = None
         if registration_id:
-            collateral = db.session.query(GeneralCollateralLegacy) \
-                                  .filter(GeneralCollateralLegacy.registration_id == registration_id) \
-                                  .order_by(GeneralCollateralLegacy.id).all()
+            collateral = (
+                db.session.query(GeneralCollateralLegacy)
+                .filter(GeneralCollateralLegacy.registration_id == registration_id)
+                .order_by(GeneralCollateralLegacy.id)
+                .all()
+            )
 
         return collateral
 
@@ -111,8 +120,11 @@ class GeneralCollateralLegacy(db.Model):  # pylint: disable=too-many-instance-at
         """Return a list of general collateral objects by financing statement ID."""
         collateral = None
         if financing_id:
-            collateral = db.session.query(GeneralCollateralLegacy) \
-                                  .filter(GeneralCollateralLegacy.financing_id == financing_id) \
-                                  .order_by(GeneralCollateralLegacy.id).all()
+            collateral = (
+                db.session.query(GeneralCollateralLegacy)
+                .filter(GeneralCollateralLegacy.financing_id == financing_id)
+                .order_by(GeneralCollateralLegacy.id)
+                .all()
+            )
 
         return collateral

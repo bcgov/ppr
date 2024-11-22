@@ -1,14 +1,13 @@
 # Application Name
 
-BC Registries Personal Property Registry API
+BC Registries PPR API
 
 ## Background
-For API usage documentation see [PPR API](https://yfthig-test.web.app/ppr-api) 
-For BC Registries Gateway API configuration see [Gateway PPR Proxy](https://github.com/bcregistry/apigw/blob/master/proxy/README-ppr.md)
+
 
 ## Technology Stack Used
-* Python, Flask
-* Postgres -  SQLAlchemy, psycopg2-binary & alembic
+* Python, Flask, GCP Cloud Storage
+* Postgres -  SQLAlchemy, psycopg2-binary
 
 ## Third-Party Products/Libraries used and the the License they are covert by
 
@@ -20,69 +19,46 @@ GitHub Pages (https://guides.github.com/features/pages/) are a neat way to docum
 
 ## Security
 
-
 ## Files in this repository
 
 ## Environment Variables
-The set of environment variables used by this API includes:
-
-| Variable Name | Description |
-|---------------|-------------|
-| PAYMENT_SVC_UR | Pay API |
-| PAYMENT_SVC_PREFIX | Pay API |
-| PAYMENT_GATEWAY_APIKEY_TEST | Pay API integration testing if using gateway endpoint.  |
-| DATABASE_PASSWORD | Database  |
-| DATABASE_URL | Database  |
-| DATABASE_USERNAME | Database  |
-| DATABASE_NAME | Database   |
-| DATABASE_HOST | Database   |
-| DATABASE_PORT | Database   |
-| DATABASE_TEST_PASSWORD | Database Test |
-| DATABASE_TEST_URL | Database Test |
-| DATABASE_TEST_USERNAME | Database Test |
-| DATABASE_TEST_NAME | Database Test |
-| DATABASE_TEST_HOST | Database Test |
-| DATABASE_TEST_PORT | Database Test |
-| JWT_OIDC_ALGORITHMS | Authorization  |
-| JWT_OIDC_AUDIENCE | Authorization  |
-| JWT_OIDC_CACHING_ENABLED | Authorization  |
-| JWT_OIDC_JWKS_CACHE_TIMEOUT | Authorization  |
-| JWT_OIDC_WELL_KNOWN_CONFIG | Authorization  |
-| JWT_OIDC_CLIENT_SECRET | Authorization  |
-
-## Development Environment
-Follow the instructions of the [Development Readme](https://github.com/bcgov/entity/blob/master/docs/development.md)
-to setup your local development environment.
-
-### Mock pay-api environment variable.
-To use the mock pay-api service for local testing, set the .env variable:
-   PAYMENT_SVC_URL="https://bcregistry-bcregistry-mock.apigee.net/pay/api/v1"
+Copy '.env.sample' to '.env' and replace the values
 
 ### Development Setup
-1. Open the ppr-api directory in VS Code to treat it as a project (or WSL projec). To prevent version clashes, set up a virtual environment to install the Python packages used by this project.
-1. Run `make setup`
-1. Run `pip install .`
-1. Update the .env file to add your local environment variables including the database configuration. A sample .env file is provided.
-1. Run a local instance of the Postgres PPR database.
-    1. From your project root run: `docker-compose up -d`
-    1. In your `venv` environment run: `python manage.py db upgrade`
-    1. In your `venv` environment load/reload unit test data. Run: `python manage.py create_test_data`
+Run `poetry install`
 
+Run `poetry shell`
 
-### Running the PPR-API
-Start the flask server with `(python -m flask run -p 5000)`
+See the src/database README for the database instance set up.
+
+To load/reload unit test data run python manage.py create_test_data
+
+### Bump version
+Run `poetry version (patch, minor, major, prepatch, preminor, premajor, prerelease)`
+
+### Running the db migration
+If modifying the database definition run `poetry run flask db migrate -m "xxx"`
+Note: PPR API and MHR API share the same database so the migration scripts need to be synchronized. 
+Run `poetry run flask db upgrade`
+Run `poetry run flask db downgrade`
+
+### Running the Doc-API
+Run `poetry run flask run`
 
 ### Running Linting
-Run `make pylint`
+Run `poetry run isort . --check`
+Run `poetry run black . --check`
+Run `poetry run pylint src`
+Run `poetry run flake8 src`
 
 ### Running Unit Tests
-- For all tests run `pytest -v -s` 
-- For an individual file run `pytest -v -s ./tests/unit/api/filename.py` or `pytest -v -s ./tests/unit/models/filename.py`
-- For an individual test case run `pytest -v -s ./tests/unit/api/filename.py::test-case-name`
-  
-## Deployment (OpenShift)
+- For all tests run `poetry run pytest -v -s`
+- For an individual file run `poetry run pytest -v -s ./tests/unit/api/filename.py`
+- For an individual test case run `poetry run pytest -v -s ./tests/unit/api/filename.py::test-case-name`
 
-See (openshift/Readme.md)
+## Deployment
+
+See https://github.com/bcgov/bcregistry-sre/blob/main/.github/workflows/doc-api-cd-gcp.yaml
 
 ## Getting Help or Reporting an Issue
 
@@ -94,7 +70,6 @@ If you would like to contribute, please see our [CONTRIBUTING](./CONTRIBUTING.md
 
 Please note that this project is released with a [Contributor Code of Conduct](./CODE_OF_CONDUCT.md).
 By participating in this project you agree to abide by its terms.
-
 
 ## License
 
@@ -111,4 +86,3 @@ By participating in this project you agree to abide by its terms.
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-

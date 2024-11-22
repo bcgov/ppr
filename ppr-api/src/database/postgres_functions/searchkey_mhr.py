@@ -5,7 +5,7 @@ from alembic_utils.pg_function import PGFunction
 searchkey_mhr = PGFunction(
     schema="public",
     signature="searchkey_mhr(mhr_number IN VARCHAR)",
-    definition="""
+    definition=r"""
     RETURNS VARCHAR
     LANGUAGE plpgsql
     AS

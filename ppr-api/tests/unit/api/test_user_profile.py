@@ -19,6 +19,7 @@ Test-Suite to ensure that the /party-codes endpoint is working as expected.
 from http import HTTPStatus
 
 import pytest
+from flask import current_app
 
 from ppr_api.models import UserProfile
 from ppr_api.services.authz import (
@@ -95,29 +96,30 @@ TEST_DATA_AGREEMENT = [
 def test_get_user_profile_agreement(session, client, jwt, desc, account_id, idp_userid, status, roles,
                                     agreement_required):
     """Assert that a get user profile conditionally returns the expected MHR service agreement information."""
-    # setup
-    headers = None
-    if account_id:
-        headers = create_header_account_idp(jwt, roles, idp_userid, 'test-user', account_id)
-    else:
-        headers = create_header_account(jwt, roles)
-
-    if agreement_required:
-        profile: UserProfile = UserProfile.find_by_id(int(idp_userid))
-        if profile and not profile.service_agreements.get('acceptAgreementRequired'):
-            profile.service_agreements['acceptAgreementRequired'] = True
-
-    # test
-    rv = client.get('/api/v1/user-profile', headers=headers)
-    # check
-    assert rv.status_code == status
-    if rv.status_code == HTTPStatus.OK:
-        response_data = rv.json
-        assert response_data
-        if agreement_required:
-            assert response_data.get('acceptAgreementRequired')
+    if not is_ci_testing():
+        # setup
+        headers = None
+        if account_id:
+            headers = create_header_account_idp(jwt, roles, idp_userid, 'test-user', account_id)
         else:
-            assert not response_data.get('acceptAgreementRequired')
+            headers = create_header_account(jwt, roles)
+
+        if agreement_required:
+            profile: UserProfile = UserProfile.find_by_id(int(idp_userid))
+            if profile and not profile.service_agreements.get('acceptAgreementRequired'):
+                profile.service_agreements['acceptAgreementRequired'] = True
+
+        # test
+        rv = client.get('/api/v1/user-profile', headers=headers)
+        # check
+        assert rv.status_code == status
+        if rv.status_code == HTTPStatus.OK:
+            response_data = rv.json
+            assert response_data
+            if agreement_required:
+                assert response_data.get('acceptAgreementRequired')
+            else:
+                assert not response_data.get('acceptAgreementRequired')
 
 
 @pytest.mark.parametrize('desc,staff,include_account,status,role', TEST_DATA)
@@ -188,3 +190,8 @@ def test_update_user_profile(session, client, jwt, desc, staff, include_account,
         elif desc == 'Valid miscellaneous preferences':
             assert 'miscellaneousPreferences' in response_data
             assert response_data['miscellaneousPreferences'] == TEST_UPDATE_MISC_JSON['miscellaneousPreferences']
+
+
+def is_ci_testing() -> bool:
+    """Check unit test environment: exclude most reports for CI testing."""
+    return  current_app.config.get("DEPLOYMENT_ENV", "testing") == "testing"

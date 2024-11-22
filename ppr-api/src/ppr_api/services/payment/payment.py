@@ -13,7 +13,7 @@
 # limitations under the License.
 """This module exposes all pay-api operations used by the PPR api."""
 
-from flask import current_app
+from ppr_api.utils.logging import logger
 
 from .client import ApiRequestError, SBCPaymentClient
 from .exceptions import SBCPaymentException
@@ -31,12 +31,7 @@ class Payment:
         self.details = details
 
     def create_payment(  # pylint: disable=too-many-arguments
-            self,
-            transaction_type,
-            quantity,
-            transaction_id=None,
-            client_reference_id=None,
-            processing_fee=None
+        self, transaction_type, quantity, transaction_id=None, client_reference_id=None, processing_fee=None
     ):
         """Submit a payment request for the account_id-jwt pair.
 
@@ -49,24 +44,19 @@ class Payment:
         Detail_label and detail_value if they exist will show up on the account transaction report.
         """
         try:
-            api_instance = SBCPaymentClient(self.jwt,
-                                            self.account_id,
-                                            self.api_key,
-                                            self.details)
+            api_instance = SBCPaymentClient(self.jwt, self.account_id, self.api_key, self.details)
             if self.api_url:
                 api_instance.api_url = self.api_url
-            api_response = api_instance.create_payment(transaction_type,
-                                                       quantity,
-                                                       transaction_id,
-                                                       client_reference_id,
-                                                       processing_fee)
-            current_app.logger.debug(api_response)
+            api_response = api_instance.create_payment(
+                transaction_type, quantity, transaction_id, client_reference_id, processing_fee
+            )
+            logger.debug(api_response)
             return api_response
 
         except ApiRequestError as api_err:
-            raise SBCPaymentException(api_err, json_data=api_err.json_data)
+            raise SBCPaymentException(api_err, json_data=api_err.json_data) from api_err
         except Exception as err:  # noqa: B902; wrapping exception
-            raise SBCPaymentException(err)
+            raise SBCPaymentException(err) from err
 
     def cancel_payment(self, invoice_id):
         """Submit a request to cancel a payment using the invoice ID from the create_payment response.
@@ -80,8 +70,8 @@ class Payment:
             api_response = api_instance.cancel_payment(invoice_id)
             return api_response
 
-        except Exception as err:   # noqa: B902; wrapping exception
-            raise SBCPaymentException(err)
+        except Exception as err:  # noqa: B902; wrapping exception
+            raise SBCPaymentException(err) from err
 
     def create_payment_staff_search(self, transaction_info, client_reference_id=None):
         """Submit a staff payment request for the transaction_info. Token must have a staff role.
@@ -91,18 +81,15 @@ class Payment:
         Detail_label and detail_value if they exist will show up on the account transaction report.
         """
         try:
-            api_instance = SBCPaymentClient(self.jwt,
-                                            transaction_info.get('accountId'),
-                                            self.api_key,
-                                            self.details)
+            api_instance = SBCPaymentClient(self.jwt, transaction_info.get("accountId"), self.api_key, self.details)
             if self.api_url:
                 api_instance.api_url = self.api_url
             api_response = api_instance.create_payment_staff_search(transaction_info, client_reference_id)
-            current_app.logger.debug(api_response)
+            logger.debug(api_response)
             return api_response
 
         except Exception as err:  # noqa: B902; wrapping exception
-            raise SBCPaymentException(err)
+            raise SBCPaymentException(err) from err
 
     def create_payment_staff_registration(self, transaction_info, client_reference_id=None, processing_fee=None):
         """Submit a staff payment request for the transaction_info. Token must have a reg staff role.
@@ -112,16 +99,14 @@ class Payment:
         Detail_label and detail_value if they exist will show up on the account transaction report.
         """
         try:
-            api_instance = SBCPaymentClient(self.jwt,
-                                            transaction_info.get('accountId'),
-                                            self.api_key,
-                                            self.details)
+            api_instance = SBCPaymentClient(self.jwt, transaction_info.get("accountId"), self.api_key, self.details)
             if self.api_url:
                 api_instance.api_url = self.api_url
             api_response = api_instance.create_payment_staff_registration(
-                transaction_info, client_reference_id, processing_fee)
-            current_app.logger.debug(api_response)
+                transaction_info, client_reference_id, processing_fee
+            )
+            logger.debug(api_response)
             return api_response
 
         except Exception as err:  # noqa: B902; wrapping exception
-            raise SBCPaymentException(err)
+            raise SBCPaymentException(err) from err

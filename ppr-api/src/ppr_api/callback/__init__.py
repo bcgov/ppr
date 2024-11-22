@@ -12,3 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This module holds request non-schema data validation functions and helpers."""
+from .auth.token_service import GoogleStorageTokenService
+from .document_storage.storage_service import GoogleStorageService
+
+auth_service = GoogleStorageTokenService()
+storage_service = GoogleStorageService()

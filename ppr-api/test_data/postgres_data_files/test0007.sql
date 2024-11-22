@@ -47,6 +47,6 @@ UPDATE parties
 ;
 UPDATE serial_collateral
   SET registration_id_end = 200000008
-WHERE id = 200000001
+ WHERE id = 200000001
 ;
 -- TEST0007 end

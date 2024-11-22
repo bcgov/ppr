@@ -18,5 +18,11 @@ from ppr_api.callback.auth.token_service import GoogleStorageTokenService
 def test_get_token(session, client, jwt):
     """Assert that config to get a google storage token works as expected."""
     token = GoogleStorageTokenService.get_token()
-    print(token)
+    # print(token)
     assert token
+
+
+def test_get_credentials(session, client, jwt):
+    """Assert that the configuration to get a google storage token works as expected (no exceptions)."""
+    credentials = GoogleStorageTokenService.get_credentials()
+    assert credentials

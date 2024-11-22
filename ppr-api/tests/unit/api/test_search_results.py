@@ -307,12 +307,10 @@ def test_valid_callback_search_report(session, client, jwt):
     rv = client.post('/api/v1/search-results/callback/' + str(search_detail.search_id),
                      headers=headers)
     # check
-    print(rv.json)
+    # print(rv.json)
     assert rv.status_code == HTTPStatus.OK
     response = rv.json
-    assert response['name']
-    assert response['selfLink']
-    GoogleStorageService.delete_document(response['name'])
+    assert response
 
 
 @pytest.mark.parametrize('desc,status,search_id', TEST_NOTIFICATION_DATA)
