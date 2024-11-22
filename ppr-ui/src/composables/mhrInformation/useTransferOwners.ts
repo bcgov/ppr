@@ -438,15 +438,15 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
    **/
   const isDisabledForSJTChanges = (owner: MhrRegistrationHomeOwnerIF): boolean => {
     if (getMhrTransferType.value?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT) {
-      const hasDeceasedOrChangedOwners = getMhrTransferHomeOwnerGroups.value.some(group =>
-        group.owners.some(owner => owner.action === ActionTypes.REMOVED || owner.action === ActionTypes.CHANGED))
+      const hasDeceasedOwners = getMhrTransferHomeOwnerGroups.value.some(group =>
+        group.owners.some(owner => owner.action === ActionTypes.REMOVED))
 
-      const isDeceasedOrChangedOwnerGroup = getMhrTransferHomeOwnerGroups.value.find(group =>
+      const isDeceasedOwnerGroup = getMhrTransferHomeOwnerGroups.value.find(group =>
         group.groupId === owner.groupId).owners.some(owner =>
-        owner.action === ActionTypes.REMOVED || owner.action === ActionTypes.CHANGED
+        owner.action === ActionTypes.REMOVED
       )
 
-      return hasDeceasedOrChangedOwners && !isDeceasedOrChangedOwnerGroup
+      return hasDeceasedOwners && !isDeceasedOwnerGroup
     }
     return false
   }

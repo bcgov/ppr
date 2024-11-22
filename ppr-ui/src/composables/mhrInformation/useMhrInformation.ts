@@ -467,7 +467,8 @@ export const useMhrInformation = () => {
   const parseDueToDeathOwnerGroups = (isDraft: boolean = false): MhrRegistrationHomeOwnerGroupIF[] => {
     const ownerGroups = []
     getMhrTransferHomeOwnerGroups.value.forEach(ownerGroup => {
-      if (ownerGroup.owners.some(owner => owner.action === ActionTypes.REMOVED)) {
+      if (ownerGroup.owners.some(owner =>
+        owner.action === ActionTypes.REMOVED || owner.action === ActionTypes.CHANGED)) {
         ownerGroups.push({
           ...ownerGroup,
           owners: ownerGroup.owners
@@ -489,11 +490,13 @@ export const useMhrInformation = () => {
   const parseDeletedDueToDeathOwnerGroups = (): MhrRegistrationHomeOwnerGroupIF[] => {
     const ownerGroups = []
     getMhrTransferHomeOwnerGroups.value.forEach(ownerGroup => {
-      if (ownerGroup.owners.some(owner => owner.action === ActionTypes.REMOVED)) {
+      if (ownerGroup.owners.some(owner =>
+        owner.action === ActionTypes.REMOVED || owner.action === ActionTypes.CHANGED)) {
         ownerGroups.push({
           ...ownerGroup,
           groupId: getCurrentOwnerGroupIdByOwnerId(ownerGroup.owners[0].ownerId),
-          owners: ownerGroup.owners.filter(owner => owner.action === ActionTypes.REMOVED).map(owner => {
+          owners: ownerGroup.owners.filter(owner =>
+            owner.action === ActionTypes.REMOVED || owner.action === ActionTypes.CHANGED).map(owner => {
             return owner.individualName ? { ...owner, individualName: normalizeObject(owner.individualName) } : owner
           }),
           // Determine group tenancy type
