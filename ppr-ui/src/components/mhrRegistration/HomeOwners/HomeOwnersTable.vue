@@ -267,7 +267,7 @@
                         <v-btn
                           variant="plain"
                           color="primary"
-                          class="menu-drop-down-btn px-0 mr-n2"
+                          class="menu-drop-down-btn px-0 mr-n4"
                           :disabled="isAddingMode || isGlobalEditingMode"
                           v-bind="props"
                         >
@@ -398,8 +398,9 @@
                     <v-btn
                       v-if="!isRemovedHomeOwner(item) &&
                         !isChangedOwner(item) &&
-                        !isDisabledForSoGChanges(item) &&
-                        !(!isPartyTypeNotEAT(item) && isTransferToSurvivingJointTenant)"
+                        !(!isPartyTypeNotEAT(item) && isTransferToSurvivingJointTenant) &&
+                        !isDisabledForSJTChanges(item) &&
+                        !isDisabledForWillChanges(item)"
                       variant="plain"
                       color="primary"
                       class="mr-n4"
@@ -407,10 +408,7 @@
                       :disabled="
                         isAddingMode ||
                           isEditingMode ||
-                          isGlobalEditingMode ||
-                          isDisabledForSJTChanges(item) ||
-                          isDisabledForWillChanges(item)
-                      "
+                          isGlobalEditingMode"
                       data-test-id="table-delete-btn"
                       @click="markForRemoval(item)"
                     >
@@ -431,9 +429,7 @@
                       color="primary"
                       class="mx-0 px-0"
                       :ripple="false"
-                      :disabled="
-                        isAddingMode || isEditingMode || isGlobalEditingMode || isDisabledForSJTChanges(item)
-                      "
+                      :disabled="isAddingMode || isEditingMode || isGlobalEditingMode"
                       data-test-id="table-undo-btn"
                       @click="undo(item)"
                     >
@@ -448,15 +444,31 @@
                       />
                     </v-btn>
 
+                    <!-- Change Details when other actions are disabled -->
+                    <v-btn
+                      v-else-if="isDisabledForSJTChanges(item) || isDisabledForWillChanges(item)"
+                      variant="plain"
+                      color="primary"
+                      class="mx-0 px-0"
+                      :ripple="false"
+                      data-test-id="owner-change-details-btn"
+                      @click="openForEditing(homeOwners.indexOf(item))"
+                    >
+                      <v-icon size="small">
+                        mdi-pencil
+                      </v-icon>
+                      <span>Change Details</span>
+                    </v-btn>
+
                     <!-- Menu actions drop down menu -->
                     <template
                       v-if="enableTransferOwnerMenuActions(item) &&
                         !isRemovedHomeOwner(item) &&
-                        !(!isPartyTypeNotEAT(item) && isTransferToSurvivingJointTenant)"
+                        !(!isPartyTypeNotEAT(item) && isTransferToSurvivingJointTenant) &&
+                        !isDisabledForSJTChanges(item) &&
+                        !isDisabledForWillChanges(item)"
                     >
-                      <v-menu
-                        location="bottom right"
-                      >
+                      <v-menu location="bottom right">
                         <template #activator="{ props }">
                           <v-btn
                             variant="plain"
@@ -506,6 +518,22 @@
                         </v-list>
                       </v-menu>
                     </template>
+                  </template>
+                  <template v-else-if="!!getMhrTransferType?.transferType">
+                    <!-- Change Details when other actions are disabled -->
+                    <v-btn
+                      variant="plain"
+                      color="primary"
+                      class="mx-0 px-0"
+                      :ripple="false"
+                      data-test-id="owner-change-details-btn"
+                      @click="openForEditing(homeOwners.indexOf(item))"
+                    >
+                      <v-icon size="small">
+                        mdi-pencil
+                      </v-icon>
+                      <span>Change Details</span>
+                    </v-btn>
                   </template>
                 </td>
               </div>
@@ -792,6 +820,7 @@ export default defineComponent({
     const addressSchema = PartyAddressSchema
     const { setUnsavedChanges } = useStore()
     const {
+      getMhrTransferType,
       getMhrRegistrationValidationModel,
       getMhrInfoValidation,
       hasUnsavedChanges,
@@ -1248,6 +1277,7 @@ export default defineComponent({
       showCorrectUndoOptions,
       isMhrCorrection,
       correctAmendLabel,
+      getMhrTransferType,
       ...toRefs(localState)
     }
   }
