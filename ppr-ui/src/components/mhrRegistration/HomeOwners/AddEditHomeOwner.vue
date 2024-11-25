@@ -362,8 +362,8 @@
 
           <!-- Group Add / Edit -->
           <template
-            v-if="!isTransferDueToDeath && !isFrozenMhrDueToAffidavit &&
-              !(isMhrCorrection && editHomeOwner) && !(disableNameFields && isCurrentOwner(owner))"
+            v-if="!isTransferDueToDeath && !(isMhrCorrection && editHomeOwner) &&
+              !(disableNameFields && isCurrentOwner(owner))"
           >
             <hr class="mt-3 mb-10">
             <HomeOwnerGroups
@@ -533,13 +533,11 @@ export default defineComponent({
     const {
       isCurrentOwner,
       isTransferDueToDeath,
-      isTransferDueToSaleOrGift,
       isTransferToAdminNoWill,
       hasCurrentOwnerChanges,
       disableNameFields,
       isTransferToExecOrAdmin,
-      TransToExec,
-      TransAffidavit
+      TransToExec
     } = useTransferOwners()
 
     const {
@@ -729,14 +727,6 @@ export default defineComponent({
             TransToExec.hasDeletedOwnersWithProbateGrantOrAffidavit() &&
             localState.owner.partyType === HomeOwnerPartyTypes.EXECUTOR) {
             localState.ownerGroupId = localState.owner.groupId
-          }
-
-          // In Sale or Gift Transfer after Affidavit (aka Frozen) flow, add new owners to same group as Executor
-          if (props.isMhrTransfer &&
-              isTransferDueToSaleOrGift.value &&
-              isFrozenMhrDueToAffidavit.value) {
-            // Find the GroupId with an Executor
-            localState.ownerGroupId = TransAffidavit.getGroupIdWithExecutor()
           }
 
           if (props.isMhrTransfer &&

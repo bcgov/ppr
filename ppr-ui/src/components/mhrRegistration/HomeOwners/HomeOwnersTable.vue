@@ -267,7 +267,7 @@
                         <v-btn
                           variant="plain"
                           color="primary"
-                          class="menu-drop-down-btn px-0 mr-n2"
+                          class="menu-drop-down-btn px-0 mr-n4"
                           :disabled="isAddingMode || isGlobalEditingMode"
                           v-bind="props"
                         >
@@ -398,9 +398,7 @@
                     <v-btn
                       v-if="!isRemovedHomeOwner(item) &&
                         !isChangedOwner(item) &&
-                        !isDisabledForSoGChanges(item) &&
-                        !(!isPartyTypeNotEAT(item) &&
-                          isTransferToSurvivingJointTenant) &&
+                        !(!isPartyTypeNotEAT(item) && isTransferToSurvivingJointTenant) &&
                         !isDisabledForSJTChanges(item) &&
                         !isDisabledForWillChanges(item)"
                       variant="plain"
@@ -470,9 +468,7 @@
                         !isDisabledForSJTChanges(item) &&
                         !isDisabledForWillChanges(item)"
                     >
-                      <v-menu
-                        location="bottom right"
-                      >
+                      <v-menu location="bottom right">
                         <template #activator="{ props }">
                           <v-btn
                             variant="plain"

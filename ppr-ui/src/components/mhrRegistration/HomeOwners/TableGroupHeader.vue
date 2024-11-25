@@ -217,7 +217,7 @@
             <v-btn
               variant="plain"
               color="primary"
-              class="pa-0"
+              class="mr-1"
               :disabled="isGlobalEditingMode"
               v-bind="props"
             >
