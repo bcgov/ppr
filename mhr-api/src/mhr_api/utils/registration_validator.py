@@ -28,7 +28,7 @@ from mhr_api.models.type_tables import (
     MhrTenancyTypes,
 )
 from mhr_api.services.authz import DEALERSHIP_GROUP, GOV_ACCOUNT_ROLE, MANUFACTURER_GROUP, QUALIFIED_USER_GROUP
-from mhr_api.utils import validator_utils
+from mhr_api.utils import validator_owner_utils, validator_utils
 from mhr_api.utils.logging import logger
 
 OWNERS_NOT_ALLOWED = "Owners not allowed with new registrations: use ownerGroups instead. "
@@ -43,22 +43,14 @@ OWNER_NAME_MISMATCH = "The existing owner name must match exactly a current owne
 MANUFACTURER_DEALER_INVALID = "The existing location must be a dealer or manufacturer lot for this registration. "
 MANUFACTURER_PERMIT_INVALID = "A manufacturer can only submit a transport permit once for a home. "
 PARTY_TYPE_INVALID = "Death of owner requires an executor, trustee, administrator owner party type. "
-GROUP_PARTY_TYPE_INVALID = (
-    "For TRUSTEE, ADMINISTRATOR, or EXECUTOR, all owner party types within the group " + "must be identical. "
-)
-OWNER_DESCRIPTION_REQUIRED = "Owner description is required for the owner party type. "
-TRANSFER_PARTY_TYPE_INVALID = "Owner party type of administrator, executor, trustee not allowed for this registration. "
-TENANCY_PARTY_TYPE_INVALID = "Owner group tenancy type must be NA for executors, trustees, or administrators. "
-TENANCY_TYPE_NA_INVALID = "Tenancy type NA is not allowed when there is 1 active owner group with 1 owner. "
 REG_STAFF_ONLY = "Only BC Registries Staff are allowed to submit this registration. "
-TRAN_DEATH_GROUP_COUNT = "Only one owner group can be modified in a transfer due to death registration. "
 TRAN_DEATH_JOINT_TYPE = "The existing tenancy type must be joint for this transfer registration. "
 TRAN_ADMIN_OWNER_INVALID = "The existing owners must be administrators for this registration. "
 TRAN_DEATH_OWNER_INVALID = "The owners must be individuals or businesses for this registration. "
 TRAN_EXEC_OWNER_INVALID = "The owners must be individuals, businesses, or executors for this registration. "
-TRAN_ADMIN_NEW_OWNER = "The new owners must be administrators for this registration. "
-TRAN_DEATH_NEW_OWNER = "The new owners must be individuals or businesses for this registration. "
-TRAN_AFFIDAVIT_NEW_OWNER = "The new owners must be executors for this registration. "
+TRAN_ADMIN_NEW_OWNER = "One of the new owners must be an administrator for this registration. "
+TRAN_DEATH_NEW_OWNER = "One of the new owners must be an individual or business for this registration. "
+TRAN_AFFIDAVIT_NEW_OWNER = "One of the new owners must be an executor for this registration. "
 TRAN_DEATH_ADD_OWNER = "Owners cannot be added with this registration. "
 TRAN_DEATH_CERT_MISSING = "A death certificate number is required with this registration. "
 TRAN_DEATH_CORP_NUM_MISSING = "A removed business owner corporation number is required with this registration. "
@@ -72,7 +64,7 @@ TRAN_WILL_PROBATE = "One (and only one) deceased owner must have a probate docum
 TRAN_WILL_DEATH_CERT = (
     "Deceased owners without a probate document must have a death certificate " + "or corporation number. "
 )
-TRAN_WILL_NEW_OWNER = "The new owners must be executors for this registration. "
+TRAN_WILL_NEW_OWNER = "One of the new owners must be an executor for this registration. "
 TRAN_EXEC_DEATH_CERT = "All deceased owners must have a death certificate or corporation number. "
 TRAN_ADMIN_GRANT = "One (and only one) deceased owner must have a grant document (no death certificate). "
 TRAN_ADMIN_DEATH_CERT = "Deceased owners without a grant document must have a death certificate or corporation number. "
@@ -148,8 +140,12 @@ def validate_registration(json_data, staff: bool = False):
         error_msg += validator_utils.validate_submitting_party(json_data)
         error_msg += validator_utils.validate_mhr_number(json_data.get("mhrNumber", ""), staff)
         owner_count: int = len(json_data.get("ownerGroups")) if json_data.get("ownerGroups") else 0
-        error_msg += validator_utils.validate_owner_groups(json_data.get("ownerGroups"), True, None, None, owner_count)
-        error_msg += validate_owner_party_type(json_data, json_data.get("ownerGroups"), True, owner_count)
+        error_msg += validator_owner_utils.validate_owner_groups(
+            json_data.get("ownerGroups"), True, None, None, owner_count
+        )
+        error_msg += validator_owner_utils.validate_owner_party_type(
+            json_data, json_data.get("ownerGroups"), True, owner_count, staff
+        )
         error_msg += validator_utils.validate_location(json_data.get("location"))
         error_msg += validator_utils.validate_description(json_data.get("description"), staff)
     except Exception as validation_exception:  # noqa: B902; eat all errors
@@ -158,9 +154,7 @@ def validate_registration(json_data, staff: bool = False):
     return error_msg
 
 
-def validate_transfer(  # pylint: disable=too-many-branches
-    registration: MhrRegistration, json_data, staff: bool, group: str
-):
+def validate_transfer(registration: MhrRegistration, json_data, staff: bool, group: str):
     """Perform all transfer data validation checks not covered by schema validation."""
     error_msg = ""
     try:
@@ -171,50 +165,28 @@ def validate_transfer(  # pylint: disable=too-many-branches
             error_msg += validator_utils.validate_doc_id(json_data, True)
         elif registration:
             error_msg += validator_utils.validate_ppr_lien(registration.mhr_number, MhrRegistrationTypes.TRANS, staff)
-        active_group_count: int = validator_utils.get_active_group_count(json_data, registration)
+        active_group_count: int = validator_owner_utils.get_active_group_count(json_data, registration)
         error_msg += validator_utils.validate_submitting_party(json_data)
-        error_msg += validator_utils.validate_owner_groups(
+        reg_staff: bool = registration.staff
+        registration.staff = staff
+        error_msg += validator_owner_utils.validate_owner_groups(
             json_data.get("addOwnerGroups"), False, registration, json_data.get("deleteOwnerGroups"), active_group_count
         )
-        error_msg += validate_owner_party_type(json_data, json_data.get("addOwnerGroups"), False, active_group_count)
+        registration.staff = reg_staff
+        error_msg += validator_owner_utils.validate_owner_party_type(
+            json_data, json_data.get("addOwnerGroups"), False, active_group_count, staff
+        )
         reg_type: str = json_data.get("registrationType", MhrRegistrationTypes.TRANS)
         error_msg += validator_utils.validate_registration_state(registration, staff, reg_type)
         error_msg += validator_utils.validate_draft_state(json_data)
         if registration and json_data.get("deleteOwnerGroups"):
-            error_msg += validator_utils.validate_delete_owners(registration, json_data)
+            error_msg += validator_owner_utils.validate_delete_owners(registration, json_data)
         if not staff:
-            if (
-                not isinstance(json_data.get("declaredValue", 0), int)
-                or not json_data.get("declaredValue")
-                or json_data.get("declaredValue") < 0
-            ):
-                error_msg += DECLARED_VALUE_REQUIRED
-            if reg_type == MhrRegistrationTypes.TRANS and (
-                not json_data.get("transferDocumentType")
-                or json_data.get("transferDocumentType")
-                in (
-                    MhrDocumentTypes.TRANS_QUIT_CLAIM,
-                    MhrDocumentTypes.TRANS_RECEIVERSHIP,
-                    MhrDocumentTypes.TRANS_SEVER_GRANT,
-                )
-            ):
-                if not json_data.get("consideration"):
-                    error_msg += CONSIDERATION_REQUIRED
-                error_msg += validate_transfer_date(json_data)
-            if (
-                json_data.get("deleteOwnerGroups")
-                and len(json_data.get("deleteOwnerGroups")) != 1
-                and group == QUALIFIED_USER_GROUP
-                and len(json_data.get("deleteOwnerGroups")) != validator_utils.get_existing_group_count(registration)
-            ):
-                error_msg += TRAN_QUALIFIED_DELETE
-            error_msg += validate_transfer_dealer(registration, json_data, reg_type, group)
+            error_msg += validate_transfer_non_staff(registration, json_data, reg_type, group)
         if reg_type != MhrRegistrationTypes.TRANS and json_data.get("transferDocumentType"):
             error_msg += TRANS_DOC_TYPE_INVALID
-        elif not staff and json_data.get("transferDocumentType"):
-            error_msg += TRANS_DOC_TYPE_NOT_ALLOWED
         if reg_utils.is_transfer_due_to_death(json_data.get("registrationType")):
-            error_msg += validate_transfer_death(registration, json_data, group, active_group_count)
+            error_msg += validate_transfer_death(registration, json_data, staff, group, active_group_count)
     except Exception as validation_exception:  # noqa: B902; eat all errors
         logger.error("validate_transfer exception: " + str(validation_exception))
         error_msg += VALIDATOR_ERROR
@@ -474,25 +446,38 @@ def validate_permit_location_address(json_data: dict, current_location: dict) ->
     return error_msg
 
 
-def existing_owner_added(new_owners, owner) -> bool:
-    """Check if the existing owner name matches an owner name in the new group."""
-    if owner and new_owners:
-        for owner_json in new_owners:
-            if (
-                owner_json.get("individualName")
-                and owner.get("individualName")
-                and owner_json["individualName"].get("last") == owner["individualName"].get("last")
-                and owner_json["individualName"].get("first") == owner["individualName"].get("first")
-            ):
-                if owner_json["individualName"].get("middle", "") == owner["individualName"].get("middle", ""):
-                    return True
-            elif (
-                owner_json.get("organizationName")
-                and owner.get("organizationName")
-                and owner_json.get("organizationName") == owner.get("organizationName")
-            ):
-                return True
-    return False
+def validate_transfer_non_staff(registration: MhrRegistration, json_data, reg_type: str, group: str):
+    """Perform non-registries staff transfer extra data validation checks."""
+    error_msg = ""
+    if (
+        not isinstance(json_data.get("declaredValue", 0), int)
+        or not json_data.get("declaredValue")
+        or json_data.get("declaredValue") < 0
+    ):
+        error_msg += DECLARED_VALUE_REQUIRED
+    if reg_type == MhrRegistrationTypes.TRANS and (
+        not json_data.get("transferDocumentType")
+        or json_data.get("transferDocumentType")
+        in (
+            MhrDocumentTypes.TRANS_QUIT_CLAIM,
+            MhrDocumentTypes.TRANS_RECEIVERSHIP,
+            MhrDocumentTypes.TRANS_SEVER_GRANT,
+        )
+    ):
+        if not json_data.get("consideration"):
+            error_msg += CONSIDERATION_REQUIRED
+        error_msg += validate_transfer_date(json_data)
+    if (
+        json_data.get("deleteOwnerGroups")
+        and len(json_data.get("deleteOwnerGroups")) != 1
+        and group == QUALIFIED_USER_GROUP
+        and len(json_data.get("deleteOwnerGroups")) != validator_owner_utils.get_existing_group_count(registration)
+    ):
+        error_msg += TRAN_QUALIFIED_DELETE
+    error_msg += validate_transfer_dealer(registration, json_data, reg_type, group)
+    if json_data.get("transferDocumentType"):
+        error_msg += TRANS_DOC_TYPE_NOT_ALLOWED
+    return error_msg
 
 
 def validate_transfer_death_existing_owners(reg_type: str, modified_group: dict, group: str):
@@ -517,57 +502,40 @@ def validate_transfer_death_existing_owners(reg_type: str, modified_group: dict,
     return error_msg
 
 
-def new_owner_exists(modified_group, owner) -> bool:
-    """Check if the new owner name matches an existing group owner name."""
-    if owner and modified_group and modified_group.get("owners"):
-        for owner_json in modified_group.get("owners"):
-            if (
-                owner_json.get("individualName")
-                and owner.get("individualName")
-                and owner_json["individualName"].get("last") == owner["individualName"].get("last")
-                and owner_json["individualName"].get("first") == owner["individualName"].get("first")
-            ):
-                if owner_json["individualName"].get("middle", "") == owner["individualName"].get("middle", ""):
-                    return True
-            elif (
-                owner_json.get("organizationName")
-                and owner.get("organizationName")
-                and owner_json.get("organizationName") == owner.get("organizationName")
-            ):
-                return True
-    return False
-
-
 def validate_transfer_death_new_owners(reg_type: str, new_owners, modified_group):
     """Apply new owner validation rules specific to transfer due to death registration types."""
     error_msg: str = ""
     if not new_owners:
         return error_msg
-    exec_count: int = 0
+    party_count: int = 0
     for owner in new_owners:
         party_type = owner.get("partyType")
-        if (
-            reg_type == MhrRegistrationTypes.TRAND
-            and party_type
-            and party_type not in (MhrPartyTypes.OWNER_BUS, MhrPartyTypes.OWNER_IND)
+        if reg_type == MhrRegistrationTypes.TRAND and (
+            not party_type or party_type in (MhrPartyTypes.OWNER_BUS, MhrPartyTypes.OWNER_IND)
         ):
-            error_msg += TRAN_DEATH_NEW_OWNER
-        elif reg_type == MhrRegistrationTypes.TRANS_ADMIN and (
-            not party_type or party_type != MhrPartyTypes.ADMINISTRATOR
-        ):
-            error_msg += TRAN_ADMIN_NEW_OWNER
+            party_count += 1
+        elif reg_type == MhrRegistrationTypes.TRANS_ADMIN and party_type and party_type == MhrPartyTypes.ADMINISTRATOR:
+            party_count += 1
         elif (
             reg_type in (MhrRegistrationTypes.TRANS_WILL, MhrRegistrationTypes.TRANS_AFFIDAVIT)
             and party_type
             and party_type == MhrPartyTypes.EXECUTOR
         ):
-            exec_count += 1
-        if reg_type == MhrRegistrationTypes.TRAND and modified_group and not new_owner_exists(modified_group, owner):
+            party_count += 1
+        if (
+            reg_type == MhrRegistrationTypes.TRAND
+            and modified_group
+            and not validator_owner_utils.new_owner_exists(modified_group, owner)
+        ):
             error_msg += TRAN_DEATH_ADD_OWNER
-    if exec_count != len(new_owners) and reg_type == MhrRegistrationTypes.TRANS_AFFIDAVIT:
+    if party_count < 1 and reg_type == MhrRegistrationTypes.TRANS_AFFIDAVIT:
         error_msg += TRAN_AFFIDAVIT_NEW_OWNER
-    elif exec_count != len(new_owners) and reg_type == MhrRegistrationTypes.TRANS_WILL:
+    elif party_count < 1 and reg_type == MhrRegistrationTypes.TRANS_WILL:
         error_msg += TRAN_WILL_NEW_OWNER
+    elif party_count < 1 and reg_type == MhrRegistrationTypes.TRANS_ADMIN:
+        error_msg += TRAN_ADMIN_NEW_OWNER
+    elif party_count < 1 and reg_type == MhrRegistrationTypes.TRAND:
+        error_msg += TRAN_DEATH_NEW_OWNER
     return error_msg
 
 
@@ -605,25 +573,6 @@ def validate_transfer_cert_corp(reg_type: str, owner_json: dict) -> str:
     return error_msg
 
 
-def is_delete_exec_admin(reg_type: str, owner_json: dict) -> bool:
-    """Evaluate if a deleted owner is an executor or an administrator for one of the death transfers types."""
-    if reg_type == MhrRegistrationTypes.TRANS_WILL and owner_json.get("partyType", "") in (
-        MhrPartyTypes.EXECUTOR,
-        MhrPartyTypes.ADMINISTRATOR,
-        MhrPartyTypes.TRUST,
-        MhrPartyTypes.TRUSTEE,
-    ):
-        return True
-    if reg_type == MhrRegistrationTypes.TRANS_ADMIN and owner_json.get("partyType", "") in (
-        MhrPartyTypes.EXECUTOR,
-        MhrPartyTypes.ADMINISTRATOR,
-        MhrPartyTypes.TRUST,
-        MhrPartyTypes.TRUSTEE,
-    ):
-        return True
-    return False
-
-
 def validate_transfer_death_owners(reg_type: str, new_owners, delete_owners):
     """Apply owner delete/add validation rules specific to transfer due to death registration types."""
     error_msg: str = ""
@@ -631,14 +580,17 @@ def validate_transfer_death_owners(reg_type: str, new_owners, delete_owners):
     death_count: int = 0
     party_count: int = 0
     for owner_json in delete_owners:
-        if not existing_owner_added(new_owners, owner_json) and reg_type == MhrRegistrationTypes.TRAND:
+        if (
+            not validator_owner_utils.existing_owner_added(new_owners, owner_json)
+            and reg_type == MhrRegistrationTypes.TRAND
+        ):
             error_msg += validate_transfer_cert_corp(reg_type, owner_json)
         elif reg_type in (
             MhrRegistrationTypes.TRANS_WILL,
             MhrRegistrationTypes.TRANS_AFFIDAVIT,
             MhrRegistrationTypes.TRANS_ADMIN,
         ):
-            if is_delete_exec_admin(reg_type, owner_json):
+            if validator_owner_utils.is_delete_exec_admin(reg_type, owner_json):
                 party_count += 1
             elif (
                 not owner_json.get("deathCertificateNumber")
@@ -663,32 +615,33 @@ def validate_transfer_death_owners(reg_type: str, new_owners, delete_owners):
     return error_msg
 
 
-def validate_transfer_death(registration: MhrRegistration, json_data, group: str, active_group_count: int):
+def validate_transfer_death(
+    registration: MhrRegistration, json_data: dict, staff: bool, group: str, active_group_count: int
+):
     """Apply validation rules specific to transfer due to death registration types."""
     error_msg: str = ""
     if not json_data.get("deleteOwnerGroups") or not json_data.get("addOwnerGroups"):
         return error_msg
     reg_type: str = json_data.get("registrationType")
-    tenancy_type: str = None
-    modified_group: dict = None
-    if json_data.get("deleteOwnerGroups"):
-        modified_group = validator_utils.get_modified_group(
-            registration, json_data["deleteOwnerGroups"][0].get("groupId", 0)
-        )
-    if len(json_data.get("deleteOwnerGroups")) != 1 or len(json_data.get("addOwnerGroups")) != 1:
-        error_msg += TRAN_DEATH_GROUP_COUNT
-    if json_data["deleteOwnerGroups"][0].get("type"):
-        tenancy_type = json_data["deleteOwnerGroups"][0].get("type")
-        if reg_type == MhrRegistrationTypes.TRAND and tenancy_type != MhrTenancyTypes.JOINT:
+    # Exactly one group deleted ignoring owner edits.
+    delete_group, modified_group = validator_owner_utils.get_death_delete_group(registration, json_data)
+    # Do not count groups where the owner information is updated.
+    # Exactly 1 group added ignoring owner edits.
+    new_group = validator_owner_utils.get_death_add_group(json_data)
+    error_msg += validator_owner_utils.validate_death_group_counts(registration, json_data, delete_group, new_group)
+    if not new_group or not delete_group:
+        return error_msg
+    if delete_group.get("type"):
+        if reg_type == MhrRegistrationTypes.TRAND and delete_group.get("type") != MhrTenancyTypes.JOINT:
             error_msg += TRAN_DEATH_JOINT_TYPE
-    new_owners = json_data["addOwnerGroups"][0].get("owners")
+    new_owners = new_group.get("owners")
     # check existing owners.
-    error_msg += validate_transfer_death_existing_owners(reg_type, modified_group, group)
+    if not staff:
+        error_msg += validate_transfer_death_existing_owners(reg_type, modified_group, group)
     # check new owners.
     error_msg += validate_transfer_death_new_owners(reg_type, new_owners, modified_group)
-    delete_owners = json_data["deleteOwnerGroups"][0].get("owners")
-    if new_owners and delete_owners:
-        error_msg += validate_transfer_death_owners(reg_type, new_owners, delete_owners)
+    if new_owners and delete_group.get("owners"):
+        error_msg += validate_transfer_death_owners(reg_type, new_owners, delete_group.get("owners"))
     if (
         reg_type == MhrRegistrationTypes.TRANS_AFFIDAVIT
         and json_data.get("declaredValue")
@@ -706,16 +659,6 @@ def validate_transfer_death(registration: MhrRegistration, json_data, group: str
                 error_msg += TRAN_DEATH_QS_JOINT
                 break
     return error_msg
-
-
-def delete_group(group_id: int, delete_groups):
-    """Check if owner group is flagged for deletion."""
-    if not delete_groups or group_id < 1:
-        return False
-    for group in delete_groups:
-        if group.get("groupId", 0) == group_id:
-            return True
-    return False
 
 
 def validate_manufacturer_permit(mhr_number: str, json_data: dict, current_location: dict) -> str:
@@ -770,107 +713,6 @@ def location_address_match(current_location, request_location):
             )
         return city == address_1.get("city") and street == address_1.get("street") and region == address_1.get("region")
     return False
-
-
-def validate_owner_party_type(  # pylint: disable=too-many-branches
-    json_data, groups, new: bool, active_group_count: int
-):
-    """Verify owner groups are valid."""
-    error_msg = ""
-    owner_death: bool = reg_utils.is_transfer_due_to_death_staff(json_data.get("registrationType"))
-    if not groups:
-        return error_msg
-    for group in groups:
-        if not new and len(groups) > 1 and group_owners_unchanged(json_data, group):
-            continue
-        party_count: int = 0
-        owner_count: int = 0
-        group_parties_invalid: bool = False
-        first_party_type: str = None
-        if group.get("owners"):
-            owner_count = len(group.get("owners"))
-            for owner in group["owners"]:
-                party_type = owner.get("partyType", None)
-                if party_type and party_type in (
-                    MhrPartyTypes.ADMINISTRATOR,
-                    MhrPartyTypes.EXECUTOR,
-                    MhrPartyTypes.TRUSTEE,
-                ):
-                    party_count += 1
-                    if not first_party_type:
-                        first_party_type = party_type
-                    if first_party_type and party_type != first_party_type:
-                        group_parties_invalid = True
-                if (
-                    party_type
-                    and not owner.get("description")
-                    and party_type
-                    in (MhrPartyTypes.ADMINISTRATOR, MhrPartyTypes.EXECUTOR, MhrPartyTypes.TRUST, MhrPartyTypes.TRUSTEE)
-                ):
-                    error_msg += OWNER_DESCRIPTION_REQUIRED
-                if (
-                    not new
-                    and not owner_death
-                    and not json_data.get("transferDocumentType")
-                    and party_type
-                    and party_type
-                    in (MhrPartyTypes.ADMINISTRATOR, MhrPartyTypes.EXECUTOR, MhrPartyTypes.TRUST, MhrPartyTypes.TRUSTEE)
-                ):
-                    error_msg += TRANSFER_PARTY_TYPE_INVALID
-        if active_group_count < 2 and group.get("type", "") == MhrTenancyTypes.NA and owner_count == 1:
-            error_msg += TENANCY_TYPE_NA_INVALID  # SOLE owner cannot be NA
-        elif active_group_count > 1 and party_count > 0 and group.get("type", "") != MhrTenancyTypes.NA:
-            error_msg += TENANCY_PARTY_TYPE_INVALID  # COMMON scenario
-        elif (
-            active_group_count == 1
-            and owner_count > 1
-            and party_count > 0
-            and group.get("type", "") != MhrTenancyTypes.NA
-        ):
-            error_msg += TENANCY_PARTY_TYPE_INVALID  # JOINT scenario
-        if new and group_parties_invalid:
-            error_msg += GROUP_PARTY_TYPE_INVALID
-    return error_msg
-
-
-def group_owners_unchanged(json_data, add_group) -> bool:
-    """Check if the owners in an added group are identical to the owners in a deleted group."""
-    if not json_data.get("deleteOwnerGroups") or not add_group.get("owners"):
-        return False
-    for group in json_data.get("deleteOwnerGroups"):
-        if group.get("owners") and len(group["owners"]) == len(add_group["owners"]):
-            identical: bool = True
-            for add_owner in add_group.get("owners"):
-                owner_match: bool = False
-                for del_owner in group.get("owners"):
-                    if owner_name_address_match(add_owner, del_owner):
-                        owner_match = True
-                if not owner_match:
-                    identical = False
-            if identical:
-                return True
-    return False
-
-
-def owner_name_address_match(owner1, owner2) -> bool:
-    """Check if 2 owner json name and addresses are identical."""
-    address_match: bool = False
-    name_match: bool = False
-    if owner1.get("address") and owner2.get("address") and owner1.get("address") == owner2.get("address"):
-        address_match = True
-    if (
-        owner1.get("organizationName")
-        and owner2.get("organizationName")
-        and owner1.get("organizationName") == owner2.get("organizationName")
-    ):
-        name_match = True
-    elif (
-        owner1.get("individualName")
-        and owner2.get("individualName")
-        and owner1.get("individualName") == owner2.get("individualName")
-    ):
-        name_match = True
-    return address_match and name_match
 
 
 def validate_active_permit(registration: MhrRegistration, account_id: str) -> str:

@@ -15,7 +15,6 @@
 
 Refactored from registration_validator.
 """
-# pylint: disable=too-many-lines
 import copy
 
 from mhr_api.models import MhrDraft, MhrRegistration, registration_json_utils
@@ -25,12 +24,9 @@ from mhr_api.models.type_tables import (
     MhrDocumentTypes,
     MhrLocationTypes,
     MhrNoteStatusTypes,
-    MhrOwnerStatusTypes,
-    MhrPartyTypes,
     MhrRegistrationStatusTypes,
     MhrRegistrationTypes,
     MhrStatusTypes,
-    MhrTenancyTypes,
 )
 from mhr_api.services import ltsa
 from mhr_api.utils import valid_charset
@@ -69,10 +65,6 @@ DESCRIPTION_INVALID_IDENTICAL = "The new description cannot be identical to the 
 EXEMPT_EXNR_INVALID = "Registration not allowed: the home is exempt because of an existing non-residential exemption. "
 EXEMPT_EXRS_INVALID = "Residential exemption registration not allowed: the home is already exempt. "
 EXEMPT_PERMIT_INVALID = "Registration not allowed: the home is not exempt because of a transport permit location. "
-DELETE_GROUP_ID_INVALID = "The owner group with ID {group_id} is not active and cannot be changed. "
-DELETE_GROUP_ID_NONEXISTENT = "No owner group with ID {group_id} exists. "
-DELETE_GROUP_TYPE_INVALID = "The owner group tenancy type with ID {group_id} is invalid. "
-GROUP_INTEREST_MISMATCH = "The owner group interest numerator sum does not equal the interest common denominator. "
 MHR_NUMBER_INVALID = "MHR number {mhr_num} either is greater than the existng maximum MHR number or already exists. "
 LOCATION_INVALID_IDENTICAL = "The new location cannot be identical to the existing location. "
 LOCATION_DEALER_REQUIRED = "Location dealer/manufacturer name is required for this registration. "
@@ -108,18 +100,6 @@ LOCATION_TAX_DATE_INVALID_QS = (
 )
 LOCATION_TAX_CERT_REQUIRED = "Location tax certificate and tax certificate expiry date are required. "
 STATUS_CONFIRMATION_REQUIRED = "The land status confirmation is required for this registration. "
-GROUP_NUMERATOR_MISSING = "The owner group interest numerator is required and must be an integer greater than 0. "
-GROUP_DENOMINATOR_MISSING = "The owner group interest denominator is required and must be an integer greater than 0. "
-TENANCY_TYPE_NA_INVALID2 = (
-    "Tenancy type NA is only allowed when all owners are ADMINISTRATOR, EXECUTOR, " + "or TRUSTEE party types. "
-)
-OWNERS_JOINT_INVALID = "The owner group must contain at least 2 owners. "
-OWNERS_COMMON_INVALID = "Each COMMON owner group must contain exactly 1 owner. "
-OWNERS_COMMON_SOLE_INVALID = (
-    "SOLE owner group tenancy type is not allowed when there is more than 1 " + "owner group. Use COMMON instead. "
-)
-GROUP_COMMON_INVALID = "More than 1 group is required with the Tenants in Common owner group type. "
-ADD_SOLE_OWNER_INVALID = "Only one sole owner and only one sole owner group can be added. "
 CANCEL_PERMIT_INVALID = "Cancel Transport Permit not allowed: no active, non-expired transport permit exists. "
 PPR_REG_TYPE_ALL = " SA_TAX TA_TAX TM_TAX "
 PPR_REG_TYPE_GOV = " SA_GOV TA_GOV TM_GOV "
@@ -402,23 +382,6 @@ def validate_pid(pid: str):
     return error_msg
 
 
-def get_existing_group_count(registration: MhrRegistration) -> int:
-    """Count number of existing owner groups."""
-    group_count: int = 0
-    if not registration:
-        return group_count
-    for existing in registration.owner_groups:
-        if existing.status_type in (MhrOwnerStatusTypes.ACTIVE, MhrOwnerStatusTypes.EXEMPT):
-            group_count += 1
-    if registration.change_registrations:
-        for reg in registration.change_registrations:
-            if reg.owner_groups:
-                for existing in reg.owner_groups:
-                    if existing.status_type in (MhrOwnerStatusTypes.ACTIVE, MhrOwnerStatusTypes.EXEMPT):
-                        group_count += 1
-    return group_count
-
-
 def check_state_note(
     registration: MhrRegistration, staff: bool, error_msg: str, reg_type: str, doc_type: str = None
 ) -> str:
@@ -524,232 +487,6 @@ def validate_description(description, staff: bool):
     if not staff and not description.get("csaNumber") and not description.get("engineerDate"):
         error_msg += DESCRIPTION_CSA_ENGINEER_REQUIRED
     return error_msg
-
-
-def owner_name_match(registration: MhrRegistration = None, request_owner=None):  # pylint: disable=too-many-branches
-    """Verify the request owner name matches one of the current owner names."""
-    if not registration or not request_owner:
-        return False
-    request_name: str = ""
-    first_name: str = ""
-    last_name: str = ""
-    match: bool = False
-    is_business = request_owner.get("organizationName")
-    if is_business:
-        request_name = request_owner.get("organizationName").strip().upper()
-    elif (
-        request_owner.get("individualName")
-        and request_owner["individualName"].get("first")
-        and request_owner["individualName"].get("last")
-    ):
-        first_name = request_owner["individualName"].get("first").strip().upper()
-        last_name = request_owner["individualName"].get("last").strip().upper()
-    if not request_name and not last_name:
-        return False
-    if registration.owner_groups:
-        for group in registration.owner_groups:
-            if group.status_type == MhrOwnerStatusTypes.ACTIVE:
-                for owner in group.owners:
-                    if is_business and owner.business_name == request_name:
-                        match = True
-                    elif not is_business and owner.first_name == first_name and owner.last_name == last_name:
-                        match = True
-    if not match and registration.change_registrations:  # pylint: disable=too-many-nested-blocks
-        for reg in registration.change_registrations:
-            for group in reg.owner_groups:
-                if group.status_type == MhrOwnerStatusTypes.ACTIVE:
-                    for owner in group.owners:
-                        if is_business and owner.business_name == request_name:
-                            match = True
-                        elif not is_business and owner.first_name == first_name and owner.last_name == last_name:
-                            match = True
-    return match
-
-
-def get_existing_owner_groups(registration: MhrRegistration) -> dict:
-    """Get the existing active/exempt owner groups."""
-    groups = []
-    for existing in registration.owner_groups:
-        if existing.status_type in (MhrOwnerStatusTypes.ACTIVE, MhrOwnerStatusTypes.EXEMPT):
-            groups.append(existing.json)
-    if registration.change_registrations:
-        for reg in registration.change_registrations:
-            if reg.owner_groups:
-                for existing in reg.owner_groups:
-                    if existing.status_type in (MhrOwnerStatusTypes.ACTIVE, MhrOwnerStatusTypes.EXEMPT):
-                        groups.append(existing.json)
-    return groups
-
-
-def is_valid_dealer_transfer_owner(registration: MhrRegistration, qs: dict) -> bool:
-    """Check qs dealer name matches owner name and owner is a sole owner."""
-    qs_name: str = str(qs.get("businessName", "")).strip().upper()
-    dba_name: str = qs.get("dbaName", "")
-    if dba_name:
-        dba_name = dba_name.strip().upper()
-    logger.debug(f"is_valid_dealer_transfer_owner checking dealer name={qs_name} dba_name={dba_name}")
-    groups = get_existing_owner_groups(registration)
-    if not groups or len(groups) > 1:
-        return False
-    owners = groups[0].get("owners")
-    if owners and len(owners) == 1:
-        owner_name: str = owners[0].get("organizationName", "")
-        if owner_name:
-            logger.debug(f"Comparing owner name={owner_name} with qs name and dba name")
-            owner_name = owner_name.strip().upper()
-            if owner_name == qs_name or (dba_name and owner_name == dba_name):
-                return True
-    return False
-
-
-def validate_delete_owners(  # pylint: disable=too-many-branches
-    registration: MhrRegistration = None, json_data: dict = None
-) -> str:
-    """Check groups id's and owners are valid for deleted groups."""
-    error_msg = ""
-    if not registration or not json_data.get("deleteOwnerGroups"):
-        return error_msg
-    for deleted in json_data["deleteOwnerGroups"]:  # pylint: disable=too-many-nested-blocks
-        if deleted.get("groupId"):
-            deleted_group = None
-            group_id = deleted["groupId"]
-            for existing in registration.owner_groups:
-                if existing.group_id == group_id:
-                    deleted_group = existing
-            if not deleted_group and registration.change_registrations:
-                for reg in registration.change_registrations:
-                    if reg.owner_groups:
-                        for existing in reg.owner_groups:
-                            if existing.group_id == group_id:
-                                deleted_group = existing
-            if deleted_group:
-                tenancy_type = deleted.get("type")
-                # Data migration legacy owner group can have a status of EXEMPT.
-                if deleted_group.status_type not in (MhrOwnerStatusTypes.ACTIVE, MhrOwnerStatusTypes.EXEMPT):
-                    error_msg += DELETE_GROUP_ID_INVALID.format(group_id=group_id)
-                if tenancy_type and deleted_group.tenancy_type != tenancy_type and tenancy_type != MhrTenancyTypes.NA:
-                    error_msg += DELETE_GROUP_TYPE_INVALID.format(group_id=group_id)
-            else:
-                error_msg += DELETE_GROUP_ID_NONEXISTENT.format(group_id=group_id)
-    return error_msg
-
-
-def delete_group(group_id: int, delete_groups):
-    """Check if owner group is flagged for deletion."""
-    if not delete_groups or group_id < 1:
-        return False
-    for group in delete_groups:
-        if group.get("groupId", 0) == group_id:
-            return True
-    return False
-
-
-def interest_required(groups, registration: MhrRegistration = None, delete_groups=None) -> bool:
-    """Determine if group interest is required."""
-    group_count: int = len(groups)  # Verify interest if multiple groups or existing interest.
-    if group_count > 1:
-        return True
-    if not registration:
-        return False
-    for existing in registration.owner_groups:
-        if (
-            existing.status_type == MhrOwnerStatusTypes.ACTIVE
-            and existing.tenancy_type != MhrTenancyTypes.SOLE
-            and not delete_group(existing.group_id, delete_groups)
-            and existing.interest_denominator > 0
-        ):
-            group_count += 1
-    if registration.change_registrations:
-        for reg in registration.change_registrations:
-            if reg.owner_groups:
-                for existing in reg.owner_groups:
-                    if (
-                        existing.status_type == MhrOwnerStatusTypes.ACTIVE
-                        and existing.tenancy_type != MhrTenancyTypes.SOLE
-                        and not delete_group(existing.group_id, delete_groups)
-                        and existing.interest_denominator > 0
-                    ):
-                        group_count += 1
-    return group_count > 1
-
-
-def validate_group_interest(  # pylint: disable=too-many-branches
-    groups,
-    denominator: int,
-    registration: MhrRegistration = None,
-    delete_groups=None,
-):
-    """Verify owner group interest values are valid."""
-    error_msg = ""
-    numerator_sum: int = 0
-    group_count: int = len(groups)  # Verify interest if multiple groups or existing interest.
-    if registration:  # pylint: disable=too-many-nested-blocks
-        for existing in registration.owner_groups:
-            if (
-                existing.status_type == MhrOwnerStatusTypes.ACTIVE
-                and existing.tenancy_type != MhrTenancyTypes.SOLE
-                and not delete_group(existing.group_id, delete_groups)
-            ):
-                den = existing.interest_denominator
-                if den > 0:
-                    group_count += 1
-                    if den == denominator:
-                        numerator_sum += existing.interest_numerator
-                    elif den < denominator:
-                        numerator_sum += denominator / den * existing.interest_numerator
-                    else:
-                        numerator_sum += int((denominator * existing.interest_numerator) / den)
-        if registration.change_registrations:
-            for reg in registration.change_registrations:
-                if reg.owner_groups:
-                    for existing in reg.owner_groups:
-                        if (
-                            existing.status_type == MhrOwnerStatusTypes.ACTIVE
-                            and existing.tenancy_type != MhrTenancyTypes.SOLE
-                            and not delete_group(existing.group_id, delete_groups)
-                        ):
-                            den = existing.interest_denominator
-                            if den > 0:
-                                group_count += 1
-                                if den == denominator:
-                                    numerator_sum += existing.interest_numerator
-                                elif den < denominator:
-                                    numerator_sum += denominator / den * existing.interest_numerator
-                                else:
-                                    numerator_sum += int((denominator * existing.interest_numerator) / den)
-    logger.debug(f"group_count={group_count} denominator={denominator}")
-    if group_count < 2:  # Could have transfer of joint tenants with no interest.
-        return error_msg
-    for group in groups:
-        num = group.get("interestNumerator", 0)
-        den = group.get("interestDenominator", 0)
-        if num and den and num > 0 and den > 0:
-            if den == denominator:
-                numerator_sum += num
-            else:
-                numerator_sum += denominator / den * num
-    if numerator_sum != denominator:
-        error_msg = GROUP_INTEREST_MISMATCH
-    return error_msg
-
-
-def get_modified_group(registration: MhrRegistration, group_id: int) -> dict:
-    """Find the existing owner group as JSON, matching on the group id."""
-    group = {}
-    if not registration:
-        return group
-    for existing in registration.owner_groups:
-        if existing.group_id == group_id:
-            group = existing.json
-            break
-    if not group and registration.change_registrations:
-        for reg in registration.change_registrations:
-            if reg.owner_groups:
-                for existing in reg.owner_groups:
-                    if existing.group_id == group_id:
-                        group = existing.json
-                        break
-    return group
 
 
 def validate_mhr_number(mhr_number: str, staff: bool) -> str:
@@ -954,122 +691,6 @@ def has_active_permit(registration: MhrRegistration) -> bool:
         ):
             return True
     return False
-
-
-def validate_owner_group(group, int_required: bool = False):
-    """Verify owner group is valid."""
-    error_msg = ""
-    if not group:
-        return error_msg
-    tenancy_type: str = group.get("type", "")
-    if tenancy_type == MhrTenancyTypes.COMMON or int_required:
-        if not group.get("interestNumerator") or group.get("interestNumerator", 0) < 1:
-            error_msg += GROUP_NUMERATOR_MISSING
-        if not group.get("interestDenominator") or group.get("interestDenominator", 0) < 1:
-            error_msg += GROUP_DENOMINATOR_MISSING
-    if tenancy_type == MhrTenancyTypes.NA and group.get("owners") and len(group.get("owners")) > 1:
-        owner_count: int = 0
-        for owner in group.get("owners"):
-            if not owner.get("partyType") or owner.get("partyType") in (
-                MhrPartyTypes.OWNER_BUS,
-                MhrPartyTypes.OWNER_IND,
-            ):
-                owner_count += 1
-        if owner_count != 0:
-            error_msg += TENANCY_TYPE_NA_INVALID2
-    if tenancy_type == MhrTenancyTypes.JOINT and (not group.get("owners") or len(group.get("owners")) < 2):
-        error_msg += OWNERS_JOINT_INVALID
-    elif tenancy_type == MhrTenancyTypes.COMMON and (not group.get("owners") or len(group.get("owners")) > 1):
-        error_msg += OWNERS_COMMON_INVALID
-    elif tenancy_type == MhrTenancyTypes.SOLE and int_required:
-        error_msg += OWNERS_COMMON_SOLE_INVALID
-    return error_msg
-
-
-def validate_owner(owner: dict) -> str:
-    """Verify owner names are valid and legacy suffix length is valid."""
-    error_msg = ""
-    if not owner:
-        return error_msg
-    desc: str = "owner"
-    if owner.get("organizationName"):
-        error_msg += validate_text(owner.get("organizationName"), desc + " organization name")
-    elif owner.get("individualName"):
-        error_msg += validate_individual_name(owner.get("individualName"), desc)
-    return error_msg
-
-
-def common_tenancy(groups, new: bool, active_count: int = 0) -> bool:
-    """Determine if the owner groups is a tenants in common scenario."""
-    if new and groups and len(groups) == 1:
-        return False
-    for group in groups:
-        group_type = group.get("type", "")
-        if group_type and group_type != MhrTenancyTypes.SOLE and active_count > 1:
-            return True
-    return False
-
-
-def validate_owner_groups_common(groups, registration: MhrRegistration = None, delete_groups=None):
-    """Verify tenants in common owner groups are valid."""
-    error_msg = ""
-    tc_owner_count_invalid: bool = False
-    common_denominator: int = 0
-    int_required: bool = interest_required(groups, registration, delete_groups)
-    for group in groups:
-        if common_denominator == 0:
-            common_denominator = group.get("interestDenominator", 0)
-        elif group.get("interestDenominator", 0) > common_denominator:
-            common_denominator = group.get("interestDenominator", 0)
-        if not group.get("owners"):
-            tc_owner_count_invalid = True
-        error_msg += validate_owner_group(group, int_required)
-        for owner in group.get("owners"):
-            error_msg += validate_owner(owner)
-    error_msg += validate_group_interest(groups, common_denominator, registration, delete_groups)
-    if tc_owner_count_invalid:
-        error_msg += OWNERS_COMMON_INVALID
-    return error_msg
-
-
-def validate_owner_groups(
-    groups, new: bool, registration: MhrRegistration = None, delete_groups=None, active_count: int = 0
-):
-    """Verify owner groups are valid."""
-    error_msg = ""
-    if not groups:
-        return error_msg
-    so_count: int = 0
-    if common_tenancy(groups, new, active_count):
-        return validate_owner_groups_common(groups, registration, delete_groups)
-    for group in groups:
-        tenancy_type: str = group.get("type", "")
-        if new and tenancy_type == MhrTenancyTypes.COMMON:
-            error_msg += GROUP_COMMON_INVALID
-        error_msg += validate_owner_group(group, False)
-        for owner in group.get("owners"):
-            if tenancy_type == MhrTenancyTypes.SOLE:
-                so_count += 1
-            error_msg += validate_owner(owner)
-    if so_count > 1 or (so_count == 1 and len(groups) > 1):
-        error_msg += ADD_SOLE_OWNER_INVALID
-    if not new and active_count == 1 and tenancy_type == MhrTenancyTypes.COMMON:
-        error_msg += GROUP_COMMON_INVALID
-    return error_msg
-
-
-def get_active_group_count(json_data, registration: MhrRegistration) -> int:
-    """Count number of active owner groups."""
-    group_count: int = 0
-    if json_data.get("ownerGroups"):
-        group_count += len(json_data.get("ownerGroups"))
-    else:
-        if json_data.get("addOwnerGroups"):
-            group_count += len(json_data.get("addOwnerGroups"))
-        if json_data.get("deleteOwnerGroups"):
-            group_count -= len(json_data.get("deleteOwnerGroups"))
-        group_count += get_existing_group_count(registration)
-    return group_count
 
 
 def validate_cancel_permit(registration: MhrRegistration) -> str:
