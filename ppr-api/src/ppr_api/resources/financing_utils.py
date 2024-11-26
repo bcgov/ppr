@@ -307,7 +307,7 @@ def get_registration_callback_report(registration: Registration):  # pylint: dis
         report_info.save()
         # Track success event.
         EventTracking.create(registration_id, EventTracking.EventTrackingTypes.REGISTRATION_REPORT, int(HTTPStatus.OK))
-        return response, HTTPStatus.OK
+        return {}, HTTPStatus.OK
     except ReportException as report_err:
         return registration_callback_error(
             resource_utils.CallbackExceptionCodes.REPORT_ERR,
@@ -372,7 +372,7 @@ def get_registration_report(  # pylint: disable=too-many-return-statements,too-m
                 doc_name = model_utils.get_doc_storage_name(registration)
                 logger.info(f"Saving registration report output to doc storage: name={doc_name}.")
                 response = GoogleStorageService.save_document(doc_name, raw_data, DocumentTypes.REGISTRATION)
-                logger.info("Save document storage response: " + json.dumps(response))
+                logger.info(f"Save document storage response: {response}")
                 report_info.create_ts = model_utils.now_ts()
                 report_info.doc_storage_url = doc_name
                 report_info.save()
@@ -393,7 +393,7 @@ def get_registration_report(  # pylint: disable=too-many-return-statements,too-m
             doc_name = model_utils.get_doc_storage_name(registration)
             logger.info(f"Saving registration report output to doc storage: name={doc_name}.")
             response = GoogleStorageService.save_document(doc_name, raw_data, DocumentTypes.REGISTRATION)
-            logger.info("Save document storage response: " + json.dumps(response))
+            logger.info(f"Save document storage response: {response}")
             verification_report: VerificationReport = VerificationReport(
                 create_ts=model_utils.now_ts(),
                 registration_id=registration.id,

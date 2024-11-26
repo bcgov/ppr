@@ -152,7 +152,7 @@ def generate_mail_callback_report(mail_report: MailReport):  # pylint: disable=t
         )
         logger.info(f"Saving mail report output to doc storage: name={doc_name}.")
         response = GoogleStorageService.save_document(doc_name, raw_data, DocumentTypes.MAIL_DEFAULT)
-        logger.info("Save document storage response: " + json.dumps(response))
+        logger.info(f"Save document storage response: {response}.")
         mail_report.update_storage_url(doc_name, HTTPStatus.OK)
         mail_report.save()
         return {}, HTTPStatus.OK, {"Content-Type": "application/json"}

@@ -152,14 +152,14 @@ def get_registration_callback_report(
         doc_name = model_utils.get_doc_storage_name(registration)
         logger.info(f"Saving registration report output to doc storage: name={doc_name}.")
         response = GoogleStorageService.save_document(doc_name, raw_data, DocumentTypes.REGISTRATION)
-        logger.info(f"Updating report tracking doc_storage_url to {doc_name}.")
+        logger.info(f"Updating report tracking doc_storage_url to {doc_name}, doc storage response {response}.")
         report_info.doc_storage_url = doc_name
         report_info.save()
         # Track success event.
         EventTracking.create(
             registration_id, EventTracking.EventTrackingTypes.MHR_REGISTRATION_REPORT, int(HTTPStatus.OK)
         )
-        return response, HTTPStatus.OK
+        return {}, HTTPStatus.OK
     except ReportException as report_err:
         return registration_callback_error(
             resource_utils.CallbackExceptionCodes.REPORT_ERR,
