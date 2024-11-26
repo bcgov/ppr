@@ -266,7 +266,6 @@
                 <section
                   v-if="!isChangeLocationActive && !isCancelChangeLocationActive && !isExtendChangeLocationActive"
                 >
-                  <v-divider class="mx-7 ma-0" />
                   <TransferDetailsReview class="py-6 pt-4 px-8" />
                 </section>
 
