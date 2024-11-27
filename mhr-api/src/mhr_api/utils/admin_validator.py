@@ -18,7 +18,7 @@ Validation includes verifying the data combination for various registration docu
 from mhr_api.models import MhrRegistration
 from mhr_api.models import registration_utils as reg_utils
 from mhr_api.models.type_tables import MhrDocumentTypes, MhrNoteStatusTypes, MhrRegistrationTypes
-from mhr_api.utils import validator_utils
+from mhr_api.utils import validator_utils, validator_owner_utils
 from mhr_api.utils.logging import logger
 
 NCAN_DOC_TYPES = " CAU CAUC CAUE NCON NPUB REGC REST "  # Set of doc types NCAN can cancel.
@@ -212,11 +212,11 @@ def validate_owners(registration: MhrRegistration, json_data: dict) -> str:
         error_msg += DELETE_OWNERS_MISSING
     if not json_data.get("addOwnerGroups") or not json_data.get("deleteOwnerGroups"):
         return error_msg
-    active_group_count: int = validator_utils.get_active_group_count(json_data, registration)
+    active_group_count: int = validator_owner_utils.get_active_group_count(json_data, registration)
     error_msg += validator_utils.validate_submitting_party(json_data)
-    error_msg += validator_utils.validate_owner_groups(
+    error_msg += validator_owner_utils.validate_owner_groups(
         json_data.get("addOwnerGroups"), False, registration, json_data.get("deleteOwnerGroups"), active_group_count
     )
     if registration and json_data.get("deleteOwnerGroups"):
-        error_msg += validator_utils.validate_delete_owners(registration, json_data)
+        error_msg += validator_owner_utils.validate_delete_owners(registration, json_data)
     return error_msg

@@ -204,7 +204,7 @@ def get_search_results(search_id: str):  # pylint: disable=too-many-branches,too
                 doc_name = model_utils.get_search_doc_storage_name(search_detail.search)
                 logger.info(f"Saving report output to doc storage: name={doc_name}.")
                 response = GoogleStorageService.save_document(doc_name, raw_data)
-                logger.info("Save document storage response: " + json.dumps(response))
+                logger.info(f"Save document storage response: {response}.")
                 search_detail.doc_storage_url = doc_name
                 search_detail.save()
                 return raw_data, HTTPStatus.OK, {"Content-Type": "application/pdf"}
@@ -402,7 +402,7 @@ def results_pdf_response(
     if raw_data and status_code in (HTTPStatus.OK, HTTPStatus.CREATED):
         doc_name = model_utils.get_search_doc_storage_name(search_detail.search)
         response = GoogleStorageService.save_document(doc_name, raw_data)
-        logger.info(f"Save {doc_name} document storage response: " + json.dumps(response))
+        logger.info(f"Save {doc_name} document storage response: {response}")
         search_detail.doc_storage_url = doc_name
         search_detail.save()
         return raw_data, HTTPStatus.OK, {"Content-Type": "application/pdf"}
