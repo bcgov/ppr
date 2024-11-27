@@ -132,6 +132,7 @@
                       :isHomeOwnerPerson="!item.organizationName"
                       :isMhrTransfer="isMhrTransfer"
                       :showTableError="validateTransfer && (isAddingMode || isEditingMode)"
+                      :disableOwnerRemoval="isDisabledForSJTChanges(item) || isDisabledForWillChanges(item)"
                       @cancel="currentlyEditingHomeOwnerId = -1"
                       @remove="removeOwnerHandler(item)"
                     />
