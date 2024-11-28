@@ -178,7 +178,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
   /** Returns true when Add/Edit Owner name fields should be disabled **/
   const disableNameFields = computed((): boolean => {
-    return isTransferDueToDeath.value || isTransferBillOfSale.value || isTransferNonGiftBillOfSale.value
+    return !!getMhrTransferType.value?.transferType
   })
 
   /** Returns true when ownership structure is joint tenancy /w min 2  owners but not executors, trustees or admins. **/

@@ -132,6 +132,7 @@
                       :isHomeOwnerPerson="!item.organizationName"
                       :isMhrTransfer="isMhrTransfer"
                       :showTableError="validateTransfer && (isAddingMode || isEditingMode)"
+                      :disableOwnerRemoval="isDisabledForSJTChanges(item) || isDisabledForWillChanges(item)"
                       @cancel="currentlyEditingHomeOwnerId = -1"
                       @remove="removeOwnerHandler(item)"
                     />
@@ -142,8 +143,13 @@
               <div
                 v-else-if="item.ownerId"
                 :key="`owner-row-key-${homeOwners.indexOf(item)}`"
-                class="owner-info"
-                :class="{ 'border-error-left': isInvalidOwnerGroup(item.groupId) }"
+                class="owner-row owner-info"
+                :class="{
+                  'border-error-left': isInvalidOwnerGroup(item.groupId),
+                  'no-bottom-border': (isRemovedHomeOwner(item) &&
+                    (showDeathCertificate() || showSupportingDocuments()) &&
+                    isReadonlyTable)
+                }"
                 :data-test-id="`owner-info-${item.ownerId}`"
               >
                 <!-- Start of Name -->
@@ -1355,8 +1361,8 @@ export default defineComponent({
       border-radius: 0 !important;
     }
 
-    .owner-row:not(:last-child) tr > td,
-    .bottom-border, .owner-info {
+    .owner-row,
+    .bottom-border {
       border-bottom: thin solid rgba(0, 0, 0, 0.12);
     }
 

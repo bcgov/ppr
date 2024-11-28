@@ -391,7 +391,7 @@
                 variant="outlined"
                 color="error"
                 class="remove-btn"
-                :disabled="isAddingHomeOwner"
+                :disabled="isAddingHomeOwner || disableOwnerRemoval"
                 :ripple="false"
                 @click="remove()"
               >
@@ -484,6 +484,10 @@ export default defineComponent({
       default: false
     },
     showTableError: {
+      type: Boolean,
+      default: false
+    },
+    disableOwnerRemoval: {
       type: Boolean,
       default: false
     }
