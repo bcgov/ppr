@@ -1,0 +1,40 @@
+/**
+ * Enum for route names for vue router
+ */
+
+export enum RouteNames {
+  ADD_COLLATERAL = 'add-collateral',
+  ADD_SECUREDPARTIES_AND_DEBTORS = 'add-securedparties-debtors',
+  AMEND_REGISTRATION = 'amend-registration',
+  CONFIRM_AMENDMENT = 'confirm-amendment',
+  CONFIRM_DISCHARGE = 'confirm-discharge',
+  CONFIRM_RENEWAL = 'confirm-renewal',
+  DASHBOARD = 'dashboard',
+  HOME_OWNERS = 'home-owners',
+  HOME_LOCATION = 'home-location',
+  LENGTH_TRUST = 'length-trust',
+  LOGIN = 'login',
+  MHRSEARCH = 'mhr-search',
+  MHRSEARCH_CONFIRM = 'mhr-search-confirm',
+  MHR_REGISTRATION = 'mhr-registration',
+  MHR_REVIEW_CONFIRM = 'mhr-review-confirm',
+  RENEW_REGISTRATION = 'renew-registration',
+  REVIEW_CONFIRM = 'review-confirm',
+  REVIEW_DISCHARGE = 'review-discharge',
+  SEARCH = 'search',
+  SUBMITTING_PARTY = 'submitting-party',
+  SIGN_IN = 'signin',
+  SIGN_OUT = 'signout',
+  YOUR_HOME = 'your-home',
+  MHR_INFORMATION = 'mhr-information',
+  MHR_INFORMATION_NOTE = 'mhr-information-note',
+  MHR_HISTORY = 'mhr-history',
+  RESIDENTIAL_EXEMPTION = 'residential-exemption',
+  NON_RESIDENTIAL_EXEMPTION = 'non-residential-exemption',
+  EXEMPTION_DETAILS = 'exemption-details',
+  EXEMPTION_REVIEW = 'exemption-review',
+  QS_USER_ACCESS = 'user-access',
+  QS_ACCESS_TYPE = 'qs-access-type',
+  QS_ACCESS_INFORMATION = 'qs-access-information',
+  QS_ACCESS_REVIEW_CONFIRM = 'qs-access-review-confirm'
+}

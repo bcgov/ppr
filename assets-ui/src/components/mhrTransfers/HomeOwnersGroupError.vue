@@ -1,0 +1,158 @@
+<template>
+  <!-- Transfer to Executor error messages -->
+  <span v-if="isTransferToExecutorProbateWill || isTransferToExecutorUnder25Will">
+    <span
+      v-if="!TransToExec.hasAddedExecutorsInGroup(groupId) &&
+        !TransToExec.hasDeletedOwnersWithProbateGrantOrAffidavit()"
+    >
+      {{ transfersErrors.allOwnersHaveDeathCerts[getMhrTransferType.transferType] }}
+    </span>
+    <span
+      v-else-if="!TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
+        !TransToExec.hasAddedExecutorsInGroup(groupId) &&
+        !TransToExec.hasAtLeastOneExecInGroup(groupId)"
+    >
+      {{ transfersErrors.ownersMustBeDeceasedAndExecutorAdded }}
+    </span>
+    <span v-else-if="!TransToExec.hasAddedExecutorsInGroup(groupId) && hasOneHomeOwnerGroup">
+      {{ transfersErrors.mustContainOneExecutor }}
+    </span>
+    <span
+      v-else-if="!TransToExec.hasAddedExecutorsInGroup(groupId) &&
+        TransToExec.hasAllCurrentOwnersRemoved(groupId)"
+    >
+      {{ transfersErrors.mustContainOneExecutorInGroup }}
+    </span>
+    <span
+      v-else-if="!TransToExec.hasAllCurrentOwnersRemoved(groupId) && TransToExec.hasAddedExecutorsInGroup(groupId)"
+    >
+      {{ transfersErrors.ownersMustBeDeceased }}
+    </span>
+    <span v-else-if="TransSaleOrGift.hasMixedOwnersInGroup(groupId)">
+      {{ hasOneHomeOwnerGroup ?
+        MixedRolesErrors.hasMixedOwnerTypes :
+        MixedRolesErrors.hasMixedOwnerTypesInGroup }}
+    </span>
+    <span v-else-if="TransToExec.isAllGroupOwnersWithDeathCerts(groupId)">
+      {{ transfersErrors.allOwnersHaveDeathCerts[getMhrTransferType.transferType] }}
+    </span>
+  </span>
+  <!-- Transfer Sale or Gift error messages -->
+  <span v-else-if="isTransferDueToSaleOrGift && TransSaleOrGift.hasMixedOwnersInGroup(groupId)">
+    {{ hasOneHomeOwnerGroup ?
+      MixedRolesErrors.hasMixedOwnerTypes :
+      MixedRolesErrors.hasMixedOwnerTypesInGroup }}
+  </span>
+  <span v-else-if="isTransferDueToSaleOrGift && TransSaleOrGift.hasPartlyRemovedEATOwners(groupId)">
+    {{ transfersErrors.eatOwnersMustBeDeleted }}
+  </span>
+
+  <!-- Transfer to Admin error messages -->
+  <span v-else-if="isTransferToAdminNoWill">
+    <span
+      v-if="!TransToAdmin.hasAddedAdministratorsInGroup(groupId) &&
+        !TransToExec.hasDeletedOwnersWithProbateGrantOrAffidavit()"
+    >
+      {{ transfersErrors.allOwnersHaveDeathCerts[getMhrTransferType.transferType] }}
+    </span>
+    <span
+      v-else-if="!TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
+        !TransToAdmin.hasAddedAdministratorsInGroup(groupId) &&
+        !TransToAdmin.hasAtLeastOneAdminInGroup(groupId)"
+    >
+      {{ transfersErrors.ownersMustBeDeceasedAndAdminAdded }}
+    </span>
+    <span v-else-if="!TransToAdmin.hasAddedAdministratorsInGroup(groupId) && hasOneHomeOwnerGroup">
+      {{ transfersErrors.mustContainOneAdmin }}
+    </span>
+    <span
+      v-else-if="!TransToAdmin.hasAddedAdministratorsInGroup(groupId) &&
+        TransToExec.hasAllCurrentOwnersRemoved(groupId)"
+    >
+      {{ transfersErrors.mustContainOneAdminInGroup }}
+    </span>
+    <span v-else-if="TransSaleOrGift.hasMixedOwnersInGroup(groupId)">
+      {{ hasOneHomeOwnerGroup ?
+        MixedRolesErrors.hasMixedOwnerTypes :
+        MixedRolesErrors.hasMixedOwnerTypesInGroup }}
+    </span>
+    <span
+      v-else-if="!TransToExec.hasAllCurrentOwnersRemoved(groupId) &&
+        TransToAdmin.hasAddedAdministratorsInGroup(groupId)"
+    >
+      {{ transfersErrors.ownersMustBeDeceased }}
+    </span>
+    <span v-else-if="TransToExec.isAllGroupOwnersWithDeathCerts(groupId)">
+      {{ transfersErrors.allOwnersHaveDeathCerts[getMhrTransferType.transferType] }}
+    </span>
+  </span>
+  <!-- Transfer to Admin error messages -->
+  <span v-else-if="isTransferWithoutBillOfSale && !TransWithoutBillOfSale.hasAllCurrentOwnersRemoved(groupId)">
+    {{ hasOneHomeOwnerGroup ?
+      MixedRolesErrors.hasMixedOwnerTypes :
+      MixedRolesErrors.hasMixedOwnerTypesInGroup }}
+  </span>
+
+  <!-- Other error messages -->
+  <span v-else>
+    Group must contain at least one owner.
+  </span>
+</template>
+
+<script lang="ts">
+import { computed, defineComponent, reactive, toRefs } from 'vue'
+import { transfersErrors, MixedRolesErrors } from '@/resources'
+import { useStore } from '@/store/store'
+import { useTransferOwners } from '@/composables/mhrInformation'
+import { storeToRefs } from 'pinia'
+
+export default defineComponent({
+  name: 'HomeOwnersGroupError',
+  props: {
+    groupId: {
+      type: Number,
+      required: true
+    }
+  },
+  setup () {
+    const {
+      TransSaleOrGift,
+      TransToExec,
+      TransToAdmin,
+      TransWithoutBillOfSale,
+      isTransferDueToSaleOrGift,
+      isTransferToExecutorProbateWill,
+      isTransferToExecutorUnder25Will,
+      isTransferToAdminNoWill,
+      isTransferWithoutBillOfSale,
+      getMhrTransferType
+    } = useTransferOwners()
+    const { getMhrTransferHomeOwnerGroups } = storeToRefs(useStore())
+
+    const localState = reactive({
+      hasOneHomeOwnerGroup: computed(() => getMhrTransferHomeOwnerGroups.value.length === 1)
+    })
+
+    return {
+      TransSaleOrGift,
+      TransToExec,
+      TransToAdmin,
+      TransWithoutBillOfSale,
+      isTransferDueToSaleOrGift,
+      isTransferToExecutorProbateWill,
+      isTransferToExecutorUnder25Will,
+      isTransferToAdminNoWill,
+      isTransferWithoutBillOfSale,
+      getMhrTransferType,
+      MixedRolesErrors,
+      transfersErrors,
+      ...toRefs(localState)
+    }
+  }
+})
+
+</script>
+
+<style lang="scss" scoped>
+  @import '@/assets/styles/theme.scss';
+</style>

@@ -1,0 +1,12 @@
+export enum ProductCode {
+  BUSINESS = 'BUSINESS',
+  BUSINESS_SEARCH = 'BUSINESS_SEARCH',
+  CSO = 'CSO',
+  PPR = 'PPR',
+  MHR = 'MHR',
+  RPT = 'RPT',
+  VS = 'VS',
+  LAWYERS_NOTARIES = 'MHR_QSLN',
+  MANUFACTURER = 'MHR_QSHM',
+  DEALERS = 'MHR_QSHD'
+}

@@ -1,0 +1,6 @@
+export { default as HomeLocation } from './HomeLocation.vue'
+export { default as HomeOwners } from './HomeOwners.vue'
+export { default as MhrRegistration } from './MhrRegistration.vue'
+export { default as MhrReviewConfirm } from './MhrReviewConfirm.vue'
+export { default as YourHome } from './YourHome.vue'
+export { default as SubmittingParty } from './SubmittingParty.vue'
