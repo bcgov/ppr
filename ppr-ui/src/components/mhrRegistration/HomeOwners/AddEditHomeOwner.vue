@@ -25,6 +25,7 @@
         <!-- Owner Roles Component-->
         <HomeOwnerRoles
           :partyType="owner.partyType"
+          :disableRoles="isCurrentOwner(owner)"
           @update:partyType="owner.partyType = $event"
         />
 

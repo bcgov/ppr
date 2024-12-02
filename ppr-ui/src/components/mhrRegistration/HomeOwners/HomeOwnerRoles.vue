@@ -28,7 +28,8 @@
               :id="role.id"
               :value="role.model"
               :class="role.class"
-              :disabled="isDisabledRadio(role.model) && selectedPartyType !== role.model"
+              :disabled="(isDisabledRadio(role.model) && selectedPartyType !== role.model) ||
+                (disableRoles && selectedPartyType !== role.model)"
             >
               <template #label>
                 <div
@@ -60,6 +61,10 @@ export default defineComponent({
     partyType: {
       type: String as PropType<HomeOwnerPartyTypes>,
       default: null
+    },
+    disableRoles: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['update:partyType'],
