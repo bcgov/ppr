@@ -21,7 +21,7 @@ import {
   MhApiFrozenDocumentTypes,
   MhApiStatusTypes,
   RouteNames,
-  UITransferTypes, HomeTenancyToApiMap
+  UITransferTypes
 } from '@/enums'
 import {
   fetchMhRegistration,
