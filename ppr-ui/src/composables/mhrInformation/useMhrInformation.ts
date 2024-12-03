@@ -502,7 +502,8 @@ export const useMhrInformation = () => {
           // Determine group tenancy type
           type: (ownerGroup.owners.filter(owner => owner.action === ActionTypes.REMOVED).length > 1 ||
                 (getMhrTransferType.value?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT &&
-                  !ownerGroup.owners.some(owner => owner.action === ActionTypes.CHANGED)))
+                  ownerGroup.owners.some(owner => owner.action === ActionTypes.REMOVED)
+                ))
                 ? isTransferToExecOrAdmin.value
                   ? ApiHomeTenancyTypes.NA
                   : ApiHomeTenancyTypes.JOINT
