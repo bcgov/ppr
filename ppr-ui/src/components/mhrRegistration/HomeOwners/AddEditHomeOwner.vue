@@ -585,7 +585,8 @@ export default defineComponent({
         middle: props.editHomeOwner?.individualName.middle || '',
         last: props.editHomeOwner?.individualName.last || ''
       }
-    } else {
+    } else if (![HomeOwnerPartyTypes.EXECUTOR, HomeOwnerPartyTypes.ADMINISTRATOR, HomeOwnerPartyTypes.TRUSTEE]
+      .includes(props.editHomeOwner?.partyType)) {
       defaultHomeOwner.organizationName = props.editHomeOwner?.organizationName || ''
       defaultHomeOwner.partyType = HomeOwnerPartyTypes.OWNER_BUS
     }
