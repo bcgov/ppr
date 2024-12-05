@@ -1,110 +1,110 @@
 <template>
   <v-footer class="bg-white pa-0">
-    <v-overlay
-      v-model="submitting"
-      class="overlay-container"
-    >
-      <v-progress-circular
-        color="primary"
-        size="30"
-        indeterminate
-      />
-    </v-overlay>
+<!--    <v-overlay-->
+<!--      v-model="submitting"-->
+<!--      class="overlay-container"-->
+<!--    >-->
+<!--      <v-progress-circular-->
+<!--        color="primary"-->
+<!--        size="30"-->
+<!--        indeterminate-->
+<!--      />-->
+<!--    </v-overlay>-->
 
-    <BaseDialog
-      :closeAction="true"
-      :setOptions="options"
-      :setDisplay="showCancelDialog"
-      @proceed="handleDialogResp($event)"
-    />
+<!--    <BaseDialog-->
+<!--      :close-action="true"-->
+<!--      :set-options="options"-->
+<!--      :set-display="showCancelDialog"-->
+<!--      @proceed="handleDialogResp($event)"-->
+<!--    />-->
 
-    <StaffPaymentDialog
-      attach=""
-      class="mt-10"
-      :setDisplay="staffPaymentDialogDisplay"
-      :setOptions="staffPaymentDialogOptions"
-      :setShowCertifiedCheckbox="false"
-      @proceed="onStaffPaymentChanges($event)"
-    />
+<!--    <StaffPaymentDialog-->
+<!--      attach=""-->
+<!--      class="mt-10"-->
+<!--      :set-display="staffPaymentDialogDisplay"-->
+<!--      :set-options="staffPaymentDialogOptions"-->
+<!--      :set-show-certified-checkbox="false"-->
+<!--      @proceed="onStaffPaymentChanges($event)"-->
+<!--    />-->
 
-    <v-container class="pt-8 pb-15">
-      <v-row noGutters>
-        <v-col cols="6">
-          <span
-            v-if="buttonConfig.showCancel"
-            class="pr-3"
-          >
-            <v-btn
-              id="reg-cancel-btn"
-              variant="outlined"
-              color="primary"
-              @click="cancel()"
-            >
-              Cancel
-            </v-btn>
-          </span>
-          <span
-            v-if="buttonConfig.showSaveResume"
-            class="pr-3"
-          >
-            <v-btn
-              id="reg-save-resume-btn"
-              variant="outlined"
-              color="primary"
-              @click="submitSaveResume"
-            >
-              Save and Resume Later
-            </v-btn>
-          </span>
-          <v-btn
-            v-if="buttonConfig.showSave"
-            id="reg-save-btn"
-            variant="outlined"
-            color="primary"
-            @click="saveDraft()"
-          >
-            Save
-          </v-btn>
-        </v-col>
-        <v-col
-          class="justify"
-          cols="6"
-        >
-          <v-btn
-            id="reg-next-btn"
-            color="primary"
-            :disabled="lastStepBcol"
-            class="float-right pl-6"
-            @click="submitNext"
-          >
-            {{ buttonConfig.nextText }}
-            <v-icon
-              color="white"
-              class="pt-1"
-            >
-              mdi-chevron-right
-            </v-icon>
-          </v-btn>
-          <span
-            v-if="buttonConfig.showBack"
-            class="pr-3"
-          >
-            <v-btn
-              id="reg-back-btn"
-              variant="outlined"
-              color="primary"
-              class="float-right mr-4 pr-5"
-              @click="submitBack"
-            >
-              <v-icon
-                color="primary"
-                class="pt-1"
-              >mdi-chevron-left</v-icon> Back
-            </v-btn>
-          </span>
-        </v-col>
-      </v-row>
-    </v-container>
+<!--    <v-container class="pt-8 pb-15">-->
+<!--      <v-row no-gutters>-->
+<!--        <v-col cols="6">-->
+<!--          <span-->
+<!--            v-if="buttonConfig.showCancel"-->
+<!--            class="pr-3"-->
+<!--          >-->
+<!--            <v-btn-->
+<!--              id="reg-cancel-btn"-->
+<!--              variant="outlined"-->
+<!--              color="primary"-->
+<!--              @click="cancel()"-->
+<!--            >-->
+<!--              Cancel-->
+<!--            </v-btn>-->
+<!--          </span>-->
+<!--          <span-->
+<!--            v-if="buttonConfig.showSaveResume"-->
+<!--            class="pr-3"-->
+<!--          >-->
+<!--            <v-btn-->
+<!--              id="reg-save-resume-btn"-->
+<!--              variant="outlined"-->
+<!--              color="primary"-->
+<!--              @click="submitSaveResume"-->
+<!--            >-->
+<!--              Save and Resume Later-->
+<!--            </v-btn>-->
+<!--          </span>-->
+<!--          <v-btn-->
+<!--            v-if="buttonConfig.showSave"-->
+<!--            id="reg-save-btn"-->
+<!--            variant="outlined"-->
+<!--            color="primary"-->
+<!--            @click="saveDraft()"-->
+<!--          >-->
+<!--            Save-->
+<!--          </v-btn>-->
+<!--        </v-col>-->
+<!--        <v-col-->
+<!--          class="justify"-->
+<!--          cols="6"-->
+<!--        >-->
+<!--          <v-btn-->
+<!--            id="reg-next-btn"-->
+<!--            color="primary"-->
+<!--            :disabled="lastStepBcol"-->
+<!--            class="float-right pl-6"-->
+<!--            @click="submitNext"-->
+<!--          >-->
+<!--            {{ buttonConfig.nextText }}-->
+<!--            <v-icon-->
+<!--              color="white"-->
+<!--              class="pt-1"-->
+<!--            >-->
+<!--              mdi-chevron-right-->
+<!--            </v-icon>-->
+<!--          </v-btn>-->
+<!--          <span-->
+<!--            v-if="buttonConfig.showBack"-->
+<!--            class="pr-3"-->
+<!--          >-->
+<!--            <v-btn-->
+<!--              id="reg-back-btn"-->
+<!--              variant="outlined"-->
+<!--              color="primary"-->
+<!--              class="float-right mr-4 pr-5"-->
+<!--              @click="submitBack"-->
+<!--            >-->
+<!--              <v-icon-->
+<!--                color="primary"-->
+<!--                class="pt-1"-->
+<!--              >mdi-chevron-left</v-icon> Back-->
+<!--            </v-btn>-->
+<!--          </span>-->
+<!--        </v-col>-->
+<!--      </v-row>-->
+<!--    </v-container>-->
   </v-footer>
 </template>
 
@@ -116,8 +116,7 @@ import { saveFinancingStatement, saveFinancingStatementDraft } from '@/utils'
 import { RouteNames } from '@/enums'
 import { BaseDialog } from '@/components/dialogs'
 import StaffPaymentDialog from '@/components/dialogs/StaffPaymentDialog.vue'
-import {
-  // eslint-disable-next-line no-unused-vars
+import type {
   ButtonConfigIF, DialogOptionsIF, DraftIF, ErrorIF, FinancingStatementIF, RegTableNewItemI, StateModelIF
 } from '@/interfaces'
 import { unsavedChangesDialog } from '@/resources/dialogOptions'
@@ -210,12 +209,15 @@ export default defineComponent({
         return isRoleStaffSbc.value
       }),
       buttonConfig: computed((): ButtonConfigIF => {
-        for (const i in props.navConfig) {
-          if (props.navConfig[i].stepName === props.currentStepName) {
-            return props.navConfig[i]
-          }
-        }
-        return null
+        console.log(props.currentStepName)
+        console.log(props.navConfig)
+        //
+        // for (const i in props.navConfig) {
+        //   if (props.navConfig[i].stepName === props.currentStepName) {
+        //     return props.navConfig[i]
+        //   }
+        // }
+        // return null
       })
     })
     const cancel = () => {
@@ -372,10 +374,10 @@ export default defineComponent({
       return statement
     }, 2000, { trailing: false })
 
-    watch(() => props.forceSave, () => {
-      // on change (T/F doesn't matter), save and go back to dash
-      submitSaveResume()
-    })
+    // watch(() => props.forceSave, () => {
+    //   // on change (T/F doesn't matter), save and go back to dash
+    //   submitSaveResume()
+    // })
 
     return {
       ...toRefs(localState),

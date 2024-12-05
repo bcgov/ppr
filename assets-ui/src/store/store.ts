@@ -87,7 +87,7 @@ import {
   QsReviewConfirm,
   SubmittingParty,
   YourHome
-} from '../../HOLDINGFOLDER'
+} from '@/pages'
 import {
   MHRButtonFooterConfig, MHRCorrectionButtonFooterConfig,
   MHRManufacturerButtonFooterConfig,
@@ -559,6 +559,9 @@ export const useStore = defineStore('assetsStore', () => {
     return isMhrManufacturerRegistration.value ? getMhrManufacturerSteps.value : getMhrStaffSteps.value
   })
   const getFooterButtonConfig = computed<ButtonConfigIF[]>(() => {
+    console.log('getFooterButtonConfig')
+    console.log(isMhrRegistration.value || isMhrReRegistration.value)
+    console.log(getMhrButtonFooterConfig.value)
     return isMhrRegistration.value || isMhrReRegistration.value
       ? getMhrButtonFooterConfig.value
       : RegistrationButtonFooterConfig

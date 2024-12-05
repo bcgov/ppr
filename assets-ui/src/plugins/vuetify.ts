@@ -1,4 +1,3 @@
-// plugins/vuetify.ts
 import { defineNuxtPlugin } from '#app'
 import { h } from 'vue'
 import { createVuetify } from 'vuetify'

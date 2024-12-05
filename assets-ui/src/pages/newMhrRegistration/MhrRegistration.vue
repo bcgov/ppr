@@ -89,21 +89,21 @@
               :key="step.step"
             />
           </v-col>
-          <v-col
-            class="pl-6 pt-5"
-            cols="3"
-          >
-            <aside>
-              <StickyContainer
-                :set-right-offset="true"
-                :set-show-fee-summary="true"
-                :set-fee-type="feeType"
-                :set-fee-subtitle="getRegistrationType.registrationTypeUI"
-                :set-registration-length="registrationLength"
-                :set-registration-type="registrationTypeUI"
-              />
-            </aside>
-          </v-col>
+<!--          <v-col-->
+<!--            class="pl-6 pt-5"-->
+<!--            cols="3"-->
+<!--          >-->
+<!--            <aside>-->
+<!--              <StickyContainer-->
+<!--                :set-right-offset="true"-->
+<!--                :set-show-fee-summary="true"-->
+<!--                :set-fee-type="feeType"-->
+<!--                :set-fee-subtitle="getRegistrationType.registrationTypeUI"-->
+<!--                :set-registration-length="registrationLength"-->
+<!--                :set-registration-type="registrationTypeUI"-->
+<!--              />-->
+<!--            </aside>-->
+<!--          </v-col>-->
         </v-row>
       </div>
     </div>
@@ -111,10 +111,9 @@
       no-gutters
       class="mt-20"
     >
-      <v-col cols="12">
+      <v-col cols="12">{{getFooterButtonConfig}}
         <ButtonFooter
           is-mhr
-          :nav-config="getFooterButtonConfig"
           :current-step-name="$route.name"
           :force-save="saveDraftExit"
           @error="emitError($event)"

@@ -232,14 +232,14 @@ export default <RouterConfig> {
         requiresAuth: true,
       },
     },
-    // {
-    //   path: '/mhr-information',
-    //   name: RouteNames.MHR_INFORMATION,
-    //   component: MhrInformation,
-    //   meta: {
-    //     requiresAuth: true,
-    //   },
-    // },
+    {
+      path: '/mhr-information',
+      name: RouteNames.MHR_INFORMATION,
+      component: MhrInformation,
+      meta: {
+        requiresAuth: true,
+      },
+    },
     {
       path: '/mhr-information-note',
       name: RouteNames.MHR_INFORMATION_NOTE,

@@ -225,7 +225,7 @@ import {
 } from '@/components/common'
 import { useExemptions, usePayment } from '@/composables'
 import { parseSubmittingPartyToAccountInfo, yyyyMmDdToPacificDate } from '@/utils'
-import { TransportPermitDetails } from '@/components/mhrTransportPermit'
+import { TransportPermitDetails } from '@/components/mhrTransportPermits'
 import CautionBox from '@/components/common/CautionBox.vue'
 
 export default defineComponent({

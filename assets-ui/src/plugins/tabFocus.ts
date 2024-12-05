@@ -1,6 +1,6 @@
 // assets-ui/src/plugins/tabFocus.ts
 
-const tabFocus = {
+export const tabFocus = {
   install(app) {
     const TAB_KEY = 'Tab'
 
@@ -64,7 +64,3 @@ const tabFocus = {
     addTabFocusToComponent(VTextarea)
   }
 }
-
-export default defineNuxtPlugin((nuxtApp) => {
-  nuxtApp.vueApp.use(tabFocus)
-})

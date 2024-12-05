@@ -12,7 +12,7 @@ import SbcSystemBanner from 'sbc-common-components/src/components/SbcSystemBanne
 import * as Dialogs from '@/components/dialogs'
 import { Breadcrumb, SkipToMainContent } from '@/components/common'
 import { Tombstone } from '@/components/tombstone'
-// import * as Views from '@/pages'
+import * as Views from '@/pages'
 import {
   authPprError, authAssetsError, draftDeleteError, historyRegError, loginError, openDocError, paymentErrorReg,
   paymentErrorSearch, registrationCompleteError, registrationDeleteError, registrationLoadError,
@@ -53,7 +53,7 @@ export default defineComponent({
     SbcSystemBanner,
     Tombstone,
     ...Dialogs,
-    // ...Views
+    ...Views
   },
   setup () {
     const route = useRoute()
@@ -709,8 +709,9 @@ export default defineComponent({
   </v-app>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import '@/assets/styles/theme';
+@import '@/assets/styles/overrides';
 
 .sbc-system-banner {
   min-height: 60px;

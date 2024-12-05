@@ -694,15 +694,14 @@ import {
   outOfDateOwnersDialogOptions
 } from '@/resources/dialogOptions'
 import AccountInfo from '@/components/common/AccountInfo.vue'
-import { MhrTransportPermit } from '@/pages'
+import MhrTransportPermit from './MhrTransportPermit.vue'
+import { LocationChangeReview, TransportPermitDetails } from '@/components/mhrTransportPermits'
 import {
-  LocationChangeReview,
   LocationChangeConfirmCompletion,
   TransportPermitConfirmCompletion,
   AmendTransportPermitConfirmCompletion,
-  CancelTransportPermitConfirmCompletion,
-  TransportPermitDetails
-} from '@/components/mhrTransportPermit'
+  CancelTransportPermitConfirmCompletion
+} from '@/components/mhrTransportPermits/ConfirmCompletionContent'
 import type {
   AccountInfoIF,
   DialogOptionsIF,

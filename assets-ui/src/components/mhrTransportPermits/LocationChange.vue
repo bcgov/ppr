@@ -1,15 +1,15 @@
 <template>
   <div class="mhr-location-change">
     <BaseDialog
-      :setOptions="changeTransportPermitLocationTypeDialog"
-      :setDisplay="state.showChangeTransportPermitLocationTypeDialog"
+      :set-options="changeTransportPermitLocationTypeDialog"
+      :set-display="state.showChangeTransportPermitLocationTypeDialog"
       @proceed="handleChangeTransportPermitLocationTypeResp($event)"
     />
 
     <FormCard
       v-if="!isAmendLocationActive && !isExtendChangeLocationActive && !isNewPermitActive"
       label="Location Change Type"
-      :showErrors="validate && !state.locationChangeFromValid"
+      :show-errors="validate && !state.locationChangeFromValid"
       :class="{'border-error-left': validate && !state.locationChangeFromValid}"
     >
       <template #formSlot>
@@ -23,8 +23,8 @@
             v-model="state.locationChangeType"
             :items="state.roleBasedLocationChangeTypes"
             :rules="required('Select Location Change Type')"
-            itemTitle="title"
-            itemValue="type"
+            item-title="title"
+            item-value="type"
             variant="filled"
             label="Location Change Type"
             color="primary"
@@ -40,7 +40,7 @@
                 <v-tooltip
                   v-if="isListItemDisabled(item.props.value)"
                   location="right"
-                  contentClass="left-tooltip"
+                  content-class="left-tooltip"
                   transition="fade-transition"
                 >
                   <template #activator="{ props }">
@@ -102,12 +102,12 @@
 
         <HomeLocationType
           :key="getMhrTransportPermit.locationChangeType"
-          :locationTypeInfo="getMhrTransportPermit.newLocation"
+          :location-type-info="getMhrTransportPermit.newLocation"
           :class="{ 'border-error-left': state.isLocationTypeInvalid }"
           :validate="validate"
-          :updatedBadge="isAmendLocationActive ? state.amendedBadgeHomeLocationType : null"
-          @setStoreProperty="handleLocationTypeUpdate($event)"
-          @isValid="setValidation('isHomeLocationTypeValid', $event)"
+          :updated-badge="isAmendLocationActive ? state.amendedBadgeHomeLocationType : null"
+          @set-store-property="handleLocationTypeUpdate($event)"
+          @is-valid="setValidation('isHomeLocationTypeValid', $event)"
         />
       </section>
 
@@ -147,10 +147,10 @@
           :schema="CivicAddressSchema"
           :class="{ 'border-error-left': state.isCivicAddressInvalid }"
           :validate="state.isCivicAddressInvalid"
-          :updatedBadge="isAmendLocationActive ? state.amendedBadgeCivicAddress : null"
-          :hasOnlyStreetEditable="state.isRoleQSorSBCAmend"
-          @setStoreProperty="handleTransportPermitAddressUpdate($event)"
-          @isValid="setValidation('isHomeCivicAddressValid', $event)"
+          :updated-badge="isAmendLocationActive ? state.amendedBadgeCivicAddress : null"
+          :has-only-street-editable="state.isRoleQSorSBCAmend"
+          @set-store-property="handleTransportPermitAddressUpdate($event)"
+          @is-valid="setValidation('isHomeCivicAddressValid', $event)"
         />
       </section>
 
@@ -166,16 +166,16 @@
 
         <HomeLandOwnership
           :key="getMhrTransportPermit.locationChangeType"
-          :ownLand="getMhrTransportPermit.ownLand"
+          :own-land="getMhrTransportPermit.ownLand"
           :class="{ 'border-error-left': state.isLandOwnershipInvalid }"
           :validate="state.isLandOwnershipInvalid"
           :content="{
             description: 'Will the manufactured home be located on land that the homeowners ' +
               'own or on land that they have a registered lease of 3 years or more?'
           }"
-          :updatedBadge="isAmendLocationActive ? state.amendedBadgeHomeLandOwnership : null"
-          @setStoreProperty="setMhrTransportPermit({ key: 'ownLand', value: $event })"
-          @isValid="setValidation('isHomeLandOwnershipValid', $event)"
+          :updated-badge="isAmendLocationActive ? state.amendedBadgeHomeLandOwnership : null"
+          @set-store-property="setMhrTransportPermit({ key: 'ownLand', value: $event })"
+          @is-valid="setValidation('isHomeLandOwnershipValid', $event)"
         />
       </section>
 
@@ -203,7 +203,7 @@
         </p>
 
         <SimpleHelpToggle
-          :toggleButtonTitle="'Help with Tax Certificate'"
+          :toggle-button-title="'Help with Tax Certificate'"
           class="my-6"
         >
           <template #content>
@@ -215,12 +215,12 @@
         <TaxCertificate
           ref="taxCertificateRef"
           :key="getMhrTransportPermit.locationChangeType"
-          :expiryDate="getMhrTransportPermit.newLocation.taxExpiryDate"
+          :expiry-date="getMhrTransportPermit.newLocation.taxExpiryDate"
           :class="{ 'border-error-left': validate && !getInfoValidation('isTaxCertificateValid') }"
           :validate="validate && !getInfoValidation('isTaxCertificateValid')"
-          @setStoreProperty="handleTaxCertificateUpdate($event)"
-          @waiveCertificate="setMhrTransportPermitNewLocation({ key: 'waiveCertificate', value: $event })"
-          @isValid="setValidation('isTaxCertificateValid', $event)"
+          @set-store-property="handleTaxCertificateUpdate($event)"
+          @waive-certificate="setMhrTransportPermitNewLocation({ key: 'waiveCertificate', value: $event })"
+          @is-valid="setValidation('isTaxCertificateValid', $event)"
         />
       </section>
     </div>
@@ -229,7 +229,7 @@
 
 <script setup lang="ts">
 import { HomeLocationTypes, LocationChangeTypes, MhApiStatusTypes } from '@/enums'
-import { FormIF } from '@/interfaces'
+import type { FormIF } from '@/interfaces'
 import { locationChangeTypes } from '@/resources/mhr-transport-permits/transport-permits'
 import { useStore } from '@/store/store'
 import { reactive, computed, watch, ref, nextTick, onMounted } from 'vue'
@@ -243,8 +243,8 @@ import { storeToRefs } from "pinia"
 import { changeTransportPermitLocationTypeDialog } from '@/resources/dialogOptions'
 import { BaseDialog } from '@/components/dialogs'
 import { cloneDeep } from 'lodash'
-import QsTaxCertificateHelp from '@/components/mhrTransportPermit/HelpContent/QsTaxCertificateHelp.vue'
-import StaffTaxCertificateHelp from '@/components/mhrTransportPermit/HelpContent/StaffTaxCertificateHelp.vue'
+import QsTaxCertificateHelp from '@/components/mhrTransportPermits/HelpContent/QsTaxCertificateHelp.vue'
+import StaffTaxCertificateHelp from '@/components/mhrTransportPermits/HelpContent/StaffTaxCertificateHelp.vue'
 
 const props = defineProps<{
   validate: boolean

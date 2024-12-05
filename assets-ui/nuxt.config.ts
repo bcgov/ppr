@@ -1,10 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-// import { defineNuxtConfig } from 'nuxt'
+import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 import path from 'path'
-// import dotenv from 'dotenv'
-
-// Load environment variables from .env file
-// dotenv.config()
 
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
@@ -15,8 +11,11 @@ export default defineNuxtConfig({
     head: {
       title: 'Assets UI',
       htmlAttrs: { dir: 'ltr' },
-      link: [{ rel: 'icon', type: 'image/png', href: '/favicon.png' }]
+      link: [{ rel: 'icon', type: 'image/png', href: './src/assets/favicon.png' }]
     }
+  },
+  build: {
+    transpile: ['vuetify'],
   },
   colorMode: {
     preference: 'light'
@@ -28,21 +27,19 @@ export default defineNuxtConfig({
     '@sbc': path.resolve(__dirname, './node_modules/sbc-common-components/src')
   },
   resolve: {
-    extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue']
+    extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue', '.scss', '.css']
   },
-  scss: [
-    '@mdi/font/css/materialdesignicons.css',
-    '@/assets/styles/base.scss',
-    '@/assets/styles/layout.scss',
-    '@/assets/styles/overrides.scss',
-    '@sbc/assets/styles/theme.scss',
-  ],
   ui: {
     icons: ['mdi']
   },
   ssr: false,
-  modules: ['@pinia/nuxt', "@nuxt/eslint", 'vuetify-nuxt-module', 'nuxt-lodash'],
-  plugins: [],
+  modules: ['@pinia/nuxt', '@nuxt/eslint', 'nuxt-lodash',
+    (_options, nuxt) => {
+      nuxt.hooks.hook('vite:extendConfig', (config) => {
+        config.plugins.push(vuetify({ autoImport: true }))
+      })
+    }
+    ],
   typescript: {
     tsConfig: {
       compilerOptions: {
@@ -64,10 +61,16 @@ export default defineNuxtConfig({
         'keycloak-js',
       ]
     },
+    vue: {
+      template: {
+        transformAssetUrls,
+      },
+    }
   },
   runtimeConfig: {
     public: {
       VUE_APP_PATH: process.env.VUE_APP_PATH || '',
+      VUE_APP_LOCAL_DEV: process.env.VUE_APP_LOCAL_DEV || '',
       BASE_URL: process.env.BASE_URL || '',
       VUE_APP_AUTH_API_URL: process.env.VUE_APP_AUTH_API_URL || '',
       VUE_APP_AUTH_API_VERSION: process.env.VUE_APP_AUTH_API_VERSION || '',

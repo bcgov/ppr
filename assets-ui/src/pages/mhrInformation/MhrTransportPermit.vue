@@ -475,7 +475,7 @@
 
 <script setup lang="ts">
 import { CautionBox, DocumentId, SimpleHelpToggle } from '@/components/common'
-import { LocationChange, TransportPermitDetails } from '@/components/mhrTransportPermit'
+import { LocationChange, TransportPermitDetails } from '@/components/mhrTransportPermits'
 import { useMhrInformation, useMhrInfoValidation, useTransportPermits } from "@/composables/mhrInformation"
 import { APIMhrTypes, LocationChangeTypes } from '@/enums'
 import { useStore } from "@/store/store"

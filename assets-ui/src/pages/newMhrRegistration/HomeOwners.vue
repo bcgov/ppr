@@ -1,433 +1,429 @@
 <template>
   <div id="mhr-home-owners-list">
-<!--    <BaseDialog-->
-<!--      :set-display="showDeleteAllGroupsDialog"-->
-<!--      :set-options="{-->
-<!--        title: 'Delete All Owners/Groups',-->
-<!--        text:-->
-<!--          'Deleting all owners/groups will delete all previous owners and remove any newly added owners.',-->
-<!--        acceptText: 'Delete All Owners/Groups',-->
-<!--        cancelText: 'Cancel'-->
-<!--      }"-->
-<!--      @proceed="cancelOrProceed($event)"-->
-<!--    />-->
-<!--    <section-->
-<!--      id="mhr-owners"-->
-<!--      :class="{'mt-10': !isReadonlyTable && !isMhrTransfer}"-->
-<!--      role="region"-->
-<!--      aria-labelledby="mhr-home-owners-list"-->
-<!--    >-->
-<!--      <template v-if="!isMhrTransfer">-->
-<!--        <h2>1. Owners</h2>-->
-<!--        <p class="mt-2 mb-0">-->
-<!--          Add a person or an organization as the owner of the home. You can add-->
-<!--          multiple owners to form joint tenancy or tenants in common ownership.-->
-<!--          <strong>Note:</strong> Tenants in common ownership requires more than one group of-->
-<!--          owners.-->
-<!--        </p>-->
+    <BaseDialog
+      :set-display="showDeleteAllGroupsDialog"
+      :set-options="{
+        title: 'Delete All Owners/Groups',
+        text:
+          'Deleting all owners/groups will delete all previous owners and remove any newly added owners.',
+        acceptText: 'Delete All Owners/Groups',
+        cancelText: 'Cancel'
+      }"
+      @proceed="cancelOrProceed($event)"
+    />
+    <section
+      id="mhr-owners"
+      :class="{'mt-10': !isReadonlyTable && !isMhrTransfer}"
+      role="region"
+      aria-labelledby="mhr-home-owners-list"
+    >
+      <template v-if="!isMhrTransfer">
+        <h2>1. Owners</h2>
+        <p class="mt-2 mb-0">
+          Add a person or an organization as the owner of the home. You can add
+          multiple owners to form joint tenancy or tenants in common ownership.
+          <strong>Note:</strong> Tenants in common ownership requires more than one group of
+          owners.
+        </p>
 
-<!--        <SimpleHelpToggle-->
-<!--          toggle-button-title="Help with Owners"-->
-<!--          :default-hide-text="false"-->
-<!--          class="my-6 help-with-owners"-->
-<!--        >-->
-<!--          <template #content>-->
-<!--            <h3 class="text-center mb-7">-->
-<!--              Help with Owners-->
-<!--            </h3>-->
-<!--            <h4>-->
-<!--              Sole Ownership-->
-<!--            </h4>-->
-<!--            <p>This applies when the home is owned by a single individual or organization.</p>-->
-<!--            <h4>Joint Tenancy</h4>-->
-<!--            <p>-->
-<!--              This applies when the home is owned by two or more individuals and/or organizations jointly, with rights-->
-<!--              of survivorship. In joint tenancy, if one joint tenant dies (or for an organization, if it ceases to-->
-<!--              exist) their-->
-<!--              ownership share in the home passes to the surviving joint owner(s).-->
-<!--            </p>-->
-<!--            <h4>Tenants in Common</h4>-->
-<!--            <p>-->
-<!--              This applies when the home is owned by two or more individuals and/or organizations that owns an undivided-->
-<!--              share in the home. Ownership will be displayed in groups of owners with their undivided portion. Each-->
-<!--              owner has the right to dispose of their share independently of the other owners, and in the case of the-->
-<!--              death of an individual,-->
-<!--              their share will belong to the estate of the individual, or through the legal process for dissolution of-->
-<!--              assets, in the case of an organization.-->
-<!--            </p>-->
-<!--            <h4>Definition for Groups</h4>-->
-<!--            <p>-->
-<!--              A group is one or more owners of the home that have an equal undivided share of the home. Tenants in-->
-<!--              common are-->
-<!--              recorded in the Manufactured Home Registry in groups. The relationship between groups will always be as-->
-<!--              tenants in-->
-<!--              common. The relationship between owners within each group is a joint tenancy. There may be multiple groups-->
-<!--              with-->
-<!--              joint tenants.-->
-<!--            </p>-->
-<!--            <h4>Recording Ownership for Multiple Groups</h4>-->
-<!--            <p>-->
-<!--              Each group’s ownership share must be recorded as a portion of the total number of equal shares in the-->
-<!--              home. For-->
-<!--              example, if the home is owned by two groups, and each owns half of the home, this is recorded as each-->
-<!--              group-->
-<!--              holding 1 of 2 shares. If the home is owned by two groups but one group holds two-thirds and one group-->
-<!--              holds-->
-<!--              one-third, this is recorded as the first group holding 2 of 3 shares and the second group holding 1 of 3-->
-<!--              shares.-->
-<!--            </p>-->
-<!--            <p>-->
-<!--              When adding groups of owners, you must enter the total number of shares in the home (Total Available) and-->
-<!--              the-->
-<!--              number of shares owned by each group (Amount Owned by the Group). All groups should use the same-->
-<!--              denominator as is-->
-<!--              used for Total Available, preferably using the lowest common denominator for all groups.-->
-<!--            </p>-->
-<!--          </template>-->
-<!--        </SimpleHelpToggle>-->
+        <SimpleHelpToggle
+          toggle-button-title="Help with Owners"
+          :default-hide-text="false"
+          class="my-6 help-with-owners"
+        >
+          <template #content>
+            <h3 class="text-center mb-7">
+              Help with Owners
+            </h3>
+            <h4>
+              Sole Ownership
+            </h4>
+            <p>This applies when the home is owned by a single individual or organization.</p>
+            <h4>Joint Tenancy</h4>
+            <p>
+              This applies when the home is owned by two or more individuals and/or organizations jointly, with rights
+              of survivorship. In joint tenancy, if one joint tenant dies (or for an organization, if it ceases to
+              exist) their
+              ownership share in the home passes to the surviving joint owner(s).
+            </p>
+            <h4>Tenants in Common</h4>
+            <p>
+              This applies when the home is owned by two or more individuals and/or organizations that owns an undivided
+              share in the home. Ownership will be displayed in groups of owners with their undivided portion. Each
+              owner has the right to dispose of their share independently of the other owners, and in the case of the
+              death of an individual,
+              their share will belong to the estate of the individual, or through the legal process for dissolution of
+              assets, in the case of an organization.
+            </p>
+            <h4>Definition for Groups</h4>
+            <p>
+              A group is one or more owners of the home that have an equal undivided share of the home. Tenants in
+              common are
+              recorded in the Manufactured Home Registry in groups. The relationship between groups will always be as
+              tenants in
+              common. The relationship between owners within each group is a joint tenancy. There may be multiple groups
+              with
+              joint tenants.
+            </p>
+            <h4>Recording Ownership for Multiple Groups</h4>
+            <p>
+              Each group’s ownership share must be recorded as a portion of the total number of equal shares in the
+              home. For
+              example, if the home is owned by two groups, and each owns half of the home, this is recorded as each
+              group
+              holding 1 of 2 shares. If the home is owned by two groups but one group holds two-thirds and one group
+              holds
+              one-third, this is recorded as the first group holding 2 of 3 shares and the second group holding 1 of 3
+              shares.
+            </p>
+            <p>
+              When adding groups of owners, you must enter the total number of shares in the home (Total Available) and
+              the
+              number of shares owned by each group (Amount Owned by the Group). All groups should use the same
+              denominator as is
+              used for Total Available, preferably using the lowest common denominator for all groups.
+            </p>
+          </template>
+        </SimpleHelpToggle>
 
-<!--        <label class="generic-label">-->
-<!--          Your registration must include the following:-->
-<!--        </label>-->
-<!--        <div class="mt-5 mb-11 reg-owners-check">-->
-<!--          <v-icon-->
-<!--            v-if="hasHomeOwners"-->
-<!--            color="green-darken-2"-->
-<!--            data-test-id="reg-owner-checkmark"-->
-<!--          >-->
-<!--            mdi-check-->
-<!--          </v-icon>-->
-<!--          <v-icon-->
-<!--            v-else-->
-<!--            color="black"-->
-<!--          >-->
-<!--            mdi-circle-small-->
-<!--          </v-icon>-->
-<!--          <span class="ml-1">At least one owner</span>-->
-<!--        </div>-->
-<!--      </template>-->
+        <label class="generic-label">
+          Your registration must include the following:
+        </label>
+        <div class="mt-5 mb-11 reg-owners-check">
+          <v-icon
+            v-if="hasHomeOwners"
+            color="green-darken-2"
+            data-test-id="reg-owner-checkmark"
+          >
+            mdi-check
+          </v-icon>
+          <v-icon
+            v-else
+            color="black"
+          >
+            mdi-circle-small
+          </v-icon>
+          <span class="ml-1">At least one owner</span>
+        </div>
+      </template>
 
-<!--      &lt;!&ndash; Add/Remove Owner Actions &ndash;&gt;-->
-<!--      <v-row-->
-<!--        v-if="!isReadonlyTable && enableAddHomeOwners() && !isFrozenMhrDueToUnitNote"-->
-<!--        no-gutters-->
-<!--      >-->
-<!--        <v-col cols="12">-->
-<!--          <v-btn-->
-<!--            variant="outlined"-->
-<!--            color="primary"-->
-<!--            :ripple="false"-->
-<!--            :disabled="isGlobalEditingMode"-->
-<!--            data-test-id="add-person-btn"-->
-<!--            @click="hasHomeOwnersTableErrors ? showError = true : (showAddPersonSection = true, showError = false)"-->
-<!--          >-->
-<!--            <v-icon class="pr-1">-->
-<!--              mdi-account-plus-->
-<!--            </v-icon> Add a Person-->
-<!--          </v-btn>-->
+      <!-- Add/Remove Owner Actions -->
+      <v-row
+        v-if="!isReadonlyTable && enableAddHomeOwners() && !isFrozenMhrDueToUnitNote"
+        no-gutters
+      >
+        <v-col cols="12">
+          <v-btn
+            variant="outlined"
+            color="primary"
+            :ripple="false"
+            :disabled="isGlobalEditingMode"
+            data-test-id="add-person-btn"
+            @click="validationHandler"
+          >
+            <v-icon class="pr-1">
+              mdi-account-plus
+            </v-icon> Add a Person
+          </v-btn>
 
-<!--          <span class="mx-2" />-->
+          <span class="mx-2" />
 
-<!--          <v-btn-->
-<!--            variant="outlined"-->
-<!--            color="primary"-->
-<!--            :ripple="false"-->
-<!--            :disabled="isGlobalEditingMode"-->
-<!--            data-test-id="add-org-btn"-->
-<!--            @click="hasHomeOwnersTableErrors-->
-<!--              ? showError = true-->
-<!--              : (showAddPersonOrganizationSection = true, showError = false)"-->
-<!--          >-->
-<!--            <v-icon class="pr-1">-->
-<!--              mdi-domain-plus-->
-<!--            </v-icon>-->
-<!--            Add a Business or Organization-->
-<!--          </v-btn>-->
+          <v-btn
+            variant="outlined"
+            color="primary"
+            :ripple="false"
+            :disabled="isGlobalEditingMode"
+            data-test-id="add-org-btn"
+            @click="validationHandler"
+          >
+            <v-icon class="pr-1">
+              mdi-domain-plus
+            </v-icon>
+            Add a Business or Organization
+          </v-btn>
 
-<!--          <span class="mx-2" />-->
+          <span class="mx-2" />
 
-<!--          <v-btn-->
-<!--            v-if="isMhrTransfer && enableDeleteAllGroupsActions() || isMhrCorrection"-->
-<!--            variant="outlined"-->
-<!--            color="primary"-->
-<!--            :ripple="false"-->
-<!--            :disabled="isGlobalEditingMode"-->
-<!--            class="float-right"-->
-<!--            data-test-id="remove-all-owners-btn"-->
-<!--            @click="removeAllOwnersHandler()"-->
-<!--          >-->
-<!--            <v-icon class="pr-1">-->
-<!--              mdi-delete-->
-<!--            </v-icon>-->
-<!--            Delete All Owners/Groups-->
-<!--          </v-btn>-->
-<!--        </v-col>-->
-<!--        <v-col-->
-<!--          cols="9"-->
-<!--          class="mb-n6 pa-0"-->
-<!--        /> &lt;!&ndash; Column Spacer &ndash;&gt;-->
-<!--        <v-col-->
-<!--          cols="3"-->
-<!--          class="mb-n6 pa-0"-->
-<!--        >-->
-<!--          <v-fade-transition>-->
-<!--            <span-->
-<!--              v-if="showRemovedAllOwnersMsg"-->
-<!--              class="error-text fs-12 ml-5"-->
-<!--            >Nothing to delete</span>-->
-<!--          </v-fade-transition>-->
-<!--        </v-col>-->
-<!--      </v-row>-->
+          <v-btn
+            v-if="isMhrTransfer && enableDeleteAllGroupsActions() || isMhrCorrection"
+            variant="outlined"
+            color="primary"
+            :ripple="false"
+            :disabled="isGlobalEditingMode"
+            class="float-right"
+            data-test-id="remove-all-owners-btn"
+            @click="removeAllOwnersHandler()"
+          >
+            <v-icon class="pr-1">
+              mdi-delete
+            </v-icon>
+            Delete All Owners/Groups
+          </v-btn>
+        </v-col>
+        <v-col
+          cols="9"
+          class="mb-n6 pa-0"
+        /> <!-- Column Spacer -->
+        <v-col
+          cols="3"
+          class="mb-n6 pa-0"
+        >
+          <v-fade-transition>
+            <span
+              v-if="showRemovedAllOwnersMsg"
+              class="error-text fs-12 ml-5"
+            >Nothing to delete</span>
+          </v-fade-transition>
+        </v-col>
+      </v-row>
 
-<!--      <v-row v-if="!isFrozenMhrDueToUnitNote">-->
-<!--        <v-col-->
-<!--          class="transfer-table-error"-->
-<!--        >-->
-<!--          <div-->
-<!--            v-if="showError && hasHomeOwnersTableErrors"-->
-<!--            class="error-text fs-12"-->
-<!--            data-test-id="transfer-table-error"-->
-<!--          >-->
-<!--            {{ transfersErrors.noSupportingDocSelected[getMhrTransferType.transferType] }}-->
-<!--          </div>-->
-<!--        </v-col>-->
-<!--      </v-row>-->
+      <v-row v-if="!isFrozenMhrDueToUnitNote">
+        <v-col
+          class="transfer-table-error"
+        >
+          <div
+            v-if="showError && hasHomeOwnersTableErrors"
+            class="error-text fs-12"
+            data-test-id="transfer-table-error"
+          >
+            {{ transfersErrors.noSupportingDocSelected[getMhrTransferType.transferType] }}
+          </div>
+        </v-col>
+      </v-row>
 
-<!--      <v-row-->
-<!--        v-if="!isReadonlyTable"-->
-<!--        class="mb-6"-->
-<!--        no-gutters-->
-<!--      >-->
-<!--        <v-col cols="12">-->
-<!--          <span class="generic-label">Home Tenancy Type: </span>-->
-<!--          <span data-test-id="home-owner-tenancy-type">{{ homeTenancyType }}</span>-->
-<!--          <span-->
-<!--            v-if="showTenancyTypeError"-->
-<!--            class="error-text fs-14 ml-3"-->
-<!--          >-->
-<!--            Must include more than one group of owners-->
-<!--          </span>-->
-<!--          <span-->
-<!--            v-if="hasRemovedOwners && !showTotalOwnership"-->
-<!--            class="float-right hide-show-owners fs-14"-->
-<!--            @click="hideShowRemovedOwners()"-->
-<!--          >-->
-<!--            <v-icon-->
-<!--              v-if="hideRemovedOwners"-->
-<!--              class="hide-show-owners-icon pr-1"-->
-<!--              color="primary"-->
-<!--            >mdi-eye</v-icon>-->
-<!--            <v-icon-->
-<!--              v-else-->
-<!--              class="hide-show-owners-icon pr-1"-->
-<!--              color="primary"-->
-<!--            >mdi-eye-off</v-icon>-->
-<!--            {{ hideShowRemovedOwnersLabel }} Deleted Owners-->
-<!--          </span>-->
-<!--        </v-col>-->
-<!--        <v-col-->
-<!--          v-show="showTotalOwnership"-->
-<!--          cols="12"-->
-<!--          data-test-id="ownership-allocation"-->
-<!--        >-->
-<!--          &lt;!&ndash; Ownership Allocation Information &ndash;&gt;-->
-<!--          <span class="generic-label">Total Ownership Allocated:</span> {{ ownershipTotalAllocation }}-->
-<!--          <span-->
-<!--            v-if="hasUndefinedGroups"-->
-<!--            class="error-text fs-14 ml-2"-->
-<!--          >-->
-<!--            No ownership allocated-->
-<!--          </span>-->
-<!--          <span-->
-<!--            v-else-if="getTotalOwnershipAllocationStatus.hasTotalAllocationError"-->
-<!--            class="error-text fs-14 ml-2"-->
-<!--          >-->
-<!--            {{ getTotalOwnershipAllocationStatus.allocationErrorMsg }}-->
-<!--          </span>-->
-<!--          &lt;!&ndash; Success when allocation is whole &ndash;&gt;-->
-<!--          <span v-else><v-icon-->
-<!--            color="success"-->
-<!--            class="mt-n2"-->
-<!--          >mdi-check</v-icon></span>-->
+      <v-row
+        v-if="!isReadonlyTable"
+        class="mb-6"
+        no-gutters
+      >
+        <v-col cols="12">
+          <span class="generic-label">Home Tenancy Type: </span>
+          <span data-test-id="home-owner-tenancy-type">{{ homeTenancyType }}</span>
+          <span
+            v-if="showTenancyTypeError"
+            class="error-text fs-14 ml-3"
+          >
+            Must include more than one group of owners
+          </span>
+          <span
+            v-if="hasRemovedOwners && !showTotalOwnership"
+            class="float-right hide-show-owners fs-14"
+            @click="hideShowRemovedOwners()"
+          >
+            <v-icon
+              v-if="hideRemovedOwners"
+              class="hide-show-owners-icon pr-1"
+              color="primary"
+            >mdi-eye</v-icon>
+            <v-icon
+              v-else
+              class="hide-show-owners-icon pr-1"
+              color="primary"
+            >mdi-eye-off</v-icon>
+            {{ hideShowRemovedOwnersLabel }} Deleted Owners
+          </span>
+        </v-col>
+        <v-col
+          v-show="showTotalOwnership"
+          cols="12"
+          data-test-id="ownership-allocation"
+        >
+          <!-- Ownership Allocation Information -->
+          <span class="generic-label">Total Ownership Allocated:</span> {{ ownershipTotalAllocation }}
+          <span
+            v-if="hasUndefinedGroups"
+            class="error-text fs-14 ml-2"
+          >
+            No ownership allocated
+          </span>
+          <span
+            v-else-if="getTotalOwnershipAllocationStatus.hasTotalAllocationError"
+            class="error-text fs-14 ml-2"
+          >
+            {{ getTotalOwnershipAllocationStatus.allocationErrorMsg }}
+          </span>
+          <!-- Success when allocation is whole -->
+          <span v-else><v-icon
+            color="success"
+            class="mt-n2"
+          >mdi-check</v-icon></span>
 
-<!--          &lt;!&ndash; Toggle removed owners &ndash;&gt;-->
-<!--          <span-->
-<!--            v-if="isMhrTransfer && hasRemovedOwners"-->
-<!--            class="float-right hide-show-owners fs-14"-->
-<!--            @click="hideShowRemovedOwners()"-->
-<!--          >-->
-<!--            <v-icon-->
-<!--              v-if="hideRemovedOwners"-->
-<!--              class="hide-show-owners-icon pr-1"-->
-<!--              color="primary"-->
-<!--            >mdi-eye</v-icon>-->
-<!--            <v-icon-->
-<!--              v-else-->
-<!--              class="hide-show-owners-icon pr-1"-->
-<!--              color="primary"-->
-<!--            >mdi-eye-off</v-icon>-->
-<!--            {{ hideShowRemovedOwnersLabel }} Deleted Owners-->
-<!--          </span>-->
-<!--        </v-col>-->
-<!--        <v-col-->
-<!--          v-if="changesRequired"-->
-<!--          class="mt-3"-->
-<!--        >-->
-<!--          <span-->
-<!--            class="error-text fs-14"-->
-<!--            data-test-id="structure-change-required"-->
-<!--          >-->
-<!--            Change to the ownership structure is required-->
-<!--          </span>-->
-<!--        </v-col>-->
-<!--      </v-row>-->
+          <!-- Toggle removed owners -->
+          <span
+            v-if="isMhrTransfer && hasRemovedOwners"
+            class="float-right hide-show-owners fs-14"
+            @click="hideShowRemovedOwners()"
+          >
+            <v-icon
+              v-if="hideRemovedOwners"
+              class="hide-show-owners-icon pr-1"
+              color="primary"
+            >mdi-eye</v-icon>
+            <v-icon
+              v-else
+              class="hide-show-owners-icon pr-1"
+              color="primary"
+            >mdi-eye-off</v-icon>
+            {{ hideShowRemovedOwnersLabel }} Deleted Owners
+          </span>
+        </v-col>
+        <v-col
+          v-if="changesRequired"
+          class="mt-3"
+        >
+          <span
+            class="error-text fs-14"
+            data-test-id="structure-change-required"
+          >
+            Change to the ownership structure is required
+          </span>
+        </v-col>
+      </v-row>
 
-<!--      &lt;!&ndash; Read Only Template &ndash;&gt;-->
-<!--      <v-card-->
-<!--        v-else-->
-<!--        id="read-only-owners"-->
-<!--        class="review-table"-->
-<!--        flat-->
-<!--      >-->
-<!--        &lt;!&ndash; Transfer Type Review &ndash;&gt;-->
-<!--        <template v-if="isMhrTransfer">-->
-<!--          <v-row-->
-<!--            v-if="isRoleStaff"-->
-<!--            id="document-id-review"-->
-<!--            class="px-7 pt-8"-->
-<!--            no-gutters-->
-<!--          >-->
-<!--            <v-col cols="3">-->
-<!--              <label class="generic-label">Document ID</label>-->
-<!--            </v-col>-->
-<!--            <v-col-->
-<!--              id="transfer-doc-id-display"-->
-<!--              cols="9"-->
-<!--              class="gray7"-->
-<!--            >-->
-<!--              {{ getMhrTransferDocumentId || 'Generate a Document ID Number upon filing' }}-->
-<!--            </v-col>-->
-<!--          </v-row>-->
-<!--          <v-row-->
-<!--            id="transfer-type-review"-->
-<!--            :class="isRoleStaff ? 'mt-4 px-7' : 'pt-8 px-7'"-->
-<!--            no-gutters-->
-<!--          >-->
-<!--            <v-col cols="3">-->
-<!--              <label class="generic-label">Transfer Type</label>-->
-<!--            </v-col>-->
-<!--            <v-col-->
-<!--              id="transfer-type-display"-->
-<!--              cols="9"-->
-<!--              class="gray7"-->
-<!--            >-->
-<!--              {{ getUiTransferType() }}-->
-<!--            </v-col>-->
-<!--          </v-row>-->
-<!--          <v-row-->
-<!--            class="my-4 px-7"-->
-<!--            no-gutters-->
-<!--          >-->
-<!--            <v-col cols="3">-->
-<!--              <label class="generic-label">Declared Value of Home</label>-->
-<!--            </v-col>-->
-<!--            <v-col-->
-<!--              id="declared-value-display"-->
-<!--              cols="9"-->
-<!--              class="gray7"-->
-<!--            >-->
-<!--              {{ formatCurrency(getMhrTransferDeclaredValue) }}-->
-<!--            </v-col>-->
-<!--          </v-row>-->
-<!--          <v-divider class="my-6 mx-7" />-->
-<!--        </template>-->
+      <!-- Read Only Template -->
+      <v-card
+        v-else
+        id="read-only-owners"
+        class="review-table"
+        flat
+      >
+        <!-- Transfer Type Review -->
+        <template v-if="isMhrTransfer">
+          <v-row
+            v-if="isRoleStaff"
+            id="document-id-review"
+            class="px-7 pt-8"
+            no-gutters
+          >
+            <v-col cols="3">
+              <label class="generic-label">Document ID</label>
+            </v-col>
+            <v-col
+              id="transfer-doc-id-display"
+              cols="9"
+              class="gray7"
+            >
+              {{ getMhrTransferDocumentId || 'Generate a Document ID Number upon filing' }}
+            </v-col>
+          </v-row>
+          <v-row
+            id="transfer-type-review"
+            :class="isRoleStaff ? 'mt-4 px-7' : 'pt-8 px-7'"
+            no-gutters
+          >
+            <v-col cols="3">
+              <label class="generic-label">Transfer Type</label>
+            </v-col>
+            <v-col
+              id="transfer-type-display"
+              cols="9"
+              class="gray7"
+            >
+              {{ getUiTransferType() }}
+            </v-col>
+          </v-row>
+          <v-row
+            class="my-4 px-7"
+            no-gutters
+          >
+            <v-col cols="3">
+              <label class="generic-label">Declared Value of Home</label>
+            </v-col>
+            <v-col
+              id="declared-value-display"
+              cols="9"
+              class="gray7"
+            >
+              {{ formatCurrency(getMhrTransferDeclaredValue) }}
+            </v-col>
+          </v-row>
+          <v-divider class="my-6 mx-7" />
+        </template>
 
-<!--        <v-row-->
-<!--          class="my-4 px-7"-->
-<!--          no-gutters-->
-<!--        >-->
-<!--          <v-col cols="12">-->
-<!--            <h4 class="fs-16 lh-24">-->
-<!--              Home Owners-->
-<!--            </h4>-->
-<!--            <span-->
-<!--              v-if="(isMhrTransfer) && hasRemovedOwners"-->
-<!--              class="float-right hide-show-owners fs-14"-->
-<!--              @click="hideShowRemovedOwners()"-->
-<!--            >-->
-<!--              <v-icon-->
-<!--                class="hide-show-owners-icon pr-1"-->
-<!--                color="primary"-->
-<!--              >-->
-<!--                {{ hideRemovedOwners ? 'mdi-eye' : 'mdi-eye-off' }}-->
-<!--              </v-icon>-->
-<!--              {{ hideShowRemovedOwnersLabel }} Deleted Owners-->
-<!--            </span>-->
-<!--          </v-col>-->
-<!--        </v-row>-->
-<!--        <v-row-->
-<!--          class="my-4 px-7"-->
-<!--          no-gutters-->
-<!--        >-->
-<!--          <v-col cols="3">-->
-<!--            <span class="generic-label">Home Tenancy Type</span>-->
-<!--          </v-col>-->
-<!--          <v-col cols="9">-->
-<!--            <span data-test-id="home-owner-tenancy-type">{{ homeTenancyType }}</span>-->
-<!--          </v-col>-->
-<!--        </v-row>-->
-<!--        <v-row-->
-<!--          class="mt-4 px-7"-->
-<!--          no-gutters-->
-<!--        >-->
-<!--          <v-col>-->
-<!--            <HomeOwnersTable-->
-<!--              show-chips-->
-<!--              :home-owner-groups="hideRemovedOwners ? filteredHomeOwnersGroups : getHomeOwnerGroups"-->
-<!--              :is-adding="disableAddHomeOwnerBtn"-->
-<!--              :is-mhr-transfer="isMhrTransfer"-->
-<!--              :is-readonly-table="isReadonlyTable"-->
-<!--              :hide-removed-owners="hideRemovedOwners"-->
-<!--            />-->
-<!--          </v-col>-->
-<!--        </v-row>-->
-<!--      </v-card>-->
-<!--    </section>-->
+        <v-row
+          class="my-4 px-7"
+          no-gutters
+        >
+          <v-col cols="12">
+            <h4 class="fs-16 lh-24">
+              Home Owners
+            </h4>
+            <span
+              v-if="(isMhrTransfer) && hasRemovedOwners"
+              class="float-right hide-show-owners fs-14"
+              @click="hideShowRemovedOwners()"
+            >
+              <v-icon
+                class="hide-show-owners-icon pr-1"
+                color="primary"
+              >
+                {{ hideRemovedOwners ? 'mdi-eye' : 'mdi-eye-off' }}
+              </v-icon>
+              {{ hideShowRemovedOwnersLabel }} Deleted Owners
+            </span>
+          </v-col>
+        </v-row>
+        <v-row
+          class="my-4 px-7"
+          no-gutters
+        >
+          <v-col cols="3">
+            <span class="generic-label">Home Tenancy Type</span>
+          </v-col>
+          <v-col cols="9">
+            <span data-test-id="home-owner-tenancy-type">{{ homeTenancyType }}</span>
+          </v-col>
+        </v-row>
+        <v-row
+          class="mt-4 px-7"
+          no-gutters
+        >
+          <v-col>
+            <HomeOwnersTable
+              show-chips
+              :home-owner-groups="hideRemovedOwners ? filteredHomeOwnersGroups : getHomeOwnerGroups"
+              :is-adding="disableAddHomeOwnerBtn"
+              :is-mhr-transfer="isMhrTransfer"
+              :is-readonly-table="isReadonlyTable"
+              :hide-removed-owners="hideRemovedOwners"
+            />
+          </v-col>
+        </v-row>
+      </v-card>
+    </section>
 
-<!--    <v-expand-transition>-->
-<!--      <AddEditHomeOwner-->
-<!--        v-if="showAddPersonSection"-->
-<!--        :is-home-owner-person="true"-->
-<!--        :is-mhr-transfer="isMhrTransfer"-->
-<!--        :show-table-error="validateTransfer && isGlobalEditingMode"-->
-<!--        @cancel="showAddPersonSection = false"-->
-<!--      />-->
-<!--    </v-expand-transition>-->
+    <v-expand-transition>
+      <AddEditHomeOwner
+        v-if="showAddPersonSection"
+        :is-home-owner-person="true"
+        :is-mhr-transfer="isMhrTransfer"
+        :show-table-error="validateTransfer && isGlobalEditingMode"
+        @cancel="showAddPersonSection = false"
+      />
+    </v-expand-transition>
 
-<!--    <v-expand-transition>-->
-<!--      <AddEditHomeOwner-->
-<!--        v-if="showAddPersonOrganizationSection"-->
-<!--        :is-mhr-transfer="isMhrTransfer"-->
-<!--        :show-table-error="validateTransfer && isGlobalEditingMode"-->
-<!--        @cancel="showAddPersonOrganizationSection = false"-->
-<!--      />-->
-<!--    </v-expand-transition>-->
+    <v-expand-transition>
+      <AddEditHomeOwner
+        v-if="showAddPersonOrganizationSection"
+        :is-mhr-transfer="isMhrTransfer"
+        :show-table-error="validateTransfer && isGlobalEditingMode"
+        @cancel="showAddPersonOrganizationSection = false"
+      />
+    </v-expand-transition>
 
-<!--    <div v-if="!isReadonlyTable">-->
-<!--      <v-fade-transition>-->
-<!--        <HomeOwnersTable-->
-<!--          :home-owner-groups="hideRemovedOwners ? filteredHomeOwnersGroups : getHomeOwnerGroups"-->
-<!--          :is-adding="disableAddHomeOwnerBtn"-->
-<!--          :is-mhr-transfer="isMhrTransfer"-->
-<!--          :hide-removed-owners="hideRemovedOwners"-->
-<!--          :validate-transfer="validateTransfer"-->
-<!--          @is-valid-transfer-owners="isValidTransferOwners($event)"-->
-<!--          @handle-undo="handleUndo"-->
-<!--        />-->
-<!--      </v-fade-transition>-->
-<!--    </div>-->
+    <div v-if="!isReadonlyTable">
+        <HomeOwnersTable
+          :home-owner-groups="hideRemovedOwners ? filteredHomeOwnersGroups : getHomeOwnerGroups"
+          :is-adding="disableAddHomeOwnerBtn"
+          :is-mhr-transfer="isMhrTransfer"
+          :hide-removed-owners="hideRemovedOwners"
+          :validate-transfer="validateTransfer"
+          @is-valid-transfer-owners="isValidTransferOwners($event)"
+          @handle-undo="handleUndo"
+        />
+    </div>
 
-<!--    <PreviousHomeOwners v-if="showPreviousHomeOwners" />-->
+    <PreviousHomeOwners v-if="showPreviousHomeOwners" />
   </div>
 </template>
 
@@ -616,6 +612,12 @@ export default defineComponent({
       )
     })
 
+    const validationHandler = () => {
+     return localState.hasHomeOwnersTableErrors
+       ? localState.showError = true
+       : localState.showAddPersonSection = true, localState.showError = false
+    }
+
     const hideShowRemovedOwners = (forceShow: boolean = false): void => {
       // Override Toggle to force show
       if (forceShow) localState.hideRemovedOwners = true
@@ -700,6 +702,7 @@ export default defineComponent({
     })
 
     return {
+      validationHandler,
       isRoleStaff,
       isMhrCorrection,
       getTotalOwnershipAllocationStatus,
