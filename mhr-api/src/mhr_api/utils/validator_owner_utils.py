@@ -662,6 +662,23 @@ def get_death_group_count(registration: MhrRegistration, json_data: dict) -> int
     return add_count - edit_count
 
 
+def get_delete_group_count(registration: MhrRegistration, json_data: dict) -> int:
+    """Transfer non-staff registration get deleted group count ignoring owner edits."""
+    del_count: int = len(json_data.get("deleteOwnerGroups"))
+    if del_count == 1:
+        return 1
+    # Ignore groups with valid owner edits.
+    edit_count: int = 0
+    for group in json_data.get("addOwnerGroups"):
+        if is_edit_group(registration, group):
+            edit_count += 1
+    if edit_count == 0:
+        return del_count
+    if del_count - edit_count == 0:
+        return 1
+    return del_count - edit_count
+
+
 def get_death_add_group(json_data: dict) -> dict:
     """Transfer death registration get single added group ignoring owner edits."""
     if len(json_data.get("addOwnerGroups")) == 1:
