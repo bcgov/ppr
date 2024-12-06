@@ -107,13 +107,6 @@
 import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
-import {
-  BaseDialog,
-  ConfirmationDialog,
-  LargeSearchResultDialog,
-  LargeSearchDelayDialog
-} from '@/components/dialogs'
-import { SearchedResultPpr } from '@/components/tables'
 import { MatchTypes, RouteNames, SettingOptions } from '@/enums'
 import {
   largeSearchReportError,
@@ -130,13 +123,6 @@ import { useAuth, useNavigation } from '@/composables'
 
 export default defineComponent({
   name: 'Search',
-  components: {
-    BaseDialog,
-    ConfirmationDialog,
-    LargeSearchResultDialog,
-    LargeSearchDelayDialog,
-    SearchedResultPpr
-  },
   props: {
     appReady: {
       type: Boolean,
@@ -154,7 +140,7 @@ export default defineComponent({
   emits: ['haveData'],
   setup (props, context) {
     const router = useRouter()
-    const { goToDash, navigateTo } = useNavigation()
+    const { goToDash, navigateToUrl } = useNavigation()
     const { isAuthenticated } = useAuth()
     const {
       getSearchedType,
@@ -285,7 +271,7 @@ export default defineComponent({
     }
 
     const redirectRegistryHome = (): void => {
-      navigateTo(props.registryUrl)
+      navigateToUrl(props.registryUrl)
     }
 
     const submitCheck = (): void => {

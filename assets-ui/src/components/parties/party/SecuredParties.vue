@@ -8,7 +8,7 @@
     <ChangeSecuredPartyDialog
       attach="#app"
       :display="showDialog"
-      :securedPartyName="currentPartyName"
+      :secured-party-name="currentPartyName"
       @proceed="dialogSubmit($event)"
     />
     <v-row v-if="isSecuredPartiesRestricted">
@@ -27,7 +27,7 @@
     </v-row>
     <v-row
       v-if="isSecuredPartiesRestricted && !isStaffReg"
-      noGutters
+      no-gutters
       class="pb-4 pt-6"
     >
       <v-col
@@ -39,16 +39,16 @@
           v-model="searchValue"
           variant="filled"
           color="primary"
-          hideDetails
+          hide-details
           :loading="loading"
           :items="partyResults"
-          itemTitle="businessName"
-          itemValue="code"
+          item-title="businessName"
+          item-value="code"
           label="Secured Party Code or Name"
           no-data-text="No matches found."
-          :menuProps="{ maxHeight: '325px' }"
+          :menu-props="{ maxHeight: '325px' }"
           offset="1000"
-          returnObject
+          return-object
           class="mx-7 my-8"
         >
           <template #selection="{ item }">
@@ -87,7 +87,7 @@
 
     <v-row
       v-if="!isSecuredPartiesRestricted"
-      noGutters
+      no-gutters
     >
       <v-col cols="auto">
         Include Secured Parties in your registration by adding their secured
@@ -98,19 +98,19 @@
     </v-row>
     <v-row
       v-if="(!isSecuredPartiesRestricted || isStaffReg) && !isSecurityActNotice"
-      noGutters
+      no-gutters
       class="pb-4 pt-6"
     >
       <PartySearch
-        :isAutoCompleteDisabled="addEditInProgress"
-        :registeringPartyAdded="registeringPartyAdded"
-        @selectItem="addItem()"
-        @showSecuredPartyAdd="initAdd"
-        @addRegisteringParty="addRegisteringParty"
-        @removeRegisteringParty="removeRegisteringParty"
+        :is-auto-complete-disabled="addEditInProgress"
+        :registering-party-added="registeringPartyAdded"
+        @select-item="addItem()"
+        @show-secured-party-add="initAdd"
+        @add-registering-party="addRegisteringParty"
+        @remove-registering-party="removeRegisteringParty"
       />
     </v-row>
-    <v-row noGutters>
+    <v-row no-gutters>
       <v-col>
         <div :class="{ 'invalid-section': invalidSection }">
           <v-expand-transition>
@@ -120,10 +120,10 @@
               class="add-party-container"
             >
               <EditParty
-                :activeIndex="activeIndex"
-                :invalidSection="invalidSection"
-                :setShowErrorBar="setShowErrorBar"
-                @resetEvent="resetData"
+                :active-index="activeIndex"
+                :invalid-section="invalidSection"
+                :set-show-error-bar="setShowErrorBar"
+                @reset-event="resetData"
               />
             </v-card>
           </v-expand-transition>
@@ -131,7 +131,7 @@
       </v-col>
     </v-row>
     <v-row
-      noGutters
+      no-gutters
       class="pt-2"
     >
       <v-col>
@@ -176,12 +176,12 @@
                       class="edit-Party-container"
                     >
                       <EditParty
-                        :activeIndex="activeIndex"
-                        :invalidSection="invalidSection"
-                        :setShowErrorBar="setShowErrorBar"
-                        :isEditMode="true"
-                        @removeSecuredParty="removeParty"
-                        @resetEvent="resetData"
+                        :active-index="activeIndex"
+                        :invalid-section="invalidSection"
+                        :set-show-error-bar="setShowErrorBar"
+                        :is-edit-mode="true"
+                        @remove-secured-party="removeParty"
+                        @reset-event="resetData"
                       />
                     </v-card>
                   </td>
@@ -190,7 +190,7 @@
                 <template v-else>
                   <td class="list-item__title">
                     <v-row
-                      noGutters
+                      no-gutters
                       :aria-label="`${isBusiness(item) ? 'Business' : 'Person'} ${getName(item)}`"
                     >
                       <v-col
@@ -216,7 +216,7 @@
                         <div v-if="item.action && isAmendment">
                           <v-chip
                             v-if="item.action === ActionTypes.REMOVED"
-                            xSmall
+                            x-small
                             variant="elevated"
                             color="greyLighten"
                           >
@@ -224,7 +224,7 @@
                           </v-chip>
                           <v-chip
                             v-else
-                            xSmall
+                            x-small
                             variant="elevated"
                             color="primary"
                           >
@@ -467,14 +467,12 @@ import {
 } from 'vue'
 import { useStore } from '@/store/store'
 import { cloneDeep, isEqual } from 'lodash'
-import { ChangeSecuredPartyDialog } from '@/components/dialogs'
-import { EditParty, PartySearch } from '@/components/parties/party'
 import { BaseAddress } from '@/composables/address'
 import { useCountriesProvinces } from '@/composables/address/factories'
 import { useParty } from '@/composables/useParty'
 import { useSecuredParty } from '@/composables/parties'
 import { ActionTypes, RegistrationFlowType } from '@/enums'
-import { PartyIF, AddPartiesIF, SearchPartyIF } from '@/interfaces'
+import type { PartyIF, AddPartiesIF, SearchPartyIF } from '@/interfaces'
 import { editTableHeaders, partyTableHeaders } from '@/resources'
 import { PartyAddressSchema } from '@/schemas'
 import { partyCodeAccount } from '@/utils'
@@ -483,10 +481,7 @@ import { usePprRegistration } from '@/composables'
 
 export default defineComponent({
   components: {
-    EditParty,
-    PartySearch,
-    BaseAddress,
-    ChangeSecuredPartyDialog
+    BaseAddress
   },
   props: {
     isSummary: {

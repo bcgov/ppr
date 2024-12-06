@@ -30,7 +30,7 @@ export default defineComponent({
   setup (props, context) {
     const route = useRoute()
     const router = useRouter()
-    const { navigateTo } = useNavigation()
+    const { navigateToUrl } = useNavigation()
     const localState = reactive({})
 
     /** Called when user profile is ready (ie, the user is authenticated). */
@@ -49,7 +49,7 @@ export default defineComponent({
     }
 
     const redirectRegistryHome = (): void => {
-      navigateTo(props.registryUrl)
+      navigateToUrl(props.registryUrl)
     }
 
     const emitProfileReady = (profileReady: boolean = true) => {

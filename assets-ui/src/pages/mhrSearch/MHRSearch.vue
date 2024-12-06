@@ -92,7 +92,7 @@ export default defineComponent({
   },
   emits: ['haveData'],
   setup (props, context) {
-    const { goToDash, isRouteName, navigateTo } = useNavigation()
+    const { goToDash, isRouteName, navigateToUrl } = useNavigation()
     const { isAuthenticated } = useAuth()
     const { getManufacturedHomeSearchResults } = storeToRefs(useStore())
 
@@ -136,7 +136,7 @@ export default defineComponent({
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
       if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
         window.alert('Personal Property Registry is under construction. Please check again later.')
-        navigateTo(props.registryUrl)
+        navigateToUrl(props.registryUrl)
         return
       }
 

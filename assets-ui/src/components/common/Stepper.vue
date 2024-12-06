@@ -85,7 +85,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { StepIF } from '@/interfaces'
+import type { StepIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'Stepper',

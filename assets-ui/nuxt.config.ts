@@ -5,7 +5,43 @@ import path from 'path'
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-  components: true,
+  // components: true,
+  components: [
+    '~/components', // Auto-import components from the components directory
+    '~/components/collateral',
+    '~/components/collateral/generalCollateral',
+    '~/components/collateral/vehicle',
+    '~/components/common',
+    '~/components/dashboard',
+    '~/components/dialogs',
+    '~/components/dialogs/common',
+    '~/components/exemptions',
+    '~/components/mhrHistory',
+    '~/components/mhrRegistration',
+    '~/components/mhrRegistration/HomeLocation',
+    '~/components/mhrRegistration/HomeOwners',
+    '~/components/mhrRegistration/ReviewConfirm',
+    '~/components/mhrRegistration/YourHome',
+    '~/components/mhrTransfers',
+    '~/components/mhrTransportPermits',
+    '~/components/mhrTransportPermits/ConfirmCompletionContent',
+    '~/components/mhrTransportPermits/HelpContent',
+    '~/components/parties',
+    '~/components/parties/debtor',
+    '~/components/parties/party',
+    '~/components/parties/summaries',
+    '~/components/registration',
+    '~/components/registration/length-trust',
+    '~/components/registration/securities-act-notices',
+    '~/components/search',
+    '~/components/tables',
+    '~/components/tables/common',
+    '~/components/tables/mhr',
+    '~/components/tables/ppr',
+    '~/components/tombstones',
+    '~/components/unitNotes',
+    '~/components/userAccess'
+  ],
   app: {
     buildAssetsDir: '/src/',
     head: {
@@ -21,7 +57,6 @@ export default defineNuxtConfig({
     preference: 'light'
   },
   srcDir: 'src/',
-  // envPrefix: 'VUE_APP_', // Need to remove this after fixing vaults. Use import.meta.env with VUE_APP.
   alias: {
     '@': path.resolve(__dirname, './src'),
     '@sbc': path.resolve(__dirname, './node_modules/sbc-common-components/src')
@@ -33,13 +68,23 @@ export default defineNuxtConfig({
     icons: ['mdi']
   },
   ssr: false,
+  server: {
+    hmr: {
+      overlay: false, // Disable the error overlay
+      clientPort: 443, // Specify the client port if needed
+    },
+    watch: {
+      usePolling: true, // Use polling for file changes
+      interval: 1000, // Polling interval in milliseconds
+    },
+  },
   modules: ['@pinia/nuxt', '@nuxt/eslint', 'nuxt-lodash',
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
         config.plugins.push(vuetify({ autoImport: true }))
       })
     }
-    ],
+  ],
   typescript: {
     tsConfig: {
       compilerOptions: {

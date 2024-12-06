@@ -172,12 +172,7 @@ import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { ProductStatus, RouteNames } from '@/enums'
 import { getFeatureFlag, getQualifiedSupplier, searchHistory, updateQualifiedSupplier } from '@/utils'
-import { BaseSnackbar, CautionBox, RegistrationsWrapper } from '@/components/common'
-import { DealerInfo } from '@/components/userAccess'
-import { SearchHistory } from '@/components/tables'
-import { SearchBar } from '@/components/search'
 import { useSearch } from '@/composables/useSearch'
-import { DashboardTabs } from '@/components/dashboard'
 import type {
   ErrorIF,
   ManufacturedHomeSearchResponseIF,
@@ -187,15 +182,6 @@ import { useAuth, useNavigation, useTransportPermits, useUserAccess } from '@/co
 
 export default defineComponent({
   name: 'Dashboard',
-  components: {
-    DealerInfo,
-    BaseSnackbar,
-    CautionBox,
-    DashboardTabs,
-    SearchBar,
-    SearchHistory,
-    RegistrationsWrapper
-  },
   props: {
     appReady: {
       type: Boolean,
@@ -206,10 +192,11 @@ export default defineComponent({
       default: 'https://bcregistry.ca'
     }
   },
+  definePageMeta: { keepalive: true },
   emits: ['error', 'haveData'],
   setup (props, context) {
     const router = useRouter()
-    const { navigateTo } = useNavigation()
+    const { navigateToUrl } = useNavigation()
     const { isAuthenticated } = useAuth()
     const { fetchIsAccountAdmin, qsMsgContent, hideStatusMsg } = useUserAccess()
     const {
@@ -304,7 +291,7 @@ export default defineComponent({
 
     /** Redirects browser to Business Registry home page. */
     const redirectRegistryHome = (): void => {
-      navigateTo(props.registryUrl)
+      navigateToUrl(props.registryUrl)
     }
 
     const retrieveSearchHistory = async (): Promise<void> => {

@@ -25,6 +25,16 @@ import {
   Login,
   MhrUnitNote,
   UserAccess,
+  SubmittingParty,
+  YourHome,
+  HomeOwners,
+  HomeLocation,
+  MhrReviewConfirm,
+  QsSelectAccess,
+  QsInformation,
+  QsReviewConfirm,
+  ExemptionDetails,
+  ExemptionReview
 } from '@/pages'
 
 export default <RouterConfig> {
@@ -159,54 +169,61 @@ export default <RouterConfig> {
       },
     },
     {
-      path: '/mhr-registration/your-home',
-      name: RouteNames.YOUR_HOME,
+      path: '/mhr-registration',
       component: MhrRegistration,
-      meta: {
-        step: 1,
-        label: 'Describe your Home',
-        requiresAuth: true,
-      },
-    },
-    {
-      path: '/mhr-registration/submitting-party',
-      name: RouteNames.SUBMITTING_PARTY,
-      component: MhrRegistration,
-      meta: {
-        step: 2,
-        label: 'Submitting Party',
-        requiresAuth: true,
-      },
-    },
-    {
-      path: '/mhr-registration/home-owners',
-      name: RouteNames.HOME_OWNERS,
-      component: MhrRegistration,
-      meta: {
-        step: 3,
-        label: 'List the Home Owners',
-        requiresAuth: true,
-      },
-    },
-    {
-      path: '/mhr-registration/home-location',
-      name: RouteNames.HOME_LOCATION,
-      component: MhrRegistration,
-      meta: {
-        step: 4,
-        label: 'Detail the Home Location',
-        requiresAuth: true,
-      },
-    },
-    {
-      path: '/mhr-registration/mhr-review-confirm',
-      name: RouteNames.MHR_REVIEW_CONFIRM,
-      component: MhrRegistration,
-      meta: {
-        step: 5,
-        label: 'Review and Confirm',
-        requiresAuth: true,
-      },
+      name: RouteNames.MHR_REGISTRATION,
+      children: [
+        {
+          path: '/mhr-registration/your-home',
+          name: RouteNames.YOUR_HOME,
+          component: YourHome,
+          meta: {
+            step: 1,
+            label: 'Describe your Home',
+            requiresAuth: true,
+          },
+        },
+        {
+          path: '/mhr-registration/submitting-party',
+          name: RouteNames.SUBMITTING_PARTY,
+          component: SubmittingParty,
+          meta: {
+            step: 2,
+            label: 'Submitting Party',
+            requiresAuth: true,
+          },
+        },
+        {
+          path: '/mhr-registration/home-owners',
+          name: RouteNames.HOME_OWNERS,
+          component: HomeOwners,
+          meta: {
+            step: 3,
+            label: 'List the Home Owners',
+            requiresAuth: true,
+          },
+        },
+        {
+          path: '/mhr-registration/home-location',
+          name: RouteNames.HOME_LOCATION,
+          component: HomeLocation,
+          meta: {
+            step: 4,
+            label: 'Detail the Home Location',
+            requiresAuth: true,
+          },
+        },
+        {
+          path: '/mhr-registration/mhr-review-confirm',
+          name: RouteNames.MHR_REVIEW_CONFIRM,
+          component: MhrReviewConfirm,
+          meta: {
+            step: 5,
+            label: 'Review and Confirm',
+            requiresAuth: true,
+          },
+        },
+      ]
     },
     {
       path: '/ppr/search',
@@ -257,52 +274,66 @@ export default <RouterConfig> {
       },
     },
     {
-      path: '/user-access/qs-access-type',
-      name: RouteNames.QS_ACCESS_TYPE,
+      path: '/user-access',
       component: UserAccess,
-      meta: {
-        requiresAuth: true,
-      },
+      name: RouteNames.QS_USER_ACCESS,
+      children: [
+        {
+          path: '/user-access/qs-access-type',
+          name: RouteNames.QS_ACCESS_TYPE,
+          component: QsSelectAccess,
+          meta: {
+            requiresAuth: true,
+          },
+        },
+        {
+          path: '/user-access/qs-access-information',
+          name: RouteNames.QS_ACCESS_INFORMATION,
+          component: QsInformation,
+          meta: {
+            step: 1,
+            label: 'Qualified Supplier Information',
+            requiresAuth: true,
+          },
+        },
+        {
+          path: '/user-access/qs-access-review-confirm',
+          name: RouteNames.QS_ACCESS_REVIEW_CONFIRM,
+          component: QsReviewConfirm,
+          meta: {
+            step: 2,
+            label: 'Review and Confirm',
+            requiresAuth: true,
+          },
+        },
+      ]
     },
     {
-      path: '/user-access/qs-access-information',
-      name: RouteNames.QS_ACCESS_INFORMATION,
-      component: UserAccess,
-      meta: {
-        step: 1,
-        label: 'Qualified Supplier Information',
-        requiresAuth: true,
-      },
-    },
-    {
-      path: '/user-access/qs-access-review-confirm',
-      name: RouteNames.QS_ACCESS_REVIEW_CONFIRM,
-      component: UserAccess,
-      meta: {
-        step: 2,
-        label: 'Review and Confirm',
-        requiresAuth: true,
-      },
-    },
-    {
-      path: '/residential-exemption/exemption-details',
-      name: RouteNames.EXEMPTION_DETAILS,
+      path: '/residential-exemption',
       component: Exemptions,
-      meta: {
-        step: 1,
-        label: 'Verify Home Details',
-        requiresAuth: true,
-      },
-    },
-    {
-      path: '/residential-exemption/exemption-review',
-      name: RouteNames.EXEMPTION_REVIEW,
-      component: Exemptions,
-      meta: {
-        step: 2,
-        label: 'Review and Confirm',
-        requiresAuth: true,
-      },
+      name: RouteNames.RESIDENTIAL_EXEMPTION,
+      children: [
+        {
+          path: '/residential-exemption/exemption-details',
+          name: RouteNames.EXEMPTION_DETAILS,
+          component: ExemptionDetails,
+          meta: {
+            step: 1,
+            label: 'Verify Home Details',
+            requiresAuth: true,
+          },
+        },
+        {
+          path: '/residential-exemption/exemption-review',
+          name: RouteNames.EXEMPTION_REVIEW,
+          component: ExemptionReview,
+          meta: {
+            step: 2,
+            label: 'Review and Confirm',
+            requiresAuth: true,
+          },
+        },
+      ]
     },
     {
       // default/fallback route

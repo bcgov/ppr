@@ -6,54 +6,54 @@
     <!-- Registration Dialogs -->
     <BaseDialog
       id="manufacturerRegSuccessDialog"
-      :setDisplay="manufacturerRegSuccessDialogDisplay"
-      :setOptions="manufacturerRegSuccessDialogOptions"
+      :set-display="manufacturerRegSuccessDialogDisplay"
+      :set-options="manufacturerRegSuccessDialogOptions"
       show-dismiss-dialog-checkbox
       @proceed="manufacturerRegSuccessDialogDisplay = false"
     />
     <BaseDialog
       id="myRegAddDialog"
-      :setDisplay="myRegAddDialogDisplay"
-      :setOptions="myRegAddDialog"
+      :set-display="myRegAddDialogDisplay"
+      :set-options="myRegAddDialog"
       @proceed="myRegAddDialogProceed"
     />
     <BaseDialog
       id="myRegCannotBeAddedDialog"
-      :setDisplay="myRegCannotBeAddedDialogDisplay"
-      :setOptions="myRegCannotBeAddedDialog"
+      :set-display="myRegCannotBeAddedDialogDisplay"
+      :set-options="myRegCannotBeAddedDialog"
       @proceed="myRegCannotBeAddedDialogDisplay = false"
     />
     <BaseDialog
       id="myRegDeleteDialog"
-      :setDisplay="myRegDeleteDialogDisplay"
-      :setOptions="myRegDeleteDialog"
+      :set-display="myRegDeleteDialogDisplay"
+      :set-options="myRegDeleteDialog"
       @proceed="myRegDeleteDialogProceed"
     />
     <RegistrationConfirmation
       attach=""
       :options="myRegActionDialog"
       :display="myRegActionDialogDisplay"
-      :registrationNumber="myRegActionRegNum"
+      :registration-number="myRegActionRegNum"
       @proceed="myRegActionDialogHandler"
     />
     <BaseDialog
       id="staleDraftDialog"
-      :setDisplay="staleDraftDialogDisplay"
-      :setOptions="staleDraftDialogOptions(`MHR Number ${mhrWithDraftId}`)"
+      :set-display="staleDraftDialogDisplay"
+      :set-options="staleDraftDialogOptions(`MHR Number ${mhrWithDraftId}`)"
       @proceed="staleDraftHandler"
     />
     <BaseDialog
       id="manufacturedHomeDelivered"
-      setConfirmActionLabel="I confirm the manufactured home has been delivered"
-      :setDisplay="manufacturedHomeDeliveredDialogDisplay"
-      :setOptions="manufacturedHomeDeliveredDialogOptions(exemptionTypeDesc)"
+      set-confirm-action-label="I confirm the manufactured home has been delivered"
+      :set-display="manufacturedHomeDeliveredDialogDisplay"
+      :set-options="manufacturedHomeDeliveredDialogOptions(exemptionTypeDesc)"
       @proceed="mhDeliveredHandler"
     />
 
     <!-- Registrations Upper Section -->
     <v-row
       class="pt-10 px-0"
-      noGutters
+      no-gutters
       align="center"
     >
       <v-col
@@ -62,16 +62,16 @@
       >
         <RegistrationBar
           class="soft-corners-bottom"
-          :isMhr="isMhr"
-          :isTabView="isTabView"
-          @selectedRegistrationType="startNewRegistration($event)"
+          :is-mhr="isMhr"
+          :is-tab-view="isTabView"
+          @selected-registration-type="startNewRegistration($event)"
         />
       </v-col>
       <v-col cols="5">
         <p class="fs-14 float-right pr-7 mb-0">
           <v-tooltip
             class="pa-2"
-            contentClass="top-tooltip"
+            content-class="top-tooltip"
             location="top"
             transition="fade-transition"
           >
@@ -101,10 +101,10 @@
           v-model="myRegAdd"
           class="reg-input rounded-all float-right"
           :class="{'column-selection': !isTabView}"
-          appendInnerIcon="mdi-magnify"
+          append-inner-icon="mdi-magnify"
           variant="filled"
           color="primary"
-          :errorMessages="myRegAddInvalid ? `Registration numbers contain ${ isMhr ? '6' : '7' } digits` : ''"
+          :error-messages="myRegAddInvalid ? `Registration numbers contain ${ isMhr ? '6' : '7' } digits` : ''"
           :label="`${registrationLabel} Registration Number`"
           style="width:342px"
           density="compact"
@@ -116,7 +116,7 @@
 
     <!-- Registrations Table Section -->
     <v-row
-      noGutters
+      no-gutters
       class="my-10"
     >
       <v-col>
@@ -124,7 +124,7 @@
           id="registration-header"
           class="review-header px-6 py-2 rounded-top"
           align="center"
-          noGutters
+          no-gutters
         >
           <v-col
             cols="auto"
@@ -138,7 +138,7 @@
           <v-col>
             <v-row
               justify="end"
-              noGutters
+              no-gutters
             >
               <v-col
                 class="py-1"
@@ -148,10 +148,10 @@
                   id="column-selection"
                   v-model="myRegHeadersSelected"
                   :items="myRegHeadersSelectable"
-                  hideDetails
-                  itemTitle="text"
+                  hide-details
+                  item-title="text"
                   multiple
-                  returnObject
+                  return-object
                   density="compact"
                   placeholder="Columns to Show"
                 >
@@ -171,7 +171,7 @@
                       <template #prepend>
                         <v-checkbox
                           class="py-0"
-                          hideDetails
+                          hide-details
                           density="compact"
                           :model-value="isActiveHeader(item.value)"
                         />
@@ -184,7 +184,7 @@
           </v-col>
         </v-row>
         <v-row
-          noGutters
+          no-gutters
           class="bg-white"
         >
           <v-col
@@ -193,19 +193,19 @@
           >
             <RegistrationTable
               :class="{'table-border': isTabView}"
-              :isPpr="isPpr"
-              :isMhr="isMhr"
-              :setHeaders="myRegHeaders"
-              :setLoading="myRegDataLoading || myRegDataAdding"
-              :setMorePages="hasMorePages"
-              :setNewRegItem="getRegTableNewItem"
-              :setRegistrationHistory="myRegistrations"
-              :setSearch="myRegFilter"
-              :setSort="isPpr ? getRegTableSortOptions : getRegTableMhSortOptions"
+              :is-ppr="isPpr"
+              :is-mhr="isMhr"
+              :set-headers="myRegHeaders"
+              :set-loading="myRegDataLoading || myRegDataAdding"
+              :set-more-pages="hasMorePages"
+              :set-new-reg-item="getRegTableNewItem"
+              :set-registration-history="myRegistrations"
+              :set-search="myRegFilter"
+              :set-sort="isPpr ? getRegTableSortOptions : getRegTableMhSortOptions"
               @action="myRegActionHandler($event)"
               @error="emitError($event)"
               @sort="myRegSort($event)"
-              @getNext="myRegGetNext"
+              @get-next="myRegGetNext"
             />
           </v-col>
           <v-col
@@ -240,7 +240,7 @@ import {
   MhrRegistrationType,
   registrationTableHeaders
 } from '@/resources'
-import {
+import type {
   BaseHeaderIF,
   DialogOptionsIF,
   DraftResultIF,

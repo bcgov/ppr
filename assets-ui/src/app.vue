@@ -1,18 +1,11 @@
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, toRefs, reactive, watch } from 'vue'
 import { useStore } from '@/store/store'
-import { useRoute, useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
 import { StatusCodes } from 'http-status-codes'
 import KeycloakService from 'sbc-common-components/src/services/keycloak.services'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import SbcHeader from 'sbc-common-components/src/components/SbcHeader.vue'
 import SbcFooter from 'sbc-common-components/src/components/SbcFooter.vue'
 import SbcSystemBanner from 'sbc-common-components/src/components/SbcSystemBanner.vue'
-import * as Dialogs from '@/components/dialogs'
-import { Breadcrumb, SkipToMainContent } from '@/components/common'
-import { Tombstone } from '@/components/tombstone'
-import * as Views from '@/pages'
 import {
   authPprError, authAssetsError, draftDeleteError, historyRegError, loginError, openDocError, paymentErrorReg,
   paymentErrorSearch, registrationCompleteError, registrationDeleteError, registrationLoadError,
@@ -46,19 +39,14 @@ import { useAuth, useNavigation } from '@/composables'
 export default defineComponent({
   name: 'App',
   components: {
-    SkipToMainContent,
     SbcHeader,
     SbcFooter,
-    Breadcrumb,
     SbcSystemBanner,
-    Tombstone,
-    ...Dialogs,
-    ...Views
   },
   setup () {
     const route = useRoute()
     const router = useRouter()
-    const { goToDash, navigateTo } = useNavigation()
+    const { goToDash, navigateToUrl } = useNavigation()
     const { isAuthenticated, loadAccountProductSubscriptions, initializeUserProducts } = useAuth()
     const {
       // Actions
@@ -576,7 +564,7 @@ export default defineComponent({
       localState.errorDisplay = false
       // Navigate to Registries dashboard in the event of a login or access error.
       if ([loginError.title, authPprError.title, authAssetsError.title].includes(localState.errorOptions.title)) {
-        navigateTo(localState.registryUrl)
+        navigateToUrl(localState.registryUrl)
       }
       // for now just refresh app
       if (!proceed) initApp()

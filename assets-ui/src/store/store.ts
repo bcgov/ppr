@@ -98,6 +98,7 @@ import type { CancelUnitNoteIF, UnitNoteIF } from '@/interfaces/unit-note-interf
 export const useStore = defineStore('assetsStore', () => {
   // State Model
   const state = ref({ ...stateModel })
+  const { isMhrCorrection } = useMhrCorrections()
 
   /** PPR Getters **/
 
@@ -558,10 +559,8 @@ export const useStore = defineStore('assetsStore', () => {
   const getMhrSteps = computed(() => {
     return isMhrManufacturerRegistration.value ? getMhrManufacturerSteps.value : getMhrStaffSteps.value
   })
+
   const getFooterButtonConfig = computed<ButtonConfigIF[]>(() => {
-    console.log('getFooterButtonConfig')
-    console.log(isMhrRegistration.value || isMhrReRegistration.value)
-    console.log(getMhrButtonFooterConfig.value)
     return isMhrRegistration.value || isMhrReRegistration.value
       ? getMhrButtonFooterConfig.value
       : RegistrationButtonFooterConfig
@@ -569,7 +568,7 @@ export const useStore = defineStore('assetsStore', () => {
   const getMhrButtonFooterConfig = computed<ButtonConfigIF[]>(() => {
     return isMhrManufacturerRegistration.value
       ? MHRManufacturerButtonFooterConfig
-      : useMhrCorrections().isMhrCorrection.value ? MHRCorrectionButtonFooterConfig : MHRButtonFooterConfig
+      : isMhrCorrection ? MHRCorrectionButtonFooterConfig : MHRButtonFooterConfig
   })
   const isBusySaving = computed<boolean>(() => {
     return false
@@ -1262,6 +1261,7 @@ export const useStore = defineStore('assetsStore', () => {
 
   // MHR Registration
   function setEmptyMhr (emptyMhr: MhrRegistrationIF) {
+    console.log('setEmptyMhr', emptyMhr)
     state.value.mhrRegistration = emptyMhr
   }
 

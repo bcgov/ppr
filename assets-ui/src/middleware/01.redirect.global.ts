@@ -1,6 +1,9 @@
-import type { Route} from 'vue-router';
+import type { Route } from 'vue-router'
 import { RouteNames } from '@/enums'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
+import { useNavigation } from '@/composables'
+
+const { goToRoute } = useNavigation()
 
 /** Returns True if route requires authentication, else False. */
 function requiresAuth (route: Route): boolean {
@@ -35,7 +38,7 @@ function isLoginSuccess (route: Route): boolean {
   return Boolean(route.name === RouteNames.LOGIN && route.hash)
 }
 
-export default defineNuxtRouteMiddleware((to) => {
+export default defineNuxtRouteMiddleware( (to) => {
   if (isLoginSuccess(to)) {
     // this route is to verify login
     navigateTo({
@@ -45,13 +48,11 @@ export default defineNuxtRouteMiddleware((to) => {
   } else {
     if (requiresAuth(to) && !isAuthenticated()) {
       // this route needs authentication, so re-route to login
-      navigateTo({
-        name: RouteNames.LOGIN,
-        query: { redirect: to.fullPath }
-      })
+      navigateTo({ name: RouteNames.LOGIN, query: { redirect: to.fullPath } })
+      // return goToRoute(RouteNames.LOGIN, { redirect: to.fullPath })
     } else {
       if (isLogin(to) && isAuthenticated()) {
-        // this route is to login
+        // this route is to dashboard after login
         navigateTo({ name: RouteNames.DASHBOARD })
       } else {
         // otherwise just proceed normally

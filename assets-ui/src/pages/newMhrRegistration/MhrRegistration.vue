@@ -67,7 +67,6 @@
 
             <!-- Mhr Header -->
             <v-row
-              v-else
               id="registration-header"
               no-gutters
               class="pt-3 pb-3 soft-corners-top"
@@ -82,28 +81,24 @@
               :show-step-errors="isValidatingApp && !isValidMhrRegistration"
             />
             <!-- Component Steps -->
-            <component
-              :is="step.component"
-              v-for="step in getMhrSteps"
-              v-show="isRouteName(step.to)"
-              :key="step.step"
-            />
+            <NuxtPage />
+
           </v-col>
-<!--          <v-col-->
-<!--            class="pl-6 pt-5"-->
-<!--            cols="3"-->
-<!--          >-->
-<!--            <aside>-->
-<!--              <StickyContainer-->
-<!--                :set-right-offset="true"-->
-<!--                :set-show-fee-summary="true"-->
-<!--                :set-fee-type="feeType"-->
-<!--                :set-fee-subtitle="getRegistrationType.registrationTypeUI"-->
-<!--                :set-registration-length="registrationLength"-->
-<!--                :set-registration-type="registrationTypeUI"-->
-<!--              />-->
-<!--            </aside>-->
-<!--          </v-col>-->
+          <v-col
+            class="pl-6 pt-5"
+            cols="3"
+          >
+            <aside>
+              <StickyContainer
+                :set-right-offset="true"
+                :set-show-fee-summary="true"
+                :set-fee-type="feeType"
+                :set-fee-subtitle="getRegistrationType.registrationTypeUI"
+                :set-registration-length="registrationLength"
+                :set-registration-type="registrationTypeUI"
+              />
+            </aside>
+          </v-col>
         </v-row>
       </div>
     </div>
@@ -111,9 +106,10 @@
       no-gutters
       class="mt-20"
     >
-      <v-col cols="12">{{getFooterButtonConfig}}
+      <v-col cols="12">
         <ButtonFooter
           is-mhr
+          :nav-config="getFooterButtonConfig"
           :current-step-name="$route.name"
           :force-save="saveDraftExit"
           @error="emitError($event)"
@@ -246,6 +242,9 @@ export default defineComponent({
       }),
       isValidMhrRegistration: computed((): boolean => {
         return getMhrSteps.value.every((step: StepIF) => step.valid)
+      }),
+      navConfiguration: computed(() => {
+        return getFooterButtonConfig.value
       })
     })
 
@@ -280,7 +279,7 @@ export default defineComponent({
         const { registration } = await getMhrDraft(getMhrDraftNumber.value)
         await initDraftOrCurrentMhr(registration as unknown as MhrRegistrationIF)
       }
-
+      console.log('onMounted Called')
       context.emit('emitHaveData', true)
       localState.dataLoaded = true
     })

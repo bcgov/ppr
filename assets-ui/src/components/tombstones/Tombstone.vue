@@ -3,8 +3,8 @@
     <v-container class="py-8">
       <TombstoneDynamic
         v-if="displayTombstoneDynamic"
-        :isMhrInformation="displayMhrInformation"
-        :actionInProgress="actionInProgress"
+        :is-mhr-information="displayMhrInformation"
+        :action-in-progress="actionInProgress"
       />
       <TombstoneDefault v-else />
     </v-container>
@@ -15,17 +15,12 @@
 import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { useRoute } from 'vue-router'
 // local
-import { TombstoneDefault, TombstoneDynamic } from '@/components/tombstone'
 import { useMhrCorrections } from '@/composables'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'Tombstone',
-  components: {
-    TombstoneDefault,
-    TombstoneDynamic
-  },
   props: {
     actionInProgress: {
       type: Boolean,
