@@ -15,6 +15,7 @@
 
 This module is the API for the BC Registries Personal Property Registry system.
 """
+
 import os
 
 from flask import Flask, redirect  # noqa: I001
@@ -34,7 +35,9 @@ from ppr_api.translations import babel
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.logging import logger, setup_logging
 
-setup_logging(os.path.join(os.path.abspath(os.path.dirname(__file__)), "logging.yaml"))  # important to do this first
+setup_logging(
+    os.path.join(os.path.abspath(os.path.dirname(__file__)), "logging.yaml")
+)  # important to do this first
 
 
 def create_app(service_environment=APP_RUNNING_ENVIRONMENT, **kwargs):
@@ -47,12 +50,16 @@ def create_app(service_environment=APP_RUNNING_ENVIRONMENT, **kwargs):
 
     db.init_app(app)
     Migrate(app, db)
-    if app.config.get("DEPLOYMENT_ENV", "") == "testing":  # CI only run upgrade for unit testing.
+    if (
+        app.config.get("DEPLOYMENT_ENV", "") == "unitTesting"
+    ):  # CI only run upgrade for unit testing.
         logger.info("Running migration upgrade.")
         with app.app_context():
             upgrade(directory="migrations", revision="head", sql=False, tag=None)
         # Alembic has it's own logging config, we'll need to restore our logging here.
-        setup_logging(os.path.join(os.path.abspath(os.path.dirname(__file__)), "logging.yaml"))
+        setup_logging(
+            os.path.join(os.path.abspath(os.path.dirname(__file__)), "logging.yaml")
+        )
         logger.info("Finished migration upgrade.")
     else:
         logger.info("Logging, migrate set up.")
@@ -107,13 +114,18 @@ def setup_test_data():
     """Load unit test data in the dev/local environment. Delete all existing test data as a first step."""
     try:
         test_path = os.getcwd()
-        logger.info(f"Executing DB scripts to create test data from test data dir {test_path}...")
+        logger.info(
+            f"Executing DB scripts to create test data from test data dir {test_path}..."
+        )
         # execute_script(db.session, os.path.join(test_path, "test_data/postgres_test_reset.sql"))
         execute_script(db.session, "test_data/postgres_create_first.sql")
         filenames = os.listdir(os.path.join(test_path, "test_data/postgres_data_files"))
         sorted_names = sorted(filenames)
         for filename in sorted_names:
-            execute_script(db.session, os.path.join(test_path, ("test_data/postgres_data_files/" + filename)))
+            execute_script(
+                db.session,
+                os.path.join(test_path, ("test_data/postgres_data_files/" + filename)),
+            )
     except Exception as err:  # pylint: disable=broad-except # noqa F841;
         logger.error(f"setup_test_data failed: {str(err)}")
 

@@ -15,7 +15,7 @@ coverage:
         target: 75%
         flags:
           - pprapi
-
+          - mhrapi
       ui:
         target: 50%
         flags:
@@ -45,4 +45,8 @@ flags:
   pprui:
     paths:
       - ppr-ui/src
+    carryforward: true
+  mhrapi:
+    paths:
+      - mhr-api/src/mhr-api
     carryforward: true

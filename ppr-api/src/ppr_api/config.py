@@ -19,6 +19,7 @@ All modules and lookups get their configuration from the
 Flask config, rather than reading environment variables directly
 or by accessing this configuration directly.
 """
+
 import json
 import os
 import sys
@@ -49,10 +50,12 @@ def get_named_config(config_name: str = "production"):
         configuration = ProdConfig()
     elif config_name == "sandbox":
         configuration = SandboxConfig()
-    elif config_name == "testing":
+    elif config_name == "test":
         configuration = TestConfig()
     elif config_name == "development":
         configuration = DevConfig()
+    elif config_name == "unitTesting":
+        configuration = UnitTestingConfig()
     else:
         raise KeyError(f"Unknown configuration: {config_name}")
     return configuration
@@ -74,9 +77,16 @@ class Config:  # pylint: disable=too-few-public-methods
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     ALEMBIC_INI = "migrations/alembic.ini"
 
-    PAYMENT_SVC_URL = os.getenv("PAYMENT_SVC_URL", "https://pay-api-dev.apps.silver.devops.gov.bc.ca/api/v1")
-    AUTH_SVC_URL = os.getenv("AUTH_SVC_URL", "https://auth-api-dev.apps.silver.devops.gov.bc.ca/api/v1")
-    REPORT_SVC_URL = os.getenv("REPORT_SVC_URL", "https://gotenberg-p56lvhvsqa-nn.a.run.app")
+    # API Endpoints
+    AUTH_API_URL = os.getenv("AUTH_API_URL", "")
+    AUTH_API_VERSION = os.getenv("AUTH_API_VERSION", "")
+    PAY_API_URL = os.getenv("PAY_API_URL", "")
+    PAY_API_VERSION = os.getenv("PAY_API_VERSION", "")
+    REPORT_API_URL = os.getenv("REPORT_API_URL", "")
+
+    AUTH_SVC_URL = f"{AUTH_API_URL + AUTH_API_VERSION}"
+    PAYMENT_SVC_URL = f"{PAY_API_URL + PAY_API_VERSION}"
+    REPORT_SVC_URL = f"{REPORT_API_URL}"
     REPORT_TEMPLATE_PATH = os.getenv("REPORT_TEMPLATE_PATH", "report-templates")
 
     LD_SDK_KEY = os.getenv("LD_SDK_KEY", None)
@@ -91,7 +101,9 @@ class Config:  # pylint: disable=too-few-public-methods
     if DB_UNIX_SOCKET := os.getenv("DATABASE_UNIX_SOCKET", None):
         SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@/{DB_NAME}?host={DB_UNIX_SOCKET}"
     else:
-        SQLALCHEMY_DATABASE_URI = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+        SQLALCHEMY_DATABASE_URI = (
+            f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+        )
 
     # Connection pool settings
     DB_MIN_POOL_SIZE = os.getenv("DATABASE_MIN_POOL_SIZE", "2")
@@ -131,15 +143,25 @@ class Config:  # pylint: disable=too-few-public-methods
     # ACCOUNT_SVC_TIMEOUT = os.g
 
     # DB Query limits on result set sizes
-    ACCOUNT_REGISTRATIONS_MAX_RESULTS = os.getenv("ACCOUNT_REGISTRATIONS_MAX_RESULTS", "100")
+    ACCOUNT_REGISTRATIONS_MAX_RESULTS = os.getenv(
+        "ACCOUNT_REGISTRATIONS_MAX_RESULTS", "100"
+    )
     ACCOUNT_DRAFTS_MAX_RESULTS = os.getenv("ACCOUNT_DRAFTS_MAX_RESULTS", "1000")
     ACCOUNT_SEARCH_MAX_RESULTS = os.getenv("ACCOUNT_SEARCH_MAX_RESULTS", "1000")
 
     # DEBTOR search trgram similarity quotients
-    SIMILARITY_QUOTIENT_BUSINESS_NAME: float = float(os.getenv("SIMILARITY_QUOTIENT_BUSINESS_NAME", "0.6"))
-    SIMILARITY_QUOTIENT_FIRST_NAME: float = float(os.getenv("SIMILARITY_QUOTIENT_FIRST_NAME", "0.4"))
-    SIMILARITY_QUOTIENT_LAST_NAME: float = float(os.getenv("SIMILARITY_QUOTIENT_LAST_NAME", "0.29"))
-    SIMILARITY_QUOTIENT_DEFAULT: float = float(os.getenv("SIMILARITY_QUOTIENT_DEFAULT", "0.5"))
+    SIMILARITY_QUOTIENT_BUSINESS_NAME: float = float(
+        os.getenv("SIMILARITY_QUOTIENT_BUSINESS_NAME", "0.6")
+    )
+    SIMILARITY_QUOTIENT_FIRST_NAME: float = float(
+        os.getenv("SIMILARITY_QUOTIENT_FIRST_NAME", "0.4")
+    )
+    SIMILARITY_QUOTIENT_LAST_NAME: float = float(
+        os.getenv("SIMILARITY_QUOTIENT_LAST_NAME", "0.29")
+    )
+    SIMILARITY_QUOTIENT_DEFAULT: float = float(
+        os.getenv("SIMILARITY_QUOTIENT_DEFAULT", "0.5")
+    )
 
     # Search results report number of financing statements threshold for async requests.
     SEARCH_PDF_ASYNC_THRESHOLD: int = int(os.getenv("SEARCH_PDF_ASYNC_THRESHOLD", "75"))
@@ -152,22 +174,36 @@ class Config:  # pylint: disable=too-few-public-methods
 
     # Google APIs and cloud storage
     GOOGLE_DEFAULT_SA = os.getenv("GOOGLE_DEFAULT_SA")
-    GCP_CS_SA_SCOPES = os.getenv("GCP_CS_SA_SCOPES", "https://www.googleapis.com/auth/cloud-platform")
+    GCP_CS_SA_SCOPES = os.getenv(
+        "GCP_CS_SA_SCOPES", "https://www.googleapis.com/auth/cloud-platform"
+    )
     # Storage of search reports
     GCP_CS_BUCKET_ID = os.getenv("GCP_CS_BUCKET_ID", "ppr_search_results_dev")
     # Storage of verification mail reports
-    GCP_CS_BUCKET_ID_VERIFICATION = os.getenv("GCP_CS_BUCKET_ID_VERIFICATION", "ppr_verification_report_dev")
+    GCP_CS_BUCKET_ID_VERIFICATION = os.getenv(
+        "GCP_CS_BUCKET_ID_VERIFICATION", "ppr_verification_report_dev"
+    )
     # Storage of registration verification reports
-    GCP_CS_BUCKET_ID_REGISTRATION = os.getenv("GCP_CS_BUCKET_ID_REGISTRATION", "ppr_registration_report_dev")
+    GCP_CS_BUCKET_ID_REGISTRATION = os.getenv(
+        "GCP_CS_BUCKET_ID_REGISTRATION", "ppr_registration_report_dev"
+    )
     # Storage of mail verification reports
     GCP_CS_BUCKET_ID_MAIL = os.getenv("GCP_CS_BUCKET_ID_MAIL", "ppr_mail_report_dev")
 
     # Pub/Sub
     GCP_PS_PROJECT_ID = os.getenv("DEPLOYMENT_PROJECT", "eogruh-dev")
-    GCP_PS_SEARCH_REPORT_TOPIC = os.getenv("GCP_PS_SEARCH_REPORT_TOPIC", "ppr-search-report")
-    GCP_PS_NOTIFICATION_TOPIC = os.getenv("GCP_PS_NOTIFICATION_TOPIC", "ppr-api-notification")
-    GCP_PS_VERIFICATION_REPORT_TOPIC = os.getenv("GCP_PS_VERIFICATION_REPORT_TOPIC", "ppr-mail-report")
-    GCP_PS_REGISTRATION_REPORT_TOPIC = os.getenv("GCP_PS_REGISTRATION_REPORT_TOPIC", "ppr-registration-report")
+    GCP_PS_SEARCH_REPORT_TOPIC = os.getenv(
+        "GCP_PS_SEARCH_REPORT_TOPIC", "ppr-search-report"
+    )
+    GCP_PS_NOTIFICATION_TOPIC = os.getenv(
+        "GCP_PS_NOTIFICATION_TOPIC", "ppr-api-notification"
+    )
+    GCP_PS_VERIFICATION_REPORT_TOPIC = os.getenv(
+        "GCP_PS_VERIFICATION_REPORT_TOPIC", "ppr-mail-report"
+    )
+    GCP_PS_REGISTRATION_REPORT_TOPIC = os.getenv(
+        "GCP_PS_REGISTRATION_REPORT_TOPIC", "ppr-registration-report"
+    )
 
     GATEWAY_URL = os.getenv("GATEWAY_URL", "https://bcregistry-dev.apigee.net")
     SUBSCRIPTION_API_KEY = os.getenv("SUBSCRIPTION_API_KEY")
@@ -179,7 +215,9 @@ class Config:  # pylint: disable=too-few-public-methods
     MAX_SIZE_SEARCH_RT: int = int(os.getenv("MAX_SIZE_SEARCH_RT", "225000"))
     # Default 2, set to 1 to revert to original report api client
     REPORT_VERSION = os.getenv("REPORT_VERSION", "2")
-    REPORT_API_AUDIENCE = os.getenv("REPORT_API_AUDIENCE", "https://gotenberg-p56lvhvsqa-nn.a.run.app")
+    REPORT_API_AUDIENCE = os.getenv(
+        "REPORT_API_AUDIENCE", "https://gotenberg-p56lvhvsqa-nn.a.run.app"
+    )
     # Number of registrations threshold for search report light format.
     REPORT_SEARCH_LIGHT: int = int(os.getenv("REPORT_SEARCH_LIGHT", "700"))
 
@@ -219,7 +257,9 @@ class UnitTestingConfig(Config):  # pylint: disable=too-few-public-methods
     DB_HOST = os.getenv("DATABASE_TEST_HOST", "")
     DB_PORT = os.getenv("DATABASE_TEST_PORT", "5432")
     # SQLALCHEMY_DATABASE_URI = f"postgresql+pg8000://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-    SQLALCHEMY_DATABASE_URI = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    SQLALCHEMY_DATABASE_URI = (
+        f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    )
 
     # JWT OIDC settings
     # JWT_OIDC_TEST_MODE will set jwt_manager to use
