@@ -1,4 +1,4 @@
-name: PPR API CD
+name: MHR API CD
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
       - feature*
       - hotfix*
     paths:
-      - "ppr-api/**"
+      - "mhr-api/**"
   workflow_dispatch:
     inputs:
       target:
@@ -21,12 +21,12 @@ on:
         - prod
 
 jobs:
-  ppr-api-cd:
+  mhr-api-cd:
     uses: bcgov/bcregistry-sre/.github/workflows/backend-cd.yaml@main
     with:
       target: ${{ inputs.target }}
-      app_name: "ppr-api"
-      working_directory: "./ppr-api"
+      app_name: "mhr-api"
+      working_directory: "./mhr-api"
     secrets:
       WORKLOAD_IDENTIFY_POOLS_PROVIDER: ${{ secrets.WORKLOAD_IDENTIFY_POOLS_PROVIDER }}
       GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }}

@@ -60,6 +60,11 @@ serialPipeline:
       app-env: "sandbox"
       cloudsql-instances: "eogruh-sandbox:northamerica-northeast1:ppr-sandbox-pgdb"
       service-account: "sa-api@eogruh-sandbox.iam.gserviceaccount.com"
+      max-scale: "50"
+      container-concurrency: "20"
+      container-port: "8080"
+      resources-cpu: 4000m
+      resources-memory: 8Gi
  - targetId: eogruh-prod
    profiles: [prod]
    strategy:
@@ -74,5 +79,8 @@ serialPipeline:
       app-env: "production"
       cloudsql-instances: "eogruh-prod:northamerica-northeast1:ppr-prod"
       service-account: "sa-api@eogruh-prod.iam.gserviceaccount.com"
-      max-scale: "10"
+      max-scale: "50"
       container-concurrency: "20"
+      container-port: "8080"
+      resources-cpu: 4000m
+      resources-memory: 8Gi
