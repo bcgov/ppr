@@ -471,9 +471,13 @@ def validate_transfer_non_staff(registration: MhrRegistration, json_data, reg_ty
         json_data.get("deleteOwnerGroups")
         and len(json_data.get("deleteOwnerGroups")) != 1
         and group == QUALIFIED_USER_GROUP
-        and len(json_data.get("deleteOwnerGroups")) != validator_owner_utils.get_existing_group_count(registration)
     ):
-        error_msg += TRAN_QUALIFIED_DELETE
+        if validator_owner_utils.get_delete_group_count(
+            registration, json_data
+        ) != 1 and validator_owner_utils.get_existing_group_count(registration) != len(
+            json_data.get("deleteOwnerGroups")
+        ):
+            error_msg += TRAN_QUALIFIED_DELETE
     error_msg += validate_transfer_dealer(registration, json_data, reg_type, group)
     if json_data.get("transferDocumentType"):
         error_msg += TRANS_DOC_TYPE_NOT_ALLOWED
