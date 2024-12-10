@@ -50,10 +50,12 @@ def get_named_config(config_name: str = "production"):
         configuration = ProdConfig()
     elif config_name == "sandbox":
         configuration = SandboxConfig()
-    elif config_name == "testing":
+    elif config_name == "test":
         configuration = TestConfig()
     elif config_name == "development":
         configuration = DevConfig()
+    elif config_name == "unitTesting":
+        configuration = UnitTestingConfig()
     else:
         raise KeyError(f"Unknown configuration: {config_name}")
     return configuration
