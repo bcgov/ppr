@@ -82,7 +82,7 @@ class Config:  # pylint: disable=too-few-public-methods
     AUTH_API_VERSION = os.getenv("AUTH_API_VERSION", "")
     PAY_API_URL = os.getenv("PAY_API_URL", "")
     PAY_API_VERSION = os.getenv("PAY_API_VERSION", "")
-    REPORT_API_URL = os.getenv("REPORT_API_URL", "")
+    REPORT_API_URL = os.getenv("REPORT_API_URL", "https://gotenberg-p56lvhvsqa-nn.a.run.app")
 
     AUTH_SVC_URL = f"{AUTH_API_URL + AUTH_API_VERSION}"
     PAYMENT_SVC_URL = f"{PAY_API_URL + PAY_API_VERSION}"
@@ -101,9 +101,7 @@ class Config:  # pylint: disable=too-few-public-methods
     if DB_UNIX_SOCKET := os.getenv("DATABASE_UNIX_SOCKET", None):
         SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@/{DB_NAME}?host={DB_UNIX_SOCKET}"
     else:
-        SQLALCHEMY_DATABASE_URI = (
-            f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-        )
+        SQLALCHEMY_DATABASE_URI = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
     # Connection pool settings
     DB_MIN_POOL_SIZE = os.getenv("DATABASE_MIN_POOL_SIZE", "2")
@@ -142,9 +140,7 @@ class Config:  # pylint: disable=too-few-public-methods
     # ACCOUNT_SVC_TIMEOUT = os.g
 
     # DB Query limits on result set sizes
-    ACCOUNT_REGISTRATIONS_MAX_RESULTS = os.getenv(
-        "ACCOUNT_REGISTRATIONS_MAX_RESULTS", "100"
-    )
+    ACCOUNT_REGISTRATIONS_MAX_RESULTS = os.getenv("ACCOUNT_REGISTRATIONS_MAX_RESULTS", "100")
     ACCOUNT_DRAFTS_MAX_RESULTS = os.getenv("ACCOUNT_DRAFTS_MAX_RESULTS", "1000")
     ACCOUNT_SEARCH_MAX_RESULTS = os.getenv("ACCOUNT_SEARCH_MAX_RESULTS", "1000")
 
@@ -159,35 +155,23 @@ class Config:  # pylint: disable=too-few-public-methods
 
     # Google APIs and cloud storage
     GOOGLE_DEFAULT_SA = os.getenv("GOOGLE_DEFAULT_SA")
-    GCP_CS_SA_SCOPES = os.getenv(
-        "GCP_CS_SA_SCOPES", "https://www.googleapis.com/auth/cloud-platform"
-    )
+    GCP_CS_SA_SCOPES = os.getenv("GCP_CS_SA_SCOPES", "https://www.googleapis.com/auth/cloud-platform")
     # Storage of search reports
     GCP_CS_BUCKET_ID = os.getenv("GCP_CS_BUCKET_ID", "mhr_search_result_report_dev")
     # Storage of registration verification reports
-    GCP_CS_BUCKET_ID_REGISTRATION = os.getenv(
-        "GCP_CS_BUCKET_ID_REGISTRATION", "mhr_registration_report_dev"
-    )
+    GCP_CS_BUCKET_ID_REGISTRATION = os.getenv("GCP_CS_BUCKET_ID_REGISTRATION", "mhr_registration_report_dev")
     # Storage of batch reports
     GCP_CS_BUCKET_ID_BATCH = os.getenv("GCP_CS_BUCKET_ID_BATCH", "mhr_batch_report_dev")
     # Storage of service agreement terms reports
-    GCP_CS_BUCKET_ID_TERMS = os.getenv(
-        "GCP_CS_BUCKET_ID_TERMS", "mhr_service_agreement_dev"
-    )
+    GCP_CS_BUCKET_ID_TERMS = os.getenv("GCP_CS_BUCKET_ID_TERMS", "mhr_service_agreement_dev")
 
     # Pub/Sub
     GCP_PS_PROJECT_ID = os.getenv("DEPLOYMENT_PROJECT", "eogruh-dev")
-    GCP_PS_SEARCH_REPORT_TOPIC = os.getenv(
-        "GCP_PS_SEARCH_REPORT_TOPIC", "mhr-search-report"
-    )
-    GCP_PS_REGISTRATION_REPORT_TOPIC = os.getenv(
-        "GCP_PS_REGISTRATION_REPORT_TOPIC", "mhr-registration-report"
-    )
+    GCP_PS_SEARCH_REPORT_TOPIC = os.getenv("GCP_PS_SEARCH_REPORT_TOPIC", "mhr-search-report")
+    GCP_PS_REGISTRATION_REPORT_TOPIC = os.getenv("GCP_PS_REGISTRATION_REPORT_TOPIC", "mhr-registration-report")
 
     GATEWAY_URL = os.getenv("GATEWAY_URL", "https://bcregistry-dev.apigee.net")
-    GATEWAY_LTSA_URL = os.getenv(
-        "GATEWAY_LTSA_URL", "https://bcregistry-test.apigee.net/ltsa/api/v1"
-    )
+    GATEWAY_LTSA_URL = os.getenv("GATEWAY_LTSA_URL", "https://bcregistry-test.apigee.net/ltsa/api/v1")
     SUBSCRIPTION_API_KEY = os.getenv("SUBSCRIPTION_API_KEY")
     GATEWAY_API_KEY = os.getenv("GATEWAY_API_KEY")
 
@@ -195,9 +179,7 @@ class Config:  # pylint: disable=too-few-public-methods
     MAX_SIZE_SEARCH_RT: int = int(os.getenv("MAX_SIZE_SEARCH_RT", "200000"))
     # Default 2, set to 1 to revert to original report api client
     REPORT_VERSION = os.getenv("REPORT_VERSION", "2")
-    REPORT_API_AUDIENCE = os.getenv(
-        "REPORT_API_AUDIENCE", "https://gotenberg-p56lvhvsqa-nn.a.run.app"
-    )
+    REPORT_API_AUDIENCE = os.getenv("REPORT_API_AUDIENCE", "https://gotenberg-p56lvhvsqa-nn.a.run.app")
 
     NOTIFY_MAN_REG_CONFIG = os.getenv("NOTIFY_MAN_REG_CONFIG")
     NOTIFY_LOCATION_CONFIG = os.getenv("NOTIFY_LOCATION_CONFIG")
@@ -250,9 +232,7 @@ class UnitTestingConfig(Config):  # pylint: disable=too-few-public-methods
     DB_HOST = os.getenv("DATABASE_TEST_HOST", "")
     DB_PORT = os.getenv("DATABASE_TEST_PORT", "5432")
     # SQLALCHEMY_DATABASE_URI = f"postgresql+pg8000://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-    SQLALCHEMY_DATABASE_URI = (
-        f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-    )
+    SQLALCHEMY_DATABASE_URI = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
     # JWT OIDC settings
     # JWT_OIDC_TEST_MODE will set jwt_manager to use

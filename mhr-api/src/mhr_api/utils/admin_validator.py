@@ -18,7 +18,7 @@ Validation includes verifying the data combination for various registration docu
 from mhr_api.models import MhrRegistration
 from mhr_api.models import registration_utils as reg_utils
 from mhr_api.models.type_tables import MhrDocumentTypes, MhrNoteStatusTypes, MhrRegistrationTypes
-from mhr_api.utils import validator_utils, validator_owner_utils
+from mhr_api.utils import validator_owner_utils, validator_utils
 from mhr_api.utils.logging import logger
 
 NCAN_DOC_TYPES = " CAU CAUC CAUE NCON NPUB REGC REST "  # Set of doc types NCAN can cancel.

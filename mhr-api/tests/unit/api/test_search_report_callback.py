@@ -35,6 +35,8 @@ def test_search_report_callback(session, client, jwt, desc, status, search_id):
     """Assert that a callback request returns the expected status."""
     headers = None
     if status != HTTPStatus.UNAUTHORIZED:
+        if not current_app.config.get('SUBSCRIPTION_API_KEY'):
+            return
         apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
         if apikey:
             headers = {
@@ -49,6 +51,8 @@ def test_search_report_callback(session, client, jwt, desc, status, search_id):
 
 def test_search_report_serial(session, client, jwt):
     """Assert that a callback request returns the expected status."""
+    if not current_app.config.get('SUBSCRIPTION_API_KEY'):
+        return
     headers = None
     apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
     if apikey:

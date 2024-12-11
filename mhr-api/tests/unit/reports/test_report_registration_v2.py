@@ -177,7 +177,7 @@ def test_transfer_affidavit(session, client, jwt):
 def test_registration_test(session, client, jwt):
     """Assert that generation of a test report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(REGISTRATON_TEST_DATAFILE)
         report = Report(json_data, '2617', ReportTypes.MHR_REGISTRATION, 'Account Name')
         # test

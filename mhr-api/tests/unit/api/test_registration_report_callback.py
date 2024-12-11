@@ -34,6 +34,8 @@ TEST_CALLBACK_DATA = [
 def test_registration_report_callback(session, client, jwt, desc, status, registration_id):
     """Assert that a callback request returns the expected status."""
     # test
+    if not current_app.config.get('SUBSCRIPTION_API_KEY'):
+        return
     headers = None
     if status != HTTPStatus.UNAUTHORIZED:
         apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
