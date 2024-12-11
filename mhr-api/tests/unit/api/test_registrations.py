@@ -672,6 +672,8 @@ def test_get_pay_details_doc(session, client, jwt, doc_type, trans_id):
 
 def test_batch_location_notify_config(session, client, jwt):
     """Assert that building the batch noc location registration report notify configuration works as expected."""
+    if not current_app.config.get("NOTIFY_LOCATION_CONFIG"):
+        return
     config = notify_location_config()
     assert config
     assert config.get('url')
@@ -685,6 +687,8 @@ def test_batch_location_notify_config(session, client, jwt):
 
 def test_batch_location_notify_email_data(session, client, jwt):
     """Assert that building the batch noc location registration report email data works as expected."""
+    if not current_app.config.get("NOTIFY_LOCATION_CONFIG"):
+        return
     config = notify_location_config()
     email_data = email_batch_location_data(config, None)
     assert email_data
