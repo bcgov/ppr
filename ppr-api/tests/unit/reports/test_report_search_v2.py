@@ -96,7 +96,7 @@ def test_merge(session, client, jwt):
 def test_search_rg(session, client, jwt):
     """Assert that setup for a reg number search type result report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(SEARCH_RESULT_RG_DATAFILE)
         report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, 'Account Name')
         # test

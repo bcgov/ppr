@@ -14,6 +14,8 @@
 """Google Storage token tests."""
 from ppr_api.callback.document_storage.storage_service import DocumentTypes, GoogleStorageService
 
+from flask import current_app
+
 
 TEST_DOC_NAME = 'financing-statements_100348B.pdf'
 TEST_DATAFILE = 'tests/unit/callback/financing-statements_100348B.pdf'
@@ -30,6 +32,8 @@ TEST_REGISTRATION_SAVE_DOC_NAME = '2022/02/16/ut-verification-financing.pdf'
 
 def test_cs_get_document(session):
     """Assert that getting a document from google cloud storage works as expected."""
+    if is_ci_testing():
+        return
     raw_data = GoogleStorageService.get_document(TEST_DOC_NAME)
     assert raw_data
     assert len(raw_data) > 0
@@ -40,6 +44,8 @@ def test_cs_get_document(session):
 
 def test_cs_save_document(session):
     """Assert that saving a document to google cloud storage works as expected."""
+    if is_ci_testing():
+        return
     raw_data = None
     with open(TEST_DATAFILE, 'rb') as data_file:
         raw_data = data_file.read()
@@ -52,6 +58,8 @@ def test_cs_save_document(session):
 
 def test_cs_save_document_link(session):
     """Assert that saving a document and returning a link to google cloud storage works as expected."""
+    if is_ci_testing():
+        return
     raw_data = None
     with open(TEST_DATAFILE, 'rb') as data_file:
         raw_data = data_file.read()
@@ -63,6 +71,8 @@ def test_cs_save_document_link(session):
 
 def test_cs_get_verification_document(session):
     """Assert that getting a mail verification statement document from google cloud storage works as expected."""
+    if is_ci_testing():
+        return
     raw_data = GoogleStorageService.get_document(TEST_VERIFICATION_DOC_NAME, DocumentTypes.VERIFICATION_MAIL)
     assert raw_data
     assert len(raw_data) > 0
@@ -73,6 +83,8 @@ def test_cs_get_verification_document(session):
 
 def test_cs_get_verification_document_link(session):
     """Assert that getting a document link from google cloud storage works as expected."""
+    if is_ci_testing():
+        return
     download_link = GoogleStorageService.get_document_link(TEST_VERIFICATION_DOC_NAME,
                                                            DocumentTypes.VERIFICATION_MAIL,
                                                            2)
@@ -81,6 +93,8 @@ def test_cs_get_verification_document_link(session):
 
 def test_cs_save_verification_document(session):
     """Assert that saving a mail verification statement document to google cloud storage works as expected."""
+    if is_ci_testing():
+        return
     raw_data = None
     with open(TEST_VERIFICATION_DATAFILE, 'rb') as data_file:
         raw_data = data_file.read()
@@ -94,6 +108,8 @@ def test_cs_save_verification_document(session):
 
 def test_cs_get_registration_document(session):
     """Assert that getting a registration verification statement from google cloud storage works as expected."""
+    if is_ci_testing():
+        return
     raw_data = GoogleStorageService.get_document(TEST_REGISTRATION_DOC_NAME, DocumentTypes.REGISTRATION)
     assert raw_data
     assert len(raw_data) > 0
@@ -104,6 +120,8 @@ def test_cs_get_registration_document(session):
 
 def test_cs_save_registration_document(session):
     """Assert that saving a registration verification statement to google cloud storage works as expected."""
+    if is_ci_testing():
+        return
     raw_data = None
     with open(TEST_REGISTRATION_DATAFILE, 'rb') as data_file:
         raw_data = data_file.read()
@@ -113,3 +131,8 @@ def test_cs_save_registration_document(session):
                                                   DocumentTypes.REGISTRATION)
     print(response)
     assert response
+
+
+def is_ci_testing() -> bool:
+    """Check unit test environment: exclude most reports for CI testing."""
+    return  current_app.config.get("DEPLOYMENT_ENV", "testing") == "testing"

@@ -51,7 +51,7 @@ def create_app(service_environment=APP_RUNNING_ENVIRONMENT, **kwargs):
     db.init_app(app)
     Migrate(app, db)
     if (
-        app.config.get("DEPLOYMENT_ENV", "") == "unitTesting"
+        app.config.get("DEPLOYMENT_ENV", "") == "testing"
     ):  # CI only run upgrade for unit testing.
         logger.info("Running migration upgrade.")
         with app.app_context():
