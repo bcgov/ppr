@@ -30,7 +30,7 @@ class Payment:
         self.api_key = api_key
         self.details = details
 
-    def create_payment(  # pylint: disable=too-many-arguments
+    def create_payment(  # pylint: disable=too-many-positional-arguments
         self, transaction_type, quantity, transaction_id=None, client_reference_id=None, processing_fee=None
     ):
         """Submit a payment request for the account_id-jwt pair.
