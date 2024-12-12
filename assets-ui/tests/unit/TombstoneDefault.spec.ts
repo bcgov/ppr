@@ -1,9 +1,9 @@
 import { nextTick } from 'vue'
-import { AccountInformationIF, UserInfoIF } from '@/interfaces'
+import type { AccountInformationIF, UserInfoIF } from '@/interfaces'
 import { useStore } from '@/store/store'
 import { AuthRoles, ProductCode, RouteNames } from '@/enums'
 import { createComponent } from './utils'
-import { TombstoneDefault } from '@/components/tombstone'
+import { Tombstone, TombstoneDefault, TombstoneDynamic } from '@/components/tombstones'
 import { defaultFlagSet } from '@/utils/feature-flags'
 
 const store = useStore()

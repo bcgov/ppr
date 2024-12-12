@@ -1,6 +1,24 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { defineNuxtConfig } from 'nuxt/config'
 import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
+
+import fs from 'fs'
 import path from 'path'
+
+const packageJson = fs.readFileSync('./package.json', 'utf-8')
+const appName = JSON.parse(packageJson).appName
+const appVersion = JSON.parse(packageJson).version
+const sbcName = JSON.parse(packageJson).sbcName
+const sbcVersion = JSON.parse(packageJson).dependencies['sbc-common-components']
+const aboutText1 = (appName && appVersion) ? `${appName} v${appVersion}` : ''
+const aboutText2 = (sbcName && sbcVersion) ? `${sbcName} v${sbcVersion}` : ''
+const aboutText = (aboutText1 && aboutText2)
+  ? `${aboutText1}<br>${aboutText2}`
+  : aboutText1
+    ? `${aboutText1}`
+    : aboutText2
+      ? `${aboutText2}`
+      : ''
 
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
@@ -78,7 +96,7 @@ export default defineNuxtConfig({
       interval: 1000, // Polling interval in milliseconds
     },
   },
-  modules: ['@pinia/nuxt', '@nuxt/eslint', 'nuxt-lodash',
+  modules: ['@pinia/nuxt', '@nuxt/eslint', 'nuxt-lodash', '@nuxt/test-utils/module',
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
         config.plugins.push(vuetify({ autoImport: true }))
@@ -112,8 +130,25 @@ export default defineNuxtConfig({
       },
     }
   },
+  test: {
+    server: {
+      deps: {
+        inline: ['vuetify', 'vue-pdf-embed']
+      }
+    },
+    globals: true,
+    threads: true,
+    environment: 'jsdom',
+    testTimeout: 60000,
+    setupFiles: './tests/setup.ts',
+    onConsoleLog (log) {
+      if (log.includes('Vue warn')) return false // Filter out Vue warnings while preserving errors and logs.
+      if (log.includes('AggregateError')) return false // Filter out failed network requests vs mocking them all.
+    }
+  },
   runtimeConfig: {
     public: {
+      ABOUT_TEXT: aboutText,
       VUE_APP_PATH: process.env.VUE_APP_PATH || '',
       VUE_APP_LOCAL_DEV: process.env.VUE_APP_LOCAL_DEV || '',
       BASE_URL: process.env.BASE_URL || '',

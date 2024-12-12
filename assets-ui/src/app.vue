@@ -101,7 +101,7 @@ export default defineComponent({
         return null
       }),
       aboutText: computed((): string => {
-        return import.meta.env.ABOUT_TEXT
+        return useRuntimeConfig().public.ABOUT_TEXT
       }),
       isProd: computed((): boolean => {
         const env = sessionStorage.getItem('POD_NAMESPACE')

@@ -3,10 +3,20 @@ import { afterEach, beforeAll, vi } from 'vitest'
 import { config } from '@vue/test-utils'
 import { dataTestId } from './unit/plugins'
 import { createPinia, setActivePinia } from 'pinia'
-import vuetify from '@/plugins/vuetify'
 import * as matchers from 'vitest-axe/matchers'
 import 'vitest-axe/extend-expect'
 import { expect } from 'vitest'
+
+import 'vuetify/styles'
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
+import { createVuetify } from 'vuetify'
+
+// Create Vuetify instance
+const vuetify = createVuetify({
+  components,
+  directives,
+})
 
 // Extend vitest with axe matchers
 expect.extend(matchers)
