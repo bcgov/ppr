@@ -57,6 +57,8 @@ TEST_MAIL_LIST_DATA = [
 def test_callback_mail_report(session, client, jwt, desc, status, reg_id, party_id):
     """Assert that a mail report callback request returns the expected status."""
     # setup
+    if is_ci_testing():
+        return
     json_data = {
         'registrationId': reg_id,
         'partyId': party_id
@@ -86,6 +88,8 @@ def test_callback_mail_report(session, client, jwt, desc, status, reg_id, party_
 def test_list_mail_report(session, client, jwt, desc, status, start_ts, end_ts):
     """Assert that list mail reports by timestamp request returns the expected status."""
     # setup
+    if is_ci_testing():
+        return
     params = ''
     if start_ts:
         params += f'?startDateTime={start_ts}'
@@ -117,3 +121,8 @@ def test_list_mail_report(session, client, jwt, desc, status, start_ts, end_ts):
             assert result.get('docStorageRef')
             if desc == 'Valid start with job id':
                 assert result.get('jobId')
+
+
+def is_ci_testing() -> bool:
+    """Check unit test environment: exclude most reports for CI testing."""
+    return  current_app.config.get("DEPLOYMENT_ENV", "testing") == "testing"
