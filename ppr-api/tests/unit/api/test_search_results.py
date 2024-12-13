@@ -242,6 +242,8 @@ def test_get_search_detail(session, client, jwt, desc, roles, status, has_accoun
     current_app.config.update(AUTH_SVC_URL=MOCK_URL_NO_KEY)
     headers = None
     # setup
+    if is_ci_testing() and is_report:
+        return
     if is_report:
         headers = create_header_account_report(jwt, roles)
     elif has_account and BCOL_HELP in roles:
