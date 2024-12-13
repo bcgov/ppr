@@ -26,6 +26,8 @@ from .validator_utils import validate_individual_name, validate_text
 DELETE_GROUP_ID_INVALID = "The owner group with ID {group_id} is not active and cannot be changed. "
 DELETE_GROUP_ID_NONEXISTENT = "No owner group with ID {group_id} exists. "
 DELETE_GROUP_TYPE_INVALID = "The owner group tenancy type with ID {group_id} is invalid. "
+DELETE_GROUPS_MISSING = "The delete owner groups are required. "
+DELETE_GROUP_ID_MISSING = "Delete owner group ID is missing. "
 GROUP_INTEREST_MISMATCH = "The owner group interest numerator sum does not equal the interest common denominator. "
 GROUP_NUMERATOR_MISSING = "The owner group interest numerator is required and must be an integer greater than 0. "
 GROUP_DENOMINATOR_MISSING = "The owner group interest denominator is required and must be an integer greater than 0. "
@@ -373,19 +375,27 @@ def validate_owner_groups_common(groups, registration: MhrRegistration = None, d
     return error_msg
 
 
-def validate_owner_groups(
+def validate_owner_groups(  # pylint: disable=too-many-branches
     groups, new: bool, registration: MhrRegistration = None, delete_groups=None, active_count: int = 0
 ):
     """Verify owner groups are valid."""
-    error_msg = ""
+    error_msg: str = ""
     if not groups:
         return error_msg
     so_count: int = 0
     staff: bool = False
+
+    if not new and delete_groups is None:
+        error_msg += DELETE_GROUPS_MISSING
+    elif not new and delete_groups:
+        for del_group in delete_groups:
+            if not del_group.get("groupId"):
+                error_msg += DELETE_GROUP_ID_MISSING
     if registration:
         staff = registration.staff
     if common_tenancy(groups, new, active_count):
-        return validate_owner_groups_common(groups, registration, delete_groups)
+        error_msg += validate_owner_groups_common(groups, registration, delete_groups)
+        return error_msg
     for group in groups:
         tenancy_type: str = group.get("type", "")
         if new and tenancy_type == MhrTenancyTypes.COMMON:
