@@ -63,7 +63,7 @@ CALLBACK_MESSAGES = {
 }
 
 
-def pay_and_save(  # pylint: disable=too-many-arguments,too-many-locals,too-many-branches
+def pay_and_save(  # pylint: disable=too-many-positional-arguments,too-many-locals,too-many-branches,too-many-arguments
     req: request,
     request_json,
     registration_class,

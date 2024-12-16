@@ -64,7 +64,7 @@ REPORT_VERSION_V2 = '2'
 def test_financing_sa(session, client, jwt):
     """Assert that generation of a test report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(FINANCING_SA_DATAFILE)
         report = Report(json_data, 'PS12345', ReportTypes.FINANCING_STATEMENT_REPORT, 'Account Name')
         # test

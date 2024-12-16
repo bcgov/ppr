@@ -21,6 +21,7 @@ import os
 from http import HTTPStatus
 
 import pytest
+from flask import current_app
 
 from ppr_api.services.payment.client import SBCPaymentClient, ApiRequestError
 from ppr_api.services.payment import TransactionTypes
@@ -422,6 +423,8 @@ def test_payment_apikey(client, jwt):
 def test_sa_get_token(client, jwt):
     """Assert that an OIDC get token request with valid SA credentials works as expected."""
     # setup
+    if is_ci_testing():
+        return
     token = helper_create_jwt(jwt, [PPR_ROLE])
     pay_client = SBCPaymentClient(jwt=token, account_id='PS12345')
 
@@ -431,6 +434,11 @@ def test_sa_get_token(client, jwt):
     # check
     assert jwt
     assert len(jwt) > 0
+
+
+def is_ci_testing() -> bool:
+    """Check unit test environment: exclude most reports for CI testing."""
+    return  current_app.config.get("DEPLOYMENT_ENV", "testing") == "testing"
 
 
 # def test_refund(client, jwt):

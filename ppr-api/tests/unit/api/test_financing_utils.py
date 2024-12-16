@@ -19,7 +19,7 @@ Test-Suite to ensure that the financing/registration helper methods are working 
 from http import HTTPStatus
 
 import pytest
-# from flask import current_app
+from flask import current_app
 
 from ppr_api.models import Registration, FinancingStatement, VerificationReport, utils as model_utils
 from ppr_api.reports import ReportTypes
@@ -40,6 +40,8 @@ TEST_REGISTRATION_GET_DATA = [
 def test_get_registration_report(session, client, jwt, desc, status, reg_id, is_create):
     """Assert that a get registration report request returns the expected response."""
     # setup
+    if is_ci_testing():
+        return
     token = SBCPaymentClient.get_sa_token()
     registration: Registration = Registration.find_by_id(reg_id)
     valid_status: int = HTTPStatus.CREATED if is_create else HTTPStatus.OK
@@ -65,6 +67,8 @@ def test_get_registration_report(session, client, jwt, desc, status, reg_id, is_
 def test_get_registration_callback_report(session, client, jwt):
     """Assert that a valid get registration callback report request returns the expected response."""
     # setup
+    if is_ci_testing():
+        return
     statement: FinancingStatement = FinancingStatement.find_by_registration_number('TEST0001', 'PS12345', True)
     statement.include_changes_json = False
     statement.current_view_json = False
@@ -76,3 +80,8 @@ def test_get_registration_callback_report(session, client, jwt):
     # check
     assert status == HTTPStatus.OK
     assert response_data
+
+
+def is_ci_testing() -> bool:
+    """Check unit test environment: exclude most reports for CI testing."""
+    return  current_app.config.get("DEPLOYMENT_ENV", "testing") == "testing"

@@ -23,26 +23,9 @@ depends_on = None
 
 def upgrade():
     # ### Manually install extensions. ###
-    # op.execute("CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;")
-    # op.execute("CREATE EXTENSION IF NOT EXISTS pg_trgm;")
-    # op.execute("CREATE EXTENSION IF NOT EXISTS btree_gist;")
-    public_fuzzystrmatch = PGExtension(
-        schema="public",
-        signature="fuzzystrmatch"
-    )
-    op.create_entity(public_fuzzystrmatch)
-
-    public_btree_gist = PGExtension(
-        schema="public",
-        signature="btree_gist"
-    )
-    op.create_entity(public_btree_gist)
-
-    public_pg_trgm = PGExtension(
-        schema="public",
-        signature="pg_trgm"
-    )
-    op.create_entity(public_pg_trgm)
+    op.execute("CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;")
+    op.execute("CREATE EXTENSION IF NOT EXISTS pg_trgm;")
+    op.execute("CREATE EXTENSION IF NOT EXISTS btree_gist;")
 
     # ### Manually create sequences and add them to pk columns. ###
     # PPR sequences
@@ -3625,25 +3608,6 @@ def downgrade():
     op.execute(DropSequence(Sequence('verification_report_id_seq')))
     op.execute(DropSequence(Sequence('word_id_seq')))
     op.execute(DropSequence(Sequence('name_id_seq')))
-
-    # Manually added drop extensions
-    public_pg_trgm = PGExtension(
-        schema="public",
-        signature="pg_trgm"
-    )
-    op.drop_entity(public_pg_trgm)
-
-    public_btree_gist = PGExtension(
-        schema="public",
-        signature="btree_gist"
-    )
-    op.drop_entity(public_btree_gist)
-
-    public_fuzzystrmatch = PGExtension(
-        schema="public",
-        signature="fuzzystrmatch"
-    )
-    op.drop_entity(public_fuzzystrmatch)
 
     public_mhr_account_reg_vw = PGView(
         schema="public",
