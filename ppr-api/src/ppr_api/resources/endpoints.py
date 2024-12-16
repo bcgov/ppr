@@ -17,9 +17,10 @@ from http import HTTPStatus
 from typing import Optional
 
 from flask import Flask, current_app, redirect, request, url_for  # noqa: I001
-from ppr_api import errorhandlers
-from ppr_api.utils.run_version import get_run_version
 from registry_schemas import __version__ as registry_schemas_version  # noqa: I005
+
+from ppr_api import errorhandlers
+from ppr_api.metadata import APP_VERSION
 
 from .constants import EndpointEnum, EndpointVersionEnum
 from .v1 import v1_endpoint
@@ -41,7 +42,7 @@ class Endpoints:
         self._mount_endpoints()
 
     def _handler_setup(self):
-        @self.app.route('/')
+        @self.app.route("/")
         def be_nice_swagger_redirect():  # pylint: disable=unused-variable
             """Redirect / to the swagger app, until the REST extension is removed."""
             # TODO: remove this when the REST extension is removed.
@@ -50,32 +51,31 @@ class Endpoints:
         @self.app.before_request
         def before_request():  # pylint: disable=unused-variable
             """Before routing the request, check the Accept Version header to route to the correct API."""
-            if (version := request.headers.get('accept-version')) and request.endpoint:  # pylint: disable=R1705
-                if version == EndpointVersionEnum.V1 and request.endpoint.startswith(EndpointEnum.API.name + '.'):
+            if (version := request.headers.get("accept-version")) and request.endpoint:  # pylint: disable=R1705
+                if version == EndpointVersionEnum.V1 and request.endpoint.startswith(EndpointEnum.API.name + "."):
                     return self._redirect(
-                        url_for(
-                            request.endpoint.replace(EndpointEnum.API.name, EndpointEnum.API_V1.name, 1)
-                        ))
-                if version == EndpointVersionEnum.V1 \
-                    and not request.endpoint.startswith(EndpointEnum.API_V1.name + '.') \
-                        and request.endpoint.startswith(EndpointEnum.API.name + '.'):
+                        url_for(request.endpoint.replace(EndpointEnum.API.name, EndpointEnum.API_V1.name, 1))
+                    )
+                if (
+                    version == EndpointVersionEnum.V1
+                    and not request.endpoint.startswith(EndpointEnum.API_V1.name + ".")
+                    and request.endpoint.startswith(EndpointEnum.API.name + ".")
+                ):
                     return self._redirect(
-                        url_for(
-                            request.endpoint.replace(EndpointEnum.API.name, EndpointEnum.API_V1.name, 1)
-                        ))
+                        url_for(request.endpoint.replace(EndpointEnum.API.name, EndpointEnum.API_V1.name, 1))
+                    )
             return None
 
         @self.app.after_request
         def add_version(response):  # pylint: disable=unused-variable
-            version = get_run_version()
-            response.headers['API'] = f'mhr_api/{version}'
-            response.headers['SCHEMAS'] = f'registry_schemas/{registry_schemas_version}'
+            response.headers["API"] = f"ppr_api/{APP_VERSION}"
+            response.headers["SCHEMAS"] = f"registry_schemas/{registry_schemas_version}"
             return response
 
         errorhandlers.init_app(self.app)
 
     def _redirect(self, path, code=302):
-        if request.method == 'OPTIONS':
+        if request.method == "OPTIONS":
             options_resp = current_app.make_default_options_response()
             self._set_access_control_header(options_resp)
             return options_resp
@@ -86,8 +86,8 @@ class Endpoints:
 
     @classmethod
     def _set_access_control_header(cls, response):  # pylint: disable=unused-variable
-        response.headers['Access-Control-Allow-Origin'] = '*'
-        response.headers['Access-Control-Allow-Headers'] = 'Authorization, Content-Type'
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Headers"] = "Authorization, Content-Type"
 
     def _mount_endpoints(self):
         """Mount the endpoints of the system."""

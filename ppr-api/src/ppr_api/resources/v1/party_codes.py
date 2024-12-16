@@ -17,29 +17,29 @@
 
 from http import HTTPStatus
 
-from flask import Blueprint, current_app, jsonify, request
+from flask import Blueprint, jsonify, request
 from flask_cors import cross_origin
+
 from ppr_api.exceptions import BusinessException, DatabaseException
 from ppr_api.models import ClientCode
 from ppr_api.resources import utils as resource_utils
 from ppr_api.services.authz import authorized, is_staff
 from ppr_api.utils.auth import jwt
+from ppr_api.utils.logging import logger
+
+bp = Blueprint("PARTY_CODES1", __name__, url_prefix="/api/v1/party-codes")  # pylint: disable=invalid-name
+FUZZY_NAME_SEARCH_PARAM = "fuzzyNameSearch"
+SECURITIES_ACT_PARAM = "securitiesActCodes"
 
 
-bp = Blueprint('PARTY_CODES1',  # pylint: disable=invalid-name
-               __name__, url_prefix='/api/v1/party-codes')
-FUZZY_NAME_SEARCH_PARAM = 'fuzzyNameSearch'
-SECURITIES_ACT_PARAM = 'securitiesActCodes'
-
-
-@bp.route('/<string:code>', methods=['GET', 'OPTIONS'])
-@cross_origin(origin='*')
+@bp.route("/<string:code>", methods=["GET", "OPTIONS"])
+@cross_origin(origin="*")
 @jwt.requires_auth
 def get_party_codes(code: str):
     """Get a preset registering or secured party by client code."""
     try:
         if code is None:
-            return resource_utils.path_param_error_response('code')
+            return resource_utils.path_param_error_response("code")
 
         # Quick check: must be staff or provide an account ID.
         account_id = resource_utils.get_account_id(request)
@@ -51,29 +51,29 @@ def get_party_codes(code: str):
             return resource_utils.unauthorized_error_response(account_id)
 
         # Try to fetch client party by code
-        current_app.logger.debug(f'Getting party code for account {account_id} with code = {code}.')
+        logger.debug(f"Getting party code for account {account_id} with code = {code}.")
         party = ClientCode.find_by_code(code)
         if not party:
-            return resource_utils.not_found_error_response('party', code)
+            return resource_utils.not_found_error_response("party", code)
 
         return party, HTTPStatus.OK
 
     except DatabaseException as db_exception:
-        return resource_utils.db_exception_response(db_exception, account_id, 'GET client party code=' + code)
+        return resource_utils.db_exception_response(db_exception, account_id, "GET client party code=" + code)
     except BusinessException as exception:
         return resource_utils.business_exception_response(exception)
-    except Exception as default_exception:   # noqa: B902; return nicer default error
+    except Exception as default_exception:  # noqa: B902; return nicer default error
         return resource_utils.default_exception_response(default_exception)
 
 
-@bp.route('/head-offices/<string:name_or_code>', methods=['GET', 'OPTIONS'])
-@cross_origin(origin='*')
+@bp.route("/head-offices/<string:name_or_code>", methods=["GET", "OPTIONS"])
+@cross_origin(origin="*")
 @jwt.requires_auth
 def get_head_office_party_codes(name_or_code: str):
     """Get a list of client parties (registering or secured parties) associated with a head office code or name."""
     try:
         if name_or_code is None:
-            return resource_utils.path_param_error_response('nameOrCode')
+            return resource_utils.path_param_error_response("nameOrCode")
         fuzzy_param = request.args.get(FUZZY_NAME_SEARCH_PARAM)
 
         # Quick check: must be staff or provide an account ID.
@@ -86,22 +86,22 @@ def get_head_office_party_codes(name_or_code: str):
             return resource_utils.unauthorized_error_response(account_id)
 
         # Try to fetch client parties: no results is an empty list.
-        current_app.logger.debug(f'Getting {account_id} head office party codes searching on {name_or_code}.')
+        logger.debug(f"Getting {account_id} head office party codes searching on {name_or_code}.")
         parties = ClientCode.find_by_head_office(name_or_code, fuzzy_param)
         # if not parties:
         #    return resource_utils.not_found_error_response('party', code)
         return jsonify(parties), HTTPStatus.OK
 
     except DatabaseException as db_exception:
-        return resource_utils.db_exception_response(db_exception, account_id, 'GET client party matches')
+        return resource_utils.db_exception_response(db_exception, account_id, "GET client party matches")
     except BusinessException as exception:
         return resource_utils.business_exception_response(exception)
-    except Exception as default_exception:   # noqa: B902; return nicer default error
+    except Exception as default_exception:  # noqa: B902; return nicer default error
         return resource_utils.default_exception_response(default_exception)
 
 
-@bp.route('/accounts', methods=['GET', 'OPTIONS'])
-@cross_origin(origin='*')
+@bp.route("/accounts", methods=["GET", "OPTIONS"])
+@cross_origin(origin="*")
 @jwt.requires_auth
 def get_account_codes():
     """Get a list of client parties associated with an account-BCOL number pair."""
@@ -116,7 +116,7 @@ def get_account_codes():
             return resource_utils.unauthorized_error_response(account_id)
 
         # Try to fetch client parties: no results is an empty list.
-        current_app.logger.debug(f'Getting {account_id}  party codes.')
+        logger.debug(f"Getting {account_id}  party codes.")
         # Default filter is crown charge account party codes.
         is_crown_charge: bool = True
         is_securities_act: bool = False
@@ -128,9 +128,10 @@ def get_account_codes():
         return jsonify(parties), HTTPStatus.OK
 
     except DatabaseException as db_exception:
-        return resource_utils.db_exception_response(db_exception, account_id,
-                                                    'GET account client party codes account=' + account_id)
+        return resource_utils.db_exception_response(
+            db_exception, account_id, "GET account client party codes account=" + account_id
+        )
     except BusinessException as exception:
         return resource_utils.business_exception_response(exception)
-    except Exception as default_exception:   # noqa: B902; return nicer default error
+    except Exception as default_exception:  # noqa: B902; return nicer default error
         return resource_utils.default_exception_response(default_exception)

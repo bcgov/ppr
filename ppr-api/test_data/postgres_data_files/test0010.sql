@@ -34,6 +34,6 @@ INSERT INTO general_collateral(id, registration_id, financing_id, registration_i
 ;
 UPDATE serial_collateral
   SET registration_id_end = 200000011
-WHERE id = 200000006
+ WHERE id = 200000006
 ;
 -- TEST0010 end

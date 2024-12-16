@@ -6,12 +6,13 @@ import {
   mockedSelectSecurityAgreement
 } from './test-data'
 import { useStore } from '@/store/store'
-import { FinancingStatementIF } from '@/interfaces'
-import { TombstoneDynamic } from '@/components/tombstone'
+import type { FinancingStatementIF } from '@/interfaces'
 import { MhApiStatusTypes, RouteNames } from '@/enums'
 import { defaultFlagSet, pacificDate } from '@/utils'
 import { nextTick } from 'vue'
 import { expect } from 'vitest'
+import { Tombstone, TombstoneDefault, TombstoneDynamic } from '@/components/tombstones'
+import flushPromises from 'flush-promises'
 
 const store = useStore()
 
@@ -154,18 +155,18 @@ describe('TombstoneDynamic component - MHR', () => {
     expect(tombstoneDynamic.find(tombstoneInfo).text()).toContain(mockedMhrInformationExempt.statusType)
   })
 
-  it('does not render correction btns for Mhr when not staff and the FF is enabled', async () => {
-    defaultFlagSet['mhr-staff-correction-enabled'] = true
-    setupMockUser()
+  it('does not render correction btns for Mhr when staff and the FF is disabled', async () => {
+    defaultFlagSet['mhr-staff-correction-enabled'] = false
+    setupMockStaffUser()
     await nextTick()
 
     const correctionBtn = await wrapper.find('#registry-correction-btn')
     expect(correctionBtn.exists()).toBe(false)
   })
 
-  it('does not render correction btns for Mhr when staff and the FF is disabled', async () => {
-    defaultFlagSet['mhr-staff-correction-enabled'] = false
-    setupMockStaffUser()
+  it('does not render correction btns for Mhr when not staff and the FF is enabled', async () => {
+    defaultFlagSet['mhr-staff-correction-enabled'] = true
+    setupMockUser()
     await nextTick()
 
     const correctionBtn = await wrapper.find('#registry-correction-btn')

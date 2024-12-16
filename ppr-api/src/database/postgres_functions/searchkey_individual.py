@@ -5,7 +5,7 @@ from alembic_utils.pg_function import PGFunction
 searchkey_individual = PGFunction(
     schema="public",
     signature="searchkey_individual(last_name character varying, first_name character varying)",
-    definition="""
+    definition=r"""
     RETURNS character varying
     LANGUAGE plpgsql
     AS $function$

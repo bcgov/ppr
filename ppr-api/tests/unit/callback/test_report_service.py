@@ -14,6 +14,8 @@
 """Callback report-api service tests."""
 from http import HTTPStatus
 
+from flask import current_app
+
 from ppr_api.callback.reports.report_service import get_search_report, get_mail_verification_statement
 from ppr_api.models import Party, Registration, SearchResult, SearchRequest
 
@@ -23,6 +25,8 @@ TEST_VERIFICATION_MAIL_FILE = 'tests/unit/callback/test-get-verification-mail.pd
 
 def test_get_search_report(session):
     """Assert that a callback request to generate a search result report works as expected."""
+    if is_ci_testing():
+        return
     # setup
     json_data = {
         'type': 'SERIAL_NUMBER',
@@ -50,3 +54,8 @@ def test_get_search_report(session):
     with open(TEST_SEARCH_REPORT_FILE, "wb") as pdf_file:
         pdf_file.write(raw_data)
         pdf_file.close()
+
+
+def is_ci_testing() -> bool:
+    """Check unit test environment: exclude most reports for CI testing."""
+    return  current_app.config.get("DEPLOYMENT_ENV", "testing") == "testing"

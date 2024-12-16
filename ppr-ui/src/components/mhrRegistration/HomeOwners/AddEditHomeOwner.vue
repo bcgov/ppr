@@ -25,6 +25,7 @@
         <!-- Owner Roles Component-->
         <HomeOwnerRoles
           :partyType="owner.partyType"
+          :disableRoles="isCurrentOwner(owner)"
           @update:partyType="owner.partyType = $event"
         />
 
@@ -362,8 +363,8 @@
 
           <!-- Group Add / Edit -->
           <template
-            v-if="!isTransferDueToDeath && !isFrozenMhrDueToAffidavit &&
-              !(isMhrCorrection && editHomeOwner) && !(disableNameFields && isCurrentOwner(owner))"
+            v-if="!isTransferDueToDeath && !(isMhrCorrection && editHomeOwner) &&
+              !(disableNameFields && isCurrentOwner(owner))"
           >
             <hr class="mt-3 mb-10">
             <HomeOwnerGroups
@@ -391,7 +392,7 @@
                 variant="outlined"
                 color="error"
                 class="remove-btn"
-                :disabled="isAddingHomeOwner"
+                :disabled="isAddingHomeOwner || disableOwnerRemoval"
                 :ripple="false"
                 @click="remove()"
               >
@@ -486,6 +487,10 @@ export default defineComponent({
     showTableError: {
       type: Boolean,
       default: false
+    },
+    disableOwnerRemoval: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['remove', 'cancel'],
@@ -533,13 +538,11 @@ export default defineComponent({
     const {
       isCurrentOwner,
       isTransferDueToDeath,
-      isTransferDueToSaleOrGift,
       isTransferToAdminNoWill,
       hasCurrentOwnerChanges,
       disableNameFields,
       isTransferToExecOrAdmin,
-      TransToExec,
-      TransAffidavit
+      TransToExec
     } = useTransferOwners()
 
     const {
@@ -582,7 +585,8 @@ export default defineComponent({
         middle: props.editHomeOwner?.individualName.middle || '',
         last: props.editHomeOwner?.individualName.last || ''
       }
-    } else {
+    } else if (![HomeOwnerPartyTypes.EXECUTOR, HomeOwnerPartyTypes.ADMINISTRATOR, HomeOwnerPartyTypes.TRUSTEE]
+      .includes(props.editHomeOwner?.partyType)) {
       defaultHomeOwner.organizationName = props.editHomeOwner?.organizationName || ''
       defaultHomeOwner.partyType = HomeOwnerPartyTypes.OWNER_BUS
     }
@@ -729,14 +733,6 @@ export default defineComponent({
             TransToExec.hasDeletedOwnersWithProbateGrantOrAffidavit() &&
             localState.owner.partyType === HomeOwnerPartyTypes.EXECUTOR) {
             localState.ownerGroupId = localState.owner.groupId
-          }
-
-          // In Sale or Gift Transfer after Affidavit (aka Frozen) flow, add new owners to same group as Executor
-          if (props.isMhrTransfer &&
-              isTransferDueToSaleOrGift.value &&
-              isFrozenMhrDueToAffidavit.value) {
-            // Find the GroupId with an Executor
-            localState.ownerGroupId = TransAffidavit.getGroupIdWithExecutor()
           }
 
           if (props.isMhrTransfer &&

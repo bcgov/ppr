@@ -12,26 +12,26 @@
     </v-overlay>
 
     <BaseDialog
-      :closeAction="true"
-      :setOptions="options"
-      :setDisplay="showCancelDialog"
+      :close-action="true"
+      :set-options="options"
+      :set-display="showCancelDialog"
       @proceed="handleDialogResp($event)"
     />
 
     <StaffPaymentDialog
       attach=""
       class="mt-10"
-      :setDisplay="staffPaymentDialogDisplay"
-      :setOptions="staffPaymentDialogOptions"
-      :setShowCertifiedCheckbox="false"
+      :set-display="staffPaymentDialogDisplay"
+      :set-options="staffPaymentDialogOptions"
+      :set-show-certified-checkbox="false"
       @proceed="onStaffPaymentChanges($event)"
     />
 
     <v-container class="pt-8 pb-15">
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col cols="6">
           <span
-            v-if="buttonConfig.showCancel"
+            v-if="buttonConfig"
             class="pr-3"
           >
             <v-btn
@@ -116,8 +116,7 @@ import { saveFinancingStatement, saveFinancingStatementDraft } from '@/utils'
 import { RouteNames } from '@/enums'
 import { BaseDialog } from '@/components/dialogs'
 import StaffPaymentDialog from '@/components/dialogs/StaffPaymentDialog.vue'
-import {
-  // eslint-disable-next-line no-unused-vars
+import type {
   ButtonConfigIF, DialogOptionsIF, DraftIF, ErrorIF, FinancingStatementIF, RegTableNewItemI, StateModelIF
 } from '@/interfaces'
 import { unsavedChangesDialog } from '@/resources/dialogOptions'
@@ -132,7 +131,7 @@ export default defineComponent({
   props: {
     navConfig: {
       type: Array as () => Array<ButtonConfigIF>,
-      default: null
+      default: () => []
     },
     disableNav: {
       type: Boolean,
@@ -161,7 +160,6 @@ export default defineComponent({
   },
   emits: ['cancelProceed', 'error', 'registrationIncomplete', 'submit', 'navigationDisabled'],
   setup (props, { emit }) {
-    const { goToDash, goToRoute } = useNavigation()
     const {
       // Actions
       setDraft,
@@ -178,8 +176,8 @@ export default defineComponent({
       isMhrReRegistration,
       getMhrInformation
     } = storeToRefs(useStore())
+    const { goToDash, goToRoute } = useNavigation()
     const { mhrDraftHandler } = useNewMhrRegistration()
-
     const { isMhrCorrection } = useMhrCorrections()
 
     const localState = reactive({
@@ -209,7 +207,7 @@ export default defineComponent({
       isStaffSbc: computed((): boolean => {
         return isRoleStaffSbc.value
       }),
-      buttonConfig: computed((): ButtonConfigIF => {
+      buttonConfig: computed((): Array<ButtonConfigIF> => {
         for (const i in props.navConfig) {
           if (props.navConfig[i].stepName === props.currentStepName) {
             return props.navConfig[i]

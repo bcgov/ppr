@@ -28,7 +28,8 @@
               :id="role.id"
               :value="role.model"
               :class="role.class"
-              :disabled="isDisabledRadio(role.model) && selectedPartyType !== role.model"
+              :disabled="(isDisabledRadio(role.model) && selectedPartyType !== role.model) ||
+                (disableRoles && selectedPartyType !== role.model)"
             >
               <template #label>
                 <div
@@ -48,11 +49,10 @@
 </template>
 
 <script lang="ts">
-
 import { defineComponent, PropType, reactive, toRefs, watch } from 'vue'
 import { HomeOwnerPartyTypes } from '@/enums'
 import { HomeOwnerRoles } from '@/resources'
-import { useMhrInformation, useTransferOwners } from '@/composables'
+import { useTransferOwners } from '@/composables'
 
 
 export default defineComponent({
@@ -61,19 +61,17 @@ export default defineComponent({
     partyType: {
       type: String as PropType<HomeOwnerPartyTypes>,
       default: null
+    },
+    disableRoles: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['update:partyType'],
   setup (props, context) {
-    const { isFrozenMhrDueToUnitNote } = useMhrInformation()
     const {
       disableNameFields,
-      isTransferDueToDeath,
-      isTransferToAdminNoWill,
-      isTransferDueToSaleOrGift,
-      isTransferToExecutorProbateWill,
-      isTransferToExecutorUnder25Will,
-      isTransferToSurvivingJointTenant
+      isTransferWithoutBillOfSale
     } = useTransferOwners()
 
     const localState = reactive({
@@ -84,23 +82,9 @@ export default defineComponent({
 
     /**
      * Returns true when specific transfer type conditions are met for each respective party type
-     * @param partyType The specified party type from which to retrieve the conditions
      */
-    const isDisabledRadio = (partyType: HomeOwnerPartyTypes): boolean => {
-      switch (partyType) {
-        case HomeOwnerPartyTypes.OWNER_IND:
-        case HomeOwnerPartyTypes.OWNER_BUS:
-          return isTransferToExecutorProbateWill.value || isTransferToExecutorUnder25Will.value ||
-            isTransferToAdminNoWill.value || isTransferToSurvivingJointTenant.value
-        case HomeOwnerPartyTypes.EXECUTOR:
-          return disableNameFields.value || isTransferToAdminNoWill.value || isTransferDueToSaleOrGift.value ||
-            isFrozenMhrDueToUnitNote.value
-        case HomeOwnerPartyTypes.ADMINISTRATOR:
-          return isTransferToSurvivingJointTenant.value || isTransferToExecutorUnder25Will.value ||
-            isTransferToExecutorProbateWill.value || isTransferDueToSaleOrGift.value || isFrozenMhrDueToUnitNote.value
-        case HomeOwnerPartyTypes.TRUSTEE:
-          return isTransferDueToDeath.value || isTransferDueToSaleOrGift.value || isFrozenMhrDueToUnitNote.value
-      }
+    const isDisabledRadio = (): boolean => {
+      return disableNameFields.value && !isTransferWithoutBillOfSale.value
     }
 
     /** Apply local models to store when they change. **/

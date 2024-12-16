@@ -19,6 +19,7 @@ All modules and lookups get their configuration from the
 Flask config, rather than reading environment variables directly
 or by accessing this configuration directly.
 """
+
 import json
 import os
 import sys
@@ -53,6 +54,8 @@ def get_named_config(config_name: str = "production"):
         configuration = TestConfig()
     elif config_name == "development":
         configuration = DevConfig()
+    elif config_name == "unitTesting":
+        configuration = UnitTestingConfig()
     else:
         raise KeyError(f"Unknown configuration: {config_name}")
     return configuration
@@ -74,9 +77,16 @@ class Config:  # pylint: disable=too-few-public-methods
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     ALEMBIC_INI = "migrations/alembic.ini"
 
-    PAYMENT_SVC_URL = os.getenv("PAYMENT_SVC_URL", "https://pay-api-dev.apps.silver.devops.gov.bc.ca/api/v1")
-    AUTH_SVC_URL = os.getenv("AUTH_SVC_URL", "https://auth-api-dev-142173140222.northamerica-northeast1.run.app/api/v1")
-    REPORT_SVC_URL = os.getenv("REPORT_SVC_URL", "https://gotenberg-p56lvhvsqa-nn.a.run.app")
+    # API Endpoints
+    AUTH_API_URL = os.getenv("AUTH_API_URL", "")
+    AUTH_API_VERSION = os.getenv("AUTH_API_VERSION", "")
+    PAY_API_URL = os.getenv("PAY_API_URL", "")
+    PAY_API_VERSION = os.getenv("PAY_API_VERSION", "")
+    REPORT_API_URL = os.getenv("REPORT_API_URL", "https://gotenberg-p56lvhvsqa-nn.a.run.app")
+
+    AUTH_SVC_URL = f"{AUTH_API_URL + AUTH_API_VERSION}"
+    PAYMENT_SVC_URL = f"{PAY_API_URL + PAY_API_VERSION}"
+    REPORT_SVC_URL = f"{REPORT_API_URL}"
     REPORT_TEMPLATE_PATH = os.getenv("REPORT_TEMPLATE_PATH", "report-templates")
 
     LD_SDK_KEY = os.getenv("LD_SDK_KEY", None)

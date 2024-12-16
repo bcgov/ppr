@@ -16,22 +16,22 @@
 
 from http import HTTPStatus
 
-from flask import Blueprint, current_app, jsonify, request
+from flask import Blueprint, jsonify, request
 from flask_cors import cross_origin
+
 from ppr_api.exceptions import BusinessException, DatabaseException
 from ppr_api.models import SearchRequest
 from ppr_api.resources import utils as resource_utils
 from ppr_api.services.authz import authorized
 from ppr_api.utils.auth import jwt
+from ppr_api.utils.logging import logger
+
+bp = Blueprint("SEARCH_HISTORY1", __name__, url_prefix="/api/v1/search-history")  # pylint: disable=invalid-name
+VAL_ERROR = "Search history request data validation errors."  # Validation error prefix
 
 
-bp = Blueprint('SEARCH_HISTORY1',  # pylint: disable=invalid-name
-               __name__, url_prefix='/api/v1/search-history')
-VAL_ERROR = 'Search history request data validation errors.'  # Validation error prefix
-
-
-@bp.route('', methods=['GET', 'OPTIONS'])
-@cross_origin(origin='*')
+@bp.route("", methods=["GET", "OPTIONS"])
+@cross_origin(origin="*")
 @jwt.requires_auth
 def get_search_history():
     """Get account search history."""
@@ -47,14 +47,14 @@ def get_search_history():
 
         # Try to fetch search history by account id.
         # No results throws a not found business exception.
-        current_app.logger.info(f'Fetching search history for {account_id}.')
-        from_ui = request.args.get('from_ui', False)
+        logger.info(f"Fetching search history for {account_id}.")
+        from_ui = request.args.get("from_ui", False)
         history = SearchRequest.find_all_by_account_id(account_id, from_ui)
         return jsonify(history), HTTPStatus.OK
 
     except DatabaseException as db_exception:
-        return resource_utils.db_exception_response(db_exception, account_id, 'GET search history')
+        return resource_utils.db_exception_response(db_exception, account_id, "GET search history")
     except BusinessException as exception:
         return resource_utils.business_exception_response(exception)
-    except Exception as default_exception:   # noqa: B902; return nicer default error
+    except Exception as default_exception:  # noqa: B902; return nicer default error
         return resource_utils.default_exception_response(default_exception)

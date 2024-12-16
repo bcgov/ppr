@@ -15,6 +15,7 @@
 
 This module is the API for the BC Registries Manufactured Home Registry system.
 """
+
 import os
 
 from flask import Flask, redirect  # noqa: I001
@@ -111,13 +112,19 @@ def setup_test_data():
         filenames = os.listdir(os.path.join(test_path, "test_data/postgres_data_files"))
         sorted_names = sorted(filenames)
         for filename in sorted_names:
-            execute_script(db.session, os.path.join(test_path, ("test_data/postgres_data_files/" + filename)))
+            execute_script(
+                db.session,
+                os.path.join(test_path, ("test_data/postgres_data_files/" + filename)),
+            )
         # execute_script(db.session, "test_data/postgres_test_reset_ppr.sql")
         execute_script(db.session, "test_data/postgres_create_first_ppr.sql")
         filenames = os.listdir(os.path.join(os.getcwd(), "test_data/postgres_data_files_ppr"))
         sorted_names = sorted(filenames)
         for filename in sorted_names:
-            execute_script(db.session, os.path.join(os.getcwd(), ("test_data/postgres_data_files_ppr/" + filename)))
+            execute_script(
+                db.session,
+                os.path.join(os.getcwd(), ("test_data/postgres_data_files_ppr/" + filename)),
+            )
     except Exception as err:  # pylint: disable=broad-except # noqa F841;
         logger.error(f"setup_test_data failed: {str(err)}")
 

@@ -9,7 +9,6 @@ axios.interceptors.request.use(
     return config
   },
   error => {
-    // console.log('axios interceptor set request headers error: ' + error)
     Promise.reject(error)
   }
 )

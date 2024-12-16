@@ -20,6 +20,7 @@ from registry_schemas import utils as schema_utils
 from registry_schemas.example_data.mhr import REGISTRATION, TRANSFER, EXEMPTION
 
 from mhr_api.utils import registration_validator as validator, manufacturer_validator as man_validator, validator_utils
+from mhr_api.utils import validator_owner_utils as val_owner_utils
 from mhr_api.models import MhrRegistration, MhrManufacturer, utils as model_utils
 from mhr_api.models.type_tables import MhrRegistrationTypes, MhrTenancyTypes, MhrDocumentTypes
 from mhr_api.models.utils import now_ts
@@ -144,11 +145,7 @@ TEST_PARTY_DATA = [
     ('Reg invalid last name', None, 'first', 'middle', INVALID_TEXT_CHARSET, INVALID_CHARSET_MESSAGE, REGISTRATION),
     ('Reg street non utf-8', None, 'first', 'middle', 'last', None, REGISTRATION),
     ('Reg streetAdditional non utf-8', None, 'first', 'middle', 'last', None, REGISTRATION),
-    ('Reg city non utf-8', None, 'first', 'middle', 'last', None, REGISTRATION),
-    ('Trans invalid org/bus name', INVALID_TEXT_CHARSET, None, None, None, INVALID_CHARSET_MESSAGE, TRANSFER),
-    ('Trans invalid first name', None, INVALID_TEXT_CHARSET, 'middle', 'last', INVALID_CHARSET_MESSAGE, TRANSFER),
-    ('Trans invalid middle name', None, 'first', INVALID_TEXT_CHARSET, 'last', INVALID_CHARSET_MESSAGE, TRANSFER),
-    ('Trans invalid last name', None, 'first', 'middle', INVALID_TEXT_CHARSET, INVALID_CHARSET_MESSAGE, TRANSFER)
+    ('Reg city non utf-8', None, 'first', 'middle', 'last', None, REGISTRATION)
 ]
 # testdata pattern is ({description}, {park_name}, {dealer}, {pad}, {reserve_num}, {band_name}, {pid_num}, {message content})
 TEST_LOCATION_DATA_MANUFACTURER = [
@@ -288,25 +285,25 @@ TEST_REG_DATA_GROUP = [
     ('Valid TC', True, 1, 2, TC_GROUPS_VALID, None),
     ('Valid SO', True, None, None, SO_VALID, None),
     ('Valid JT', True, None, None, JT_VALID, None),
-    ('Invalid TC no owner', False, 1, 2, TC_GROUPS_VALID, validator_utils.OWNERS_COMMON_INVALID),
-    ('Invalid TC SO group', False, 1, 2, TC_GROUPS_VALID, validator_utils.OWNERS_COMMON_SOLE_INVALID),
-    ('Invalid TC 2 owners', False, 1, 2, TC_GROUPS_VALID, validator_utils.OWNERS_COMMON_INVALID),
-    ('Invalid TC only 1 group', False, 2, 2, TC_GROUPS_VALID, validator_utils.GROUP_COMMON_INVALID),
-    ('Invalid TC numerator missing', False, None, 2, TC_GROUPS_VALID, validator_utils.GROUP_NUMERATOR_MISSING),
-    ('Invalid TC numerator < 1', False, 0, 2, TC_GROUPS_VALID, validator_utils.GROUP_NUMERATOR_MISSING),
-    ('Invalid TC denominator missing', False, 1, None, TC_GROUPS_VALID, validator_utils.GROUP_DENOMINATOR_MISSING),
-    ('Invalid TC denominator < 1', False, 1, 0, TC_GROUPS_VALID, validator_utils.GROUP_DENOMINATOR_MISSING),
-    ('Invalid JT 1 owner', False, None, None, JT_OWNER_SINGLE, validator_utils.OWNERS_JOINT_INVALID),
-    ('Invalid SO 2 groups', False, None, None, SO_GROUP_MULTIPLE, validator_utils.ADD_SOLE_OWNER_INVALID),
-    ('Invalid SO 2 owners', False, None, None, SO_OWNER_MULTIPLE, validator_utils.ADD_SOLE_OWNER_INVALID)
+    ('Invalid TC no owner', False, 1, 2, TC_GROUPS_VALID, val_owner_utils.OWNERS_COMMON_INVALID),
+    ('Invalid TC SO group', False, 1, 2, TC_GROUPS_VALID, val_owner_utils.OWNERS_COMMON_SOLE_INVALID),
+    ('Invalid TC 2 owners', False, 1, 2, TC_GROUPS_VALID, val_owner_utils.OWNERS_COMMON_INVALID),
+    ('Invalid TC only 1 group', False, 2, 2, TC_GROUPS_VALID, val_owner_utils.GROUP_COMMON_INVALID),
+    ('Invalid TC numerator missing', False, None, 2, TC_GROUPS_VALID, val_owner_utils.GROUP_NUMERATOR_MISSING),
+    ('Invalid TC numerator < 1', False, 0, 2, TC_GROUPS_VALID, val_owner_utils.GROUP_NUMERATOR_MISSING),
+    ('Invalid TC denominator missing', False, 1, None, TC_GROUPS_VALID, val_owner_utils.GROUP_DENOMINATOR_MISSING),
+    ('Invalid TC denominator < 1', False, 1, 0, TC_GROUPS_VALID, val_owner_utils.GROUP_DENOMINATOR_MISSING),
+    ('Invalid JT 1 owner', False, None, None, JT_OWNER_SINGLE, val_owner_utils.OWNERS_JOINT_INVALID),
+    ('Invalid SO 2 groups', False, None, None, SO_GROUP_MULTIPLE, val_owner_utils.ADD_SOLE_OWNER_INVALID),
+    ('Invalid SO 2 owners', False, None, None, SO_OWNER_MULTIPLE, val_owner_utils.ADD_SOLE_OWNER_INVALID)
 ]
 # testdata pattern is ({description}, {valid}, {interest_data}, {common_denominator}, {message content})
 TEST_DATA_GROUP_INTEREST = [
     ('Valid 2 groups', True, INTEREST_VALID_1, 2, None),
     ('Valid 3 groups', True, INTEREST_VALID_2, 4, None),
     ('Valid 3 groups', True, INTEREST_VALID_3, 10, None),
-    ('Invalid numerator sum low', False, INTEREST_INVALID_1, 4, validator_utils.GROUP_INTEREST_MISMATCH),
-    ('Invalid numerator sum high', False, INTEREST_INVALID_2, 4, validator_utils.GROUP_INTEREST_MISMATCH)
+    ('Invalid numerator sum low', False, INTEREST_INVALID_1, 4, val_owner_utils.GROUP_INTEREST_MISMATCH),
+    ('Invalid numerator sum high', False, INTEREST_INVALID_2, 4, val_owner_utils.GROUP_INTEREST_MISMATCH)
 ]
 # testdata pattern is ({description}, {mhr_number}, {message content})
 TEST_DATA_LIEN_COUNT = [
@@ -323,16 +320,16 @@ TEST_PARTY_TYPE_DATA = [
     ('Valid TC exec', True, JT_VALID_EXEC, TC_VALID_EXEC, None, None, None),
     ('Valid TC trustee', True, JT_VALID_TRUSTEE, TC_VALID_TRUSTEE, None, None, None),
     ('Valid TC admin', True, JT_VALID_ADMIN, TC_VALID_ADMIN, None, None, None),
-    ('Invalid SO type NA', False, SO_VALID_EXEC, None, 'NA', None, validator.TENANCY_TYPE_NA_INVALID),
-    ('Invalid SO exec no desc', False, SO_VALID_EXEC, None, None, None, validator.OWNER_DESCRIPTION_REQUIRED),
+    ('Invalid SO type NA', False, SO_VALID_EXEC, None, 'NA', None, val_owner_utils.TENANCY_TYPE_NA_INVALID),
+    ('Invalid SO exec no desc', False, SO_VALID_EXEC, None, None, None, val_owner_utils.OWNER_DESCRIPTION_REQUIRED),
     ('Invalid common type JOINT', False, JT_VALID_EXEC, TC_VALID_EXEC, 'JOINT', None,
-     validator.TENANCY_PARTY_TYPE_INVALID),
-    ('Invalid JT party types 1', False, JT_VALID_EXEC, None, None, 'ADMINISTRATOR', validator.GROUP_PARTY_TYPE_INVALID),
-    ('Invalid JT party types 2', False, JT_VALID_TRUSTEE, None, None, 'EXECUTOR', validator.GROUP_PARTY_TYPE_INVALID),
-    ('Invalid JT party types 3', False, JT_VALID_ADMIN, None, None, 'TRUSTEE', validator.GROUP_PARTY_TYPE_INVALID),
-    ('Invalid JT type NA', False, JT_GROUP_VALID, None, 'NA', None, validator_utils.TENANCY_TYPE_NA_INVALID2),
-    ('Invalid NA type mix', False, JT_GROUP_MIX, None, None, None, validator_utils.TENANCY_TYPE_NA_INVALID2),
-    ('Invalid JT type mix', False, JT_GROUP_MIX, None, 'JT', None, validator.TENANCY_PARTY_TYPE_INVALID)
+     val_owner_utils.TENANCY_PARTY_TYPE_INVALID),
+    ('Invalid JT party types 1', False, JT_VALID_EXEC, None, None, 'ADMINISTRATOR', val_owner_utils.GROUP_PARTY_TYPE_INVALID),
+    ('Invalid JT party types 2', False, JT_VALID_TRUSTEE, None, None, 'EXECUTOR', val_owner_utils.GROUP_PARTY_TYPE_INVALID),
+    ('Invalid JT party types 3', False, JT_VALID_ADMIN, None, None, 'TRUSTEE', val_owner_utils.GROUP_PARTY_TYPE_INVALID),
+    ('Invalid JT type NA', False, JT_GROUP_VALID, None, 'NA', None, val_owner_utils.TENANCY_TYPE_NA_INVALID2),
+    ('Invalid NA type mix', False, JT_GROUP_MIX, None, None, None, val_owner_utils.TENANCY_TYPE_NA_INVALID2),
+    ('Invalid JT type mix', False, JT_GROUP_MIX, None, 'JT', None, val_owner_utils.TENANCY_PARTY_TYPE_INVALID)
 ]
 
 
@@ -699,7 +696,7 @@ def test_validate_group_interest(session, desc, valid, interest_data, common_den
         group['interestNumerator'] = interest.get('numerator')
         group['interestDenominator'] = interest.get('denominator')
         json_data.append(group)
-    error_msg = validator_utils.validate_group_interest(json_data, common_den)
+    error_msg = val_owner_utils.validate_group_interest(json_data, common_den)
     if valid:
         assert error_msg == ''
     else:

@@ -19,7 +19,7 @@ import pytest
 from registry_schemas import utils as schema_utils
 from registry_schemas.example_data.mhr import DESCRIPTION
 
-from mhr_api.utils import admin_validator as validator, validator_utils
+from mhr_api.utils import admin_validator as validator, validator_utils, validator_owner_utils as val_owner_utils
 from mhr_api.models import MhrRegistration
 from mhr_api.models.type_tables import MhrDocumentTypes
 from mhr_api.services.authz import STAFF_ROLE
@@ -479,14 +479,14 @@ TEST_AMEND_CORRECT_DATA = [
     (False, '000919', 'REGC_STAFF', None, None, None, DELETE_OG_VALID, validator.ADD_OWNERS_MISSING),
     (False, '000919', 'REGC_STAFF', None, None, ADD_OG_VALID, None, validator.DELETE_OWNERS_MISSING),
     (False, '000919', 'REGC_STAFF', None, None, ADD_OG_INVALID_JT, DELETE_OG_VALID,
-     validator_utils.OWNERS_JOINT_INVALID),
+     val_owner_utils.OWNERS_JOINT_INVALID),
     (True, '000912', 'EXRE', LOCATION_VALID, None, None, None, None),
     (True, '000912', 'EXRE', LOCATION_VALID_MINIMAL, None, None, None, None),
     (False, '000912', 'EXRE', LOCATION_000912, None, None, None, validator_utils.LOCATION_INVALID_IDENTICAL),
     (False, '000912', 'EXRE', None, DESCRIPTION_000912, None, None, validator_utils.DESCRIPTION_INVALID_IDENTICAL),
     (False, '000912', 'EXRE', None, None, None, DELETE_OG_000912, validator.ADD_OWNERS_MISSING),
     (False, '000912', 'EXRE', None, None, ADD_OG_VALID, None, validator.DELETE_OWNERS_MISSING),
-    (False, '000912', 'EXRE', None, None, ADD_OG_INVALID_JT, DELETE_OG_000912, validator_utils.OWNERS_JOINT_INVALID),
+    (False, '000912', 'EXRE', None, None, ADD_OG_INVALID_JT, DELETE_OG_000912, val_owner_utils.OWNERS_JOINT_INVALID),
     (True, '000912', 'EXRE', None, None, ADD_OG_VALID, DELETE_OG_000912, None),
     (True, '000912', 'EXRE', None, DESCRIPTION, None, None, None)
 ]

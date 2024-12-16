@@ -4,7 +4,6 @@ import {
   ApiTransferTypes,
   HomeOwnerPartyTypes,
   HomeTenancyTypes,
-  MhApiFrozenDocumentTypes,
   MhApiStatusTypes,
   SupportingDocumentsOptions
 } from '@/enums'
@@ -179,7 +178,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
 
   /** Returns true when Add/Edit Owner name fields should be disabled **/
   const disableNameFields = computed((): boolean => {
-    return isTransferDueToDeath.value || isTransferBillOfSale.value || isTransferNonGiftBillOfSale.value
+    return !!getMhrTransferType.value?.transferType
   })
 
   /** Returns true when ownership structure is joint tenancy /w min 2  owners but not executors, trustees or admins. **/
@@ -310,9 +309,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.SZL:
       case ApiTransferTypes.TAXS:
       case ApiTransferTypes.VEST:
-        // Enable for all but FROZEN status due to Affe
-        return !(getMhrInformation.value.statusType === MhApiStatusTypes.FROZEN &&
-          getMhrInformation.value?.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT)
+        return true // Always enable for above transfer types
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
@@ -398,8 +395,6 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.TRANS_RECEIVERSHIP:
       case ApiTransferTypes.TRANS_SEVER_GRANT:
       case ApiTransferTypes.TRANS_WRIT_SEIZURE:
-        return !(getMhrInformation.value.statusType === MhApiStatusTypes.FROZEN &&
-          getMhrInformation.value?.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT)
       default:
         return true
     }
@@ -438,15 +433,15 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
    **/
   const isDisabledForSJTChanges = (owner: MhrRegistrationHomeOwnerIF): boolean => {
     if (getMhrTransferType.value?.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT) {
-      const hasDeceasedOrChangedOwners = getMhrTransferHomeOwnerGroups.value.some(group =>
-        group.owners.some(owner => owner.action === ActionTypes.REMOVED || owner.action === ActionTypes.CHANGED))
+      const hasDeceasedOwners = getMhrTransferHomeOwnerGroups.value.some(group =>
+        group.owners.some(owner => owner.action === ActionTypes.REMOVED))
 
-      const isDeceasedOrChangedOwnerGroup = getMhrTransferHomeOwnerGroups.value.find(group =>
+      const isDeceasedOwnerGroup = getMhrTransferHomeOwnerGroups.value.find(group =>
         group.groupId === owner.groupId).owners.some(owner =>
-        owner.action === ActionTypes.REMOVED || owner.action === ActionTypes.CHANGED
+        owner.action === ActionTypes.REMOVED
       )
 
-      return hasDeceasedOrChangedOwners && !isDeceasedOrChangedOwnerGroup
+      return hasDeceasedOwners && !isDeceasedOwnerGroup
     }
     return false
   }

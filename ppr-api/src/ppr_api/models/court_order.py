@@ -14,42 +14,41 @@
 """This module holds data for amendment, renewal statement court order information."""
 from __future__ import annotations
 
-from .utils import format_ts, ts_from_date_iso_format
 from .db import db
+from .utils import format_ts, ts_from_date_iso_format
 
 
 class CourtOrder(db.Model):  # pylint: disable=too-many-instance-attributes
     """This class manages all of the amendment, renewal statement court order information."""
 
-    __tablename__ = 'court_orders'
+    __tablename__ = "court_orders"
 
-    id = db.mapped_column('id', db.Integer, db.Sequence('court_order_id_seq'), primary_key=True)
-    order_date = db.mapped_column('order_date', db.DateTime, nullable=False)
-    court_name = db.mapped_column('court_name', db.String(256), nullable=False)
-    court_registry = db.mapped_column('court_registry', db.String(64), nullable=False)
-    file_number = db.mapped_column('file_number', db.String(20), nullable=False)
-    effect_of_order = db.mapped_column('effect_of_order', db.String(512), nullable=True)
+    id = db.mapped_column("id", db.Integer, db.Sequence("court_order_id_seq"), primary_key=True)
+    order_date = db.mapped_column("order_date", db.DateTime, nullable=False)
+    court_name = db.mapped_column("court_name", db.String(256), nullable=False)
+    court_registry = db.mapped_column("court_registry", db.String(64), nullable=False)
+    file_number = db.mapped_column("file_number", db.String(20), nullable=False)
+    effect_of_order = db.mapped_column("effect_of_order", db.String(512), nullable=True)
 
     # parent keys
-    registration_id = db.mapped_column('registration_id', db.Integer, db.ForeignKey('registrations.id'),
-                                       nullable=False,
-                                       index=True)
+    registration_id = db.mapped_column(
+        "registration_id", db.Integer, db.ForeignKey("registrations.id"), nullable=False, index=True
+    )
 
     # Relationships - Registration
-    registration = db.relationship('Registration', foreign_keys=[registration_id],
-                                   cascade='all, delete', uselist=False)
+    registration = db.relationship("Registration", foreign_keys=[registration_id], cascade="all, delete", uselist=False)
 
     @property
     def json(self) -> dict:
         """Return the court_order as a json object."""
         court_order = {
-            'courtName': self.court_name,
-            'courtRegistry': self.court_registry,
-            'fileNumber': self.file_number,
-            'orderDate': format_ts(self.order_date)
+            "courtName": self.court_name,
+            "courtRegistry": self.court_registry,
+            "fileNumber": self.file_number,
+            "orderDate": format_ts(self.order_date),
         }
         if self.effect_of_order:
-            court_order['effectOfOrder'] = self.effect_of_order
+            court_order["effectOfOrder"] = self.effect_of_order
 
         return court_order
 
@@ -78,11 +77,11 @@ class CourtOrder(db.Model):  # pylint: disable=too-many-instance-attributes
         if registration_id:
             court_order.registration_id = registration_id
 
-        court_order.court_name = json_data['courtName']
-        court_order.court_registry = json_data['courtRegistry']
-        court_order.file_number = json_data['fileNumber']
-        court_order.order_date = ts_from_date_iso_format(json_data['orderDate'])
-        if 'effectOfOrder' in json_data:
-            court_order.effect_of_order = json_data['effectOfOrder']
+        court_order.court_name = json_data["courtName"]
+        court_order.court_registry = json_data["courtRegistry"]
+        court_order.file_number = json_data["fileNumber"]
+        court_order.order_date = ts_from_date_iso_format(json_data["orderDate"])
+        if "effectOfOrder" in json_data:
+            court_order.effect_of_order = json_data["effectOfOrder"]
 
         return court_order

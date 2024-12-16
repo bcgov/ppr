@@ -11,12 +11,10 @@ import {
   ActionTypes,
   ApiTransferTypes,
   HomeOwnerPartyTypes,
-  HomeTenancyTypes,
-  MhApiFrozenDocumentTypes,
-  MhApiStatusTypes
+  HomeTenancyTypes
 } from '@/enums'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
-import { useMhrValidations, useTransferOwners } from '@/composables'
+import { useMhrValidations } from '@/composables'
 import { find, findIndex, remove, set, uniq } from 'lodash'
 import { storeToRefs } from 'pinia'
 import { deepChangesComparison } from '@/utils'
@@ -42,7 +40,6 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
   const {
     // Getters
     getMhrBaseline,
-    getMhrInformation,
     getMhrRegistrationHomeOwners,
     getMhrRegistrationHomeOwnerGroups,
     getMhrRegistrationValidationModel,
@@ -302,19 +299,9 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
     }
     const fallBackId = (isMhrTransfer || isMhrCorrection) ? transferDefaultId : DEFAULT_GROUP_ID
 
-   // Is true when current flow is Sale or Gift transfer and the mhr is currently frozen
-    const isFrozenSoGTransfer = getMhrTransferType.value?.transferType === ApiTransferTypes.SALE_OR_GIFT &&
-      getMhrInformation.value?.statusType === MhApiStatusTypes.FROZEN &&
-      getMhrInformation.value?.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT
-
     // Try to find a group to add the owner
-    // If frozen Sale or Gift Transfer: Add Owner to the last ownership group with recently added Executor
-    const groupToUpdate = isFrozenSoGTransfer
-      ? homeOwnerGroups.find(group => group.groupId ===
-        useTransferOwners().getMostRecentExecutorOrAdmin(homeOwnerGroups)?.groupId)
-      : homeOwnerGroups.find(
-      (group: MhrRegistrationHomeOwnerGroupIF) => group.groupId === (groupId || fallBackId)
-    ) || ({} as MhrRegistrationHomeOwnerGroupIF)
+    const groupToUpdate = homeOwnerGroups.find((group: MhrRegistrationHomeOwnerGroupIF) =>
+      group.groupId === (groupId || fallBackId)) || ({} as MhrRegistrationHomeOwnerGroupIF)
 
     // Allow update to "REMOVED" group if WILL flow
     if (groupToUpdate.owners &&

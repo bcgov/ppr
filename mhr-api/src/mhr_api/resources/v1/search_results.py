@@ -388,7 +388,7 @@ def generate_search_report(search_detail: SearchResult, search_id: str):
     doc_name = model_utils.get_search_doc_storage_name(search_detail.search)
     logger.info(f"Saving report output to doc storage: name={doc_name}.")
     response = GoogleStorageService.save_document(doc_name, raw_data)
-    logger.info("Save document storage response: " + str(response))
+    logger.info(f"Save document storage response: {response}")
     search_detail.doc_storage_url = doc_name
     search_detail.save()
 

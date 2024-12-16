@@ -1,0 +1,32 @@
+name: MHR API CD
+
+on:
+  push:
+    branches:
+      - main
+      - feature*
+      - hotfix*
+    paths:
+      - "mhr-api/**"
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Deploy To"
+        required: true
+        type: choice
+        options:
+        - dev
+        - test
+        - sandbox
+        - prod
+
+jobs:
+  mhr-api-cd:
+    uses: bcgov/bcregistry-sre/.github/workflows/backend-cd.yaml@main
+    with:
+      target: ${{ inputs.target }}
+      app_name: "mhr-api"
+      working_directory: "./mhr-api"
+    secrets:
+      WORKLOAD_IDENTIFY_POOLS_PROVIDER: ${{ secrets.WORKLOAD_IDENTIFY_POOLS_PROVIDER }}
+      GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }}

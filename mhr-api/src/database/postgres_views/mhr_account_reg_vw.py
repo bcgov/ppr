@@ -66,9 +66,7 @@ mhr_account_reg_vw = PGView(
           WHERE r2.mhr_number = r.mhr_number
             AND r2.id = n.registration_id
             AND n.status_type = 'ACTIVE'
-            AND (n.document_type IN ('TAXN', 'NCON', 'REST') OR 
-                  (n.document_type IN ('REG_103', 'REG_103E') AND 
-                  n.expiry_date IS NOT NULL AND n.expiry_date > (now() at time zone 'UTC')))
+            AND n.document_type IN ('TAXN', 'NCON', 'REST')
           FETCH FIRST 1 ROWS ONLY) AS frozen_doc_type,
         r.account_id,
         dt.document_type_desc,

@@ -22,7 +22,7 @@ import json
 from flask import current_app
 
 from ppr_api.reports.v2.report import Report
-from ppr_api.reports.v2.report_utils import ReportTypes
+from ppr_api.reports.v2.report_utils import ReportTypes, merge_pdfs
 
 
 SEARCH_RESULT_RG_DATAFILE = 'tests/unit/reports/data/search-detail-reg-num-example.json'
@@ -58,19 +58,45 @@ SEARCH_RESULT_RENEWED_PDFFILE = 'tests/unit/reports/data/search-detail-renewed-e
 SEARCH_RESULT_NIL_DATAFILE = 'tests/unit/reports/data/search-detail-no-results-example.json'
 SEARCH_RESULT_NIL_PDFFILE = 'tests/unit/reports/data/search-detail-no-results-example.pdf'
 
-SEARCH_RESULT_LARGE_DATAFILE = 'tests/unit/reports/data/search-detail-bus-debtor-large-example.json'
-SEARCH_RESULT_LARGE_PDFFILE = 'tests/unit/reports/data/search-detail-bus-debtor-large-example.pdf'
 SEARCH_RESULT_75_DATAFILE = 'tests/unit/reports/data/search-detail-75-example.json'
 SEARCH_RESULT_75_PDFFILE = 'tests/unit/reports/data/search-detail-75-example.pdf'
 SEARCH_COVER_DATAFILE = 'tests/unit/reports/data/search-cover-example.json'
 SEARCH_COVER_PDFFILE = 'tests/unit/reports/data/search-cover-example.pdf'
 REPORT_VERSION_V2 = '2'
+MERGE_PDFFILE = 'tests/unit/reports/data/search-merge.pdf'
+
+
+def test_merge(session, client, jwt):
+    """Assert that merging pdf's in memory works."""
+    if is_report_v2() and not is_ci_testing():
+        json_data = get_json_from_file(SEARCH_COVER_DATAFILE)
+        report = Report(json_data, 'PS12345', ReportTypes.SEARCH_COVER_REPORT, 'Account Name')
+        # test
+        content1, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content1, status, SEARCH_COVER_PDFFILE)
+
+        json_data = get_json_from_file(SEARCH_RESULT_RG_DATAFILE)
+        report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, 'Account Name')
+        # test
+        content2, status, headers = report.get_pdf()
+        check_response(content2, status, SEARCH_RESULT_RG_PDFFILE)
+        report_files = {
+            'cover.pdf': content1,
+            'pdf1.pdf': content2
+        }
+        merge_content = merge_pdfs(report_files)
+        with open(MERGE_PDFFILE, "wb") as pdf_file:
+            pdf_file.write(merge_content)
+            pdf_file.close()
+
 
 
 def test_search_rg(session, client, jwt):
     """Assert that setup for a reg number search type result report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(SEARCH_RESULT_RG_DATAFILE)
         report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, 'Account Name')
         # test
@@ -83,7 +109,7 @@ def test_search_rg(session, client, jwt):
 def test_search_rg_sa(session, client, jwt):
     """Assert that setup for a reg number search type result report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(SEARCH_RESULT_RG_SA_RENEW_DATAFILE)
         report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, 'Account Name')
         # test
@@ -96,7 +122,7 @@ def test_search_rg_sa(session, client, jwt):
 def test_search_rg_rl(session, client, jwt):
     """Assert that setup for a reg number search type result report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(SEARCH_RESULT_RG_RL_RENEW_DATAFILE)
         report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, 'Account Name')
         # test
@@ -109,7 +135,7 @@ def test_search_rg_rl(session, client, jwt):
 def test_search_rg_cert(session, client, jwt):
     """Assert that setup for a reg number search type result report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(SEARCH_RESULT_RG_CERTIFIED_DATAFILE)
         report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, 'Account Name')
         # test
@@ -122,9 +148,9 @@ def test_search_rg_cert(session, client, jwt):
 def test_search_result_ss(session, client, jwt):
     """Assert that setup for a serial number search type result report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(SEARCH_RESULT_SS_DATAFILE)
-        report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, 'Account Name')
+        report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, '')
         # test
         content, status, headers = report.get_pdf()
         assert headers
@@ -135,7 +161,7 @@ def test_search_result_ss(session, client, jwt):
 def test_search_result_mh(session, client, jwt):
     """Assert that setup for a mhr number search type result report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(SEARCH_RESULT_MH_DATAFILE)
         report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, 'Account Name')
         # test
@@ -148,7 +174,7 @@ def test_search_result_mh(session, client, jwt):
 def test_search_result_ac(session, client, jwt):
     """Assert that setup for an aircraft search type result report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(SEARCH_RESULT_AC_DATAFILE)
         report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, 'Account Name')
         # test
@@ -161,9 +187,9 @@ def test_search_result_ac(session, client, jwt):
 def test_search_result_bs(session, client, jwt):
     """Assert that setup for a business debtor search type result report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(SEARCH_RESULT_BS_DATAFILE)
-        report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, 'Account Name')
+        report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, '')
         # test
         content, status, headers = report.get_pdf()
         assert headers
@@ -174,7 +200,7 @@ def test_search_result_bs(session, client, jwt):
 def test_search_result_is(session, client, jwt):
     """Assert that setup for an individual debtor search type result report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(SEARCH_RESULT_IS_DATAFILE)
         report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, 'Account Name')
         # test
@@ -187,7 +213,7 @@ def test_search_result_is(session, client, jwt):
 def test_search_result_discharged(session, client, jwt):
     """Assert that setup for a search result report with a a discharge is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(SEARCH_RESULT_DISCHARGED_DATAFILE)
         report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, 'Account Name')
         # test
@@ -200,7 +226,7 @@ def test_search_result_discharged(session, client, jwt):
 def test_search_result_renewed(session, client, jwt):
     """Assert that setup for a search result report with a renewal is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(SEARCH_RESULT_RENEWED_DATAFILE)
         report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, 'Account Name')
         # test
@@ -213,7 +239,7 @@ def test_search_result_renewed(session, client, jwt):
 def test_search_result_nil(session, client, jwt):
     """Assert that setup for a nil result report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(SEARCH_RESULT_NIL_DATAFILE)
         report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, 'Account Name')
         # test
@@ -226,7 +252,7 @@ def test_search_result_nil(session, client, jwt):
 def test_search_result_75(session, client, jwt):
     """Assert that setup for a search result report with 75 registrations is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(SEARCH_RESULT_75_DATAFILE)
         report = Report(json_data, 'PS12345', ReportTypes.SEARCH_DETAIL_REPORT, 'Account Name')
         # test
@@ -239,7 +265,7 @@ def test_search_result_75(session, client, jwt):
 def test_search_cover(session, client, jwt):
     """Assert that setup for a large search result cover summary report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(SEARCH_COVER_DATAFILE)
         report = Report(json_data, 'PS12345', ReportTypes.SEARCH_COVER_REPORT, 'Account Name')
         # test
@@ -276,3 +302,8 @@ def check_response(content, status_code, filename: str = None):
 
 def is_report_v2() -> bool:
     return  current_app.config.get('REPORT_VERSION', '') == REPORT_VERSION_V2
+
+
+def is_ci_testing() -> bool:
+    """Check unit test environment: exclude most reports for CI testing."""
+    return  current_app.config.get("DEPLOYMENT_ENV", "testing") == "testing"

@@ -19,7 +19,7 @@ import pytest
 from registry_schemas import utils as schema_utils
 from registry_schemas.example_data.mhr import TRANSFER
 
-from mhr_api.utils import registration_validator as validator, validator_utils
+from mhr_api.utils import registration_validator as validator, validator_utils, validator_owner_utils as val_owner_utils
 from mhr_api.models import MhrRegistration, utils as model_utils, MhrQualifiedSupplier
 from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrTenancyTypes, MhrRegistrationTypes
 from mhr_api.models.type_tables import MhrPartyTypes
@@ -86,9 +86,9 @@ TEST_TRANSFER_DATA = [
     #('Invalid draft', False, False, None, validator_utils.DRAFT_NOT_ALLOWED, MhrRegistrationStatusTypes.ACTIVE),
     # (DESC_INVALID_GROUP_ID, False, False, None, validator_utils.DELETE_GROUP_ID_INVALID,
     # MhrRegistrationStatusTypes.ACTIVE),
-    (DESC_NONEXISTENT_GROUP_ID, False, False, None, validator_utils.DELETE_GROUP_ID_NONEXISTENT,
+    (DESC_NONEXISTENT_GROUP_ID, False, False, None, val_owner_utils.DELETE_GROUP_ID_NONEXISTENT,
      MhrRegistrationStatusTypes.ACTIVE),
-    (DESC_INVALID_GROUP_TYPE, False, False, None, validator_utils.DELETE_GROUP_TYPE_INVALID,
+    (DESC_INVALID_GROUP_TYPE, False, False, None, val_owner_utils.DELETE_GROUP_TYPE_INVALID,
      MhrRegistrationStatusTypes.ACTIVE)
 ]
 # testdata pattern is ({description}, {valid}, {staff}, {tran_dt}, {dec_val}, {consideration}, {message content})
@@ -104,14 +104,16 @@ TEST_TRANSFER_DATA_EXTRA = [
 # testdata pattern is ({description}, {valid}, {numerator}, {denominator}, {add_group}, {message content})
 TEST_TRANSFER_DATA_GROUP = [
     ('Valid', True, 1, 2, None, None),
-    ('Invalid add TC no owner', False, None, None, TC_GROUP_TRANSFER_ADD2, validator_utils.OWNERS_COMMON_INVALID),
-    ('Invalid add JT 1 owner', False, None, None, JT_OWNER_SINGLE, validator_utils.OWNERS_JOINT_INVALID),
-    ('Invalid TC numerator missing', False, None, 2, TC_GROUPS_VALID, validator_utils.GROUP_NUMERATOR_MISSING),
-    ('Invalid TC numerator < 1', False, 0, 2, TC_GROUPS_VALID, validator_utils.GROUP_NUMERATOR_MISSING),
-    ('Invalid TC denominator missing', False, 1, None, TC_GROUPS_VALID, validator_utils.GROUP_DENOMINATOR_MISSING),
-    ('Invalid TC denominator < 1', False, 1, 0, TC_GROUPS_VALID, validator_utils.GROUP_DENOMINATOR_MISSING),
-    ('Invalid add SO 2 groups', False, None, None, SO_GROUP_MULTIPLE, validator_utils.ADD_SOLE_OWNER_INVALID),
-    ('Invalid add SO 2 owners', False, None, None, SO_OWNER_MULTIPLE, validator_utils.ADD_SOLE_OWNER_INVALID),
+    ('Invalid no delete group', False, 1, 2, None, val_owner_utils.DELETE_GROUPS_MISSING),
+    ('Invalid no delete groupId', False, 1, 2, None, val_owner_utils.DELETE_GROUP_ID_MISSING),
+    ('Invalid add TC no owner', False, None, None, TC_GROUP_TRANSFER_ADD2, val_owner_utils.OWNERS_COMMON_INVALID),
+    ('Invalid add JT 1 owner', False, None, None, JT_OWNER_SINGLE, val_owner_utils.OWNERS_JOINT_INVALID),
+    ('Invalid TC numerator missing', False, None, 2, TC_GROUPS_VALID, val_owner_utils.GROUP_NUMERATOR_MISSING),
+    ('Invalid TC numerator < 1', False, 0, 2, TC_GROUPS_VALID, val_owner_utils.GROUP_NUMERATOR_MISSING),
+    ('Invalid TC denominator missing', False, 1, None, TC_GROUPS_VALID, val_owner_utils.GROUP_DENOMINATOR_MISSING),
+    ('Invalid TC denominator < 1', False, 1, 0, TC_GROUPS_VALID, val_owner_utils.GROUP_DENOMINATOR_MISSING),
+    ('Invalid add SO 2 groups', False, None, None, SO_GROUP_MULTIPLE, val_owner_utils.ADD_SOLE_OWNER_INVALID),
+    ('Invalid add SO 2 owners', False, None, None, SO_OWNER_MULTIPLE, val_owner_utils.ADD_SOLE_OWNER_INVALID),
 #    ('Invalid add TC > 1 owner', False, None, None, TC_GROUP_TRANSFER_ADD, validator.OWNERS_COMMON_INVALID)
 ]
 # testdata pattern is ({description},{valid},{mhr_num},{account_id},{delete_groups},{add_groups},{message content})
@@ -137,9 +139,9 @@ TEST_TRANSFER_DATA_TRAND = [
     ('Invalid tenancy type', False,  '000920', 'PS12345', SO_GROUP, TRAND_ADD_GROUPS,
      validator.TRAN_DEATH_JOINT_TYPE),
     ('Invalid add 2 groups', False,  '000920', 'PS12345', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS,
-     validator.TRAN_DEATH_GROUP_COUNT),
+     val_owner_utils.TRAN_DEATH_GROUP_COUNT),
     ('Invalid delete 2 groups', False,  '000920', 'PS12345', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS,
-     validator.TRAN_DEATH_GROUP_COUNT),
+     val_owner_utils.TRAN_DEATH_GROUP_COUNT),
     ('Invalid future death ts', False,  '000920', 'PS12345', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS,
      validator.TRAN_DEATH_DATE_INVALID),
     ('Valid JOINT BUS non-QS', False,  '000920', 'PS12345', TRAND_DELETE_GROUPS, TRAND_ADD_GROUPS_JOINT, None),
@@ -167,9 +169,9 @@ TEST_TRANSFER_DATA_ADMIN = [
     ('Invalid no death info', False,  '000921', 'PS12345', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
      validator.TRAN_ADMIN_DEATH_CERT, True),
     ('Invalid add 2 groups', False,  '000921', 'PS12345', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
-     validator.TRAN_DEATH_GROUP_COUNT, True),
+     val_owner_utils.TRAN_DEATH_GROUP_COUNT, True),
     ('Invalid delete 2 groups', False,  '000921', 'PS12345', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
-     validator.TRAN_DEATH_GROUP_COUNT, True)
+     val_owner_utils.TRAN_DEATH_GROUP_COUNT, True)
 ]
 # testdata pattern is ({description},{valid},{mhr_num},{account_id},{delete_groups},{add_groups},{message content},{staff})
 TEST_TRANSFER_DATA_AFFIDAVIT = [
@@ -194,9 +196,9 @@ TEST_TRANSFER_DATA_AFFIDAVIT = [
     ('Invalid no death date', False,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
      validator.TRAN_DEATH_DATE_MISSING, True),
     ('Invalid add 2 groups', False,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
-     validator.TRAN_DEATH_GROUP_COUNT, True),
+     val_owner_utils.TRAN_DEATH_GROUP_COUNT, True),
     ('Invalid delete 2 groups', False,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
-     validator.TRAN_DEATH_GROUP_COUNT, True)
+     val_owner_utils.TRAN_DEATH_GROUP_COUNT, True)
 ]
 # testdata pattern is ({description},{valid},{mhr_num},{account_id},{delete_groups},{add_groups},{message content},{staff})
 TEST_TRANSFER_DATA_WILL = [
@@ -204,8 +206,7 @@ TEST_TRANSFER_DATA_WILL = [
     ('Valid delete EXEC', True,  '000923', 'PS12345', WILL_DELETE_GROUPS3, EXEC_ADD_GROUPS, None, True),
     ('Invalid non-staff', False,  '000921', 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS,
      validator.REG_STAFF_ONLY, False),
-    ('Invalid add owner', False,  '000921', 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS,
-     validator.TRAN_WILL_NEW_OWNER, True),
+    ('Valid add owner', True,  '000921', 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
     ('Valid party type EXECUTOR', True,  '000921', 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
     ('Valid party type TRUSTEE', True,  '000921', 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
     ('Valid party type ADMINISTRATOR', True,  '000921', 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
@@ -218,22 +219,22 @@ TEST_TRANSFER_DATA_WILL = [
     ('Invalid no death info', False,  '000921', 'PS12345', WILL_DELETE_GROUPS2, EXEC_ADD_GROUPS,
      validator.TRAN_WILL_DEATH_CERT, True),
     ('Invalid add 2 groups', False,  '000921', 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS,
-     validator.TRAN_DEATH_GROUP_COUNT, True),
+     val_owner_utils.TRAN_DEATH_GROUP_COUNT, True),
     ('Invalid delete 2 groups', False,  '000921', 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS,
-     validator.TRAN_DEATH_GROUP_COUNT, True)
+     val_owner_utils.TRAN_DEATH_GROUP_COUNT, True)
 ]
 # testdata pattern is ({description}, {valid}, {mhr_num}, {tenancy_type}, {add_group}, {message content})
 TEST_TRANSFER_DEATH_NA_DATA = [
    ('Invalid JOINT tenancy-party type', False, '000919', MhrTenancyTypes.JOINT, TC_GROUP_TRANSFER_ADD,
-     validator.TENANCY_PARTY_TYPE_INVALID),
+     val_owner_utils.TENANCY_PARTY_TYPE_INVALID),
     ('Invalid tenancy type - party type', False, '000900', MhrTenancyTypes.JOINT, TC_GROUP_TRANSFER_ADD,
-     validator.TENANCY_PARTY_TYPE_INVALID)
+     val_owner_utils.TENANCY_PARTY_TYPE_INVALID)
 ]
 # testdata pattern is ({description}, {valid}, {numerator}, {denominator}, {message content})
 TEST_TRANSFER_DATA_GROUP_INTEREST = [
     ('Valid add', True, 1, 2, None),
-    ('Invalid numerator < 1', False, 1, 4, validator_utils.GROUP_INTEREST_MISMATCH),
-    ('Invalid numerator sum high', False, 3, 4, validator_utils.GROUP_INTEREST_MISMATCH)
+    ('Invalid numerator < 1', False, 1, 4, val_owner_utils.GROUP_INTEREST_MISMATCH),
+    ('Invalid numerator sum high', False, 3, 4, val_owner_utils.GROUP_INTEREST_MISMATCH)
 ]
 # testdata pattern is ({description}, {valid}, {staff}, {kc_group}, {mhr_num}, {json_data}, {message content})
 TEST_TRANSFER_DATA_QS = [
@@ -248,9 +249,10 @@ TEST_TRANSFER_DATA_TC = [
     ('Valid existing exec', True, True, 'COMMON', '000924', TRANS_TC_4, None),
     ('Valid unchanged exec', True, True, 'COMMON', '000924', TRANS_TC_5, None),
     ('Valid split exec', True, True, 'COMMON', '000924', TRANS_TC_6, None),
-    ('Invalid add TC type', False, True, 'COMMON', '000900', TRANS_TC_3, validator_utils.GROUP_COMMON_INVALID),
-    ('Invalid add NA type', False, True, 'NA', '000900', TRANS_TC_3, validator.TENANCY_TYPE_NA_INVALID),
-    ('Invalid add exec', False, True, 'COMMON', '000924', TRANS_TC_5, validator.TRANSFER_PARTY_TYPE_INVALID),
+    ('Invalid add TC type', False, True, 'COMMON', '000900', TRANS_TC_3, val_owner_utils.GROUP_COMMON_INVALID),
+    ('Invalid add NA type', False, True, 'NA', '000900', TRANS_TC_3, val_owner_utils.TENANCY_TYPE_NA_INVALID),
+    ('Invalid add exec', False, False, 'COMMON', '000924', TRANS_TC_5, val_owner_utils.TRANSFER_PARTY_TYPE_INVALID),
+    ('Valid staff add exec', True, True, 'COMMON', '000924', TRANS_TC_5, None),
     ('Valid add exec staff misc.', True, True, 'COMMON', '000924', TRANS_TC_5, None)
 ]
 # testdata pattern is ({desc}, {valid}, {doc_type}, {reg_type}, {message content})
@@ -274,9 +276,10 @@ TEST_DATA_DOC_TYPE = [
     ('Valid TAXS', True, 'TAXS', MhrRegistrationTypes.TRANS, None),
     ('Valid VEST', True, 'VEST', MhrRegistrationTypes.TRANS, None),
     ('Valid EXECUTOR', True, 'TRANS_LAND_TITLE', MhrRegistrationTypes.TRANS, None),
+    ('Valid EXECUTOR no doc type', True, None, MhrRegistrationTypes.TRANS, None),
     ('Valid ADMINISTRATOR', True, 'ABAN', MhrRegistrationTypes.TRANS, None),
     ('Valid TRUSTEE', True, 'TRANS_QUIT_CLAIM', MhrRegistrationTypes.TRANS, None),
-    ('Invalid no type EXECUTOR', False,  None, None, validator.TRANSFER_PARTY_TYPE_INVALID),
+    ('Invalid no type EXECUTOR', False,  None, None, val_owner_utils.TRANSFER_PARTY_TYPE_INVALID),
     ('Invalid doc type', False,  'WILL', MhrRegistrationTypes.TRANS, 'data validation errors'),
     ('Invalid reg type', False,  'TRANS_TRUST', MhrRegistrationTypes.TRAND, validator.TRANS_DOC_TYPE_INVALID),
     ('Invalid not staff', False,  'ABAN', MhrRegistrationTypes.TRANS, validator.TRANS_DOC_TYPE_NOT_ALLOWED)
@@ -396,8 +399,13 @@ def test_validate_transfer_group(session, desc, valid, numerator, denominator, a
     """Assert that MH transfer validation of owner groups works as expected."""
     # setup
     json_data = copy.deepcopy(TRANSFER)
-    json_data['deleteOwnerGroups'][0]['groupId'] = 1
-    json_data['deleteOwnerGroups'][0]['type'] = 'SOLE'
+    if desc == 'Invalid no delete group':
+        del json_data['deleteOwnerGroups']
+    elif desc == 'Invalid no delete groupId':
+        del json_data['deleteOwnerGroups'][0]['groupId']
+    else:
+        json_data['deleteOwnerGroups'][0]['groupId'] = 1
+        json_data['deleteOwnerGroups'][0]['type'] = 'SOLE'
     if add_group:
         json_data['addOwnerGroups'] = copy.deepcopy(add_group)
         if desc == 'Invalid add TC no owner':
@@ -616,8 +624,9 @@ def test_validate_transfer_will(session, desc, valid, mhr_num, account_id, delet
         json_data['deleteOwnerGroups'][0]['owners'][0]['partyType'] = MhrPartyTypes.ADMINISTRATOR
     elif desc == 'Invalid party type add':
         json_data['addOwnerGroups'][0]['owners'][0]['partyType'] = MhrPartyTypes.TRUSTEE
-    elif desc == 'Invalid add owner':
+    elif desc == 'Valid add owner':
         json_data['addOwnerGroups'][0]['owners'].append(ADD_OWNER)
+        json_data['addOwnerGroups'][0]['type'] = 'NA'
     elif desc == 'Invalid executor missing':
         del json_data['addOwnerGroups'][0]['owners'][1]['partyType']
         del json_data['addOwnerGroups'][0]['owners'][1]['description']
@@ -628,7 +637,7 @@ def test_validate_transfer_will(session, desc, valid, mhr_num, account_id, delet
 
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     # Additional validation not covered by the schema.
-    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
+    registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id, staff)
     error_msg = validator.validate_transfer(registration, json_data, staff, STAFF_ROLE)
     current_app.logger.info(error_msg)
     if errors:
@@ -725,9 +734,11 @@ def test_validate_transfer_tc(session, desc, valid, staff, gtype, mhr_num, data,
     json_data = copy.deepcopy(data)
     json_data['documentId'] = DOC_ID_VALID
     json_data['addOwnerGroups'][0]['type'] = gtype
-    if desc == 'Invalid add exec':
+    if desc in ('Invalid add exec', 'Valid staff add exec'):
         json_data['addOwnerGroups'][1]['owners'][0]['partyType'] = 'EXECUTOR'
         json_data['addOwnerGroups'][1]['owners'][0]['description'] = 'EXECUTOR OF THE ESTATED OF ...'
+        if desc == 'Valid staff add exec':
+            json_data['addOwnerGroups'][1]['type'] = 'NA'
     elif desc == 'Valid add exec staff misc.':
         json_data['transferDocumentType'] = 'TRANS_INFORMAL_SALE'
         json_data['addOwnerGroups'][1]['owners'][0]['partyType'] = 'EXECUTOR'
@@ -766,9 +777,12 @@ def test_validate_transfer_doc_type(session, desc, valid, doc_type, reg_type, me
     if desc == 'Invalid not staff':
         staff = False
         group = QUALIFIED_USER_GROUP
-    elif desc in ('Invalid no type EXECUTOR', 'Valid EXECUTOR'):
+    elif desc in ('Invalid no type EXECUTOR', 'Valid EXECUTOR', 'Valid EXECUTOR no doc type'):
         json_data['addOwnerGroups'][0]['owners'][0]['partyType'] = 'EXECUTOR'
         json_data['addOwnerGroups'][0]['owners'][0]['description'] = 'EXECUTOR OF THE ESTATED OF ...'
+        if desc == 'Invalid no type EXECUTOR':
+            staff = False
+            group = QUALIFIED_USER_GROUP
     elif desc == 'Valid ADMINISTRATOR':
         json_data['addOwnerGroups'][0]['owners'][0]['partyType'] = 'ADMINISTRATOR'
         json_data['addOwnerGroups'][0]['owners'][0]['description'] = 'ADMINISTRATOR OF THE ESTATED OF ...'

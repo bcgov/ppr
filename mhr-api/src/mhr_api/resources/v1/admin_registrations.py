@@ -32,7 +32,7 @@ from mhr_api.models.type_tables import (
 from mhr_api.reports.v2.report_utils import ReportTypes
 from mhr_api.resources import registration_utils as reg_utils
 from mhr_api.resources import utils as resource_utils
-from mhr_api.services.authz import get_group, is_all_staff_account, is_bcol_help, is_staff
+from mhr_api.services.authz import get_group, is_all_staff_account, is_bcol_help, is_sbc_office_account, is_staff
 from mhr_api.services.payment import TransactionTypes
 from mhr_api.services.payment.exceptions import SBCPaymentException
 from mhr_api.utils.auth import jwt
@@ -73,7 +73,14 @@ def post_admin_registration(mhr_number: str):  # pylint: disable=too-many-return
             return resource_utils.unauthorized_error_response(account_id)
         # Not found throws exception.
         current_reg: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_number, account_id, True)
-        if not is_all_staff_account(account_id) and doc_type == MhrDocumentTypes.CANCEL_PERMIT:
+        is_all_staff: bool = is_staff(jwt) or is_all_staff_account(account_id)
+        if (
+            not is_all_staff
+            and doc_type == MhrDocumentTypes.CANCEL_PERMIT
+            and is_sbc_office_account(jwt.get_token_auth_header(), account_id, jwt)
+        ):
+            is_all_staff = True
+        if not is_all_staff and doc_type == MhrDocumentTypes.CANCEL_PERMIT:
             can_edit: bool = False
             if current_reg.change_registrations:
                 for reg in current_reg.change_registrations:
@@ -100,7 +107,6 @@ def post_admin_registration(mhr_number: str):  # pylint: disable=too-many-return
         # Validate request against the schema.
         valid_format, errors = schema_utils.validate(request_json, "adminRegistration", "mhr")
         # Additional validation not covered by the schema.
-        is_all_staff: bool = is_staff(jwt) or is_all_staff_account(account_id)
         extra_validation_msg = resource_utils.validate_admin_registration(current_reg, request_json, is_all_staff)
         if not valid_format or extra_validation_msg != "":
             return resource_utils.validation_error_response(errors, reg_utils.VAL_ERROR, extra_validation_msg)

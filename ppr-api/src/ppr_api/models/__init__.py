@@ -13,13 +13,14 @@
 # limitations under the License.
 
 """This exports all of the models and schemas used by the application."""
-# flake8: noqa I001
-from .db import db
-from .address import Address
 from .account_bcol_id import AccountBcolId
+from .address import Address
 from .client_code import ClientCode
 from .client_code_historical import ClientCodeHistorical
 from .court_order import CourtOrder
+
+# flake8: noqa I001
+from .db import db
 from .draft import Draft
 from .event_tracking import EventTracking
 from .financing_statement import FinancingStatement
@@ -29,10 +30,10 @@ from .mail_report import MailReport
 from .party import Party
 from .previous_financing_statement import PreviousFinancingStatement
 from .registration import Registration
-from .securities_act_notice import SecuritiesActNotice
-from .securities_act_order import SecuritiesActOrder
 from .search_request import SearchRequest
 from .search_result import SearchResult
+from .securities_act_notice import SecuritiesActNotice
+from .securities_act_order import SecuritiesActOrder
 from .trust_indenture import TrustIndenture
 from .type_tables import (
     CountryType,
@@ -41,8 +42,8 @@ from .type_tables import (
     ProvinceType,
     RegistrationType,
     RegistrationTypeClass,
-    SecuritiesActType,
     SearchType,
+    SecuritiesActType,
     SerialType,
     StateType,
 )
@@ -52,11 +53,39 @@ from .user_profile import UserProfile
 from .vehicle_collateral import VehicleCollateral
 from .verification_report import VerificationReport
 
-__all__ = ('db',
-           'AccountBcolId', 'Address', 'ClientCode', 'ClientCodeHistorical', 'CountryType', 'CourtOrder', 'Draft',
-           'EventTrackingType', 'FinancingStatement', 'GeneralCollateral', 'GeneralCollateralLegacy', 'MailReport',
-           'Party', 'PartyType', 'PreviousFinancingStatement', 'ProvinceType', 'Registration', 'RegistrationType',
-           'RegistrationTypeClass', 'SearchRequest', 'SearchResult', 'SearchType', 'StateType', 'SerialType',
-           'SecuritiesActNotice', 'SecuritiesActOrder', 'SecuritiesActType',
-           'TrustIndenture', 'User', 'UserExtraRegistration', 'UserProfile', 'VehicleCollateral',
-           'VerificationReport')
+__all__ = (
+    "db",
+    "AccountBcolId",
+    "Address",
+    "ClientCode",
+    "ClientCodeHistorical",
+    "CountryType",
+    "CourtOrder",
+    "Draft",
+    "EventTrackingType",
+    "FinancingStatement",
+    "GeneralCollateral",
+    "GeneralCollateralLegacy",
+    "MailReport",
+    "Party",
+    "PartyType",
+    "PreviousFinancingStatement",
+    "ProvinceType",
+    "Registration",
+    "RegistrationType",
+    "RegistrationTypeClass",
+    "SearchRequest",
+    "SearchResult",
+    "SearchType",
+    "StateType",
+    "SerialType",
+    "SecuritiesActNotice",
+    "SecuritiesActOrder",
+    "SecuritiesActType",
+    "TrustIndenture",
+    "User",
+    "UserExtraRegistration",
+    "UserProfile",
+    "VehicleCollateral",
+    "VerificationReport",
+)

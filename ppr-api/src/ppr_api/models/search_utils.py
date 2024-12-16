@@ -20,7 +20,7 @@ Search constants and helper functions.
 # Disable E122: allow query strings to be more human readable.
 # Disable E131: allow query strings to be more human readable.
 
-GET_DETAIL_DAYS_LIMIT = 7 # Number of days in the past a get details request is allowed.
+GET_DETAIL_DAYS_LIMIT = 7  # Number of days in the past a get details request is allowed.
 # Maximum number of days in the past to filter when fetching account search history: set to <= 0 to disable.
 GET_HISTORY_DAYS_LIMIT = 14
 
@@ -30,7 +30,7 @@ ACCOUNT_SEARCH_HISTORY_MAX_SIZE = 1000
 SEARCH_RESULTS_MAX_SIZE = 5000
 
 # Result set size limit clause
-RESULTS_SIZE_LIMIT_CLAUSE = 'FETCH FIRST :max_results_size ROWS ONLY'
+RESULTS_SIZE_LIMIT_CLAUSE = "FETCH FIRST :max_results_size ROWS ONLY"
 
 # Serial number search base where clause
 SERIAL_SEARCH_BASE = """
@@ -72,25 +72,34 @@ SELECT r2.registration_type, r2.registration_ts AS base_registration_ts,
 """
 
 # Equivalent logic as DB view search_by_mhr_num_vw, but API determines the where clause.
-MHR_NUM_QUERY = SERIAL_SEARCH_BASE + """
+MHR_NUM_QUERY = (
+    SERIAL_SEARCH_BASE
+    + """
    AND sc.serial_type = 'MH' 
    AND sc.mhr_number = (SELECT searchkey_mhr(:query_value)) 
 ORDER BY match_type, sc.serial_number ASC, sc.year ASC, r.registration_ts ASC
 """
+)
 
 # Equivalent logic as DB view search_by_serial_num_vw, but API determines the where clause.
-SERIAL_NUM_QUERY = SERIAL_SEARCH_BASE + """
+SERIAL_NUM_QUERY = (
+    SERIAL_SEARCH_BASE
+    + """
    AND sc.serial_type NOT IN ('AC', 'AF', 'AP')
    AND sc.srch_vin = (SELECT searchkey_vehicle(:query_value)) 
 ORDER BY match_type, sc.serial_number ASC, sc.year ASC, r.registration_ts ASC
 """
+)
 
 # Equivalent logic as DB view search_by_aircraft_dot_vw, but API determines the where clause.
-AIRCRAFT_DOT_QUERY = SERIAL_SEARCH_BASE + """
+AIRCRAFT_DOT_QUERY = (
+    SERIAL_SEARCH_BASE
+    + """
    AND sc.serial_type IN ('AC', 'AF', 'AP')
    AND sc.srch_vin = (SELECT searchkey_aircraft(:query_value)) 
 ORDER BY match_type, sc.serial_number ASC, sc.year ASC, r.registration_ts ASC
 """
+)
 
 BUSINESS_NAME_QUERY = """
 WITH q AS (
@@ -259,24 +268,28 @@ SELECT COUNT(r.id) AS query_count
     AND sc.registration_id_end IS NULL 
 """
 
-MHR_NUM_TOTAL_COUNT = SERIAL_SEARCH_COUNT_BASE + \
-  " AND sc.serial_type = 'MH' " + \
-   "AND sc.mhr_number = searchkey_mhr(:query_value)"
+MHR_NUM_TOTAL_COUNT = (
+    SERIAL_SEARCH_COUNT_BASE + " AND sc.serial_type = 'MH' " + "AND sc.mhr_number = searchkey_mhr(:query_value)"
+)
 
-SERIAL_NUM_TOTAL_COUNT = SERIAL_SEARCH_COUNT_BASE + \
-  " AND sc.serial_type NOT IN ('AC', 'AF') " + \
-   "AND sc.srch_vin = searchkey_vehicle(:query_value)"
+SERIAL_NUM_TOTAL_COUNT = (
+    SERIAL_SEARCH_COUNT_BASE
+    + " AND sc.serial_type NOT IN ('AC', 'AF') "
+    + "AND sc.srch_vin = searchkey_vehicle(:query_value)"
+)
 
-AIRCRAFT_DOT_TOTAL_COUNT = SERIAL_SEARCH_COUNT_BASE + \
-  " AND sc.serial_type IN ('AC', 'AF') " + \
-   "AND sc.srch_vin = searchkey_aircraft(:query_value)"
+AIRCRAFT_DOT_TOTAL_COUNT = (
+    SERIAL_SEARCH_COUNT_BASE
+    + " AND sc.serial_type IN ('AC', 'AF') "
+    + "AND sc.srch_vin = searchkey_aircraft(:query_value)"
+)
 
 COUNT_QUERY_FROM_SEARCH_TYPE = {
-    'AC': AIRCRAFT_DOT_TOTAL_COUNT,
-    'BS': BUSINESS_NAME_TOTAL_COUNT,
-    'IS': INDIVIDUAL_NAME_TOTAL_COUNT,
-    'MH': MHR_NUM_TOTAL_COUNT,
-    'SS': SERIAL_NUM_TOTAL_COUNT
+    "AC": AIRCRAFT_DOT_TOTAL_COUNT,
+    "BS": BUSINESS_NAME_TOTAL_COUNT,
+    "IS": INDIVIDUAL_NAME_TOTAL_COUNT,
+    "MH": MHR_NUM_TOTAL_COUNT,
+    "SS": SERIAL_NUM_TOTAL_COUNT,
 }
 
 
@@ -415,6 +428,6 @@ FETCH FIRST {str(ACCOUNT_SEARCH_HISTORY_MAX_SIZE)} ROWS ONLY
 
 def format_mhr_number(request_json):
     """Trim and pad with zeroes search query mhr number query."""
-    mhr_num: str = request_json['criteria']['value']
-    mhr_num = mhr_num.strip().rjust(6, '0')
-    request_json['criteria']['value'] = mhr_num
+    mhr_num: str = request_json["criteria"]["value"]
+    mhr_num = mhr_num.strip().rjust(6, "0")
+    request_json["criteria"]["value"] = mhr_num

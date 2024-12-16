@@ -5,7 +5,7 @@ from alembic_utils.pg_function import PGFunction
 sim_number = PGFunction(
     schema="public",
     signature="sim_number(actual_name character varying)",
-    definition="""
+    definition=r"""
  RETURNS numeric
  LANGUAGE plpgsql
 AS $function$

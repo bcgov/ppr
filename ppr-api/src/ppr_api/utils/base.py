@@ -49,7 +49,7 @@ class BaseEnum(str, Enum, metaclass=BaseMeta):
                 return enum_value
         return None
 
-    #pragma warning disable S5720; # noqa: E265
+    # pragma warning disable S5720; # noqa: E265
     # disable sonar cloud complaining about this signature
     def _generate_next_value_(name, start, count, last_values):  # pylint: disable=E0213;# noqa: N805
         """Return the name of the key."""

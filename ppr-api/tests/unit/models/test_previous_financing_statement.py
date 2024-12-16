@@ -23,8 +23,8 @@ from ppr_api.models import PreviousFinancingStatement
 
 # testdata pattern is ({valid}, {financing_id})
 TEST_ID_DATA = [
-    (True, '200000009'),
-    (False, '200000000')
+    (True, 200000009),
+    (False, 200000000)
 ]
 # testdata pattern is ({cr_date}, {mhr_date}, {iso_date})
 TEST_DATE_DATA = [

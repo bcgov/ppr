@@ -27,39 +27,37 @@ from .db import db
 class TestSearchBatch(db.Model):
     """This class maintains test search batches detail information (for automated testing)."""
 
-    __tablename__ = 'test_search_batches'
+    __tablename__ = "test_search_batches"
 
-    id = db.mapped_column('id', db.Integer, db.Sequence('test_search_batches_id_seq'), primary_key=True)
-    search_type = db.mapped_column('search_type', db.String(2), db.ForeignKey('search_types.search_type'),
-                                   nullable=False)
-    test_date = db.mapped_column('test_date', db.DateTime, nullable=False)
-    sim_val_business = db.mapped_column('sim_val_business', db.Float, nullable=True)
-    sim_val_first_name = db.mapped_column('sim_val_first_name', db.Float, nullable=True)
-    sim_val_last_name = db.mapped_column('sim_val_last_name', db.Float, nullable=True)
+    id = db.mapped_column("id", db.Integer, db.Sequence("test_search_batches_id_seq"), primary_key=True)
+    search_type = db.mapped_column(
+        "search_type", db.String(2), db.ForeignKey("search_types.search_type"), nullable=False
+    )
+    test_date = db.mapped_column("test_date", db.DateTime, nullable=False)
+    sim_val_business = db.mapped_column("sim_val_business", db.Float, nullable=True)
+    sim_val_first_name = db.mapped_column("sim_val_first_name", db.Float, nullable=True)
+    sim_val_last_name = db.mapped_column("sim_val_last_name", db.Float, nullable=True)
 
     # parent keys
 
     # relationships - test_search
-    searches = db.relationship('TestSearch', back_populates='search_batch')
+    searches = db.relationship("TestSearch", back_populates="search_batch")
 
     @property
     def json(self) -> dict:
         """Return the search batch as a json object."""
-        batch = {
-            'searchType': self.search_type,
-            'date': model_utils.format_ts(self.test_date)
-        }
+        batch = {"searchType": self.search_type, "date": model_utils.format_ts(self.test_date)}
         if self.search_type == SearchRequest.SearchTypes.BUSINESS_DEBTOR.value:
-            batch['similarityValue'] = self.sim_val_business
+            batch["similarityValue"] = self.sim_val_business
         elif self.search_type == SearchRequest.SearchTypes.INDIVIDUAL_DEBTOR.value:
-            batch['similarityValueFirst'] = self.sim_val_first_name
-            batch['similarityValueLast'] = self.sim_val_last_name
+            batch["similarityValueFirst"] = self.sim_val_first_name
+            batch["similarityValueLast"] = self.sim_val_last_name
 
         searches = []
         for search in self.searches:
             searches.append(search.json)
 
-        batch['searches'] = searches
+        batch["searches"] = searches
 
         return batch
 
@@ -73,17 +71,13 @@ class TestSearchBatch(db.Model):
         """Return a search batch object by batch ID."""
         batch = None
         if batch_id:
-            batch = db.session.query(TestSearchBatch).\
-                        filter(TestSearchBatch.id == batch_id).one_or_none()
+            batch = db.session.query(TestSearchBatch).filter(TestSearchBatch.id == batch_id).one_or_none()
 
         return batch
 
     @classmethod
     def find_search_batches(
-            cls,
-            search_type: SearchRequest.SearchTypes = None,
-            after_date: datetime = None,
-            before_date: datetime = None
+        cls, search_type: SearchRequest.SearchTypes = None, after_date: datetime = None, before_date: datetime = None
     ) -> List[TestSearchBatch]:
         """Return a list of search batch objects by type and/or date."""
         batch = db.session.query(TestSearchBatch)

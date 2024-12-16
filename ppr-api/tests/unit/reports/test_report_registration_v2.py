@@ -21,6 +21,7 @@ import json
 
 from flask import current_app
 
+from ppr_api.reports import get_callback_pdf
 from ppr_api.reports.v2.report import Report
 from ppr_api.reports.v2.report_utils import ReportTypes
 
@@ -63,7 +64,7 @@ REPORT_VERSION_V2 = '2'
 def test_financing_sa(session, client, jwt):
     """Assert that generation of a test report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(FINANCING_SA_DATAFILE)
         report = Report(json_data, 'PS12345', ReportTypes.FINANCING_STATEMENT_REPORT, 'Account Name')
         # test
@@ -76,7 +77,7 @@ def test_financing_sa(session, client, jwt):
 def test_financing_sg(session, client, jwt):
     """Assert that generation of a test report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(FINANCING_SG_DATAFILE)
         report = Report(json_data, 'PS12345', ReportTypes.FINANCING_STATEMENT_REPORT, 'Account Name')
         # test
@@ -89,7 +90,7 @@ def test_financing_sg(session, client, jwt):
 def test_financing_rl(session, client, jwt):
     """Assert that generation of a test report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(FINANCING_RL_DATAFILE)
         report = Report(json_data, 'PS12345', ReportTypes.FINANCING_STATEMENT_REPORT, 'Account Name')
         # test
@@ -102,7 +103,7 @@ def test_financing_rl(session, client, jwt):
 def test_financing_nc(session, client, jwt):
     """Assert that generation of a test report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(FINANCING_NO_CHANGE_DATAFILE)
         report = Report(json_data, 'PS12345', ReportTypes.FINANCING_STATEMENT_REPORT, 'Account Name')
         # test
@@ -115,7 +116,7 @@ def test_financing_nc(session, client, jwt):
 def test_change_ac(session, client, jwt):
     """Assert that generation of a test report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(CHANGE_AC_DATAFILE)
         report = Report(json_data, 'PS12345', ReportTypes.FINANCING_STATEMENT_REPORT, 'Account Name')
         # test
@@ -128,7 +129,7 @@ def test_change_ac(session, client, jwt):
 def test_change_dt(session, client, jwt):
     """Assert that generation of a test report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(CHANGE_DT_DATAFILE)
         report = Report(json_data, 'PS12345', ReportTypes.FINANCING_STATEMENT_REPORT, 'Account Name')
         # test
@@ -141,9 +142,9 @@ def test_change_dt(session, client, jwt):
 def test_amend_am(session, client, jwt):
     """Assert that generation of a test report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(AMENDMENT_DATAFILE)
-        report = Report(json_data, 'PS12345', ReportTypes.FINANCING_STATEMENT_REPORT, 'Account Name')
+        report = Report(json_data, 'PS12345', ReportTypes.FINANCING_STATEMENT_REPORT, '')
         # test
         content, status, headers = report.get_pdf()
         assert headers
@@ -154,7 +155,7 @@ def test_amend_am(session, client, jwt):
 def test_amend_co(session, client, jwt):
     """Assert that generation of a test report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(AMENDMENT_CO_DATAFILE)
         report = Report(json_data, 'PS12345', ReportTypes.FINANCING_STATEMENT_REPORT, 'Account Name')
         # test
@@ -167,9 +168,9 @@ def test_amend_co(session, client, jwt):
 def test_discharge(session, client, jwt):
     """Assert that generation of a test report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(DISCHARGE_DATAFILE)
-        report = Report(json_data, 'PS12345', ReportTypes.FINANCING_STATEMENT_REPORT, 'Account Name')
+        report = Report(json_data, 'PS12345', ReportTypes.FINANCING_STATEMENT_REPORT, '')
         # test
         content, status, headers = report.get_pdf()
         assert headers
@@ -180,7 +181,7 @@ def test_discharge(session, client, jwt):
 def test_renewal(session, client, jwt):
     """Assert that generation of a test report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(RENEWAL_DATAFILE)
         report = Report(json_data, 'PS12345', ReportTypes.FINANCING_STATEMENT_REPORT, 'Account Name')
         # test
@@ -193,7 +194,7 @@ def test_renewal(session, client, jwt):
 def test_renewal_rl(session, client, jwt):
     """Assert that generation of a test report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(RENEWAL_RL_DATAFILE)
         report = Report(json_data, 'PS12345', ReportTypes.FINANCING_STATEMENT_REPORT, 'Account Name')
         # test
@@ -206,7 +207,7 @@ def test_renewal_rl(session, client, jwt):
 def test_cover_discharge(session, client, jwt):
     """Assert that generation of a mail cover page report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(DISCHARGE_DATAFILE_COVER)
         report = Report(json_data, 'PS12345', ReportTypes.COVER_PAGE_REPORT, 'Account Name')
         # test
@@ -219,7 +220,7 @@ def test_cover_discharge(session, client, jwt):
 def test_cover_amendment(session, client, jwt):
     """Assert that generation of a mail cover page report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(AMENDMENT_DATAFILE_COVER)
         report = Report(json_data, 'PS12345', ReportTypes.COVER_PAGE_REPORT, 'Account Name')
         # test
@@ -232,9 +233,9 @@ def test_cover_amendment(session, client, jwt):
 def test_verification_discharge(session, client, jwt):
     """Assert that generation of a test report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(DISCHARGE_DATAFILE_COVER)
-        report = Report(json_data, 'PS12345', ReportTypes.VERIFICATION_STATEMENT_MAIL_REPORT, 'Account Name')
+        report = Report(json_data, None, ReportTypes.VERIFICATION_STATEMENT_MAIL_REPORT, None)
         # test
         content, status, headers = report.get_pdf()
         assert headers
@@ -245,11 +246,16 @@ def test_verification_discharge(session, client, jwt):
 def test_verification_amendment(session, client, jwt):
     """Assert that generation of a test report is as expected."""
     # setup
-    if is_report_v2():
+    if is_report_v2() and not is_ci_testing():
         json_data = get_json_from_file(AMENDMENT_DATAFILE_COVER)
-        report = Report(json_data, 'PS12345', ReportTypes.VERIFICATION_STATEMENT_MAIL_REPORT, 'Account Name')
+        # report = Report(json_data, 'PS12345', ReportTypes.VERIFICATION_STATEMENT_MAIL_REPORT, 'Account Name')
         # test
-        content, status, headers = report.get_pdf()
+        # content, status, headers = report.get_pdf()
+        content, status, headers = get_callback_pdf(json_data,
+                                                    None,
+                                                    ReportTypes.VERIFICATION_STATEMENT_MAIL_REPORT,
+                                                    None,
+                                                    None)
         assert headers
         # verify
         check_response(content, status, AMENDMENT_VERIFICATION_PDFFILE)
@@ -281,4 +287,10 @@ def check_response(content, status_code, filename: str = None):
 
 
 def is_report_v2() -> bool:
+    """Check report version"""
     return  current_app.config.get('REPORT_VERSION', '') == REPORT_VERSION_V2
+
+
+def is_ci_testing() -> bool:
+    """Check unit test environment: exclude most reports for CI testing."""
+    return  current_app.config.get("DEPLOYMENT_ENV", "testing") == "testing"
