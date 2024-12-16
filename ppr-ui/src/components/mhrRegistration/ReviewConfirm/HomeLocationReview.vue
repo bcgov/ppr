@@ -91,7 +91,7 @@
       >
         <v-row
           v-if="isCancelChangeLocationActive && isPrevTransportPermitLocation"
-          noGutters
+          no-gutters
           class="px-8 my-5 pt-5"
         >
           <v-col>
@@ -111,9 +111,9 @@
             !isPrevTransportPermitLocation &&
             !isCancelTransportPermitReview &&
             !isCreateNewPermit) || isExtendChangeLocationActive"
-          :isCancelledLocation="isCancelledTransportPermitDetails"
-          :isVoidPermit="isExemptionWithActiveTransportPermit"
-          :infoText="exemptionWithActivePermitText"
+          :is-cancelled-location="isCancelledTransportPermitDetails"
+          :is-void-permit="isExemptionWithActiveTransportPermit"
+          :info-text="exemptionWithActivePermitText"
           class="mt-5"
         />
 
@@ -122,7 +122,7 @@
           :class="{'disabled-text': isCancelledTransportPermitDetails }"
         >
           <v-row
-            noGutters
+            no-gutters
             class="pt-5 px-8 key-value-pair"
           >
             <v-col
@@ -142,7 +142,7 @@
           <!-- Lot Type -->
           <template v-if="homeLocationInfo.locationType === HomeLocationTypes.LOT">
             <v-row
-              noGutters
+              no-gutters
               class="px-8 pt-1 key-value-pair"
             >
               <v-col
@@ -154,15 +154,15 @@
                   v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
                   action="AMENDED"
                   :baseline="amendedBadgeLocationType.baseline"
-                  :currentState="amendedBadgeLocationType.currentState"
-                  isCaseSensitive
+                  :current-state="amendedBadgeLocationType.currentState"
+                  is-case-sensitive
                 />
                 <UpdatedBadge
                   v-else-if="isMhrReRegistration"
                   class="mb-1"
                   :action="correctionState.action"
                   :baseline="correctionState.location.baseline"
-                  :currentState="correctionState.location.currentState"
+                  :current-state="correctionState.location.currentState"
                 />
               </v-col>
               <v-col
@@ -177,7 +177,7 @@
           <!-- Park Type -->
           <template v-if="homeLocationInfo.locationType === HomeLocationTypes.HOME_PARK">
             <v-row
-              noGutters
+              no-gutters
               class="px-8 pt-1 key-value-pair"
             >
               <v-col
@@ -194,7 +194,7 @@
               </v-col>
             </v-row>
             <v-row
-              noGutters
+              no-gutters
               class="px-8 pt-1 key-value-pair"
             >
               <v-col
@@ -210,15 +210,15 @@
                   v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
                   action="AMENDED"
                   :baseline="amendedBadgeLocationType.baseline"
-                  :currentState="amendedBadgeLocationType.currentState"
-                  isCaseSensitive
+                  :current-state="amendedBadgeLocationType.currentState"
+                  is-case-sensitive
                 />
                 <UpdatedBadge
                   v-else-if="isMhrReRegistration"
                   class="mb-1"
                   :action="correctionState.action"
                   :baseline="correctionState.location.baseline"
-                  :currentState="correctionState.location.currentState"
+                  :current-state="correctionState.location.currentState"
                 />
               </v-col>
               <v-col
@@ -246,7 +246,7 @@
           <!-- Reserve -->
           <template v-if="homeLocationInfo.otherType === HomeLocationTypes.OTHER_RESERVE">
             <v-row
-              noGutters
+              no-gutters
               class="px-8 pt-1 key-value-pair"
             >
               <v-col
@@ -258,15 +258,15 @@
                   v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
                   action="AMENDED"
                   :baseline="amendedBadgeLocationType.baseline"
-                  :currentState="amendedBadgeLocationType.currentState"
-                  isCaseSensitive
+                  :current-state="amendedBadgeLocationType.currentState"
+                  is-case-sensitive
                 />
                 <UpdatedBadge
                   v-else-if="isMhrReRegistration"
                   class="mb-1"
                   :action="correctionState.action"
                   :baseline="correctionState.location.baseline"
-                  :currentState="correctionState.location.currentState"
+                  :current-state="correctionState.location.currentState"
                 />
               </v-col>
               <v-col
@@ -331,7 +331,7 @@
             <!-- PID Entered-->
             <template v-if="!isManualLocation">
               <v-row
-                noGutters
+                no-gutters
                 class="px-8 pt-1 key-value-pair"
               >
                 <v-col
@@ -349,7 +349,7 @@
               </v-row>
               <v-row
                 v-if="homeLocationInfo.legalDescription"
-                noGutters
+                no-gutters
                 class="px-8 pt-1 key-value-pair"
               >
                 <v-col
@@ -370,7 +370,7 @@
             <!-- No PID -->
             <v-row
               v-else
-              noGutters
+              no-gutters
               class="px-8 pt-1 key-value-pair"
             >
               <v-col
@@ -444,7 +444,7 @@
 
             <!-- Additional Details -->
             <v-row
-              noGutters
+              no-gutters
               class="px-8 pt-1 key-value-pair"
             >
               <v-col
@@ -464,7 +464,7 @@
 
           <!-- Location Type Corrections Row -->
           <v-row
-            noGutters
+            no-gutters
             class="px-8"
           >
             <v-col>
@@ -473,7 +473,7 @@
                 class="mb-1"
                 :action="correctionState.action"
                 :baseline="correctionState.location.baseline"
-                :currentState="correctionState.location.currentState"
+                :current-state="correctionState.location.currentState"
               />
               <InfoChip
                 v-if="isCancelTransportPermitReview"
@@ -489,7 +489,7 @@
             class="mx-8 mt-6"
           />
           <v-row
-            noGutters
+            no-gutters
             class="px-8 pt-5 key-value-pair"
           >
             <v-col
@@ -502,14 +502,14 @@
                 class="mb-1"
                 :action="correctionState.action"
                 :baseline="correctionState.civicAddress.baseline"
-                :currentState="correctionState.civicAddress.currentState"
+                :current-state="correctionState.civicAddress.currentState"
               />
               <UpdatedBadge
                 v-if="isAmendLocationActive && isTransportPermitReview"
                 action="AMENDED"
                 :baseline="amendedBadgeCivicAddress.baseline"
-                :currentState="amendedBadgeCivicAddress.currentState"
-                isCaseSensitive
+                :current-state="amendedBadgeCivicAddress.currentState"
+                is-case-sensitive
               />
               <InfoChip
                 v-if="isCancelTransportPermitReview"
@@ -550,7 +550,7 @@
             <!-- Land Details -->
             <v-row
               v-if="!isCreateNewPermit"
-              noGutters
+              no-gutters
               class="px-8 pt-6"
             >
               <v-col
@@ -564,7 +564,7 @@
             <!-- Lease or Land Ownership -->
             <v-row
               v-if="!isCreateNewPermit"
-              noGutters
+              no-gutters
               class="px-8 pt-1 key-value-pair"
             >
               <v-col
@@ -576,7 +576,7 @@
                   v-if="isAmendLocationActive && (isPadEditable || isTransportPermitReview)"
                   action="AMENDED"
                   :baseline="amendedBadgeLandDetails.baseline"
-                  :currentState="amendedBadgeLandDetails.currentState"
+                  :current-state="amendedBadgeLandDetails.currentState"
                 />
               </v-col>
               <v-col
@@ -588,7 +588,7 @@
             </v-row>
             <!-- Land Details Corrections Row -->
             <v-row
-              noGutters
+              no-gutters
               class="px-8"
             >
               <v-col>
@@ -597,7 +597,7 @@
                   class="mb-1"
                   :action="correctionState.action"
                   :baseline="correctionState.landDetails.baseline"
-                  :currentState="correctionState.landDetails.currentState"
+                  :current-state="correctionState.landDetails.currentState"
                 />
               </v-col>
             </v-row>
@@ -608,7 +608,7 @@
         <template v-if="isTransportPermitReview && showTaxCertificateExpiryDate">
           <v-divider class="mx-8 mt-7 mb-6" />
           <v-row
-            noGutters
+            no-gutters
             class="px-8 key-value-pair"
           >
             <v-col cols="3">
@@ -647,9 +647,9 @@ useUpdatedBadges
 } from '@/composables'
 import { storeToRefs } from 'pinia'
 import { useCountriesProvinces } from '@/composables/address/factories'
-import { FormIF, MhrRegistrationHomeLocationIF } from '@/interfaces'
+import type { FormIF, MhrRegistrationHomeLocationIF } from '@/interfaces'
 import { convertDateToLongFormat } from '@/utils/date-helper'
-import { TransportPermitDetails } from '@/components/mhrTransportPermit'
+import { TransportPermitDetails } from '@/components/mhrTransportPermits'
 import { InfoChip, UpdatedBadge } from '@/components/common'
 
 export default defineComponent({

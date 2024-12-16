@@ -1,12 +1,12 @@
 import { nextTick } from 'vue'
-import { Tombstone, TombstoneDefault, TombstoneDynamic } from '@/components/tombstone'
 import { useStore } from '@/store/store'
-import { AccountInformationIF, FinancingStatementIF, UserInfoIF } from '@/interfaces'
+import type { AccountInformationIF, FinancingStatementIF, UserInfoIF } from '@/interfaces'
 import { mockTransportPermitNewLocation, mockTransportPermitPreviousLocation, mockedFinancingStatementComplete, mockedSelectSecurityAgreement } from './test-data'
 import { AuthRoles, MhApiStatusTypes, ProductCode, RouteNames } from '@/enums'
 import { createComponent, getTestId } from './utils'
 import { pacificDate } from '@/utils'
 import { useTransportPermits } from '@/composables'
+import { Tombstone, TombstoneDefault, TombstoneDynamic } from '@/components/tombstones'
 
 const store = useStore()
 

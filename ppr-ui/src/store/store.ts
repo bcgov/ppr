@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { stateModel } from '@/store/state'
 import { find, omit } from 'lodash'
-import {
+import type {
   AccountInformationIF,
   AccountModelIF,
   AccountProductSubscriptionIF,
@@ -57,20 +57,23 @@ import {
   ExemptionNoteIF,
   AddEditSaNoticeIF
 } from '@/interfaces'
+import type {
+  LocationChangeTypes,
+  MhApiStatusTypes,
+  MhrSubTypes,
+  SettingOptions,
+  UnitNoteDocTypes
+} from '@/enums';
 import {
   AccountTypes,
   APIRegistrationTypes,
   AuthRoles,
-  LocationChangeTypes,
-  MhApiStatusTypes,
-  MhrSubTypes,
   ProductCode,
   RegistrationFlowType,
-  RouteNames,
-  SettingOptions,
-  UnitNoteDocTypes
+  RouteNames
 } from '@/enums'
-import { computed, ComputedRef, ref, toRefs } from 'vue'
+import type { ComputedRef} from 'vue';
+import { computed, ref, toRefs } from 'vue'
 import { useMhrCorrections, useMhrValidations } from '@/composables'
 import { MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { getFeatureFlag } from '@/utils'
@@ -84,17 +87,18 @@ import {
   QsReviewConfirm,
   SubmittingParty,
   YourHome
-} from '@/views'
+} from '@/pages'
 import {
   MHRButtonFooterConfig, MHRCorrectionButtonFooterConfig,
   MHRManufacturerButtonFooterConfig,
   RegistrationButtonFooterConfig
 } from '@/resources/buttonFooterConfig'
-import { CancelUnitNoteIF, UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
+import type { CancelUnitNoteIF, UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 
 export const useStore = defineStore('assetsStore', () => {
   // State Model
   const state = ref({ ...stateModel })
+  const { isMhrCorrection } = useMhrCorrections()
 
   /** PPR Getters **/
 
@@ -555,6 +559,7 @@ export const useStore = defineStore('assetsStore', () => {
   const getMhrSteps = computed(() => {
     return isMhrManufacturerRegistration.value ? getMhrManufacturerSteps.value : getMhrStaffSteps.value
   })
+
   const getFooterButtonConfig = computed<ButtonConfigIF[]>(() => {
     return isMhrRegistration.value || isMhrReRegistration.value
       ? getMhrButtonFooterConfig.value
@@ -563,7 +568,7 @@ export const useStore = defineStore('assetsStore', () => {
   const getMhrButtonFooterConfig = computed<ButtonConfigIF[]>(() => {
     return isMhrManufacturerRegistration.value
       ? MHRManufacturerButtonFooterConfig
-      : useMhrCorrections().isMhrCorrection.value ? MHRCorrectionButtonFooterConfig : MHRButtonFooterConfig
+      : isMhrCorrection ? MHRCorrectionButtonFooterConfig : MHRButtonFooterConfig
   })
   const isBusySaving = computed<boolean>(() => {
     return false

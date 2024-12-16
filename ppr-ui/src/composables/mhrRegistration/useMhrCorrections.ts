@@ -1,6 +1,7 @@
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { computed, ComputedRef, reactive } from 'vue'
+import type { ComputedRef} from 'vue';
+import { computed, reactive } from 'vue'
 import {
   deepChangesComparison,
   deleteEmptyProperties,
@@ -11,7 +12,7 @@ import {
 } from '@/utils'
 import { ActionTypes, APIRegistrationTypes, HomeCertificationOptions, MhApiStatusTypes, RouteNames } from '@/enums'
 import { useNavigation, useNewMhrRegistration, useTransportPermits } from '@/composables'
-import {
+import type {
   AdminRegistrationIF,
   HomeSectionIF,
   MhRegistrationSummaryIF,

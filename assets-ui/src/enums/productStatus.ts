@@ -1,6 +1,0 @@
-export enum ProductStatus {
-  ACTIVE = 'ACTIVE',
-  NOT_SUBSCRIBED = 'NOT_SUBSCRIBED',
-  PENDING = 'PENDING_STAFF_REVIEW',
-  REJECTED = 'REJECTED'
-}

@@ -1,5 +1,0 @@
-export * from './YourHome'
-export * from './HomeLocation'
-export * from './ReviewConfirm'
-export * from './HomeOwners'
-export { default as MhrStatusCorrection } from './MhrStatusCorrection.vue'
