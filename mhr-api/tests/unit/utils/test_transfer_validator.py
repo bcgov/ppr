@@ -104,6 +104,8 @@ TEST_TRANSFER_DATA_EXTRA = [
 # testdata pattern is ({description}, {valid}, {numerator}, {denominator}, {add_group}, {message content})
 TEST_TRANSFER_DATA_GROUP = [
     ('Valid', True, 1, 2, None, None),
+    ('Invalid no delete group', False, 1, 2, None, val_owner_utils.DELETE_GROUPS_MISSING),
+    ('Invalid no delete groupId', False, 1, 2, None, val_owner_utils.DELETE_GROUP_ID_MISSING),
     ('Invalid add TC no owner', False, None, None, TC_GROUP_TRANSFER_ADD2, val_owner_utils.OWNERS_COMMON_INVALID),
     ('Invalid add JT 1 owner', False, None, None, JT_OWNER_SINGLE, val_owner_utils.OWNERS_JOINT_INVALID),
     ('Invalid TC numerator missing', False, None, 2, TC_GROUPS_VALID, val_owner_utils.GROUP_NUMERATOR_MISSING),
@@ -397,8 +399,13 @@ def test_validate_transfer_group(session, desc, valid, numerator, denominator, a
     """Assert that MH transfer validation of owner groups works as expected."""
     # setup
     json_data = copy.deepcopy(TRANSFER)
-    json_data['deleteOwnerGroups'][0]['groupId'] = 1
-    json_data['deleteOwnerGroups'][0]['type'] = 'SOLE'
+    if desc == 'Invalid no delete group':
+        del json_data['deleteOwnerGroups']
+    elif desc == 'Invalid no delete groupId':
+        del json_data['deleteOwnerGroups'][0]['groupId']
+    else:
+        json_data['deleteOwnerGroups'][0]['groupId'] = 1
+        json_data['deleteOwnerGroups'][0]['type'] = 'SOLE'
     if add_group:
         json_data['addOwnerGroups'] = copy.deepcopy(add_group)
         if desc == 'Invalid add TC no owner':

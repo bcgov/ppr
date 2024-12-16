@@ -99,13 +99,7 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
         response_json["description"] = current_json.get("description")
         response_json["status"] = current_json.get("status")
         response_json["ownerGroups"] = current_json.get("ownerGroups")
-        if response_json.get("amendment") or response_json.get("extension"):
-            response_json["permitRegistrationNumber"] = current_json.get("permitRegistrationNumber", "")
-            response_json["permitDateTime"] = current_json.get("permitDateTime", "")
-            response_json["permitExpiryDateTime"] = current_json.get("permitExpiryDateTime", "")
-            response_json["permitStatus"] = current_json.get("permitStatus", "")
-            if existing_status != current_json.get("status"):
-                response_json["previousStatus"] = existing_status
+        response_json = set_amend_extend(response_json, current_json, existing_status)
         setup_report(registration, response_json, group, jwt, current_json)
         return jsonify(response_json), HTTPStatus.CREATED
     except DatabaseException as db_exception:
@@ -118,8 +112,24 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
         return resource_utils.default_exception_response(default_exception)
 
 
+def set_amend_extend(response_json: dict, current_json: dict, existing_status: str) -> dict:
+    """Add amend/extend permit extra information."""
+    if response_json.get("amendment") or response_json.get("extension"):
+        response_json["permitRegistrationNumber"] = current_json.get("permitRegistrationNumber", "")
+        response_json["permitDateTime"] = current_json.get("permitDateTime", "")
+        if response_json.get("note") and response_json["note"].get("expiryDateTime"):
+            response_json["permitExpiryDateTime"] = response_json["note"].get("expiryDateTime")
+            response_json["permitStatus"] = response_json["note"].get("status", "")
+        else:
+            response_json["permitExpiryDateTime"] = current_json.get("permitExpiryDateTime", "")
+            response_json["permitStatus"] = current_json.get("permitStatus", "")
+        if existing_status != current_json.get("status"):
+            response_json["previousStatus"] = existing_status
+    return response_json
+
+
 def setup_report(registration: MhrRegistration, response_json: dict, group: str, j_token, current_json: dict):
-    """Perform all extra set up of the transfer report request data and add it to the queue."""
+    """Perform all extra set up of the permit report request data and add it to the queue."""
     response_json["usergroup"] = group
     if is_staff(j_token):
         response_json["username"] = reg_utils.get_affirmby(g.jwt_oidc_token_info)
