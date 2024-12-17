@@ -2,7 +2,7 @@
   "hosting":
   {
     "site": "bcregistry-assets-dev",
-    "public": ".output",
+    "public": "dist",
     "ignore": ["**/devops/**", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {

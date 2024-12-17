@@ -6,7 +6,7 @@
   "sbcName": "SBC Common Components",
   "type": "module",
   "scripts": {
-    "build": "nuxt build",
+    "build": "nuxt generate",
     "build-check": "nuxt build",
     "dev": "nuxt dev",
     "preview": "nuxt preview --port 3000",

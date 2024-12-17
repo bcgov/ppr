@@ -7,11 +7,11 @@ Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduct
 Make sure to install dependencies:
 
 ```bash
-# npm
-npm install
-
 # pnpm
 pnpm install
+
+# ppnpm
+ppnpm install
 
 # yarn
 yarn install
@@ -25,11 +25,11 @@ bun install
 Start the development server on `http://localhost:3000`:
 
 ```bash
-# npm
-npm run dev
-
 # pnpm
-pnpm dev
+pnpm run dev
+
+# ppnpm
+ppnpm dev
 
 # yarn
 yarn dev
@@ -43,11 +43,11 @@ bun run dev
 Build the application for production:
 
 ```bash
-# npm
-npm run build
-
 # pnpm
-pnpm build
+pnpm run build
+
+# ppnpm
+ppnpm build
 
 # yarn
 yarn build
@@ -59,11 +59,11 @@ bun run build
 Locally preview production build:
 
 ```bash
-# npm
-npm run preview
-
 # pnpm
-pnpm preview
+pnpm run preview
+
+# ppnpm
+ppnpm preview
 
 # yarn
 yarn preview
