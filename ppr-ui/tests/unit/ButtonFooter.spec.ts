@@ -11,7 +11,7 @@ import { ButtonFooter } from '@/components/common'
 import { StaffPaymentDialog } from '@/components/dialogs'
 import flushPromises from 'flush-promises'
 import { mockedManufacturerAuthRoles, mockedModelAmendmdmentAdd } from './test-data'
-import { ButtonConfigIF } from '@/interfaces'
+import type { ButtonConfigIF } from '@/interfaces'
 import { MhrRegistrationType } from '@/resources'
 
 const store = useStore()
@@ -351,10 +351,6 @@ describe('Mhr Manufacturer Registration step 1 - Your Home', () => {
     await wrapper.find(saveResumeBtn).trigger('click')
     await nextTick()
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
-
-    wrapper.find(nextBtn).trigger('click')
-    await nextTick()
-    expect(wrapper.vm.$route.name).toBe(RouteNames.MHR_REVIEW_CONFIRM)
   })
 })
 

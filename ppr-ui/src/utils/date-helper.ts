@@ -1,6 +1,6 @@
-import moment, { Moment } from 'moment'
+import type { Moment } from 'moment';
+import moment from 'moment'
 import 'moment-timezone'
-import { isDate } from 'lodash'
 
 const date = new Date()
 

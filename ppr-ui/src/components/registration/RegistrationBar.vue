@@ -16,10 +16,10 @@
 
     <RegistrationBarTypeAheadList
       v-else-if="(hasRPPR || isSecurityActNoticeEnabled) && !isMhr"
-      defaultLabel="Start a New Personal Property Registration"
-      :defaultDense="false"
-      :defaultClearable="false"
-      :isLightBackGround="!isTabView"
+      default-label="Start a New Personal Property Registration"
+      :default-dense="false"
+      :default-clearable="false"
+      :is-light-back-ground="!isTabView"
       @selected="newRegistration($event)"
     />
 
@@ -40,10 +40,11 @@ import {
   AccountProductCodes, AccountProductRoles,
   APIRegistrationTypes
 } from '@/enums'
-import { AccountProductSubscriptionIF, RegistrationTypeIF } from '@/interfaces'
+import type { AccountProductSubscriptionIF, RegistrationTypeIF } from '@/interfaces'
 import { MhrRegistrationType } from '@/resources'
 import { storeToRefs } from 'pinia'
 import { usePprRegistration } from '@/composables'
+import { debounce } from 'lodash'
 
 export default defineComponent({
   components: {
@@ -77,12 +78,13 @@ export default defineComponent({
         productSubscriptions?.[AccountProductCodes.RPPR]?.roles.includes(AccountProductRoles.EDIT) || false
       )
     })
-    const newRegistration = (val: RegistrationTypeIF) => {
+    const newRegistration = debounce((val: RegistrationTypeIF) => {
       if (val.registrationTypeAPI !== APIRegistrationTypes.OTHER) {
         setRegistrationTypeOtherDesc('')
       }
       emit('selectedRegistrationType', val)
-    }
+      return
+    }, 10)
 
     return {
       hasRPPR,
