@@ -23,7 +23,6 @@ const aboutText = (aboutText1 && aboutText2)
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-  // components: true,
   components: [
     '~/components', // Auto-import components from the components directory
     '~/components/collateral',
