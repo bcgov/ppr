@@ -511,11 +511,12 @@ def enqueue_doc_record(registration: MhrRegistration, json_data: dict):
             doc_type = TO_DRS_DOC_TYPE.get(doc_type)
         payload = {
             "accountId": registration.account_id,
-            "author": json_data.get("username"),
+            "author": json_data.get("username", ""),
             "documentClass": "MHR",
             "documentType": doc_type,
             "consumerDocumentId": registration.documents[0].document_id,
             "consumerIdentifier": registration.mhr_number,
+            "consumerFilingDate": json_data.get("createDateTime", ""),
         }
         logger.info(f"Staff reg id={registration.id} queuing DRS record payload={payload}")
         GoogleQueueService().publish_create_doc_record(payload)
