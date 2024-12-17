@@ -12,7 +12,7 @@ export const useNavigation = () => {
    * @query The navigation route options.
    */
   const goToRoute = async (routeName: RouteNames, query: {[key: string]: string|number} = null): Promise<void> => {
-    await router.push({ name: routeName, query })
+    await navigateTo({ name: routeName })
     scrollToTop()
   }
 
@@ -35,7 +35,7 @@ export const useNavigation = () => {
    * Navigates to the specified URL, including Account ID param if available.
    * This function may or may not return. The caller should account for this!
    */
-  const navigateTo = (url: string): boolean => {
+  const navigateToUrl = (url: string): boolean => {
     try {
       // get account id and set in params
       const accountId = sessionStorage.getItem('ACCOUNT_ID')
@@ -62,7 +62,7 @@ export const useNavigation = () => {
     router,
     goToRoute,
     goToDash,
-    navigateTo,
+    navigateToUrl,
     isRouteName,
     containsCurrentRoute
   }

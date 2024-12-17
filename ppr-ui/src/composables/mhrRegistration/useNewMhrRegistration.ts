@@ -1,6 +1,6 @@
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import {
+import type {
   MhrRegistrationDescriptionIF,
   MhrRegistrationHomeLocationIF,
   MhrRegistrationHomeOwnerGroupIF,
@@ -28,7 +28,7 @@ import {
   mhrRegistrationHistory,
   updateMhrDraft
 } from '@/utils'
-import { orderBy } from 'lodash'
+import { debounce, orderBy } from 'lodash'
 import { useHomeOwners, useMhrCorrections } from '@/composables'
 
 export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
@@ -374,12 +374,12 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
     return data
   }
 
-  const fetchMhRegistrations = async (sortOptions: RegistrationSortIF = null): Promise<void> => {
+  const fetchMhRegistrations = debounce(async (sortOptions: RegistrationSortIF = null): Promise<void> => {
     const draftFilings = await getMhrDrafts(sortOptions)
     const myMhrHistory = await mhrRegistrationHistory(true, sortOptions)
     const filteredMhrHistory = addHistoryDraftsToMhr(myMhrHistory, draftFilings, sortOptions)
     setMhrTableHistory(filteredMhrHistory)
-  }
+  }, 10)
 
   const mhrDraftHandler = async (): Promise<MhrDraftIF> => {
 

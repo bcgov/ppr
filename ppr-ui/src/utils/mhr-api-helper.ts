@@ -1,7 +1,7 @@
 // Libraries
 import { axios } from '@/utils/axios-ppr'
 import { StatusCodes } from 'http-status-codes'
-import {
+import type {
   ErrorDetailIF,
   ErrorIF,
   ExemptionIF,
@@ -18,14 +18,8 @@ import {
   AdminRegistrationIF,
   MhrHistoryRoIF
 } from '@/interfaces'
-import {
-  APIMhrTypes,
-  ApiTransferTypes,
-  ErrorCategories,
-  ErrorCodes,
-  ErrorRootCauses,
-  StaffPaymentOptions
-} from '@/enums'
+import type { APIMhrTypes, ApiTransferTypes} from '@/enums'
+import { ErrorCategories, ErrorCodes, ErrorRootCauses, StaffPaymentOptions } from '@/enums'
 import { useSearch } from '@/composables/useSearch'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { addTimestampToDate } from '@/utils'
