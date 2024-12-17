@@ -17,6 +17,12 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     // Set all feature flags to true
     setAllFlagDefaults(true)
   }
+
+  // initialize Launch Darkly
+  if ((window as any).ldClientId) {
+    console.info('Initializing Launch Darkly...')  
+    await initLdClient()
+  }
   
   nuxtApp.vueApp.use(Vuelidate)
   nuxtApp.vueApp.use(tabFocus)
