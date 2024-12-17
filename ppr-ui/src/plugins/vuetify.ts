@@ -1,9 +1,7 @@
-// Vuetify
+import { defineNuxtPlugin } from '#app'
 import { h } from 'vue'
 import { createVuetify } from 'vuetify'
 import type { IconSet, IconProps } from 'vuetify'
-
-// Styles
 import 'vuetify/dist/vuetify.min.css'
 import '@mdi/font/css/materialdesignicons.min.css'
 import '@/assets/styles/base.scss'
@@ -11,8 +9,6 @@ import '@/assets/styles/layout.scss'
 import '@/assets/styles/overrides.scss'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
-
-// Custom Svg Icons
 import { ExecutorBusinessIcon, ExecutorPersonIcon, HomeLocationIcon, HomeOwnersIcon } from '@/assets/svgs'
 
 const customSvgNameToComponent: any = {
@@ -24,20 +20,20 @@ const custom: IconSet = {
     h(props.tag, [h(customSvgNameToComponent[props.icon as string], { class: 'v-icon__svg' })])
 }
 
-export default createVuetify({
+const vuetify = createVuetify({
   theme: {
     defaultTheme: 'bcgov',
     themes: {
       bcgov: {
         colors: {
-          primary: '#1669bb', // same as $$primary-blue
+          primary: '#1669bb',
           darkBlue: '#38598a',
-          lightBlue: '#E2E8EE', // same as $app-lt-blue
+          lightBlue: '#E2E8EE',
           error: '#d3272c',
           success: '#1a9031',
-          darkGray: '#495057', // same as theme $gray7
-          caution: '#F8661A', // same as them $app-orange,
-          greyLighten: '#e0e0e01f' // same as the previous vuetify grey lighten-2
+          darkGray: '#495057',
+          caution: '#F8661A',
+          greyLighten: '#e0e0e01f'
         }
       }
     }
@@ -50,4 +46,8 @@ export default createVuetify({
   },
   components,
   directives
+})
+
+export default defineNuxtPlugin(nuxtApp => {
+  nuxtApp.vueApp.use(vuetify)
 })

@@ -3,10 +3,20 @@ import { afterEach, beforeAll, vi } from 'vitest'
 import { config } from '@vue/test-utils'
 import { dataTestId } from './unit/plugins'
 import { createPinia, setActivePinia } from 'pinia'
-import vuetify from '@/plugins/vuetify'
 import * as matchers from 'vitest-axe/matchers'
 import 'vitest-axe/extend-expect'
 import { expect } from 'vitest'
+
+import 'vuetify/styles'
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
+import { createVuetify } from 'vuetify'
+
+// Create Vuetify instance
+const vuetify = createVuetify({
+  components,
+  directives,
+})
 
 // Extend vitest with axe matchers
 expect.extend(matchers)
@@ -23,6 +33,13 @@ config.global.config.warnHandler = () => null
 global.css = { supports: () => false }
 
 beforeAll(() => {
+  // Mock IntersectionObserver to prevent actual intersection observation
+  global.IntersectionObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+
   // Mock the entire vue-pdf-embed module
   vi.mock('vue-pdf-embed', () => {
     // Replace the component with a dummy component or return an empty object

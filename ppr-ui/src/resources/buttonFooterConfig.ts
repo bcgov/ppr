@@ -1,5 +1,5 @@
 import { RouteNames } from '@/enums'
-import { ButtonConfigIF } from '@/interfaces'
+import type { ButtonConfigIF } from '@/interfaces'
 
 export const MHRButtonFooterConfig: Array<ButtonConfigIF> = [
   {

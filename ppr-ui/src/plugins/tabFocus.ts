@@ -1,11 +1,6 @@
-/**
- * Plugin to modify the VTextField and VTextarea components to add a 'tab-focused' css class when the input
- * is focused via the Tab key. This allows to style the input differently
- * when it's focused with the keyboard, compared to when it's clicked with the mouse.
- *
- * The event listeners are cleaned up when the component is unmounted.
- */
-export default {
+// assets-ui/src/plugins/tabFocus.ts
+
+export const tabFocus = {
   install(app) {
     const TAB_KEY = 'Tab'
 

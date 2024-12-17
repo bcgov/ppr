@@ -1,4 +1,4 @@
-import { BaseDataUnionIF } from '@/interfaces'
+import type { BaseDataUnionIF } from '@/interfaces'
 import { isEqualWith } from 'lodash'
 
 export function isSigningIn (): boolean {
@@ -57,7 +57,7 @@ export function getKeyByValue (obj, value) {
 
 /** Scrolls to top of current window **/
 export const scrollToTop = () => {
-  const scrollDuration = 300 // Adjust the duration of the scroll animation (in milliseconds)
+  const scrollDuration = 600 // Adjust the duration of the scroll animation (in milliseconds)
   const scrollStep = -window.scrollY / (scrollDuration / 15)
 
   const scrollInterval = setInterval(() => {
