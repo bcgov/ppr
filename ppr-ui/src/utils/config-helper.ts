@@ -72,11 +72,6 @@ export async function fetchConfig (): Promise<any> {
     sessionStorage.setItem('ACCOUNT_ID', accountId)
   }
 
-  const ldClientId: string = config.VUE_APP_PPR_LD_CLIENT_ID
-  if (ldClientId) {
-    (<any>window).ldClientId = ldClientId
-  }
-
   const pprStaffPartyCode: string = config.VUE_APP_PPR_STAFF_PARTY_CODE
   if (pprStaffPartyCode) {
     sessionStorage.setItem('PPR_STAFF_PARTY_CODE', pprStaffPartyCode)

@@ -8,7 +8,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   // initialize Launch Darkly
   if (useRuntimeConfig().public.VUE_APP_PPR_LD_CLIENT_ID) {
     console.info('Initializing Launch Darkly...')
-    await initLdClient()
+    await initLdClient(useRuntimeConfig().public.VUE_APP_PPR_LD_CLIENT_ID)
   }
 
   // Local development only
