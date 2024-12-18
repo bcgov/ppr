@@ -1,4 +1,5 @@
-import { initialize, LDClient, LDFlagSet, LDOptions, LDUser } from 'launchdarkly-js-client-sdk'
+import type { LDClient, LDFlagSet, LDOptions, LDUser } from 'launchdarkly-js-client-sdk';
+import { initialize } from 'launchdarkly-js-client-sdk'
 
 /**
  * Default feature flags in case LD env key is not defined (eg, local development).
@@ -36,9 +37,7 @@ let ldClient: LDClient = null
 /**
  * An async method that initializes the Launch Darkly client.
  */
-export async function initLdClient (): Promise<void> {
-  const envKey: string = window['ldClientId'] // eslint-disable-line dot-notation
-
+export async function initLdClient (envKey: string): Promise<void> {
   if (envKey) {
     const user: LDUser = {
       // since we have no user data yet, use a shared key temporarily
