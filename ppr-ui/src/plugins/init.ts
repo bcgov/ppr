@@ -6,7 +6,7 @@ import { initLdClient, setAllFlagDefaults } from '@/utils'
 
 export default defineNuxtPlugin(async (nuxtApp) => {
   // initialize Launch Darkly
-  if ((window as any).ldClientId) {
+  if (useRuntimeConfig().public.VUE_APP_PPR_LD_CLIENT_ID) {
     console.info('Initializing Launch Darkly...')
     await initLdClient()
   }
@@ -16,12 +16,6 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     console.log('Local development detected.')
     // Set all feature flags to true
     setAllFlagDefaults(true)
-  }
-
-  // initialize Launch Darkly
-  if ((window as any).ldClientId) {
-    console.info('Initializing Launch Darkly...')  
-    await initLdClient()
   }
   
   nuxtApp.vueApp.use(Vuelidate)
