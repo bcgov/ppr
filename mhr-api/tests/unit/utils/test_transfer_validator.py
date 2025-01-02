@@ -104,6 +104,8 @@ TEST_TRANSFER_DATA_EXTRA = [
 # testdata pattern is ({description}, {valid}, {numerator}, {denominator}, {add_group}, {message content})
 TEST_TRANSFER_DATA_GROUP = [
     ('Valid', True, 1, 2, None, None),
+    ('Invalid party type OWNER', False, 1, 2, EXEC_ADD_GROUPS_INVALID, val_owner_utils.GROUP_PARTY_TYPE_INVALID),
+    ('Invalid party type ADMIN', False, 1, 2, EXEC_ADD_GROUPS_INVALID, val_owner_utils.GROUP_PARTY_TYPE_INVALID),
     ('Invalid no delete group', False, 1, 2, None, val_owner_utils.DELETE_GROUPS_MISSING),
     ('Invalid no delete groupId', False, 1, 2, None, val_owner_utils.DELETE_GROUP_ID_MISSING),
     ('Invalid add TC no owner', False, None, None, TC_GROUP_TRANSFER_ADD2, val_owner_utils.OWNERS_COMMON_INVALID),
@@ -412,6 +414,8 @@ def test_validate_transfer_group(session, desc, valid, numerator, denominator, a
             json_data['addOwnerGroups'][1]['owners'] = []
         elif desc == 'Invalid add TC > 1 owner':
             json_data['addOwnerGroups'][0]['type'] = 'COMMON'
+        elif desc == 'Invalid party type ADMIN':
+            json_data['addOwnerGroups'][0]['owners'][0]['partyType'] = 'ADMINISTRATOR'
         else:
             for group in json_data.get('addOwnerGroups'):
                 if not numerator:

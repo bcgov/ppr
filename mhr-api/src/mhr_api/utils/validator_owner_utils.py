@@ -46,7 +46,7 @@ OWNER_DESCRIPTION_REQUIRED = "Owner description is required for the owner party 
 TRANSFER_PARTY_TYPE_INVALID = "Owner party type of administrator, executor, trustee not allowed for this registration. "
 TENANCY_PARTY_TYPE_INVALID = "Owner group tenancy type must be NA for executors, trustees, or administrators. "
 GROUP_PARTY_TYPE_INVALID = (
-    "For TRUSTEE, ADMINISTRATOR, or EXECUTOR, all owner party types within the group " + "must be identical. "
+    "For TRUSTEE, ADMINISTRATOR, or EXECUTOR, all owner party types within the group must be identical. "
 )
 TRAN_DEATH_GROUP_COUNT = "Only one owner group can be modified in a transfer due to death registration. "
 TRAN_DEATH_DELETE_MISSING = "Death transfer excluding owner edits no request deleteOwnerGroups group found. "
@@ -523,7 +523,7 @@ def validate_owner_party_type(  # pylint: disable=too-many-branches
             and group.get("type", "") != MhrTenancyTypes.NA
         ):
             error_msg += TENANCY_PARTY_TYPE_INVALID  # JOINT scenario
-        if new and group_parties_invalid:
+        if group_parties_invalid or (not new and not owner_death and party_count > 0 and party_count != owner_count):
             error_msg += GROUP_PARTY_TYPE_INVALID
     return error_msg
 
