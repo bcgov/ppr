@@ -4,23 +4,29 @@ on:
   push:
     branches:
       - main
+      - feature*
+      - hotfix*
+      - release*
     paths:
       - "ppr-ui/**"
   workflow_dispatch:
     inputs:
       target:
-        description: "Environment"
+        description: "Deploy To"
         required: true
         type: choice
         options:
-        - dev
-        - test
-        - sandbox
-        - prod
-      tagname:
-        description: "Specify a previous version (git tag) to deploy"
-        required: false
-        default: ""
+          - dev
+          - test
+          - sandbox
+          - prod
+      redeploy:
+        description: "Redeploy Application"
+        required: true
+        type: choice
+        options:
+          - "false"
+          - "true"
 
 jobs:
   ppr-ui-cd:
