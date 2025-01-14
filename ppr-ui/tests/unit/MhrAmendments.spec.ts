@@ -1,3 +1,4 @@
+// @vitest-environment nuxt
 import { nextTick } from 'vue'
 import { defaultFlagSet } from '@/utils'
 import { ActionTypes, ApiHomeTenancyTypes, APIRegistrationTypes, AuthRoles, RouteNames } from '@/enums'
@@ -5,7 +6,6 @@ import { MhrPublicAmendment } from '@/resources'
 import { mockedMhrRegistration } from './test-data'
 import { useMhrCorrections, useNewMhrRegistration } from '@/composables'
 import { createComponent, getTestId } from './utils'
-import MhrRegistration from '@/views/newMhrRegistration/MhrRegistration.vue'
 import { expect } from 'vitest'
 import { StaffPayment, Stepper } from '@/components/common'
 import HomeSections from '@/components/mhrRegistration/YourHome/HomeSections.vue'
@@ -15,6 +15,8 @@ import InfoChip from '@/components/common/InfoChip.vue'
 import YourHomeReview from '@/components/mhrRegistration/ReviewConfirm/YourHomeReview.vue'
 import { useStore } from '@/store/store'
 import { cloneDeep } from 'lodash'
+import { MhrRegistration } from '@/pages'
+import { mockComponent } from '@nuxt/test-utils/runtime'
 
 const store = useStore()
 
@@ -45,6 +47,7 @@ describe('Mhr Public Amendments', async () => {
   })
 
   it('Submitting Party step: renders initial step of Mhr Registry Amendment', async () => {
+
     expect(wrapper.exists()).toBe(true)
     expect(wrapper.find('#registration-correction-header').text()).toBe('Public Amendment')
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
