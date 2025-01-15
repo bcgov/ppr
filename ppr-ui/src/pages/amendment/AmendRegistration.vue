@@ -197,11 +197,11 @@ import { RegisteringPartySummary, SecuredPartySummary, DebtorSummary } from '@/c
 import { unsavedChangesDialog } from '@/resources/dialogOptions'
 import {
   getFeatureFlag,
-  getFinancingStatement,
   pacificDate,
   saveAmendmentStatementDraft,
   setupAmendmentStatementFromDraft
 } from '@/utils'
+import { getFinancingStatement } from '@/utils/ppr-api-helper'
 import type {
   UIRegistrationTypes} from '@/enums';
 import {

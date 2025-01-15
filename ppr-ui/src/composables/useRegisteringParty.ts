@@ -1,6 +1,6 @@
 import { useStore } from '@/store/store'
 import { useParty } from './useParty'
-import { AddPartiesIF } from '@/interfaces'
+import type { AddPartiesIF } from '@/interfaces'
 import { getStaffRegisteringParty, getRegisteringPartyFromAuth } from '@/utils'
 import { storeToRefs } from 'pinia'
 

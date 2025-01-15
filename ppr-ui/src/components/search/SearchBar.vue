@@ -1,23 +1,23 @@
 <template>
   <v-container class="bg-white px-6 py-6">
     <ConfirmationDialog
-      :setDisplay="confirmationDialog"
-      :setOptions="dialogOptions"
-      :setSettingOption="settingOption"
+      :set-display="confirmationDialog"
+      :set-options="dialogOptions"
+      :set-setting-option="settingOption"
       @proceed="searchAction"
     />
     <StaffPaymentDialog
       attach=""
       class="mt-10"
-      :setDisplay="staffPaymentDialogDisplay"
-      :setOptions="staffPaymentDialog"
-      :setShowCertifiedCheckbox="true"
+      :set-display="staffPaymentDialogDisplay"
+      :set-options="staffPaymentDialog"
+      :set-show-certified-checkbox="true"
       @proceed="onStaffPaymentChanges($event)"
     />
 
     <!-- Intro and Folio -->
     <v-row
-      noGutters
+      no-gutters
       class="py-2"
       align="center"
     >
@@ -32,16 +32,16 @@
       >
         <FolioNumber
           class="mb-n2"
-          :defaultFolioNumber="folioNumber"
-          @folioNumber="updateFolioNumber"
-          @folioError="folioError = $event"
+          :default-folio-number="folioNumber"
+          @folio-number="updateFolioNumber"
+          @folio-error="folioError = $event"
         />
       </v-col>
     </v-row>
 
     <!-- Search Type Label -->
     <v-row
-      noGutters
+      no-gutters
       class=" pt-n4 pb-4"
     >
       <v-col>
@@ -54,11 +54,11 @@
     </v-row>
 
     <!-- Search Selector and Input Fields -->
-    <v-row noGutters>
+    <v-row no-gutters>
       <v-col class="search-selector-col mr-6">
         <SearchBarList
-          :defaultSelectedSearchType="selectedSearchType"
-          :defaultCategoryMessage="categoryMessage"
+          :default-selected-search-type="selectedSearchType"
+          :default-category-message="categoryMessage"
           @selected="returnSearchSelection($event)"
         />
       </v-col>
@@ -75,14 +75,14 @@
           variant="filled"
           color="primary"
           label="Find or enter the Full Legal Name of the Business"
-          persistentHint
+          persistent-hint
           :hint="searchHint"
-          :hideDetails="hideDetails"
+          :hide-details="hideDetails"
           :clearable="showClear"
-          :clearIcon="'mdi-close'"
-          persistentClear
+          :clear-icon="'mdi-close'"
+          persistent-clear
           :disabled="!selectedSearchType"
-          :errorMessages="searchMessage ? searchMessage : ''"
+          :error-messages="searchMessage ? searchMessage : ''"
           @click:clear="showClear = false"
         >
           <template #append-inner>
@@ -99,11 +99,11 @@
 
         <BusinessSearchAutocomplete
           v-click-outside="setCloseAutoComplete"
-          isPPR
-          nilSearchText
-          :searchValue="autoCompleteSearchValue"
-          :setAutoCompleteIsActive="autoCompleteIsActive"
-          @searchValue="setSearchValue"
+          is-p-p-r
+          nil-search-text
+          :search-value="autoCompleteSearchValue"
+          :set-auto-complete-is-active="autoCompleteIsActive"
+          @search-value="setSearchValue"
           @searching="loadingSearchResults = $event"
         />
       </v-col>
@@ -119,14 +119,14 @@
           variant="filled"
           color="primary"
           label="Enter an organization name"
-          persistentHint
-          persistentClear
+          persistent-hint
+          persistent-clear
           :hint="searchHint"
-          :hideDetails="hideDetails"
+          :hide-details="hideDetails"
           :clearable="showClear"
-          :clearIcon="'mdi-close'"
+          :clear-icon="'mdi-close'"
           :disabled="!selectedSearchType"
-          :errorMessages="searchMessage ? searchMessage : ''"
+          :error-messages="searchMessage ? searchMessage : ''"
           @click:clear="showClear = false"
         >
           <template #append-inner>
@@ -143,10 +143,10 @@
 
         <BusinessSearchAutocomplete
           v-click-outside="setCloseAutoComplete"
-          nilSearchText
-          :searchValue="autoCompleteSearchValue"
-          :setAutoCompleteIsActive="autoCompleteIsActive"
-          @searchValue="setSearchValue"
+          nil-search-text
+          :search-value="autoCompleteSearchValue"
+          :set-auto-complete-is-active="autoCompleteIsActive"
+          @search-value="setSearchValue"
           @searching="loadingSearchResults = $event"
         />
       </v-col>
@@ -171,12 +171,12 @@
               class="search-bar-text-field"
               autocomplete="off"
               :disabled="!selectedSearchType"
-              :errorMessages="searchMessage ? searchMessage : ''"
+              :error-messages="searchMessage ? searchMessage : ''"
               variant="filled"
               color="primary"
               :hint="searchHint"
-              :hideDetails="hideDetails"
-              persistentHint
+              :hide-details="hideDetails"
+              persistent-hint
               :label="selectedSearchType ? selectedSearchType.textLabel : 'Select a category first'"
               @enter="searchCheck()"
             />
@@ -195,18 +195,18 @@
         v-else
         :class="isRoleStaff ? 'staff-search-bar-field-col' : 'search-bar-field-col'"
       >
-        <v-row noGutters>
+        <v-row no-gutters>
           <v-col>
             <v-text-field
               id="first-name-field"
               v-model="searchValueFirst"
               :class="wrapClass"
               autocomplete="off"
-              :errorMessages="searchMessageFirst ? searchMessageFirst : ''"
+              :error-messages="searchMessageFirst ? searchMessageFirst : ''"
               variant="filled"
               color="primary"
               :hint="searchHintFirst"
-              persistentHint
+              persistent-hint
               :label="optionFirst"
               @keypress.enter="searchCheck()"
             />
@@ -216,11 +216,11 @@
               id="second-name-field"
               v-model="searchValueSecond"
               autocomplete="off"
-              :errorMessages="searchMessageSecond ? searchMessageSecond : ''"
+              :error-messages="searchMessageSecond ? searchMessageSecond : ''"
               variant="filled"
               color="primary"
               :hint="searchHintSecond"
-              persistentHint
+              persistent-hint
               label="Middle Name (Optional)"
               @keypress.enter="searchCheck()"
             />
@@ -230,11 +230,11 @@
               id="last-name-field"
               v-model="searchValueLast"
               autocomplete="off"
-              :errorMessages="searchMessageLast ? searchMessageLast : ''"
+              :error-messages="searchMessageLast ? searchMessageLast : ''"
               variant="filled"
               color="primary"
               :hint="searchHintLast"
-              persistentHint
+              persistent-hint
               label="Last Name"
               @keypress.enter="searchCheck()"
             />
@@ -283,7 +283,7 @@
         </v-menu>
         <v-row
           v-if="showPprFeeHint"
-          noGutters
+          no-gutters
         >
           <v-col>
             <p
@@ -297,7 +297,7 @@
       </v-col>
     </v-row>
 
-    <v-row noGutters>
+    <v-row no-gutters>
       <v-col class="pt-1">
         <div
           v-if="showPprFeeHint || showMhrHint"
@@ -332,11 +332,14 @@
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { throttle } from 'lodash'
-import { mhrSearch, search, staffSearch, validateSearchAction, validateSearchRealTime } from '@/utils'
+import { validateSearchAction, validateSearchRealTime } from '@/utils'
+import { search, staffSearch } from '@/utils/ppr-api-helper'
+import { mhrSearch } from '@/utils/mhr-api-helper'
+
 import { MHRSearchTypes, SearchTypes } from '@/resources'
 import { paymentConfirmaionDialog, staffPaymentDialog } from '@/resources/dialogOptions'
 
-import {
+import type {
   DialogOptionsIF,
   IndividualNameIF,
   SearchCriteriaIF,

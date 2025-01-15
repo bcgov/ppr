@@ -1,4 +1,4 @@
-import { RenewRegistration } from '@/views'
+import { RenewRegistration } from '@/pages'
 import { RegistrationRepairersLien } from '@/components/registration'
 import { CourtOrder, StickyContainer } from '@/components/common'
 import { RouteNames } from '@/enums'

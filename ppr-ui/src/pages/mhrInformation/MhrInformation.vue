@@ -712,18 +712,20 @@ import type {
   StaffPaymentIF,
 } from '@/interfaces'
 import {
-  createMhrDraft,
   getAccountInfoFromAuth,
   getFeatureFlag,
+  pacificDate,
+  scrollToTop
+} from '@/utils'
+import {
+  createMhrDraft,
   getMhrDraft,
   getMHRegistrationSummary,
   mhrSearch,
-  pacificDate,
-  scrollToTop,
   submitAdminRegistration,
   submitMhrTransfer,
   updateMhrDraft
-} from '@/utils'
+} from '@/utils/mhr-api-helper'
 
 export default defineComponent({
   name: 'MhrInformation',

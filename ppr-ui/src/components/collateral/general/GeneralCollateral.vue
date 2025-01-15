@@ -1,27 +1,33 @@
 <template>
   <div class="pa-0 ma-0">
+    <GenColSummary
+      :set-show-history="false"
+      :set-show-amend-link="!amendMode"
+      @init-gen-col-amend="amendMode = $event"
+    />
     <v-container
       v-if="registrationFlowType === RegistrationFlowType.AMENDMENT && amendMode"
     >
       <GenColAmend
-        :setShowErrorBar="showErrorBar"
-        @closeGenColAmend="amendMode = false"
+        :set-show-error-bar="showErrorBar"
+        @close-gen-col-amend="amendMode = false"
       />
     </v-container>
     <v-container
       v-if="summaryView || registrationFlowType === RegistrationFlowType.AMENDMENT"
+      id="gen-col-summary-container"
     >
       <GenColSummary
-        :setShowHistory="false"
-        :setShowAmendLink="!amendMode"
-        @initGenColAmend="amendMode = $event"
+        :set-show-history="false"
+        :set-show-amend-link="!amendMode"
+        @init-gen-col-amend="amendMode = $event"
       />
     </v-container>
     <v-container
       v-else
       class="px-0"
     >
-      <GenColEdit :showInvalid="showInvalid" />
+      <GenColEdit :show-invalid="showInvalid" />
     </v-container>
   </div>
 </template>
@@ -34,8 +40,10 @@ import {
   watch,
   toRefs
 } from 'vue'
-import { GenColEdit, GenColSummary, GenColAmend } from '.'
-import { APIRegistrationTypes, RegistrationFlowType } from '@/enums'
+import GenColSummary from './GenColSummary.vue'
+import { GenColEdit, GenColAmend } from './'
+import type { APIRegistrationTypes} from '@/enums';
+import { RegistrationFlowType } from '@/enums'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 

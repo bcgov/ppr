@@ -2,7 +2,7 @@
 import { useStore } from '../../src/store/store'
 import { uniqBy } from 'lodash'
 // Components
-import { SearchedResultMhr } from '@/components/tables'
+import { SearchedResultsMhr } from '@/components/tables/mhr'
 // Other
 import {
   MHRSearchTypes,
@@ -13,7 +13,7 @@ import {
   mhSearchSerialNumberHeaders,
   mhSearchSerialNumberHeadersReview
 } from '@/resources'
-import { ManufacturedHomeSearchResponseIF, ManufacturedHomeSearchResultIF } from '@/interfaces'
+import type { ManufacturedHomeSearchResponseIF, ManufacturedHomeSearchResultIF } from '@/interfaces'
 import { APIMHRSearchTypes, UIMHRSearchTypes, UIMHRSearchTypeValues } from '@/enums'
 import { mockedMHRSearchResponse, mockedMHRSearchSelections } from './test-data'
 import { createComponent } from './utils'
@@ -37,23 +37,6 @@ const noResults: ManufacturedHomeSearchResponseIF = {
 const resultsTable = '#mh-search-results-table'
 const noResultsDiv = '#search-no-results-info'
 
-/**
- * Creates and mounts a component, so that it can be tested.
- *
- * @returns a Wrapper<SearchedResultMhr> object with the given parameters.
- */
-// function createComponent (propsData: any = null) {
-//   const localVue = createLocalVue()
-//   localVue.use(Vuetify)
-//   document.body.setAttribute('data-app', 'true')
-//   return mount((SearchedResultMhr as any), {
-//     localVue,
-//     store,
-//     vuetify,
-//     propsData: { ...propsData }
-//   })
-// }
-
 function getUniqueSelectedPPRLienSearches (
   searchResults: ManufacturedHomeSearchResultIF[]
 ): ManufacturedHomeSearchResultIF[] {
@@ -67,11 +50,11 @@ describe('Test result table with no results', () => {
 
   beforeEach(async () => {
     await store.setManufacturedHomeSearchResults(noResults)
-    wrapper = await createComponent(SearchedResultMhr)
+    wrapper = await createComponent(SearchedResultsMhr)
   })
 
   it('does not display table if there are no results', async () => {
-    expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResultsMhr).exists()).toBe(true)
     expect(wrapper.vm.searched).toBeTruthy()
     expect(wrapper.vm.searchValue).toEqual(noResults.searchQuery.criteria.value)
     expect(wrapper.vm.totalResultsLength).toEqual(noResults.totalResultsSize)
@@ -90,11 +73,11 @@ describe('Serial number results', () => {
   beforeEach(async () => {
     await store.setManufacturedHomeSearchResults(testResults)
     await store.setSearchedType(MHRSearchTypes[4])
-    wrapper = await createComponent(SearchedResultMhr)
+    wrapper = await createComponent(SearchedResultsMhr)
   })
 
   it('renders Results Component with serial number results data', async () => {
-    expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResultsMhr).exists()).toBe(true)
     expect(wrapper.vm.searched).toBeTruthy()
     expect(wrapper.vm.searchValue).toEqual(testResults.searchQuery.criteria.value)
     expect(wrapper.vm.headers).toStrictEqual(mhSearchSerialNumberHeaders)
@@ -140,12 +123,12 @@ describe('Serial number results in Review Mode', () => {
     await store.setSelectedManufacturedHomes(selectedResults)
     await store.setSearchedType(MHRSearchTypes[4])
 
-    wrapper = await createComponent(SearchedResultMhr, { isReviewMode: true })
+    wrapper = await createComponent(SearchedResultsMhr, { isReviewMode: true })
 
   })
 
   it('renders Results Component with Serial number data', () => {
-    expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResultsMhr).exists()).toBe(true)
     expect(wrapper.vm.headers).toStrictEqual(mhSearchSerialNumberHeadersReview)
     expect(wrapper.vm.results).toStrictEqual(selectedResults)
 
@@ -177,11 +160,11 @@ describe('Owner name debtor results', () => {
     await store.setSelectedManufacturedHomes([])
     await store.setSearchedType(MHRSearchTypes[2])
 
-    wrapper = await createComponent(SearchedResultMhr)
+    wrapper = await createComponent(SearchedResultsMhr)
   })
 
   it('renders Results Component with individual debtor name results data', () => {
-    expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResultsMhr).exists()).toBe(true)
     expect(wrapper.vm.searched).toBeTruthy()
     expect(wrapper.vm.searchValue).toEqual(testResults.searchQuery.criteria.value)
     expect(wrapper.vm.headers).toStrictEqual(mhSearchNameHeaders)
@@ -225,11 +208,11 @@ describe('Owner name name in Review Mode', () => {
     await store.setSelectedManufacturedHomes(selectedResults)
     await store.setSearchedType(MHRSearchTypes[2])
 
-    wrapper = await createComponent(SearchedResultMhr, { isReviewMode: true })
+    wrapper = await createComponent(SearchedResultsMhr, { isReviewMode: true })
   })
 
   it('renders Results Component with Owner name data', () => {
-    expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResultsMhr).exists()).toBe(true)
     expect(wrapper.vm.headers).toStrictEqual(mhSearchNameHeadersReview)
     expect(wrapper.vm.results).toStrictEqual(selectedResults)
 
@@ -261,11 +244,11 @@ describe('Business organization results', () => {
     await store.setSelectedManufacturedHomes([])
     await store.setSearchedType(MHRSearchTypes[3])
 
-    wrapper = await createComponent(SearchedResultMhr)
+    wrapper = await createComponent(SearchedResultsMhr)
   })
 
   it('renders Results Component with business debtor name results data', () => {
-    expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResultsMhr).exists()).toBe(true)
     expect(wrapper.vm.searched).toBeTruthy()
     expect(wrapper.vm.searchValue).toEqual(testResults.searchQuery.criteria.value)
     expect(wrapper.vm.headers).toStrictEqual(mhSearchNameHeaders)
@@ -305,11 +288,11 @@ describe('Business organization results in Review Mode', () => {
     await store.setSelectedManufacturedHomes(selectedResults)
     await store.setSearchedType(MHRSearchTypes[3])
 
-    wrapper = await createComponent(SearchedResultMhr, { isReviewMode: true })
+    wrapper = await createComponent(SearchedResultsMhr, { isReviewMode: true })
   })
 
   it('renders Results Component with business debtor name data', () => {
-    expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResultsMhr).exists()).toBe(true)
     expect(wrapper.vm.headers).toStrictEqual(mhSearchNameHeadersReview)
     expect(wrapper.vm.results).toStrictEqual(selectedResults)
 
@@ -340,11 +323,11 @@ describe('Manufactured home results', () => {
     await store.setSelectedManufacturedHomes([])
     await store.setSearchedType(MHRSearchTypes[1])
 
-    wrapper = await createComponent(SearchedResultMhr)
+    wrapper = await createComponent(SearchedResultsMhr)
   })
 
   it('renders Results Component with manufactured home results data', () => {
-    expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResultsMhr).exists()).toBe(true)
     expect(wrapper.vm.searched).toBeTruthy()
     expect(wrapper.vm.searchValue).toEqual(testResults.searchQuery.criteria.value)
     expect(wrapper.vm.headers).toStrictEqual(mhSearchMhrNumberHeaders)
@@ -387,11 +370,11 @@ describe('Manufactured home results in Review Mode', () => {
     await store.setSelectedManufacturedHomes(selectedResults)
     await store.setSearchedType(MHRSearchTypes[1])
 
-    wrapper = await createComponent(SearchedResultMhr, { isReviewMode: true })
+    wrapper = await createComponent(SearchedResultsMhr, { isReviewMode: true })
   })
 
   it('renders Results Component with manufactured home results data', () => {
-    expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResultsMhr).exists()).toBe(true)
     expect(wrapper.vm.headers).toStrictEqual(mhSearchMhrNumberHeadersReview)
     expect(wrapper.vm.results).toStrictEqual(selectedResults)
 

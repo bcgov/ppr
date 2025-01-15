@@ -1,8 +1,8 @@
 import { nextTick } from 'vue'
 import { useStore } from '../../src/store/store'
-import { Wrapper } from '@vue/test-utils'
+import type { Wrapper } from '@vue/test-utils'
 
-import { MhrUnitNote } from '@/views'
+import { MhrUnitNote } from '@/pages'
 import { RouteNames, UnitNoteDocTypes } from '@/enums'
 import { createComponent, getTestId, setupMockStaffUser } from './utils'
 import { UnitNotesInfo } from '@/resources/unitNotes'
@@ -14,7 +14,7 @@ import {
   UnitNoteReview,
   UnitNoteReviewDetailsTable
 } from '@/components/unitNotes'
-import { MhrUnitNoteValidationStateIF } from '@/interfaces'
+import type { MhrUnitNoteValidationStateIF } from '@/interfaces'
 import { isEqual } from 'lodash'
 import {
   collectorInformationContent,
@@ -273,7 +273,7 @@ describe('MHR Unit Note Filing', async () => {
   it('Person Giving Notice should be checked if doctype is decal replacement', async () => {
     wrapper = await createUnitNoteComponent(UnitNoteDocTypes.DECAL_REPLACEMENT)
 
-    let UnitNoteAddComponent = wrapper.findComponent(UnitNoteAdd)
+    const UnitNoteAddComponent = wrapper.findComponent(UnitNoteAdd)
     
     expect((UnitNoteAddComponent.find('#no-person-giving-notice-checkbox').element as HTMLInputElement)
       .checked).toBe(true)
@@ -298,7 +298,7 @@ describe('MHR Unit Note Filing', async () => {
     expect(wrapper.find('.no-person-giving-notice').text())
       .toBe(hasNoPersonGivingNoticeText)
   })
-  // eslint-disable-next-line max-len
+   
   it('should not show EffectiveDate component for Decal Replacement, Public Note, and Confidential Note', async () => {
     wrapper = await createUnitNoteComponent(UnitNoteDocTypes.DECAL_REPLACEMENT)
 

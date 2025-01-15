@@ -127,7 +127,8 @@ import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import type { UIRegistrationTypes } from '@/enums';
 import { APIMhrTypes, ErrorCategories, RegistrationFlowType, RouteNames } from '@/enums'
-import { getFeatureFlag, getMhrDraft, submitAdminRegistration, submitMhrRegistration } from '@/utils'
+import { getFeatureFlag } from '@/utils'
+import { getMhrDraft, submitAdminRegistration, submitMhrRegistration } from '@/utils/mhr-api-helper'
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import {
   useAuth,

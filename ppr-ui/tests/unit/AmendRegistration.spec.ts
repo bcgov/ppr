@@ -1,6 +1,6 @@
 import { nextTick } from 'vue'
 import { createComponent } from './utils'
-import { AmendRegistration } from '@/views'
+import { AmendRegistration } from '@/pages'
 import { ActionTypes, RouteNames } from '@/enums'
 import { useStore } from '@/store/store'
 import {
@@ -104,7 +104,10 @@ describe('Amendment registration component', () => {
     wrapper.vm.courtOrderValid = true
     await store.setAmendmentDescription('test12')
     wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
+    await wrapper.vm.$router.push({ name: RouteNames.CONFIRM_AMENDMENT })
     await flushPromises()
+    await nextTick()
+
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_AMENDMENT)
   })
 
@@ -117,6 +120,7 @@ describe('Amendment registration component', () => {
   })
 
   it('saves the draft and redirects to dashboard', async () => {
+    expect(wrapper.vm.$route.name).toBe(RouteNames.AMEND_REGISTRATION)
     wrapper.findComponent(StickyContainer).vm.$emit('back', true)
     await nextTick()
     await flushPromises()
@@ -136,7 +140,10 @@ describe('Amendment registration component', () => {
     })
     wrapper.vm.courtOrderValid = true
     wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
+    await wrapper.vm.$router.push({ name: RouteNames.CONFIRM_AMENDMENT })
     await flushPromises()
+    await nextTick()
+
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_AMENDMENT)
   })
 })

@@ -11,7 +11,7 @@
       flat
     >
       <v-row
-        noGutters
+        no-gutters
         class="summary-header py-2"
       >
         <v-col
@@ -31,7 +31,7 @@
         :class="{ 'border-error-left': !valid }"
       >
         <v-row
-          noGutters
+          no-gutters
           class="pa-6 pl-4"
         >
           <v-col cols="auto">
@@ -49,16 +49,16 @@
       </v-container>
       <VehicleCollateral
         v-if="vehicleCollateralLength > 0 || !summaryView"
-        :isSummary="summaryView"
-        :showInvalid="collateral.showInvalid"
-        :setShowErrorBar="showErrorBar && vehicleCollateralOpen"
-        @collateralOpen="setVehicleCollateralOpen($event)"
+        :is-summary="summaryView"
+        :show-invalid="collateral.showInvalid"
+        :set-show-error-bar="showErrorBar && vehicleCollateralOpen"
+        @collateral-open="setVehicleCollateralOpen($event)"
       />
       <GeneralCollateral
         v-if="showGeneralCollateral"
-        :isSummary="summaryView"
-        :setShowErrorBar="showErrorBar && generalCollateralOpen"
-        @collateralOpen="setGeneralCollateralOpen($event)"
+        :is-summary="summaryView"
+        :set-show-error-bar="showErrorBar && generalCollateralOpen"
+        @collateral-open="setGeneralCollateralOpen($event)"
       />
     </v-card>
   </v-container>
@@ -68,7 +68,7 @@
     class="pa-0 noGutters"
     fluid
   >
-    <v-row noGutters>
+    <v-row no-gutters>
       <v-col
         cols="auto"
         class="generic-label"
@@ -79,7 +79,7 @@
     <v-row
       id="collateral-edit-description"
       class="pt-6"
-      noGutters
+      no-gutters
     >
       <v-col cols="auto">
         <ul
@@ -98,16 +98,16 @@
       </v-col>
     </v-row>
     <VehicleCollateral
-      :isSummary="false"
-      :showInvalid="collateral.showInvalid && !valid && hasVehicleCollateral()"
-      @collateralOpen="setVehicleCollateralOpen($event)"
+      :is-summary="false"
+      :show-invalid="collateral.showInvalid && !valid && hasVehicleCollateral()"
+      @collateral-open="setVehicleCollateralOpen($event)"
     />
     <GeneralCollateral
       v-if="hasGeneralCollateral(registrationType)"
       class="pt-8"
-      :isSummary="false"
-      :setShowInvalid="collateral.showInvalid && !valid"
-      @collateralOpen="setGeneralCollateralOpen($event)"
+      :is-summary="false"
+      :set-show-invalid="collateral.showInvalid && !valid"
+      @collateral-open="setGeneralCollateralOpen($event)"
     />
   </v-container>
 </template>
@@ -124,15 +124,15 @@ import {
 } from 'vue'
 import { useStore } from '@/store/store'
 import { useRouter } from 'vue-router'
-import { GeneralCollateral } from './generalCollateral'
-import { VehicleCollateral } from './vehicleCollateral'
+import { GeneralCollateral } from './general'
+import { VehicleCollateral } from './vehicle'
 import { ActionTypes, APIRegistrationTypes, RegistrationFlowType } from '@/enums'
-import {
+import type {
   AddCollateralIF,
   GeneralCollateralIF,
 } from '@/interfaces'
-import { useGeneralCollateral } from './generalCollateral/factories'
-import { useVehicle } from './vehicleCollateral/factories'
+import { useGeneralCollateral } from './general/factories'
+import { useVehicle } from './vehicle/factories'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({

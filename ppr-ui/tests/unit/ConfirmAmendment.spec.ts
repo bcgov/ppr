@@ -10,14 +10,14 @@ import {
   mockedPartyCodeSearchResults
 } from './test-data'
 
-import { ConfirmAmendment } from '@/views'
+import { ConfirmAmendment } from '@/pages'
 import { CertifyInformation, FolioNumberSummary, StickyContainer } from '@/components/common'
 import { BaseDialog, StaffPaymentDialog } from '@/components/dialogs'
 import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/components/registration'
-import { GenColSummary } from '@/components/collateral/generalCollateral'
+import { GenColSummary } from '@/components/collateral/general'
 
 import { ActionTypes, RegistrationFlowType, RouteNames } from '@/enums'
-import { StateModelIF } from '@/interfaces'
+import type { StateModelIF } from '@/interfaces'
 import flushPromises from 'flush-promises'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { RegisteringPartyChange } from '@/components/parties/party'

@@ -475,7 +475,7 @@ import { ActionTypes, RegistrationFlowType } from '@/enums'
 import type { PartyIF, AddPartiesIF, SearchPartyIF } from '@/interfaces'
 import { editTableHeaders, partyTableHeaders } from '@/resources'
 import { PartyAddressSchema } from '@/schemas'
-import { partyCodeAccount } from '@/utils'
+import { partyCodeAccount } from '@/utils/ppr-api-helper'
 import { storeToRefs } from 'pinia'
 import { usePprRegistration } from '@/composables'
 

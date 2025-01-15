@@ -136,15 +136,16 @@ import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'v
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
-import { CautionBox, StickyContainer } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
 import { RegistrationLengthTrustSummary, SecuritiesActNoticesPanels } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { DebtorSummary, RegisteringPartySummary, SecuredPartySummary } from '@/components/parties/summaries'
 import { notCompleteDialog } from '@/resources/dialogOptions'
-import { getFeatureFlag, getFinancingStatement, pacificDate } from '@/utils'
+import { getFeatureFlag, pacificDate } from '@/utils'
+import { getFinancingStatement } from '@/utils/ppr-api-helper'
 import type {
-  APIRegistrationTypes} from '@/enums';
+  APIRegistrationTypes
+} from '@/enums'
 import {
   RouteNames,
   RegistrationFlowType,
@@ -158,13 +159,11 @@ export default defineComponent({
   name: 'DischargeRegistration',
   components: {
     BaseDialog,
-    CautionBox,
     RegistrationLengthTrustSummary,
     Collateral,
     DebtorSummary,
     RegisteringPartySummary,
     SecuredPartySummary,
-    StickyContainer,
     SecuritiesActNoticesPanels
   },
   props: {

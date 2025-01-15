@@ -23,7 +23,7 @@ import type {
   UserInfoIF,
   UserProductSubscriptionIF
 } from '@/interfaces'
-import { partyCodeSearch } from '@/utils'
+import { partyCodeSearch } from '@/utils/ppr-api-helper'
 import type { AccountInfoIF } from '@/interfaces/account-interfaces/account-info-interface'
 
 /** Gets Keycloak JWT and parses it. */

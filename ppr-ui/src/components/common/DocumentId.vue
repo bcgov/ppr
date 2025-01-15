@@ -19,7 +19,7 @@
         :class="[{ 'border-error-left': showBorderError }, { 'pb-8': content.hintText }]"
         flat
       >
-        <v-row noGutters>
+        <v-row no-gutters>
           <v-col
             cols="12"
             sm="3"
@@ -46,9 +46,9 @@
               :disabled="generateDocumentId"
               :rules="documentIdRules"
               :error="!isUniqueDocId && validate && !generateDocumentId"
-              :errorMessages="uniqueDocIdError"
+              :error-messages="uniqueDocIdError"
               :hint="content.hintText"
-              :persistentHint="Boolean(content.hintText)"
+              :persistent-hint="Boolean(content.hintText)"
             >
               <template #append-inner>
                 <v-progress-circular
@@ -78,7 +78,7 @@
                 <p>Generate a Document ID Number upon filing.</p>
                 <v-tooltip
                   location="top"
-                  contentClass="top-tooltip"
+                  content-class="top-tooltip"
                   transition="fade-transition"
                 >
                   <template #activator="{ props }">
@@ -107,8 +107,8 @@
 
 <script lang="ts">
 import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
-import { validateDocumentID } from '@/utils'
-import { ContentIF, FormIF, MhrDocIdResponseIF } from '@/interfaces'
+import { validateDocumentID } from '@/utils/mhr-api-helper'
+import type { ContentIF, FormIF, MhrDocIdResponseIF } from '@/interfaces'
 import { useInputRules } from '@/composables'
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'

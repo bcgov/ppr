@@ -1,11 +1,11 @@
-import { ExemptionDetails } from '@/views'
+import { ExemptionDetails } from '@/pages'
 import { CautionBox, DocumentId, LienAlert, Remarks, SimpleHelpToggle } from '@/components/common'
 import { HomeLocationReview, HomeOwnersReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
 
 import { createComponent, getTestId, setupActiveTransportPermit, setupMockStaffUser } from './utils'
 import { nextTick } from 'vue'
 import { axe } from 'vitest-axe'
-import { TransportPermitDetails } from '@/components/mhrTransportPermit'
+import { TransportPermitDetails } from '@/components/mhrTransportPermits'
 import { useStore } from '@/store/store'
 import { mockedAddress } from './test-data'
 import { RouteNames, UnitNoteDocTypes } from '@/enums'

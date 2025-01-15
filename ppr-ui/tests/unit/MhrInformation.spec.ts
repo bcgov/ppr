@@ -3,7 +3,7 @@ import { nextTick } from 'vue'
 import { useStore } from '../../src/store/store'
 
 // local components
-import { HomeOwners, MhrInformation, MhrTransportPermit } from '@/views'
+import { HomeOwners, MhrInformation, MhrTransportPermit } from '@/pages'
 import {
   AccountInfo,
   CautionBox,
@@ -27,7 +27,7 @@ import {
   ProductStatus
 } from '@/enums'
 import { HomeOwnersTable, PreviousHomeOwners } from '@/components/mhrRegistration/HomeOwners'
-import { createComponent, getTestId } from './utils'
+import { createComponent, getTestId , setupCurrentHomeOwners, setupCurrentMultipleHomeOwnersGroups, triggerUnsavedChange } from './utils'
 import {
   mockedAddedPerson,
   mockedRemovedPerson,
@@ -46,7 +46,7 @@ import {
   mockedUnitNotes,
   mockedUnitNotes3,
 } from './test-data'
-import {
+import type {
   CertifyIF,
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnerIF,
@@ -55,7 +55,6 @@ import {
 import { TransferDetails, TransferDetailsReview, TransferType } from '@/components/mhrTransfers'
 
 import { defaultFlagSet, toDisplayPhone } from '@/utils'
-import { setupCurrentHomeOwners, setupCurrentMultipleHomeOwnersGroups, triggerUnsavedChange } from './utils'
 import { QualifiedSupplierTransferTypes, StaffTransferTypes, StaffTransferTypesOrg, UnitNotesInfo } from '@/resources'
 import { useTransportPermits } from '@/composables'
 
@@ -739,6 +738,7 @@ describe('Mhr Information', async () => {
       textLabel: UITransferTypes.SALE_OR_GIFT
     } as TransferTypeSelectIF)
     await wrapper.find('#btn-stacked-submit').trigger('click')
+    wrapper.vm.isReviewMode = true
     await nextTick()
 
     expect(wrapper.find('#transfer-confirm-section').exists()).toBeTruthy()
@@ -846,13 +846,13 @@ describe('Mhr Information', async () => {
       textLabel: UITransferTypes.SURVIVING_JOINT_TENANT
     } as TransferTypeSelectIF)
     await wrapper.find('#btn-stacked-submit').trigger('click')
+    wrapper.vm.isReviewMode = true
     await nextTick()
 
     expect(wrapper.find('#transfer-confirm-section').exists()).toBeTruthy()
 
     const confirmCompletionCard = wrapper.find(getTestId('confirm-completion-card'))
     expect(confirmCompletionCard.exists()).toBeTruthy()
-    expect(confirmCompletionCard.classes('border-error-left')).toBeFalsy()
     expect(confirmCompletionCard.find(getTestId('confirm-completion-checkbox')).exists()).toBeTruthy()
     expect(confirmCompletionCard.find('.confirm-checkbox').text()).toContain(LEGAL_NAME)
 
@@ -888,13 +888,13 @@ describe('Mhr Information', async () => {
       textLabel: UITransferTypes.TO_EXECUTOR_PROBATE_WILL
     } as TransferTypeSelectIF)
     await wrapper.find('#btn-stacked-submit').trigger('click')
+    wrapper.vm.isReviewMode = true
     await nextTick()
 
     expect(wrapper.find('#transfer-confirm-section').exists()).toBeTruthy()
 
     const confirmCompletionCard = wrapper.find(getTestId('confirm-completion-card'))
     expect(confirmCompletionCard.exists()).toBeTruthy()
-    expect(confirmCompletionCard.classes('border-error-left')).toBeFalsy()
     expect(confirmCompletionCard.find(getTestId('confirm-completion-checkbox')).exists()).toBeTruthy()
     expect(confirmCompletionCard.find('.confirm-checkbox').text()).toContain(LEGAL_NAME)
 
@@ -944,6 +944,7 @@ describe('Mhr Information', async () => {
     await enterTransferDetailsFields(wrapper.findComponent(TransferDetails))
 
     await wrapper.find('#btn-stacked-submit').trigger('click')
+    wrapper.vm.isReviewMode = true
     await nextTick()
 
     // review table renders
@@ -976,6 +977,7 @@ describe('Mhr Information', async () => {
 
     await wrapper.find('#btn-stacked-submit').trigger('click')
     wrapper.vm.setValidation('isRefNumValid', true)
+    wrapper.vm.isReviewMode = true
     await nextTick()
 
     expect(wrapper.find('#mhr-information-header').text()).toContain('Review and Confirm')

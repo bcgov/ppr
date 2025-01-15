@@ -27,8 +27,6 @@ import { trim } from 'lodash'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { AxiosError } from 'axios'
 
-const { mapMhrSearchType } = useSearch()
-
 // Create default request base URL and headers.
 function getDefaultConfig (): object {
   const url = sessionStorage.getItem('MHR_API_URL')
@@ -49,7 +47,7 @@ export async function mhrSearch (
       }
 
       // Map query return type to differentiate between ppr & mhr in ui
-      data.searchQuery.type = mapMhrSearchType(data.searchQuery.type, true)
+      data.searchQuery.type = useSearch().mapMhrSearchType(data.searchQuery.type, true)
 
       // need a unique value for the data table (can't use the index in the list)
       const results = data.results

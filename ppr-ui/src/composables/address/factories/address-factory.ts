@@ -156,19 +156,21 @@ export function useAddressComplete (addressLocal: Ref<AddressIF>) {
     // If you want to use this component with the Canada Post AddressComplete service:
     // 1. The AddressComplete JavaScript script (and stylesheet) must be loaded.
     // 2. Your AddressComplete account key must be defined.
-    const pca = window['pca']
-    const key = window['addressCompleteKey']
-    if (!pca || !key) {
-      // eslint-disable-next-line no-console
-      console.log('AddressComplete not initialized due to missing script and/or key')
-      return
-    }
+    if (process.client) {
+      // Code that uses the window object
+      const pca = window['pca']
+      const key = useRuntimeConfig().public.VUE_APP_ADDRESS_COMPLETE_KEY
 
-    // Destroy the old object if it exists, and create a new one.
-    if (window['currentAddressComplete']) {
-      window['currentAddressComplete'].destroy()
+      if (!pca || !key) {
+        console.log('AddressComplete not initialized due to missing script and/or key')
+        return
+      }
+
+      if (window['currentAddressComplete']) {
+        window['currentAddressComplete'].destroy()
+      }
+      window['currentAddressComplete'] = createAddressComplete(pca, key)
     }
-    window['currentAddressComplete'] = createAddressComplete(pca, key)
   }
   return {
     addressCompletePopulate,

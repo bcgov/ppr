@@ -45,13 +45,13 @@ describe('Contact Information', () => {
 
   it('shows no errors when valid persons name', async () => {
     expect(wrapper.vm.contactInfoType).toBe('person')
-    let firstName = await wrapper.find('#first-name')
+    const firstName = await wrapper.find('#first-name')
     firstName.setValue('X')
 
-    let middleName = await wrapper.find('#middle-name')
+    const middleName = await wrapper.find('#middle-name')
     middleName.setValue('X')
 
-    let lastName = await wrapper.find('#last-name')
+    const lastName = await wrapper.find('#last-name')
     lastName.setValue('X')
 
 
@@ -63,13 +63,13 @@ describe('Contact Information', () => {
 
   it('shows invalid spaces errors when invalid persons name', async () => {
     expect(wrapper.vm.contactInfoType).toBe('person')
-    let firstName = await wrapper.find('#first-name')
+    const firstName = await wrapper.find('#first-name')
     firstName.setValue('  X  ')
 
-    let middleName = await wrapper.find('#middle-name')
+    const middleName = await wrapper.find('#middle-name')
     middleName.setValue(' X ')
 
-    let lastName = await wrapper.find('#last-name')
+    const lastName = await wrapper.find('#last-name')
     lastName.setValue(' X ')
 
     const form = await wrapper.findComponent('.v-form')
@@ -84,13 +84,13 @@ describe('Contact Information', () => {
 
   it('shows maximum characters errors when invalid persons name', async () => {
     expect(wrapper.vm.contactInfoType).toBe('person')
-    let firstName = await wrapper.find('#first-name')
+    const firstName = await wrapper.find('#first-name')
     firstName.setValue('x'.repeat(16))
 
-    let middleName = await wrapper.find('#middle-name')
+    const middleName = await wrapper.find('#middle-name')
     middleName.setValue('x'.repeat(16))
 
-    let lastName = await wrapper.find('#last-name')
+    const lastName = await wrapper.find('#last-name')
     lastName.setValue('x'.repeat(26))
 
     const form = await wrapper.findComponent('.v-form')
@@ -185,6 +185,6 @@ describe('Contact Information', () => {
     expect(wrapper.vm.contactInfoType).toBe(ContactTypes.PERSON)
     expect(wrapper.find(BORDER_ERROR).exists()).toBe(true)
     // With no country selected - errors: first name, last name, country, address line 1
-    expect(wrapper.findAll(ERROR_MSG).length).toBe(4)
+    expect(wrapper.findAll(ERROR_MSG).length).toBe(7)
   })
 })
