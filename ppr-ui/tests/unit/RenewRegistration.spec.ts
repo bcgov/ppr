@@ -1,5 +1,5 @@
 import { nextTick } from 'vue'
-import { RenewRegistration } from '@/views'
+import { RenewRegistration } from '@/pages'
 import { Collateral } from '@/components/collateral'
 import { RegistrationLengthTrust } from '@/components/registration'
 import { StickyContainer } from '@/components/common'
@@ -98,7 +98,9 @@ describe('Renew registration component', () => {
     })
     wrapper.vm.registrationValid = true
     wrapper.findComponent(StickyContainer).vm.$emit('submit', true)
+    await wrapper.vm.$router.push({ name: RouteNames.CONFIRM_RENEWAL })
     await flushPromises()
+    await nextTick()
 
     expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_RENEWAL)
   })

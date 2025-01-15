@@ -1,7 +1,7 @@
 import { defaultFlagSet } from '@/utils'
 import { mockMhrTransferCurrentHomeOwner } from './test-data'
 import { createComponent, mapMhrTypeToProductCode, setupCurrentHomeOwners, setupMockUser } from './utils'
-import { HomeOwners, MhrInformation } from '@/views'
+import { HomeOwners, MhrInformation } from '@/pages'
 import {
   APIRegistrationTypes,
   MhApiFrozenDocumentTypes,
@@ -15,7 +15,7 @@ import { LienAlert } from '@/components/common'
 import { TransferType } from '@/components/mhrTransfers'
 import { HomeOwnersTable } from '@/components/mhrRegistration'
 import { useStore } from '@/store/store'
-import { afterEach, beforeAll } from 'vitest'
+import { afterEach, beforeEach, beforeAll } from 'vitest'
 import { useUserAccess } from '@/composables'
 import flushPromises from 'flush-promises'
 

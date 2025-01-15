@@ -21,13 +21,15 @@ import {
 } from '@/enums'
 import {
   cleanEmpty,
+  fromDisplayPhone
+} from '@/utils'
+import {
   createMhrDraft,
-  fromDisplayPhone,
   getMhrDrafts,
   getMhrManufacturerInfo,
   mhrRegistrationHistory,
   updateMhrDraft
-} from '@/utils'
+} from '@/utils/mhr-api-helper'
 import { debounce, orderBy } from 'lodash'
 import { useHomeOwners, useMhrCorrections } from '@/composables'
 

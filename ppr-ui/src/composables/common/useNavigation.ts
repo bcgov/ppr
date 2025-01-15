@@ -12,7 +12,7 @@ export const useNavigation = () => {
    * @query The navigation route options.
    */
   const goToRoute = async (routeName: RouteNames, query: {[key: string]: string|number} = null): Promise<void> => {
-    await navigateTo({ name: routeName })
+    await navigateTo({ name: routeName, query })
     scrollToTop()
   }
 

@@ -33,12 +33,10 @@ config.global.config.warnHandler = () => null
 global.css = { supports: () => false }
 
 beforeAll(() => {
-  // Mock IntersectionObserver to prevent actual intersection observation
-  global.IntersectionObserver = class {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-  }
+
+  vi.mock('@/plugins/keycloak', () => ({
+    default: vi.fn()
+  }))
 
   // Mock the entire vue-pdf-embed module
   vi.mock('vue-pdf-embed', () => {

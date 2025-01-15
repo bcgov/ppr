@@ -1,4 +1,4 @@
-import { Exemptions } from '@/views'
+import { Exemptions } from '@/pages'
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { createComponent } from './utils'
 import { nextTick } from 'vue'

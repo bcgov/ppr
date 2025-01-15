@@ -1,4 +1,4 @@
-import { YourHome } from '@/views'
+import { YourHome } from '@/pages'
 import {
   HomeCertification,
   HomeSections,

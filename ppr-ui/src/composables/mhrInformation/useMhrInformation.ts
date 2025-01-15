@@ -1,4 +1,4 @@
-import {
+import type {
   AccountInfoIF,
   MhrHomeOwnerGroupIF,
   MhrRegistrationDescriptionIF,
@@ -24,10 +24,12 @@ import {
   UITransferTypes
 } from '@/enums'
 import {
-  fetchMhRegistration,
   normalizeObject,
   parseAccountToSubmittingParty
-} from '@/utils'
+} from '@/utils/'
+import {
+  fetchMhRegistration
+} from '@/utils/mhr-api-helper'
 import { cloneDeep } from 'lodash'
 import { useHomeOwners, useTransferOwners } from '@/composables'
 import { computed, reactive, toRefs } from 'vue'
@@ -220,7 +222,7 @@ export const useMhrInformation = () => {
     data?.exemptDateTime && setMhrExemptDateTime(data?.exemptDateTime)
 
     // Set Transports Permit Data when it's present
-    if(!!data?.permitStatus) await parseMhrPermitData(data)
+    if(data?.permitStatus) await parseMhrPermitData(data)
 
     // previous location of the Transport Permit (used to cancel the permit)
     data?.previousLocation && parsePreviousLocation(data.previousLocation)

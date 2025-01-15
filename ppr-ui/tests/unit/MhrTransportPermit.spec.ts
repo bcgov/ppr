@@ -23,15 +23,15 @@ import {
 } from '@/components/common'
 import { PartySearch } from '@/components/parties/party'
 import { TaxCertificate, ConfirmCompletion } from '@/components/mhrTransfers'
-import { LocationChange, LocationChangeReview, TransportPermitDetails } from '@/components/mhrTransportPermit'
+import { LocationChange, LocationChangeReview, TransportPermitDetails } from '@/components/mhrTransportPermits'
 import { HomeLocationType, HomeCivicAddress, HomeLandOwnership } from '@/components/mhrRegistration'
 import { HomeLocationReview } from '@/components/mhrRegistration/ReviewConfirm'
 
 import { BaseDialog } from '@/components/dialogs'
-import { MhrInformation, MhrTransportPermit } from '@/views'
+import { MhrInformation, MhrTransportPermit } from '@/pages'
 import { useTransportPermits } from '@/composables'
 import { incompleteRegistrationDialog } from '@/resources/dialogOptions'
-import { MhrRegistrationHomeLocationIF } from '@/interfaces'
+import type { MhrRegistrationHomeLocationIF } from '@/interfaces'
 import InfoChip from '@/components/common/InfoChip.vue'
 
 const store = useStore()

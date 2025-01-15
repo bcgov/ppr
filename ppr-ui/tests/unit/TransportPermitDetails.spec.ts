@@ -1,4 +1,4 @@
-import { TransportPermitDetails } from '@/components/mhrTransportPermit'
+import { TransportPermitDetails } from '@/components/mhrTransportPermits'
 import { createComponent } from './utils'
 import { nextTick } from 'vue'
 import { beforeEach } from 'vitest'

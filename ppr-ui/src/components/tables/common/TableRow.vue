@@ -14,7 +14,7 @@
       v-if="inSelectedHeaders('registrationNumber') || inSelectedHeaders('mhrNumber')"
       :class="{'border-left': (isChild || setIsExpanded), 'fix-td-width': hasRequiredTransfer(item) }"
     >
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col
           v-if="item.changes"
           class="pr-2"
@@ -144,7 +144,7 @@
         <v-tooltip
           v-if="item.registrationDescription === APIMhrDescriptionTypes.CONVERTED"
           class="pa-2"
-          contentClass="top-tooltip"
+          content-class="top-tooltip"
           location="top"
           transition="fade-transition"
         >
@@ -215,7 +215,7 @@
         <v-tooltip
           v-if="!isDraft(item)"
           class="pa-2"
-          contentClass="top-tooltip"
+          content-class="top-tooltip"
           location="top"
           transition="fade-transition"
         >
@@ -310,7 +310,7 @@
       </v-btn>
       <v-tooltip
         v-else-if="!isDraft(item)"
-        contentClass="top-tooltip"
+        content-class="top-tooltip"
         location="top"
         transition="fade-transition"
       >
@@ -340,7 +340,7 @@
       <v-row
         v-if="isPpr && (!isChild || isDraft(item))"
         class="actions pr-4"
-        noGutters
+        no-gutters
       >
         <v-col
           cols="10"
@@ -431,7 +431,7 @@
             >
               <v-tooltip
                 location="bottom right"
-                contentClass="left-tooltip pa-2 mr-2 pl-4"
+                content-class="left-tooltip pa-2 mr-2 pl-4"
                 transition="fade-transition"
                 :disabled="!isRepairersLienAmendDisabled(item)"
               >
@@ -468,7 +468,7 @@
               </v-list-item>
               <v-tooltip
                 location="bottom right"
-                contentClass="left-tooltip pa-2 mr-2"
+                content-class="left-tooltip pa-2 mr-2"
                 transition="fade-transition"
                 :disabled="!isRenewalDisabled(item)"
               >
@@ -509,7 +509,7 @@
       <v-row
         v-else-if="isEnabledMhr(item)"
         class="actions pr-4"
-        noGutters
+        no-gutters
       >
         <v-col
           class="edit-action pa-0"
@@ -655,7 +655,7 @@
       <v-row
         v-else-if="!isPpr && isDraft(item)"
         class="actions pr-4"
-        noGutters
+        no-gutters
       >
         <v-col
           class="edit-action"
@@ -713,14 +713,13 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
-import {
-  getRegistrationSummary, mhRegistrationPDF, registrationPDF, stripChars,
-  multipleWordsToTitleCase, getMHRegistrationSummary, isWithinMinutes
-} from '@/utils'
+import { stripChars, multipleWordsToTitleCase, isWithinMinutes } from '@/utils'
+import { getRegistrationSummary, registrationPDF } from '@/utils/ppr-api-helper'
+import { mhRegistrationPDF, getMHRegistrationSummary } from '@/utils/mhr-api-helper'
 import { useStore } from '@/store/store'
 import InfoChip from '@/components/common/InfoChip.vue'
 
-import {
+import type {
   BaseHeaderIF,
   DraftResultIF,
   MhRegistrationSummaryIF,

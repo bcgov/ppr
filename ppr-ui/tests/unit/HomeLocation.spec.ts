@@ -1,5 +1,5 @@
 import { createComponent } from './utils'
-import { HomeLocation } from '@/views'
+import { HomeLocation } from '@/pages'
 import { MhApiStatusTypes, RouteNames } from '@/enums'
 import { MhrCorrectionStaff } from '@/resources'
 import { useStore } from '@/store/store'

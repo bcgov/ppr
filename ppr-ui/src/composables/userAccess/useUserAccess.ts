@@ -1,25 +1,27 @@
-import { computed, ComputedRef, nextTick } from 'vue'
+import type { ComputedRef} from 'vue';
+import { computed, nextTick } from 'vue'
 import {
   cleanEmpty,
   convertDate,
-  createManufacturer,
-  createQualifiedSupplier,
   fromDisplayPhone,
   getAccountInfoFromAuth,
   getAccountMembers,
   getFeatureFlag,
   getKeyByValue,
-  getMhrManufacturerInfo,
-  getQsServiceAgreements,
-  getQualifiedSupplier,
   hasTruthyValue,
   isObjectEqual,
   requestProductAccess,
-  updateManufacturer,
-  updateProductAccess,
-  updateQualifiedSupplier,
-  updateUserSettings
+  updateProductAccess
 } from '@/utils'
+import {
+  createManufacturer,
+  createQualifiedSupplier,
+  getMhrManufacturerInfo,
+  getQsServiceAgreements,
+  getQualifiedSupplier,
+  updateManufacturer,
+  updateQualifiedSupplier,
+} from '@/utils/mhr-api-helper'
 import {
   AccountProductMemberships,
   ApiHomeTenancyTypes,
@@ -34,7 +36,7 @@ import {
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
 import { useAuth, useNavigation } from '@/composables'
-import {
+import type {
   AddressIF,
   MhrManufacturerInfoIF,
   MhrQsPayloadIF,
@@ -256,7 +258,7 @@ export const useUserAccess = () => {
     if (clearModel) await setMhrQsInformation(defaultQsInfo)
 
     // Add or remove DBA property based on Product Type
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+     
     const { dbaName, ...baseQsInfo } = getMhrQsInformation.value
     const formattedQsInfoModel = [MhrSubTypes.MANUFACTURER, MhrSubTypes.DEALERS].includes(val)
       ? { ...getMhrQsInformation.value, dbaName: getMhrQsInformation.value.dbaName || '' }

@@ -1,7 +1,7 @@
 import { MHRSearchTypes, SearchTypes } from '@/resources'
 import { APIMHRSearchTypes, APIMHRMapSearchTypes, ErrorCategories } from '@/enums'
 import { axios } from '@/utils'
-import { SearchResponseI } from '@/interfaces'
+import type { SearchResponseI } from '@/interfaces'
 import { StatusCodes } from 'http-status-codes'
 
 const SEARCH_RESULT_SIZE = 100

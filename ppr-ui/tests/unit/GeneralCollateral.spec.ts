@@ -16,7 +16,6 @@ describe('General Collateral tests', () => {
       valid: false,
       showInvalid: false
     })
-    wrapper = await createComponent(GeneralCollateral, { isSummary: false, setShowInvalid: false })
   })
 
   it('renders summary view when prop set', async () => {

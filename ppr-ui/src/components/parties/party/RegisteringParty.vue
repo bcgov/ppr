@@ -5,7 +5,7 @@
   >
     <v-container class="pa-0">
       <v-row
-        noGutters
+        no-gutters
         class="pb-8 pt-2 rounded-top"
       >
         <v-col>
@@ -35,7 +35,7 @@
                     class="generic-label"
                   >
                     <v-row
-                      noGutters
+                      no-gutters
                       :aria-label="`${isBusiness(item) ? 'Business' : 'Person'} ${getName(item)}`"
                     >
                       <v-col
@@ -142,8 +142,8 @@
                     <v-expand-transition>
                       <div class="edit-Party-container pa-0 col-12">
                         <edit-party
-                          :isRegisteringParty="true"
-                          @resetEvent="resetData"
+                          :is-registering-party="true"
+                          @reset-event="resetData"
                         />
                       </div>
                     </v-expand-transition>
@@ -196,13 +196,13 @@ import { BaseAddress } from '@/composables/address'
 import { useParty } from '@/composables/useParty'
 import { useRegisteringParty } from '@/composables/useRegisteringParty'
 import { RegistrationFlowType, ActionTypes } from '@/enums'
-import { PartyIF } from '@/interfaces'
+import type { PartyIF } from '@/interfaces'
 import { editTableHeaders, registeringTableHeaders } from '@/resources'
 import { PartyAddressSchema } from '@/schemas'
 import { ErrorContact } from '@/components/common'
 import { storeToRefs } from 'pinia'
 import { usePprRegistration } from '@/composables'
-import { partyCodeAccount } from '@/utils'
+import { partyCodeAccount } from '@/utils/ppr-api-helper'
 import { useSecuredParty } from '@/composables/parties'
 
 export default defineComponent({

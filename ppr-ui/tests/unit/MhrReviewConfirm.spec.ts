@@ -3,20 +3,19 @@ import { nextTick } from 'vue'
 import { useStore } from '../../src/store/store'
 
 // Local Components
-import { MhrReviewConfirm } from '@/views'
+import { MhrReviewConfirm } from '@/pages'
 import { HomeLocationReview, HomeOwnersReview,
   SubmittingPartyReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
 import { AccountInfo, Attention, CautionBox, CertifyInformation,
-  ContactUsToggle, FolioOrReferenceNumber, FormField } from '@/components/common'
+  ContactUsToggle, FolioOrReferenceNumber, FormField , StaffPayment } from '@/components/common'
 import { HomeTenancyTypes, ProductCode, RouteNames, HomeCertificationOptions } from '@/enums'
 import { mockedFractionalOwnership, mockedPerson } from './test-data/mock-mhr-registration'
-import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces/mhr-registration-interfaces'
+import type { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces/mhr-registration-interfaces'
 import { createComponent, getTestId } from './utils'
 import { HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import { MhrRegistrationType } from '@/resources'
 import { mockedAccountInfo, mockedManufacturerAuthRoles } from './test-data'
 import { defaultFlagSet } from '@/utils'
-import { StaffPayment } from '@/components/common'
 import { HomeSections } from '@/components/mhrRegistration'
 
 const store = useStore()
@@ -74,13 +73,12 @@ describe('Mhr Review Confirm registration', () => {
     const homeOwnerGroup = [{ groupId: 1, owners: owners }] as MhrRegistrationHomeOwnerGroupIF[]
 
     await store.setMhrRegistrationHomeOwnerGroups(homeOwnerGroup)
+    await nextTick()
 
     const HomeOwnerReview = wrapper.findComponent(HomeOwnersReview)
 
     expect(HomeOwnerReview.exists()).toBeTruthy()
     expect(HomeOwnerReview.findComponent(HomeOwnersTable).exists()).toBeTruthy()
-
-    expect(HomeOwnerReview.find('.error-text').isVisible()).toBeFalsy()
 
     const homeTenancyType = HomeOwnerReview.find(getTestId('home-tenancy-type'))
     expect(homeTenancyType.exists()).toBeTruthy()

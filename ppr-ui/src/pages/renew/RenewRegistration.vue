@@ -135,7 +135,8 @@ import {
 } from '@/components/parties/summaries'
 import { notCompleteDialog } from '@/resources/dialogOptions'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import { getFeatureFlag, getFinancingStatement, pacificDate } from '@/utils'
+import { getFinancingStatement } from '@/utils/ppr-api-helper'
+import { getFeatureFlag, pacificDate } from '@/utils'
 import type {
   UIRegistrationTypes
 } from '@/enums';

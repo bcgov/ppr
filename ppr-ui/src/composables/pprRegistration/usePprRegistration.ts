@@ -1,5 +1,5 @@
 import { APIRegistrationTypes, RegistrationFlowType } from '@/enums'
-import {
+import type {
   AddCollateralIF,
   AddPartiesIF,
   CertifyIF,
@@ -10,7 +10,8 @@ import {
 import { AllRegistrationTypes } from '@/resources'
 import { useStore } from '@/store/store'
 import { cloneDeep } from 'lodash'
-import { computed, ComputedRef } from 'vue'
+import type { ComputedRef } from 'vue';
+import { computed } from 'vue'
 import { getFeatureFlag } from '@/utils'
 import { storeToRefs } from 'pinia'
 
@@ -45,14 +46,13 @@ export const usePprRegistration = () => {
     setRegistrationNumber(statement.baseRegistrationNumber)
     setRegistrationFlowType(flowType)
     setFolioOrReferenceNumber('')
-
     const registrationType = AllRegistrationTypes.find((reg) =>
       reg.registrationTypeAPI === statement.type)
 
     setRegistrationType(registrationType)
 
     // Conditionally parse Securities Act Notices
-    if (!!statement?.securitiesActNotices){
+    if (statement?.securitiesActNotices){
       // Map the notices to include an empty array for Orders when there is no pre-existing orders on the notice
       const mappedNotices = statement.securitiesActNotices.map(notice => ({
         ...notice,

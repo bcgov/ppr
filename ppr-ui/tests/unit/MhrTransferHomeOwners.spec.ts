@@ -1,7 +1,7 @@
 import { nextTick } from 'vue'
 import { useStore } from '../../src/store/store'
 
-import { HomeOwners } from '@/views'
+import { HomeOwners } from '@/pages'
 import {
   AddEditHomeOwner,
   HomeOwnersTable,
@@ -30,7 +30,7 @@ import {
   mockedUnitNotes3
 } from './test-data'
 import { createComponent, getTestId } from './utils'
-import {
+import type {
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeOwnerIF,
   TransferTypeSelectIF
@@ -46,6 +46,7 @@ import {
 import { DeathCertificate, SupportingDocuments } from '@/components/mhrTransfers'
 import { transferSupportingDocuments, transfersErrors, MixedRolesErrors } from '@/resources'
 import { useHomeOwners, useNewMhrRegistration } from '@/composables'
+import flushPromises from 'flush-promises'
 
 const store = useStore()
 
@@ -866,7 +867,7 @@ describe('Home Owners', () => {
     // setup transfer type to test
     const TRANSFER_TYPE = ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL
 
-    let homeOwnerGroup = [{ groupId: 1, owners: [mockedPerson], type: '' }]
+    const homeOwnerGroup = [{ groupId: 1, owners: [mockedPerson], type: '' }]
     await store.setMhrTransferHomeOwnerGroups(homeOwnerGroup)
 
     const ownersTable = wrapper.findComponent(HomeOwnersTable)
@@ -1032,6 +1033,7 @@ describe('Home Owners', () => {
       .toContain(transfersErrors.allOwnersHaveDeathCerts[TRANSFER_TYPE])
 
     await homeOwners.find(getTestId('add-person-btn')).trigger('click')
+    wrapper.vm.showError = true
     await nextTick()
 
     // check error message under the Add a Person button

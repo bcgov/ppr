@@ -2,8 +2,8 @@
 import { useStore } from '../../src/store/store'
 
 // Components
-import { SearchedResultMhr } from '@/components/tables'
-import { MHRSearch } from '@/views'
+import { SearchedResultsMhr } from '@/components/tables/mhr'
+import { MHRSearch } from '@/pages'
 
 // Other
 import { mockedMHRSearchResponse } from './test-data'
@@ -36,20 +36,20 @@ describe('Search component', () => {
     expect(wrapper.find(resultsInfo).exists()).toBe(false)
     expect(wrapper.find(noResultsInfo).exists()).toBe(false)
     expect(wrapper.find(folioHeader).exists()).toBe(false)
-    expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(false)
+    expect(wrapper.findComponent(SearchedResultsMhr).exists()).toBe(false)
   })
 
   it('renders the Results component and displays search data elements with filled result set.', async () => {
     await store.setManufacturedHomeSearchResults(mockedMHRSearchResponse[UIMHRSearchTypes.MHRMHR_NUMBER])
     await nextTick()
     expect(wrapper.find(noResultsInfo).exists()).toBe(false)
-    expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResultsMhr).exists()).toBe(true)
   })
 
   it('renders the Results component and displays search data elements with empty result set.', async () => {
     await store.setManufacturedHomeSearchResults({ ...mockedMHRSearchResponse[UIMHRSearchTypes.MHRMHR_NUMBER], totalResultsSize: 0, results: [] })
     await nextTick()
     expect(wrapper.find(noResultsInfo).exists()).toBe(true)
-    expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResultsMhr).exists()).toBe(true)
   })
 })

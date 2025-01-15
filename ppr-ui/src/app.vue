@@ -16,12 +16,12 @@ import {
   getFees,
   getFeatureFlag,
   getKeycloakRoles,
-  getPPRUserSettings,
   getSbcFromAuth,
   updateLdUser,
   axios,
   parsePayDetail
 } from '@/utils'
+import { getPPRUserSettings  } from '@/utils/ppr-api-helper'
 import { FeeCodes } from '@/composables/fees/enums'
 import {
   APIRegistrationTypes,

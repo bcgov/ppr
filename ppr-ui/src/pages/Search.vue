@@ -93,7 +93,7 @@
         no-gutters
         class="pt-9"
       >
-        <SearchedResultPpr
+        <SearchedResultsPpr
           class="rounded-top py-10"
           @selected-matches="updateSelectedMatches"
           @submit="submitCheck()"
@@ -116,13 +116,18 @@ import {
   saveResultsError,
   saveSelectionsError
 } from '@/resources/dialogOptions'
-import { getFeatureFlag, submitSelected, successfulPPRResponses, updateSelected, pacificDate } from '@/utils'
+import { getFeatureFlag, pacificDate } from '@/utils'
+import { submitSelected, successfulPPRResponses, updateSelected } from '@/utils/ppr-api-helper'
 import type { SearchResultIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
 import { useAuth, useNavigation } from '@/composables'
+import SearchedResultsPpr from '@/components/tables/ppr/SearchedResultsPpr.vue'
 
 export default defineComponent({
   name: 'Search',
+  components: {
+    SearchedResultsPpr
+  },
   props: {
     appReady: {
       type: Boolean,
