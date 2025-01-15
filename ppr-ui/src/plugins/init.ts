@@ -13,7 +13,6 @@ export default defineNuxtPlugin(async (nuxtApp) => {
 
   // Local development only
   if (useRuntimeConfig().public.VUE_APP_LOCAL_DEV === 'true') {
-    console.log('Local development detected.')
     // Set all feature flags to true
     setAllFlagDefaults(true)
   }

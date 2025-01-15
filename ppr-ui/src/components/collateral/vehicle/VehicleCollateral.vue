@@ -6,7 +6,7 @@
   >
     <v-row
       v-if="vehicleCollateral && vehicleCollateral.length > 0"
-      noGutters
+      no-gutters
       :class="registrationFlowType !== RegistrationFlowType.AMENDMENT ? 'ps-6' : ''"
     >
       <v-col
@@ -52,7 +52,7 @@
                   <div v-if="item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
                     <v-chip
                       v-if="item.action === ActionTypes.REMOVED"
-                      xSmall
+                      x-small
                       variant="elevated"
                       color="greyLighten"
                     >
@@ -60,7 +60,7 @@
                     </v-chip>
                     <v-chip
                       v-else
-                      xSmall
+                      x-small
                       variant="elevated"
                       color="#1669BB"
                     >
@@ -109,7 +109,7 @@
   >
     <v-row
       v-if="(hasVehicleCollateral() || hasOptionalVehicleCollateral()) && !isRepairersLienAmendment"
-      noGutters
+      no-gutters
       class="pb-4 pt-10 pl-1"
     >
       <v-col>
@@ -128,7 +128,7 @@
     <v-row
       v-if="(hasVehicleCollateral() || hasOptionalVehicleCollateral())"
       :class="showErrorBar ? 'error-margin' : ''"
-      noGutters
+      no-gutters
     >
       <v-col>
         <div>
@@ -139,10 +139,10 @@
               class="add-collateral-container"
             >
               <EditCollateral
-                :activeIndex="activeIndex"
-                :invalidSection="invalidSection"
-                :setShowErrorBar="showErrorBar"
-                @resetEvent="resetData"
+                :active-index="activeIndex"
+                :invalid-section="invalidSection"
+                :set-show-error-bar="showErrorBar"
+                @reset-event="resetData"
               />
             </v-card>
           </v-expand-transition>
@@ -151,7 +151,7 @@
     </v-row>
     <v-row
       v-if="(hasVehicleCollateral() || hasOptionalVehicleCollateral())"
-      noGutters
+      no-gutters
       class="pt-4"
     >
       <v-col :class="{ 'box-shadow-left': showErrorBar && activeIndex >= 0 }">
@@ -187,11 +187,11 @@
                   <td :colspan="getNumCols">
                     <div class="edit-vehicle-container col-12">
                       <edit-collateral
-                        :activeIndex="activeIndex"
-                        :invalidSection="invalidSection"
-                        :setShowErrorBar="showErrorBar"
-                        @removeVehicle="removeVehicle($event)"
-                        @resetEvent="resetData"
+                        :active-index="activeIndex"
+                        :invalid-section="invalidSection"
+                        :set-show-error-bar="showErrorBar"
+                        @remove-vehicle="removeVehicle($event)"
+                        @reset-event="resetData"
                       />
                     </div>
                   </td>
@@ -205,7 +205,7 @@
                     <div v-if="item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
                       <v-chip
                         v-if="item.action === ActionTypes.REMOVED"
-                        xSmall
+                        x-small
                         variant="elevated"
                         color="greyLighten"
                       >
@@ -213,7 +213,7 @@
                       </v-chip>
                       <v-chip
                         v-else
-                        xSmall
+                        x-small
                         variant="elevated"
                         color="#1669BB"
                       >
@@ -237,7 +237,7 @@
                       <span v-if="isRepairersLienAmendment && !item.action">
                         <v-tooltip
                           location="top"
-                          contentClass="top-tooltip pa-4 mr-2"
+                          content-class="top-tooltip pa-4 mr-2"
                           transition="fade-transition"
                           :disabled="!isLastDelete"
                         >
@@ -419,7 +419,7 @@ import {
 import { useStore } from '@/store/store'
 import { EditCollateral } from '.'
 import { ActionTypes, APIVehicleTypes, RegistrationFlowType, APIRegistrationTypes } from '@/enums'
-import { VehicleCollateralIF } from '@/interfaces'
+import type { VehicleCollateralIF } from '@/interfaces'
 import { vehicleTableHeaders, VehicleTypes } from '@/resources'
 import { useVehicle } from './factories/useVehicle'
 import { cloneDeep } from 'lodash'
@@ -555,7 +555,7 @@ export default defineComponent({
         currentVehicle.action = ActionTypes.REMOVED
         newVCollateral.splice(index, 1, currentVehicle)
       } else {
-        // eslint-disable-line
+         
         newVCollateral.splice(index, 1)
       }
       setVehicleCollateral(newVCollateral)

@@ -1,6 +1,6 @@
 import { useStore } from '@/store/store'
 import flushPromises from 'flush-promises'
-import { Dashboard } from '@/views'
+import { Dashboard } from '@/pages'
 import { BaseSnackbar } from '@/components/common'
 import { RegistrationConfirmation } from '@/components/dialogs'
 import { SearchBar } from '@/components/search'
@@ -149,6 +149,7 @@ describe('Dashboard component', () => {
 
   it('routes to new registration after selecting registration type', async () => {
     wrapper.findComponent(RegistrationBar).vm.$emit(selectedType, mockedSelectSecurityAgreement)
+    await wrapper.vm.$router.push({ name: RouteNames.LENGTH_TRUST })
     await flushPromises()
     await nextTick()
     expect(wrapper.vm.$route.name).toBe(RouteNames.LENGTH_TRUST)

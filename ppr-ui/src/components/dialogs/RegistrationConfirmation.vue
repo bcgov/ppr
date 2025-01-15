@@ -7,7 +7,7 @@
   >
     <v-card>
       <v-row
-        noGutters
+        no-gutters
         class="pl-10 pt-7"
       >
         <v-col cols="11">
@@ -24,20 +24,20 @@
           <v-autocomplete
             id="debtor-drop"
             v-model="userInput"
-            autoSelectFirst
+            auto-select-first
             :items="debtors"
             variant="filled"
             clearable
             class="debtor-drop"
             no-data-text="Debtor not found."
             label="Enter a Debtor (last name of individual person or full business name)"
-            :errorMessages="validationErrors ? validationErrors : ''"
-            persistentHint
-            returnObject
+            :error-messages="validationErrors ? validationErrors : ''"
+            persistent-hint
+            return-object
           />
         </v-col>
         <v-col cols="1">
-          <v-row noGutters>
+          <v-row no-gutters>
             <v-btn
               id="close-btn"
               color="primary"
@@ -51,7 +51,7 @@
         </v-col>
       </v-row>
       <v-row
-        noGutters
+        no-gutters
         justify="center"
         class="pt-1 pb-7"
       >
@@ -99,7 +99,7 @@ import { useStore } from '@/store/store'
 
 // local
 import { DebtorNameIF, DialogOptionsIF } from '@/interfaces' // eslint-disable-line
-import { debtorNames } from '@/utils'
+import { debtorNames } from '@/utils/ppr-api-helper'
 
 export default defineComponent({
   props: {

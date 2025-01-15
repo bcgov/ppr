@@ -35,7 +35,7 @@ describe('CollapsibleCard', () => {
     expect(cardSlots.text()).toContain('Main Content')
 
     // collapse the card and slots
-    collapsibleCard.vm.toggleCardOpen()
+    wrapper.vm.toggleCardOpen()
     await nextTick()
 
     expect(collapsibleCard.find(getTestId('card-slots')).exists()).toBe(false)

@@ -1,10 +1,11 @@
 // Libraries
 import { axios } from '@/utils/axios-ppr'
 import { StatusCodes } from 'http-status-codes'
-import { StaffPaymentOptions } from '@/enums'
+import type { ErrorCodes, SettingOptions } from '@/enums';
+import { StaffPaymentOptions , ErrorCategories } from '@/enums'
 
 // Interfaces
-import {
+import type {
   AmendmentStatementIF,
   DischargeRegistrationIF,
   DraftIF,
@@ -20,11 +21,10 @@ import {
   RenewRegistrationIF,
   ErrorIF,
   BaseHeaderIF,
-  RegistrationSortIF
+  RegistrationSortIF,
+  StaffPaymentIF
 } from '@/interfaces'
-import { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-history-response-interface'
-import { StaffPaymentIF } from '@/interfaces'
-import { ErrorCategories, ErrorCodes, SettingOptions } from '@/enums'
+import type { SearchHistoryResponseIF } from '@/interfaces/ppr-api-interfaces/search-history-response-interface'
 
 /**
  * Actions that provide integration with the ppr api.

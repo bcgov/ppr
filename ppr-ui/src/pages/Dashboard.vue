@@ -171,7 +171,9 @@ import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { ProductStatus, RouteNames } from '@/enums'
-import { getFeatureFlag, getQualifiedSupplier, searchHistory, updateQualifiedSupplier } from '@/utils'
+import { getFeatureFlag } from '@/utils'
+import { searchHistory } from '@/utils/ppr-api-helper'
+import { getQualifiedSupplier, updateQualifiedSupplier } from '@/utils/mhr-api-helper'
 import { useSearch } from '@/composables/useSearch'
 import type {
   ErrorIF,

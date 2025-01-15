@@ -1,4 +1,4 @@
-import { QsInformation } from '@/views'
+import { QsInformation } from '@/pages'
 import { createComponent, getTestId, setupMockUser } from './utils'
 import { defaultFlagSet } from '@/utils'
 import { createPinia, setActivePinia } from 'pinia'

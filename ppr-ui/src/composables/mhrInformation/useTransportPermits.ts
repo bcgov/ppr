@@ -1,16 +1,19 @@
-import { computed, ComputedRef, nextTick, ref, Ref } from 'vue'
+import type { ComputedRef, Ref } from 'vue';
+import { computed, nextTick, ref } from 'vue'
 import {
   createDateFromPacificTime,
-  deleteEmptyProperties,
   fromDisplayPhone,
   getFeatureFlag,
-  submitMhrTransportPermit
 } from '@/utils'
+import {
+  deleteEmptyProperties,
+  submitMhrTransportPermit
+} from '@/utils/mhr-api-helper'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { locationChangeTypes } from '@/resources/mhr-transport-permits/transport-permits'
 import { LocationChangeTypes } from '@/enums/transportPermits'
-import {
+import type {
   AddressIF,
   MhrRegistrationHomeLocationIF,
   MhrTransportPermitIF,

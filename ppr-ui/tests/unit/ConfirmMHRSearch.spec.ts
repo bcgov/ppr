@@ -1,9 +1,9 @@
 import { nextTick } from 'vue'
 import { createComponent } from "./utils"
-import { ConfirmMHRSearch } from '@/views'
+import { ConfirmMHRSearch } from '@/pages'
 import { useStore } from '@/store/store'
 import flushPromises from 'flush-promises'
-import { SearchedResultMhr } from '@/components/tables'
+import { SearchedResultsMhr } from '@/components/tables/mhr'
 import { RouteNames } from '@/enums'
 import { FolioNumberSummary, StickyContainer } from '@/components/common'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
@@ -27,7 +27,7 @@ describe('Confirm MHRSearch view', () => {
 
   it('renders Confirm Registration View with child components', () => {
     expect(wrapper.findComponent(ConfirmMHRSearch).exists()).toBe(true)
-    expect(wrapper.findComponent(SearchedResultMhr).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResultsMhr).exists()).toBe(false)
     expect(wrapper.vm.$route.name).toBe(RouteNames.MHRSEARCH_CONFIRM)
     expect(wrapper.vm.appReady).toBe(true)
     expect(wrapper.vm.dataLoaded).toBe(true)

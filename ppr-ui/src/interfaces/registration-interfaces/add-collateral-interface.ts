@@ -1,4 +1,4 @@
-import { GeneralCollateralIF, VehicleCollateralIF } from '@/interfaces'
+import type { GeneralCollateralIF, VehicleCollateralIF } from '@/interfaces'
 
 // New registration add vehicle and general collateral interface.
 export interface AddCollateralIF {

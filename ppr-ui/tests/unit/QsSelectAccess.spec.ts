@@ -1,4 +1,4 @@
-import { QsSelectAccess } from '@/views'
+import { QsSelectAccess } from '@/pages'
 import { FormCard, SubProductSelector } from '@/components/common'
 import { createComponent } from './utils'
 import { defaultFlagSet } from '@/utils'

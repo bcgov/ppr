@@ -2,7 +2,7 @@
   <!-- Lien Information -->
   <v-row
     id="lien-information"
-    noGutters
+    no-gutters
     class="pt-10"
   >
     <v-card
@@ -48,7 +48,7 @@ import { useRouter } from 'vue-router'
 import { useMhrInformation } from '@/composables'
 import { APIMHRMapSearchTypes, APISearchTypes, RouteNames, UIMHRSearchTypes } from '@/enums'
 import { useStore } from '@/store/store'
-import { mhrSearch } from '@/utils'
+import { mhrSearch } from '@/utils/mhr-api-helper'
 import { storeToRefs } from 'pinia'
 import {
   computed,

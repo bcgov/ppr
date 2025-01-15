@@ -265,22 +265,26 @@ import {
   UnitNoteDocTypes
 } from '@/enums'
 import {
-  addMHRegistrationSummary,
-  addRegistrationSummary,
   convertDate,
+  hasTruthyValue,
+  setupFinancingStatementDraft
+} from '@/utils'
+import {
+  addRegistrationSummary,
   deleteDraft,
-  deleteMhrDraft,
-  deleteMhRegistrationSummary,
   deleteRegistrationSummary,
   draftHistory,
-  fetchMhRegistration,
-  getMHRegistrationSummary,
   getRegistrationSummary,
-  hasTruthyValue,
   registrationHistory,
-  setupFinancingStatementDraft,
   updateUserSettings
-} from '@/utils'
+} from '@/utils/ppr-api-helper'
+import {
+  addMHRegistrationSummary,
+  deleteMhrDraft,
+  deleteMhRegistrationSummary,
+  fetchMhRegistration,
+  getMHRegistrationSummary
+} from '@/utils/mhr-api-helper'
 import {
   amendConfirmationDialog,
   dischargeConfirmationDialog,

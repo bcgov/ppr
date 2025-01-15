@@ -135,8 +135,9 @@ import { BaseDialog } from '@/components/dialogs'
 import { RouteNames, UIMHRSearchTypeValues, StaffPaymentOptions, ErrorCategories } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { notCompleteSearchDialog } from '@/resources/dialogOptions'
-import { getFeatureFlag, submitSelectedMhr } from '@/utils'
-import { SearchedResultMhr } from '@/components/tables'
+import { getFeatureFlag } from '@/utils'
+import { submitSelectedMhr } from '@/utils/mhr-api-helper'
+import { SearchedResultsMhr } from '@/components/tables/mhr'
 import { uniqBy } from 'lodash'
 
 import type { DialogOptionsIF , StaffPaymentIF } from '@/interfaces'
@@ -150,7 +151,7 @@ export default defineComponent({
     BaseDialog,
     FolioNumberSummary,
     StickyContainer,
-    SearchedResultMhr,
+    SearchedResultsMhr,
     StaffPayment
   },
   props: {

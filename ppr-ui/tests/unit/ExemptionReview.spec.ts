@@ -1,5 +1,5 @@
 import { nextTick } from 'vue'
-import { ExemptionReview } from '@/views'
+import { ExemptionReview } from '@/pages'
 import {
   createComponent,
   getTestId,
@@ -16,15 +16,14 @@ import {
   FormCard,
   LienAlert,
   ReviewCard
-} from '@/components/common'
+, StaffPayment } from '@/components/common'
 import { PartySearch } from '@/components/parties/party'
 import { ConfirmCompletion } from '@/components/mhrTransfers'
-import { StaffPayment } from '@/components/common'
 import { axe } from 'vitest-axe'
 import { useStore } from '@/store/store'
 import { RouteNames, UnitNoteDocTypes } from '@/enums'
 import { mockedAddress } from './test-data'
-import { TransportPermitDetails } from '@/components/mhrTransportPermit'
+import { TransportPermitDetails } from '@/components/mhrTransportPermits'
 
 const store = useStore()
 

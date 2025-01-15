@@ -1,6 +1,5 @@
 import type { VueWrapper } from '@vue/test-utils';
 import { mount } from '@vue/test-utils'
-import { useStore } from '@/store/store'
 import { MhApiStatusTypes, MhrSubTypes, ProductCode, RouteNames } from '@/enums'
 import type { RouterMock } from 'vue-router-mock';
 import { createRouterMock, injectRouterMock } from 'vue-router-mock'
@@ -11,7 +10,8 @@ import {
   mockTransportPermitPreviousLocation
 } from '../test-data'
 import { nextTick } from 'vue'
-import routerOptions  from '@/app/router.options'
+import { useStore } from '@/store/store'
+import MockNuxtPage from '../mocks/MockNuxtPage.vue'
 import {
   AddCollateral,
   AddSecuredPartiesAndDebtors,

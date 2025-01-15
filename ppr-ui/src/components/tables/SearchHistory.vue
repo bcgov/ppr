@@ -4,7 +4,7 @@
     role="region"
   >
     <v-row
-      noGutters
+      no-gutters
       class="pt-4"
     >
       <v-col cols="12">
@@ -12,7 +12,7 @@
           v-if="searchHistory"
           id="search-history-table"
           height="20rem"
-          fixedHeader
+          fixed-header
         >
           <template #default>
             <thead>
@@ -27,8 +27,8 @@
                   <!-- Date Sort Icon/Button -->
                   <SortingIcon
                     v-if="header.sortable"
-                    :sortAsc="sortAsc"
-                    @sortEvent="dateSortHandler(searchHistory, 'searchDateTime', $event)"
+                    :sort-asc="sortAsc"
+                    @sort-event="dateSortHandler(searchHistory, 'searchDateTime', $event)"
                   />
                 </th>
               </tr>
@@ -159,7 +159,7 @@
                   <v-tooltip
                     v-else
                     class="pa-2"
-                    contentClass="top-tooltip"
+                    content-class="top-tooltip"
                     location="top"
                     transition="fade-transition"
                   >
@@ -269,9 +269,12 @@ import {
   toRefs, watch
 } from 'vue'
 import { useStore } from '@/store/store'
-import { SearchCriteriaIF, SearchResponseIF } from '@/interfaces'
+import type { SearchCriteriaIF, SearchResponseIF } from '@/interfaces'
 import { MHRSearchTypes, searchHistoryTableHeaders, searchHistoryTableHeadersStaff, SearchTypes } from '@/resources'
-import { convertDate, searchPDF, submitSelected, successfulPPRResponses, searchMhrPDF, delayActions } from '@/utils'
+import { convertDate } from '@/utils'
+import { searchPDF, submitSelected, successfulPPRResponses } from '@/utils/ppr-api-helper'
+import { searchMhrPDF, delayActions } from '@/utils/mhr-api-helper'
+
 import { ErrorContact } from '../common'
 import { useSearch } from '@/composables/useSearch'
 import { cloneDeep } from 'lodash' // eslint-disable-line

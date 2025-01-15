@@ -125,7 +125,8 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { getMhrHistory, pacificDate , getFeatureFlag } from '@/utils'
+import { getMhrHistory } from '@/utils/mhr-api-helper'
+import { pacificDate , getFeatureFlag } from '@/utils'
 import { useAuth, useNavigation } from '@/composables'
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'

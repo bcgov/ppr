@@ -1,4 +1,4 @@
-import { MhrHistory } from '@/views'
+import { MhrHistory } from '@/pages'
 import { nextTick } from 'vue'
 import { createComponent, setupMockStaffUser } from './utils'
 import { defaultFlagSet, pacificDate } from '@/utils'

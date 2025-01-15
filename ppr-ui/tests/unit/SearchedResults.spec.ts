@@ -1,8 +1,8 @@
-import { SearchedResultPpr } from '@/components/tables'
+import { SearchedResultsPpr } from '@/components/tables'
 import { mockedSearchResponse } from './test-data'
 import { APISearchTypes, UISearchTypes } from '@/enums'
 import { useStore } from '@/store/store'
-import { SearchResponseIF } from '@/interfaces'
+import type { SearchResponseIF } from '@/interfaces'
 import { createComponent } from './utils'
 import { searchTableHeaders } from '@/resources'
 
@@ -32,11 +32,11 @@ describe('Test result table with no results', () => {
 
   beforeEach(async () => {
     await store.setSearchResults(noResults)
-    wrapper = await createComponent(SearchedResultPpr)
+    wrapper = await createComponent(SearchedResultsPpr)
   })
 
   it('doesnt display table if there are no results', async () => {
-    expect(wrapper.findComponent(SearchedResultPpr).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResultsPpr).exists()).toBe(true)
     expect(wrapper.vm.searched).toBeTruthy()
     expect(wrapper.vm.searchValue).toEqual(noResults.searchQuery.criteria.value)
     expect(wrapper.vm.totalResultsLength).toEqual(noResults.totalResultsSize)
@@ -56,11 +56,11 @@ describe('Serial number results', () => {
 
   beforeEach(async () => {
     await store.setSearchResults(testResults)
-    wrapper = await createComponent(SearchedResultPpr)
+    wrapper = await createComponent(SearchedResultsPpr)
   })
 
   it('renders Results Component with serial number results data', () => {
-    expect(wrapper.findComponent(SearchedResultPpr).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResultsPpr).exists()).toBe(true)
     expect(wrapper.vm.searched).toBeTruthy()
     expect(wrapper.vm.searchValue).toEqual(testResults.searchQuery.criteria.value)
     expect(wrapper.vm.headers).toStrictEqual(searchTableHeaders.SERIAL_NUMBER)
@@ -96,11 +96,11 @@ describe('Individual debtor results', () => {
 
   beforeEach(async () => {
     await store.setSearchResults(testResults)
-    wrapper = await createComponent(SearchedResultPpr)
+    wrapper = await createComponent(SearchedResultsPpr)
   })
 
   it('renders Results Component with individual debtor name results data', () => {
-    expect(wrapper.findComponent(SearchedResultPpr).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResultsPpr).exists()).toBe(true)
     expect(wrapper.vm.searched).toBeTruthy()
     expect(wrapper.vm.searchValue).toEqual(testResults.searchQuery.criteria.value)
     expect(wrapper.vm.headers).toStrictEqual(searchTableHeaders.INDIVIDUAL_DEBTOR)
@@ -141,11 +141,11 @@ describe('Business debtor results', () => {
 
   beforeEach(async () => {
     await store.setSearchResults(testResults)
-    wrapper = await createComponent(SearchedResultPpr)
+    wrapper = await createComponent(SearchedResultsPpr)
   })
 
   it('renders Results Component with business debtor name results data', () => {
-    expect(wrapper.findComponent(SearchedResultPpr).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResultsPpr).exists()).toBe(true)
     expect(wrapper.vm.searched).toBeTruthy()
     expect(wrapper.vm.searchValue).toEqual(testResults.searchQuery.criteria.value)
     expect(wrapper.vm.headers).toStrictEqual(searchTableHeaders.BUSINESS_DEBTOR)
@@ -176,11 +176,11 @@ describe('Manufactured home results', () => {
 
   beforeEach(async () => {
     await store.setSearchResults(testResults)
-    wrapper = await createComponent(SearchedResultPpr)
+    wrapper = await createComponent(SearchedResultsPpr)
   })
 
   it('renders Results Component with manufactured home results data', () => {
-    expect(wrapper.findComponent(SearchedResultPpr).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResultsPpr).exists()).toBe(true)
     expect(wrapper.vm.searched).toBeTruthy()
     expect(wrapper.vm.searchValue).toEqual(testResults.searchQuery.criteria.value)
     expect(wrapper.vm.headers).toStrictEqual(searchTableHeaders.MHR_NUMBER)
@@ -216,11 +216,11 @@ describe('Aircraft results', () => {
 
   beforeEach(async () => {
     await store.setSearchResults(testResults)
-    wrapper = await createComponent(SearchedResultPpr)
+    wrapper = await createComponent(SearchedResultsPpr)
   })
 
   it('renders Results Component with aircraft results data', () => {
-    expect(wrapper.findComponent(SearchedResultPpr).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResultsPpr).exists()).toBe(true)
     expect(wrapper.vm.searched).toBeTruthy()
     expect(wrapper.vm.searchValue).toEqual(testResults.searchQuery.criteria.value)
     expect(wrapper.vm.headers).toStrictEqual(searchTableHeaders.AIRCRAFT_DOT)
@@ -254,11 +254,11 @@ describe('Registration number results', () => {
 
   beforeEach(async () => {
     await store.setSearchResults(testResults)
-    wrapper = await createComponent(SearchedResultPpr)
+    wrapper = await createComponent(SearchedResultsPpr)
   })
 
   it('renders Results Component with registration number results data', () => {
-    expect(wrapper.findComponent(SearchedResultPpr).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResultsPpr).exists()).toBe(true)
     expect(wrapper.vm.searched).toBeTruthy()
     expect(wrapper.vm.searchValue).toEqual(testResults.searchQuery.criteria.value)
     expect(wrapper.vm.headers).toStrictEqual(searchTableHeaders.REGISTRATION_NUMBER)

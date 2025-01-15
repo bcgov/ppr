@@ -85,16 +85,6 @@ export default defineNuxtConfig({
     icons: ['mdi']
   },
   ssr: false,
-  server: {
-    hmr: {
-      overlay: false, // Disable the error overlay
-      clientPort: 443, // Specify the client port if needed
-    },
-    watch: {
-      usePolling: true, // Use polling for file changes
-      interval: 1000, // Polling interval in milliseconds
-    },
-  },
   modules: ['@pinia/nuxt', '@nuxt/eslint', 'nuxt-lodash', '@nuxt/test-utils/module',
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {

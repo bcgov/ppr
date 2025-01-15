@@ -1,6 +1,6 @@
 import { nextTick } from 'vue'
 
-import { HomeOwners, MhrRegistration } from '@/views'
+import { HomeOwners, MhrRegistration } from '@/pages'
 import {
   AddEditHomeOwner,
   HomeOwnersTable,
@@ -12,7 +12,7 @@ import {
 import { SimpleHelpToggle } from '@/components/common'
 import { mockedPerson, mockedOrganization, mockedExecutor, mockedOwner, mockedMhrRegistration } from './test-data'
 import { createComponent, getTestId } from './utils'
-import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
+import type { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { HomeTenancyTypes, RouteNames } from '@/enums'
 import { MhrCorrectionStaff, MixedRolesErrors } from '@/resources'
 import { useStore } from '../../src/store/store'

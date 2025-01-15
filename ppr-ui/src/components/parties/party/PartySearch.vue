@@ -14,7 +14,7 @@
           variant="filled"
           color="primary"
           :label="searchFieldLabel"
-          persistentHint
+          persistent-hint
           hint="Enter at least the first 3 characters"
           :class="isAutoCompleteDisabled ? 'disabled-custom' : ''"
           :disabled="isAutoCompleteDisabled"
@@ -43,14 +43,14 @@
         </p>
       </v-col>
     </v-row>
-    <v-row noGutters>
+    <v-row no-gutters>
       <v-col cols="12">
         <PartyAutocomplete
           v-if="setAutoCompleteActive"
-          :autoCompleteItems="autoCompleteResults"
-          :defaultClickToAdd="false"
-          :isRegisteringParty="isRegisteringParty"
-          :isMhrPartySearch="isMhrPartySearch"
+          :auto-complete-items="autoCompleteResults"
+          :default-click-to-add="false"
+          :is-registering-party="isRegisteringParty"
+          :is-mhr-party-search="isMhrPartySearch"
           @select-item="selectItem($event)"
           @close-auto-complete="closeAutoComplete"
         />
@@ -69,7 +69,7 @@
           id="add-registering-party"
           v-model="registeringPartySelected"
           class="reg-checkbox pa-0 ma-0"
-          hideDetails
+          hide-details
           :disabled="isAutoCompleteDisabled"
           @update:model-value="addRegisteringParty"
         />
@@ -95,8 +95,8 @@ import {
 import { useStore } from '@/store/store'
 import { PartyAutocomplete } from '@/components/parties/party'
 import { RegistrationFlowType } from '@/enums'
-import { SearchPartyIF } from '@/interfaces'
-import { partyCodeSearch } from '@/utils'
+import type { SearchPartyIF } from '@/interfaces'
+import { partyCodeSearch } from '@/utils/ppr-api-helper'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({

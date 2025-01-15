@@ -1,6 +1,6 @@
 // Libraries
 import { ActionTypes, APIAmendmentTypes, APIRegistrationTypes, DraftTypes } from '@/enums'
-import {
+import type {
   AddCollateralIF,
   AddEditSaNoticeIF,
   AddPartiesIF,
@@ -17,19 +17,21 @@ import {
 } from '@/interfaces'
 import {
   convertToISO8601LastMinute,
+  removeEmptyProperties,
+} from '@/utils'
+import {
   createAmendmentStatement,
   createDischarge,
   createDraft,
   createFinancingStatement,
   createRenewal,
   getDraft,
-  removeEmptyProperties,
   staffAmendment,
   staffDischarge,
   staffFinancingStatement,
   staffRenewal,
   updateDraft
-} from '@/utils'
+} from '@/utils/ppr-api-helper'
 import { RegistrationTypes } from '@/resources'
 import { usePprRegistration } from '@/composables'
 import { cloneDeep } from 'lodash'

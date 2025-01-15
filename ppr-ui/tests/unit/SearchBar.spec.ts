@@ -8,12 +8,12 @@ import {
 import { createComponent, getLastEvent, getTestId, setupMockStaffUser } from './utils'
 import { BusinessSearchAutocomplete, SearchBar } from '@/components/search'
 import { FolioNumber } from '@/components/common'
-import { SearchResponseIF, SearchTypeIF } from '@/interfaces'
+import type { SearchResponseIF, SearchTypeIF } from '@/interfaces'
 import { APIMHRSearchTypes, UISearchTypes } from '@/enums'
 import { MHRSearchTypes, SearchTypes } from '@/resources'
 import { ConfirmationDialog } from '@/components/dialogs'
 import flushPromises from 'flush-promises'
-import { delayActions } from '@/utils'
+import { delayActions } from '@/utils/mhr-api-helper'
 
 const store = useStore()
 

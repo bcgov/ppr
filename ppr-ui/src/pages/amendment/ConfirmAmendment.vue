@@ -251,11 +251,11 @@ import {
   StickyContainer
 } from '@/components/common'
 import { BaseDialog, StaffPaymentDialog } from '@/components/dialogs'
-import { GenColSummary } from '@/components/collateral/generalCollateral'
+import { GenColSummary } from '@/components/collateral/general'
 import { SecuredPartySummary, DebtorSummary } from '@/components/parties/summaries'
 import { RegisteringPartyChange } from '@/components/parties/party'
 import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/components/registration'
-import { VehicleCollateral } from '@/components/collateral/vehicleCollateral'
+import { VehicleCollateral } from '@/components/collateral/vehicle'
 import { unsavedChangesDialog } from '@/resources/dialogOptions'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {

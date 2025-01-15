@@ -54,7 +54,7 @@
       no-gutters
       class="pt-9"
     >
-      <SearchedResultMhr
+      <SearchedResultsMhr
         class="rounded-top pb-6"
         :is-review-mode="false"
       />
@@ -65,7 +65,7 @@
 <script lang="ts">
 import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
-import { SearchedResultMhr } from '@/components/tables'
+import { SearchedResultsMhr } from '@/components/tables/mhr'
 import { RouteNames } from '@/enums'
 import { getFeatureFlag } from '@/utils'
 import { storeToRefs } from 'pinia'
@@ -74,7 +74,7 @@ import { useAuth, useNavigation } from '@/composables'
 export default defineComponent({
   name: 'MHRSearch',
   components: {
-    SearchedResultMhr
+    SearchedResultsMhr
   },
   props: {
     appReady: {

@@ -1,16 +1,16 @@
 <template>
   <BaseDialog
-    :setDisplay="setDisplay"
-    :setOptions="setOptions"
+    :set-display="setDisplay"
+    :set-options="setOptions"
     @proceed="proceed($event)"
   >
     <template #content>
-      <dialog-content :setBaseText="setOptions.text" />
+      <dialog-content :set-base-text="setOptions.text" />
       <v-checkbox
         v-model="preventDialog"
         class="dialog-checkbox pt-5 ma-0"
-        :errorMessages="updateFailed ? 'error' : ''"
-        :hideDetails="!updateFailed"
+        :error-messages="updateFailed ? 'error' : ''"
+        :hide-details="!updateFailed"
         label="Don't show this message again"
       >
         <template #message>
@@ -33,9 +33,9 @@ import {
 import { useStore } from '@/store/store'
 import { BaseDialog } from '.'
 import { DialogContent } from './common'
-import { SettingOptions } from '@/enums'
-import { DialogOptionsIF, UserSettingsIF } from '@/interfaces'
-import { updateUserSettings } from '@/utils'
+import type { SettingOptions } from '@/enums'
+import type { DialogOptionsIF, UserSettingsIF } from '@/interfaces'
+import { updateUserSettings } from '@/utils/ppr-api-helper'
 
 export default defineComponent({
   name: 'ConfirmationDialog',
