@@ -1,14 +1,13 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { useStore } from '@/store/store'
 import { createComponent } from './utils'
-import App from '@/App.vue'
+import App from '@/app.vue'
 import SbcHeader from 'sbc-common-components/src/components/SbcHeader.vue'
 import SbcFooter from 'sbc-common-components/src/components/SbcFooter.vue'
 import { Tombstone } from '@/components/tombstones'
 import { Breadcrumb, SkipToMainContent } from '@/components/common'
 import {
   mockedDisableAllUserSettingsResponse,
-  mockedFinancingStatementAll,
   mockedProductSubscriptions
 } from './test-data'
 import { FeeCodes } from '@/composables/fees/enums'
