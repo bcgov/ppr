@@ -127,7 +127,10 @@
             </div>
         </td>
     </tr>
-    {% elif location.hasLTSAInfo or (location.additionalDescription is defined and location.additionalDescription != '') %}
+    {% elif location.hasLTSAInfo or 
+        (location.additionalDescription is defined and location.additionalDescription != '') or 
+        (location.bandName is defined and location.bandName != '') or 
+        (location.reserveNumber is defined and location.reserveNumber != '') %}
     <tr class="no-page-break">
         <td class="pt-3 pb-2">
             <div class="section-sub-title">Legal Land Description</div>
