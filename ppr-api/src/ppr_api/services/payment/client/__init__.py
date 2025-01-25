@@ -170,7 +170,7 @@ class BaseClient:
             self.detail_label = None
             self.detail_value = None
 
-    def call_api(  # pylint: disable=too-many-positional-arguments,too-many-arguments
+    def call_api(  # pylint: disable=too-many-arguments
         self,
         method,
         relative_path,
@@ -188,15 +188,14 @@ class BaseClient:
                 headers["Account-Id"] = self.account_id
             if self.api_key:
                 headers["x-apikey"] = self.api_key
-            logger.debug(f"Submitting pay-api request for Account-Id={self.account_id}")
             # logger.debug(json.dumps(headers))
             url = self.api_url + relative_path
-            # logger.debug(method.value + ' url=' + url)
+            logger.debug(f"Submitting pay-api request {url} for Account-Id={self.account_id}")
             if data:
                 # logger.debug(json.dumps(data))
-                response = requests.request(method.value, url, params=None, json=data, headers=headers, timeout=3.0)
+                response = requests.request(method.value, url, params=None, json=data, headers=headers, timeout=20.0)
             else:
-                response = requests.request(method.value, url, params=None, headers=headers, timeout=3.0)
+                response = requests.request(method.value, url, params=None, headers=headers, timeout=20.0)
 
             if response is not None:
                 if self.account_id:
@@ -320,7 +319,7 @@ class SBCPaymentClient(BaseClient):
 
         return data
 
-    def create_payment(  # pylint: disable=too-many-positional-arguments,too-many-arguments
+    def create_payment(  # pylint: disable=too-many-arguments
         self, transaction_type, quantity=1, ppr_id=None, client_reference_id=None, processing_fee=None
     ):
         """Submit a payment request for the PPR API transaction."""

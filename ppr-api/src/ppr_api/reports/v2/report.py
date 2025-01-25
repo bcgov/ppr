@@ -17,10 +17,11 @@ from pathlib import Path
 import markupsafe
 import pycountry
 import requests
-from flask import current_app, jsonify
+from flask import current_app
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 from ppr_api.callback.auth.token_service import GoogleStorageTokenService
-from ppr_api.exceptions import ResourceErrorCodes
 from ppr_api.models import utils as model_utils
 from ppr_api.reports.v2 import report_utils
 from ppr_api.reports.v2.report_utils import ReportMeta, ReportTypes
@@ -29,6 +30,7 @@ from ppr_api.utils.logging import logger
 SINGLE_URI = "/forms/chromium/convert/html"
 MERGE_URI = "/forms/pdfengines/merge"
 SUBREPORT_SIZE = 500
+RS_TIMEOUT = 1800.0
 
 
 class Report:  # pylint: disable=too-few-public-methods
@@ -44,6 +46,29 @@ class Report:  # pylint: disable=too-few-public-methods
     def get_payload_data(self):
         """Generate report data including template data for report api call."""
         return self._setup_report_data()
+
+    def send_request(self, uri: str, meta_data, files, rs_token):
+        """Post report generation request to the report service with a retry strategy on 502, 503 responses."""
+        url = current_app.config.get("REPORT_SVC_URL") + uri
+        headers = {}
+        if not rs_token:
+            rs_token = GoogleStorageTokenService.get_report_api_token()
+        if rs_token:
+            headers["Authorization"] = "Bearer {}".format(rs_token)
+        logger.debug(
+            "Account {0} report type {1} calling report-api {2}.".format(self._account_id, self._report_key, url)
+        )
+        retry_strategy = Retry(total=3, backoff_factor=0.2, status_forcelist=[502, 503])
+        adapter = HTTPAdapter(max_retries=retry_strategy)
+        http = requests.Session()
+        http.mount("https://", adapter)
+        response = http.post(url=url, headers=headers, data=meta_data, files=files, timeout=RS_TIMEOUT)
+        logger.info(
+            "Account {0} report type {1} response status: {2}.".format(
+                self._account_id, self._report_key, response.status_code
+            )
+        )
+        return response
 
     def get_pdf(self, report_type=None):
         """Render a pdf for the report type and report data."""
@@ -62,28 +87,11 @@ class Report:  # pylint: disable=too-few-public-methods
             return self.get_registration_mail_pdf()
         logger.debug("Account {0} report type {1} setting up report data.".format(self._account_id, self._report_key))
         data = self._setup_report_data()
-        url = current_app.config.get("REPORT_SVC_URL") + SINGLE_URI
-        logger.debug(
-            "Account {0} report type {1} calling report-api {2}.".format(self._account_id, self._report_key, url)
-        )
         meta_data = report_utils.get_report_meta_data(self._report_key)
         files = report_utils.get_report_files(data, self._report_key)
-        headers = {}
-        token = GoogleStorageTokenService.get_report_api_token()
-        if token:
-            headers["Authorization"] = "Bearer {}".format(token)
-        response = requests.post(url=url, headers=headers, data=meta_data, files=files, timeout=1800.0)
-        logger.debug(
-            "Account {0} report type {1} response status: {2}.".format(
-                self._account_id, self._report_key, response.status_code
-            )
-        )
+        response = self.send_request(SINGLE_URI, meta_data, files, None)
         if response.status_code != HTTPStatus.OK:
-            content = ResourceErrorCodes.REPORT_ERR + ": " + response.content.decode("ascii")
-            logger.error(
-                "Account {0} response status: {1} error: {2}.".format(self._account_id, response.status_code, content)
-            )
-            return jsonify(message=content), response.status_code, None
+            return report_utils.report_error(response, self._report_key, self._account_id)
         return response.content, response.status_code, {"Content-Type": "application/pdf"}
 
     def get_search_pdf(self):
@@ -92,48 +100,22 @@ class Report:  # pylint: disable=too-few-public-methods
         data_copy = copy.deepcopy(self._report_data)
         # 1: Generate the search pdf with no TOC page numbers or total page count.
         data = self._setup_report_data()
-        url = current_app.config.get("REPORT_SVC_URL") + SINGLE_URI
-        logger.debug(
-            "Account {0} report type {1} calling report-api {2}.".format(self._account_id, self._report_key, url)
-        )
         meta_data = report_utils.get_report_meta_data(self._report_key)
-        headers = {}
         token = GoogleStorageTokenService.get_report_api_token()
-        if token:
-            headers["Authorization"] = "Bearer {}".format(token)
-
         files = report_utils.get_report_files(data, self._report_key, False, False)
-        response_reg = requests.post(url=url, headers=headers, data=meta_data, files=files, timeout=1800.0)
-        logger.debug(
-            "Account {0} report type {1} response status: {2}.".format(
-                self._account_id, self._report_key, response_reg.status_code
-            )
-        )
+        response_reg = self.send_request(SINGLE_URI, meta_data, files, token)
         if response_reg.status_code != HTTPStatus.OK:
-            content = ResourceErrorCodes.REPORT_ERR + ": " + response_reg.content.decode("ascii")
-            logger.error(
-                "Account {0} response status: {1} error: {2}.".format(
-                    self._account_id, response_reg.status_code, content
-                )
-            )
-            return jsonify(message=content), response_reg.status_code, None
+            return report_utils.report_error(response_reg, self._report_key, self._account_id)
         # 2: Set TOC page numbers in report data from initial search pdf page numbering.
         self._report_data = report_utils.update_toc_page_numbers(data_copy, response_reg.content)
         # 3: Generate search report again with TOC page numbers and total page count.
         data_final = self._setup_report_data()
-        logger.debug(
-            "Account {0} report type {1} calling report-api {2}.".format(self._account_id, self._report_key, url)
-        )
         files = report_utils.get_report_files(data_final, self._report_key, False, False)
         logger.info("Search report regenerating with TOC page numbers set.")
-        response = requests.post(url=url, headers=headers, data=meta_data, files=files, timeout=1800.0)
+        response = self.send_request(SINGLE_URI, meta_data, files, token)
         logger.info("Search report regeneration with TOC page numbers completed.")
         if response.status_code != HTTPStatus.OK:
-            content = ResourceErrorCodes.REPORT_ERR + ": " + response.content.decode("ascii")
-            logger.error(
-                "Account {0} response status: {1} error: {2}.".format(self._account_id, response.status_code, content)
-            )
-            return jsonify(message=content), response.status_code, None
+            return report_utils.report_error(response, self._report_key, self._account_id)
         return response.content, response.status_code, {"Content-Type": "application/pdf"}
 
     def get_large_search_pdf(self):  # pylint: disable=too-many-locals
@@ -213,64 +195,27 @@ class Report:  # pylint: disable=too-few-public-methods
         # 1: Generate the cover page report.
         self._report_key = ReportTypes.COVER_PAGE_REPORT
         data = self._setup_report_data()
-        url = current_app.config.get("REPORT_SVC_URL") + SINGLE_URI
         meta_data = report_utils.get_report_meta_data(self._report_key)
         files = report_utils.get_report_files(data, self._report_key, True)
-        headers = {}
         token = GoogleStorageTokenService.get_report_api_token()
-        if token:
-            headers["Authorization"] = "Bearer {}".format(token)
-        response_cover = requests.post(url=url, headers=headers, data=meta_data, files=files, timeout=1800.0)
-        logger.debug(
-            "Account {0} report type {1} response status: {2}.".format(
-                self._account_id, self._report_key, response_cover.status_code
-            )
-        )
+        response_cover = self.send_request(SINGLE_URI, meta_data, files, token)
         if response_cover.status_code != HTTPStatus.OK:
-            content = ResourceErrorCodes.REPORT_ERR + ": " + response_cover.content.decode("ascii")
-            logger.error(
-                "Account {0} response status: {1} error: {2}.".format(
-                    self._account_id, response_cover.status_code, content
-                )
-            )
-            return jsonify(message=content), response_cover.status_code, None
-
+            return report_utils.report_error(response_cover, self._report_key, self._account_id)
         # 2: Generate the registration pdf.
         self._report_key = ReportTypes.FINANCING_STATEMENT_REPORT
         self._report_data["createDateTime"] = create_ts
         data = self._setup_report_data()
-        logger.debug(
-            "Account {0} report type {1} calling report-api {2}.".format(self._account_id, self._report_key, url)
-        )
         meta_data = report_utils.get_report_meta_data(self._report_key)
         files = report_utils.get_report_files(data, self._report_key, True)
-        response_reg = requests.post(url=url, headers=headers, data=meta_data, files=files, timeout=1800.0)
-        logger.debug(
-            "Account {0} report type {1} response status: {2}.".format(
-                self._account_id, self._report_key, response_reg.status_code
-            )
-        )
+        response_reg = self.send_request(SINGLE_URI, meta_data, files, token)
         if response_reg.status_code != HTTPStatus.OK:
-            content = ResourceErrorCodes.REPORT_ERR + ": " + response_reg.content.decode("ascii")
-            logger.error(
-                "Account {0} response status: {1} error: {2}.".format(
-                    self._account_id, response_reg.status_code, content
-                )
-            )
-            return jsonify(message=content), response_reg.status_code, None
-        # 3: Merge cover leter and registraiton reports.
-        url = current_app.config.get("REPORT_SVC_URL") + MERGE_URI
+            return report_utils.report_error(response_reg, self._report_key, self._account_id)
+        # 3: Merge cover leter and registration reports.
         files = {"pdf1.pdf": response_cover.content, "pdf2.pdf": response_reg.content}
-        response = requests.post(url=url, headers=headers, files=files, timeout=1800.0)
-        logger.debug("Merge cover and registration reports response status: {0}.".format(response.status_code))
+        response = self.send_request(MERGE_URI, None, files, token)
+        logger.info("Merge cover and registration reports response status: {0}.".format(response.status_code))
         if response.status_code != HTTPStatus.OK:
-            content = ResourceErrorCodes.REPORT_ERR + ": " + response.content.decode("ascii")
-            logger.error(
-                "Account {0} merge response status: {1} error: {2}.".format(
-                    self._account_id, response.status_code, content
-                )
-            )
-            return jsonify(message=content), response.status_code, None
+            return report_utils.report_error(response, self._report_key, self._account_id)
         return response.content, response.status_code, {"Content-Type": "application/pdf"}
 
     def _setup_report_data(self):
