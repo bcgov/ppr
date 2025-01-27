@@ -58,7 +58,7 @@ class Report:  # pylint: disable=too-few-public-methods
         logger.debug(
             "Account {0} report type {1} calling report-api {2}.".format(self._account_id, self._report_key, url)
         )
-        retry_strategy = Retry(total=3, backoff_factor=0.2, status_forcelist=[502, 503])
+        retry_strategy = Retry(total=4, backoff_factor=1.0, status_forcelist=[502, 503])
         adapter = HTTPAdapter(max_retries=retry_strategy)
         http = requests.Session()
         http.mount("https://", adapter)
