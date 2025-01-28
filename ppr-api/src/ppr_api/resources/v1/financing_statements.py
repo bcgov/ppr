@@ -820,7 +820,7 @@ def post_verification_callback():
 def post_reg_report_callback(registration_id: int):
     """Generate, store report, record request status and possibly retry."""
     try:
-        logger.info(f"Verification report callback starting id={registration_id}.")
+        logger.info(f"Verification report callback starting reg id={registration_id}.")
         if registration_id is None:
             return resource_utils.path_param_error_response("registration ID")
         # Authenticate with request api key
@@ -834,6 +834,7 @@ def post_reg_report_callback(registration_id: int):
         if events:
             event_count = len(events)
         if event_count > current_app.config.get("EVENT_MAX_RETRIES"):
+            logger.info(f"Verification report callback max retries reached for reg id={registration_id}.")
             return fs_utils.registration_callback_error(
                 resource_utils.CallbackExceptionCodes.MAX_RETRIES.value,
                 registration_id,
@@ -843,10 +844,12 @@ def post_reg_report_callback(registration_id: int):
         # Verify the registration ID and request.
         registration: Registration = Registration.find_by_id(registration_id)
         if not registration:
+            logger.error(f"Verification report callback no registration found for reg id={registration_id}.")
             return fs_utils.registration_callback_error(
                 resource_utils.CallbackExceptionCodes.UNKNOWN_ID.value, registration_id, HTTPStatus.NOT_FOUND
             )
         if not registration.verification_report:
+            logger.error(f"Verification report callback no report record found for reg id={registration_id}.")
             return fs_utils.registration_callback_error(
                 resource_utils.CallbackExceptionCodes.SETUP_ERR.value,
                 registration_id,

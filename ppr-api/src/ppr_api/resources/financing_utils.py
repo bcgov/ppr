@@ -63,7 +63,7 @@ CALLBACK_MESSAGES = {
 }
 
 
-def pay_and_save(  # pylint: disable=too-many-positional-arguments,too-many-locals,too-many-branches,too-many-arguments
+def pay_and_save(  # pylint: disable=too-many-arguments,too-many-locals,too-many-branches
     req: request,
     request_json,
     registration_class,
@@ -254,6 +254,7 @@ def registration_callback_error(code: str, registration_id: int, status_code, me
     error: str = CALLBACK_MESSAGES[code].format(key_id=registration_id)
     if message:
         error += " " + message
+    logger.info(f"Registration callback error status={status_code}: {error}")
     # Track event here.
     EventTracking.create(registration_id, EventTracking.EventTrackingTypes.REGISTRATION_REPORT, status_code, message)
     if status_code != HTTPStatus.BAD_REQUEST and code not in (
@@ -262,7 +263,7 @@ def registration_callback_error(code: str, registration_id: int, status_code, me
         resource_utils.CallbackExceptionCodes.SETUP_ERR,
     ):
         # set up retry
-        resource_utils.enqueue_registration_report(registration_id, None, None)
+        resource_utils.enqueue_callback_registration_report(registration_id)
     return resource_utils.error_response(status_code, error)
 
 
