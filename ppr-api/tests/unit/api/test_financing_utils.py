@@ -79,7 +79,7 @@ def test_get_registration_callback_report(session, client, jwt):
     response_data, status = fs_utils.get_registration_callback_report(registration)
     # check
     assert status == HTTPStatus.OK
-    assert response_data
+    assert response_data == {}
 
 
 def is_ci_testing() -> bool:

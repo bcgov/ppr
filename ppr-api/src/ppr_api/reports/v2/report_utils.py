@@ -15,7 +15,7 @@ from datetime import timedelta
 from pathlib import Path
 
 import PyPDF2
-from flask import current_app
+from flask import current_app, jsonify
 from jinja2 import Template
 
 from ppr_api.models import utils as model_utils
@@ -102,6 +102,7 @@ TO_AMEND_TYPE_DESCRIPTION = {
     "AS": "Amendment - Secured Parties Amended",
     "AU": "Amendment - Collateral Amended",
 }
+REPORT_ERR_MSG = "Report service error report type={type}, status={code}, message={msg}"
 
 
 class ReportTypes(BaseEnum):
@@ -780,3 +781,11 @@ def set_modified_notice(statement):
                     order["amendDeleted"] = True
                     del_orders.append(order)
                 add_notice["securitiesActOrders"] = del_orders
+
+
+def report_error(service_response, report_type: str, account_id: str):
+    """Build report request error details."""
+    content = service_response.content.decode("ascii")
+    message = REPORT_ERR_MSG.format(type=report_type, code=service_response.status_code, msg=content)
+    logger.error(f"Account {account_id}: {message}")
+    return jsonify(message=message), service_response.status_code, None

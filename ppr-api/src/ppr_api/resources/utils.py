@@ -48,6 +48,19 @@ DEBTOR_NAME = "{code}: No match found for the provided debtor name and registrat
 REPORT = "{code}: error generating report. Detail: {detail}"
 DEFAULT = "{code}: error processing request."
 PAYMENT = "{code}:{status} payment error for account {account_id}."
+REPORT_ERROR_BUSY = (
+    ResourceErrorCodes.REPORT_ERR
+    + ": "
+    + "Report request accepted but the service is busy: retry with a GET request: {detail}"
+)
+REPORT_ERROR = (
+    ResourceErrorCodes.REPORT_ERR + ": " + "Report request accepted but the service generated an error: {detail}"
+)
+REPORT_ERROR_IMMEDIATE = (
+    ResourceErrorCodes.REPORT_ERR
+    + ": "
+    + "Submission processed successfully but the report request failed: retry with a GET request: {detail}"
+)
 
 PARTY_REGISTERING = "RG"
 PARTY_SECURED = "SP"
@@ -197,6 +210,19 @@ def default_exception_response(exception):
 
 def service_exception_response(message):
     """Build 500 exception error response."""
+    return jsonify({"message": message}), HTTPStatus.INTERNAL_SERVER_ERROR
+
+
+def report_exception_response(message_json, status, is_post: bool):
+    """Build report service exception error response."""
+    detail = message_json.get("message")
+    if is_post:
+        message = REPORT_ERROR_IMMEDIATE.format(detail=detail)
+        return jsonify({"message": message}), HTTPStatus.PRECONDITION_FAILED
+    if status in (HTTPStatus.BAD_GATEWAY, HTTPStatus.SERVICE_UNAVAILABLE):
+        message = REPORT_ERROR_BUSY.format(detail=detail)
+        return jsonify({"message": message}), HTTPStatus.SERVICE_UNAVAILABLE
+    message = REPORT_ERROR.format(detail=detail)
     return jsonify({"message": message}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 
@@ -536,6 +562,30 @@ def enqueue_registration_report(registration: Registration, json_data: dict, rep
         logger.error(msg)
         EventTracking.create(
             registration.id,
+            EventTracking.EventTrackingTypes.REGISTRATION_REPORT,
+            int(HTTPStatus.INTERNAL_SERVER_ERROR),
+            msg,
+        )
+
+
+def enqueue_callback_registration_report(registration_id: int):
+    """Add the registration verification report request to the registration queue when a callback attempt fails."""
+    try:
+        payload = {"registrationId": registration_id}
+        apikey = current_app.config.get("SUBSCRIPTION_API_KEY")
+        if apikey:
+            payload["apikey"] = apikey
+        GoogleQueueService().publish_registration_report(payload)
+        logger.info(f"Enqueue registration report successful for id={registration_id}.")
+    except DatabaseException as db_err:
+        # Just log, do not return an error response.
+        msg = f"Enqueue registration report db error for id={registration_id}: " + str(db_err)
+        logger.error(msg)
+    except Exception as err:  # noqa: B902; do not alter app processing
+        msg = f"Enqueue registration report failed for id={registration_id}: " + str(err)
+        logger.error(msg)
+        EventTracking.create(
+            registration_id,
             EventTracking.EventTrackingTypes.REGISTRATION_REPORT,
             int(HTTPStatus.INTERNAL_SERVER_ERROR),
             msg,
