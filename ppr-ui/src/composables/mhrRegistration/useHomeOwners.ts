@@ -260,7 +260,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
     }
 
     // Remove first group option when there is existing SO/JT
-    if (!showGroups.value && homeOwnerGroups.length && isMhrTransfer) dropDownItems.shift()
+    if (!showGroups.value && homeOwnerGroups.length) dropDownItems.shift()
 
     // Handle Edit Defaults
     if (!dropDownItems.length) return [{ title: 'Group 1 (New Group)', value: DEFAULT_GROUP_ID }]
