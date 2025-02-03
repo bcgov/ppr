@@ -467,7 +467,7 @@ def enqueue_registration_report(
                 report_data=json_data,
                 report_type=report_type,
             )
-            reg_report.batch_report_data = get_batch_report_data(registration, json_data)
+            reg_report.batch_report_data = get_batch_report_data(registration, json_data, current_json)
             if batch_utils.is_batch_doc_type(registration.documents[0].document_type):
                 logger.debug("Setting mhr_registration_reports.batch_registration_data")
                 reg_report.batch_registration_data = batch_utils.get_batch_registration_json(
@@ -525,7 +525,7 @@ def enqueue_doc_record(registration: MhrRegistration, json_data: dict):
         logger.error(msg)
 
 
-def get_batch_report_data(registration: MhrRegistration, json_data: dict):
+def get_batch_report_data(registration: MhrRegistration, json_data: dict, current_json: dict):
     """Conditionally setup batch report data initially for NOC location registrations."""
     batch_data = None
     try:
@@ -554,6 +554,8 @@ def get_batch_report_data(registration: MhrRegistration, json_data: dict):
                 "baseRegistrationNumber": ppr_registrations[0]["financingStatement"].get("baseRegistrationNumber"),
                 "registrationDescription": ppr_registrations[0]["financingStatement"].get("registrationDescription"),
             }
+            if not batch_data.get("ownerGroups") and current_json and current_json.get("ownerGroups"):
+                batch_data["ownerGroups"] = current_json.get("ownerGroups")
             secured_parties = []
             debtors = []
             for reg in ppr_registrations:
