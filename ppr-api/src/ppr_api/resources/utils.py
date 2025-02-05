@@ -215,9 +215,6 @@ def service_exception_response(message):
 
 def report_exception_response(message_json, status):
     """Build report service exception error response."""
-    logger.error("!!!!!!!!!!!!!!!!!!!!!!!!!")
-    logger.error(message_json)
-    logger.error("!!!!!!!!!!!!!!!!!!!!!!!!!")
     detail = message_json.get("message", "no details available") if message_json else "no details available"
     if status in (HTTPStatus.BAD_GATEWAY, HTTPStatus.SERVICE_UNAVAILABLE):
         message = REPORT_ERROR_BUSY.format(detail=detail)
