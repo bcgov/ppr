@@ -213,12 +213,12 @@ def service_exception_response(message):
     return jsonify({"message": message}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 
-def report_exception_response(message_json, status, is_post: bool):
+def report_exception_response(message_json, status):
     """Build report service exception error response."""
-    detail = message_json.get("message")
-    if is_post:
-        message = REPORT_ERROR_IMMEDIATE.format(detail=detail)
-        return jsonify({"message": message}), HTTPStatus.PRECONDITION_FAILED
+    logger.error("!!!!!!!!!!!!!!!!!!!!!!!!!")
+    logger.error(message_json)
+    logger.error("!!!!!!!!!!!!!!!!!!!!!!!!!")
+    detail = message_json.get("message", "no details available") if message_json else "no details available"
     if status in (HTTPStatus.BAD_GATEWAY, HTTPStatus.SERVICE_UNAVAILABLE):
         message = REPORT_ERROR_BUSY.format(detail=detail)
         return jsonify({"message": message}), HTTPStatus.SERVICE_UNAVAILABLE

@@ -15,7 +15,7 @@ from datetime import timedelta
 from pathlib import Path
 
 import PyPDF2
-from flask import current_app, jsonify
+from flask import current_app
 from jinja2 import Template
 
 from ppr_api.models import utils as model_utils
@@ -788,4 +788,4 @@ def report_error(service_response, report_type: str, account_id: str):
     content = service_response.content.decode("ascii")
     message = REPORT_ERR_MSG.format(type=report_type, code=service_response.status_code, msg=content)
     logger.error(f"Account {account_id}: {message}")
-    return jsonify(message=message), service_response.status_code, None
+    return {"message": message}, service_response.status_code, None
