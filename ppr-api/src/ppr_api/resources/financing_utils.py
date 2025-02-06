@@ -15,7 +15,7 @@
 import json
 from http import HTTPStatus
 
-from flask import current_app, g, request
+from flask import current_app, g, jsonify, request
 
 from ppr_api.callback.document_storage.storage_service import DocumentTypes, GoogleStorageService
 from ppr_api.callback.utils.exceptions import ReportDataException, ReportException, StorageException
@@ -368,15 +368,15 @@ def get_registration_report(  # pylint: disable=too-many-return-statements,too-m
             raw_data, status_code, headers = get_pdf(report_data, registration.account_id, report_type, token)
             logger.debug(f"Retry report api call status={status_code}.")
             if status_code not in (HTTPStatus.OK, HTTPStatus.CREATED):
-                logger.error(f"{registration_id} retry report api call failed: " + raw_data.get_data(as_text=True))
-            else:
-                doc_name = model_utils.get_doc_storage_name(registration)
-                logger.info(f"Saving registration report output to doc storage: name={doc_name}.")
-                response = GoogleStorageService.save_document(doc_name, raw_data, DocumentTypes.REGISTRATION)
-                logger.info(f"Save document storage response: {response}")
-                report_info.create_ts = model_utils.now_ts()
-                report_info.doc_storage_url = doc_name
-                report_info.save()
+                logger.error(f"{registration_id} registration report api retry call failed.")
+                return resource_utils.report_exception_response(raw_data, status_code)
+            doc_name = model_utils.get_doc_storage_name(registration)
+            logger.info(f"Saving registration report output to doc storage: name={doc_name}.")
+            response = GoogleStorageService.save_document(doc_name, raw_data, DocumentTypes.REGISTRATION)
+            logger.info(f"Save document storage response: {response}")
+            report_info.create_ts = model_utils.now_ts()
+            report_info.doc_storage_url = doc_name
+            report_info.save()
             return raw_data, response_status, headers
 
         # Edge case: too large to generate in real time.
@@ -389,20 +389,22 @@ def get_registration_report(  # pylint: disable=too-many-return-statements,too-m
         raw_data, status_code, headers = get_pdf(report_data, registration.account_id, report_type, token)
         logger.debug(f"Report api call status={status_code}.")
         if status_code not in (HTTPStatus.OK, HTTPStatus.CREATED):
-            logger.error(f"{registration_id} report api call failed: " + raw_data.get_data(as_text=True))
-        else:
-            doc_name = model_utils.get_doc_storage_name(registration)
-            logger.info(f"Saving registration report output to doc storage: name={doc_name}.")
-            response = GoogleStorageService.save_document(doc_name, raw_data, DocumentTypes.REGISTRATION)
-            logger.info(f"Save document storage response: {response}")
-            verification_report: VerificationReport = VerificationReport(
-                create_ts=model_utils.now_ts(),
-                registration_id=registration.id,
-                report_data=report_data,
-                report_type=report_type,
-                doc_storage_url=doc_name,
-            )
-            verification_report.save()
+            logger.error(f"{registration_id} registration report api call failed, adding to queue.")
+            resource_utils.enqueue_registration_report(registration, report_data, report_type)
+            return jsonify(report_data), HTTPStatus.ACCEPTED, {"Content-Type": "application/json"}
+        # POST registration report request: save new document.
+        doc_name = model_utils.get_doc_storage_name(registration)
+        logger.info(f"Saving registration report output to doc storage: name={doc_name}.")
+        response = GoogleStorageService.save_document(doc_name, raw_data, DocumentTypes.REGISTRATION)
+        logger.info(f"Save document storage response: {response}")
+        verification_report: VerificationReport = VerificationReport(
+            create_ts=model_utils.now_ts(),
+            registration_id=registration.id,
+            report_data=report_data,
+            report_type=report_type,
+            doc_storage_url=doc_name,
+        )
+        verification_report.save()
         return raw_data, response_status, headers
     except ReportException as report_err:
         return resource_utils.service_exception_response("Report API error: " + str(report_err))

@@ -208,7 +208,9 @@ def get_search_results(search_id: str):  # pylint: disable=too-many-branches,too
                 search_detail.doc_storage_url = doc_name
                 search_detail.save()
                 return raw_data, HTTPStatus.OK, {"Content-Type": "application/pdf"}
-
+            # Report generation error: return error response.
+            if status_code not in (HTTPStatus.OK, HTTPStatus.CREATED):
+                return resource_utils.report_exception_response(raw_data, status_code)
         response_data["reportAvailable"] = search_detail.doc_storage_url is not None
         return jsonify(response_data), HTTPStatus.OK
     except DatabaseException as db_exception:
@@ -406,8 +408,9 @@ def results_pdf_response(
         search_detail.doc_storage_url = doc_name
         search_detail.save()
         return raw_data, HTTPStatus.OK, {"Content-Type": "application/pdf"}
-
-    return jsonify(response_data), HTTPStatus.OK
+    # Report generation error: return Accepted status code to identify error.
+    response_data["reportAvailable"] = False
+    return jsonify(response_data), HTTPStatus.ACCEPTED, {"Content-Type": "application/json"}
 
 
 def callback_error(code: str, search_id: str, status_code, message: str = None):
