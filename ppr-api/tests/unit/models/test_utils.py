@@ -21,6 +21,7 @@ import pytest
 from registry_schemas.example_data.ppr import AMENDMENT_STATEMENT
 
 from ppr_api.models import utils as model_utils, Registration, SearchRequest
+from ppr_api.models.type_tables import RegistrationType, RegistrationTypes
 
 
 AMENDMENT_SE = {
@@ -193,6 +194,18 @@ TEST_DATA_DOC_STORAGE_NAME = [
     ('Renewal', 'TEST00R5', 'renewal-200000006-TEST00R5.pdf'),
     ('Change', 'TEST0008', 'change-200000009-TEST0008.pdf'),
     ('Amendment', 'TEST0007', 'amendment-200000008-TEST0007.pdf')
+]
+# testdata pattern is (today_offset, valid)
+TEST_DATA_VALID_RL = [
+    (None, True),
+    (1, True),
+    (-1, False),
+]
+# testdata pattern is (today_offset, valid)
+TEST_DATA_VALID_CL = [
+    (None, True),
+    (1, False),
+    (-1, True),
 ]
 
 
@@ -545,6 +558,32 @@ def test_mail_doc_storage_name(session):
     search: SearchRequest = SearchRequest(id=2000, search_ts=model_utils.now_ts())
     name = model_utils.get_mail_doc_storage_name(reg_ts, 1000, 2000)
     assert test_name == name
+
+
+@pytest.mark.parametrize('today_offset,valid', TEST_DATA_VALID_RL)
+def test_rl_enabled(session, today_offset, valid):
+    """Assert that checking a RL act timestamp for type validity works as expected."""
+    if today_offset:
+        now_offset = model_utils.now_ts_offset(today_offset, True)
+        reg_type: RegistrationType = RegistrationType.find_by_registration_type(RegistrationTypes.RL.value)
+        reg_type.act_ts = now_offset
+        session.add(reg_type)
+        session.commit()
+    test_valid = model_utils.is_rl_enabled()
+    assert test_valid == valid
+
+
+@pytest.mark.parametrize('today_offset,valid', TEST_DATA_VALID_CL)
+def test_cl_enabled(session, today_offset, valid):
+    """Assert that checking a CL act timestamp for type validity works as expected."""
+    if today_offset:
+        now_offset = model_utils.now_ts_offset(today_offset, True)
+        reg_type: RegistrationType = RegistrationType.find_by_registration_type(RegistrationTypes.CL.value)
+        reg_type.act_ts = now_offset
+        session.add(reg_type)
+        session.commit()
+    test_valid = model_utils.is_cl_enabled()
+    assert test_valid == valid
 
 
 def is_ci_testing() -> bool:

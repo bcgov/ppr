@@ -18,7 +18,9 @@ import pytest
 
 from ppr_api.models import utils as model_utils
 from ppr_api.models.registration import CrownChargeTypes, PPSATypes
+from ppr_api.models.type_tables import RegistrationType, RegistrationTypes
 from ppr_api.utils.validators import financing_validator as validator
+from ppr_api.utils.logging import logger
 
 
 FINANCING = {
@@ -356,6 +358,15 @@ TEST_MISC_DATA = [
     (DESC_EXCLUDES_LY, False, 'SE', validator.LY_NOT_ALLOWED),
     (DESC_EXCLUDES_LY, False, 'WL', validator.LY_NOT_ALLOWED)
 ]
+# testdata pattern is ({description}, {valid}, {reg_type}, {today_offset}, {message content})
+TEST_DATA_TYPE_ENABLED = [
+    ("Valid RL no act TS", True, RegistrationTypes.RL.value, None, None),
+    ("Valid CL no act TS", True, RegistrationTypes.CL.value, None, None),
+    ("Valid CL act TS", True, RegistrationTypes.CL.value, -1, None),
+    ("Invalid CL act TS", False, RegistrationTypes.CL.value, 1, validator.CL_NOT_ALLOWED),
+    ("Valid RL act TS", True, RegistrationTypes.RL.value, 1, None),
+    ("Invalid RL act TS", False, RegistrationTypes.RL.value, -1, validator.RL_NOT_ALLOWED),
+]
 
 
 @pytest.mark.parametrize('desc,valid,account_id,registering,secured,notices,message_content', TEST_SE_DATA)
@@ -646,3 +657,35 @@ def test_validate_sc_ap(session):
     # print(error_msg)
     assert error_msg != ''
     assert error_msg.find(validator.VC_AP_NOT_ALLOWED) != -1
+
+
+@pytest.mark.parametrize('desc,valid,reg_type,today_offset,message_content', TEST_DATA_TYPE_ENABLED)
+def test_validate_type_enabled(session, desc, valid, reg_type, today_offset, message_content):
+    """Assert that financing statement registration type enabled validation works as expected."""
+    if today_offset:
+        now_offset = model_utils.now_ts_offset(today_offset, True)
+        r_type: RegistrationType = RegistrationType.find_by_registration_type(reg_type)
+        r_type.act_ts = now_offset
+        session.add(r_type)
+        session.commit()
+        logger.info(r_type.act_ts)
+    json_data = copy.deepcopy(FINANCING)
+    json_data['type'] = reg_type
+    del json_data['trustIndenture']
+    if reg_type == RegistrationTypes.RL.value:
+        del json_data['lifeYears']
+        del json_data['lifeInfinite']
+        del json_data['generalCollateral']
+        json_data['lienAmount'] = 10000
+        json_data['surrenderDate'] = model_utils.format_ts(model_utils.now_ts())
+    else:
+        json_data['lifeYears'] = 5
+        del json_data['lifeInfinite']
+
+    # test
+    error_msg = validator.validate(json_data, 'PS12345')
+    if valid:
+        assert error_msg == ''
+    elif message_content:
+        assert error_msg != ''
+        assert error_msg.find(message_content) != -1

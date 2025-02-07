@@ -23,6 +23,7 @@ import pytest
 from flask import current_app
 
 from ppr_api.models import FinancingStatement, Registration
+from ppr_api.models.type_tables import RegistrationTypes
 from ppr_api.resources.utils import get_payment_details, get_payment_details_financing, \
      get_payment_type_financing
 from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, BCOL_HELP, GOV_ACCOUNT_ROLE
@@ -315,7 +316,8 @@ TEST_CREATE_DATA = [
     ('BCOL helpdesk account', FINANCING_VALID, [PPR_ROLE, BCOL_HELP], HTTPStatus.UNAUTHORIZED, True),
     ('Valid Security Agreement', FINANCING_VALID, [PPR_ROLE], HTTPStatus.CREATED, True),
     ('SBC Valid Security Agreement', FINANCING_VALID, [PPR_ROLE, GOV_ACCOUNT_ROLE], HTTPStatus.CREATED, True),
-    ('Valid Securities Act', FINANCING_VALID, [PPR_ROLE], HTTPStatus.CREATED, True)
+    ('Valid Securities Act', FINANCING_VALID, [PPR_ROLE], HTTPStatus.CREATED, True),
+    ('Valid Commercial Lien', FINANCING_VALID, [PPR_ROLE], HTTPStatus.CREATED, True)
 ]
 # testdata pattern is ({role}, {routingSlip}, {bcolNumber}, {datNUmber}, {status})
 TEST_STAFF_CREATE_DATA = [
@@ -472,7 +474,7 @@ def test_create(session, client, jwt, desc, request_data, roles, status, has_acc
     # setup
     json_data = copy.deepcopy(request_data)
     if desc == 'Valid Securities Act':
-        json_data['type'] = 'SE'
+        json_data['type'] = RegistrationTypes.SE.value
         json_data['lifeInfinite'] = True
         del json_data['lifeYears']
         del json_data['vehicleCollateral']
@@ -481,6 +483,11 @@ def test_create(session, client, jwt, desc, request_data, roles, status, has_acc
         json_data['securedParties'] = SE_SP
         json_data['securitiesActNotices'] = copy.deepcopy(SECURITIES_ACT_NOTICES)
         account_id = 'PS00002'
+    elif desc == 'Valid Commercial Lien':
+        json_data['type'] = RegistrationTypes.CL.value
+        del json_data['trustIndenture']
+        json_data['lifeInfinite'] = False
+        json_data['lifeYears'] = 3
     if has_account and BCOL_HELP in roles:
         headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
     elif has_account and GOV_ACCOUNT_ROLE in roles:

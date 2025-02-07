@@ -24,6 +24,7 @@ from sqlalchemy.sql import text
 
 from ppr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from ppr_api.models import utils as model_utils
+from ppr_api.models.type_tables import RegistrationTypes
 from ppr_api.utils.base import BaseEnum
 from ppr_api.utils.logging import logger
 
@@ -165,7 +166,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             if vehicle_collateral:
                 statement["vehicleCollateral"] = vehicle_collateral
 
-            if reg.registration_type == model_utils.REG_TYPE_REPAIRER_LIEN:
+            if reg.registration_type in (RegistrationTypes.RL.value, RegistrationTypes.CL.value):
                 if reg.lien_value:
                     statement["lienAmount"] = reg.lien_value
                 if reg.surrender_date:

@@ -48,20 +48,28 @@
       </td>
     </tr>
     {% if detail.financingStatement.type == 'RL' %}
-    <tr>
-      <td>Surrender Date:</td>
-      <td>{{detail.financingStatement.surrenderDate}}</td>
-    </tr>
-    <tr>
-      <td>Lien Amount:</td>
-      <td>{{detail.financingStatement.lienAmount}}</td>
-    </tr>
-    {% endif %}
-    {% if detail.financingStatement.type == 'SA' %}
-    <tr>
-      <td>Trust Indenture:</td>
-      <td>{% if detail.financingStatement.trustIndenture == true %}Yes{% else %}No{% endif %}</td>
-    </tr>
+      <tr>
+        <td>Surrender Date:</td>
+        <td>{{detail.financingStatement.surrenderDate}}</td>
+      </tr>
+      <tr>
+        <td>Lien Amount (CAD):</td>
+        <td>{{detail.financingStatement.lienAmount}}</td>
+      </tr>
+    {% elif detail.financingStatement.type == 'CL' and detail.financingStatement.surrenderDate is defined %}
+      <tr>
+        <td>Surrender Date:</td>
+        <td>{{detail.financingStatement.surrenderDate}}</td>
+      </tr>
+      <tr>
+        <td>Lien Amount (CAD):</td>
+        <td>{{detail.financingStatement.lienAmount}}</td>
+      </tr>      
+    {% elif detail.financingStatement.type == 'SA' %}
+      <tr>
+        <td>Trust Indenture:</td>
+        <td>{% if detail.financingStatement.trustIndenture == true %}Yes{% else %}No{% endif %}</td>
+      </tr>
     {% endif %}
 
     {% if detail.financingStatement.transitionDescription is defined and detail.financingStatement.transitionDescription != '' %}

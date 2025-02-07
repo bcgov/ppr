@@ -716,7 +716,7 @@ class Report:  # pylint: disable=too-few-public-methods
             for collateral in statement["generalCollateral"]:
                 if "addedDateTime" in collateral:
                     collateral["addedDateTime"] = Report._to_report_datetime(collateral["addedDateTime"], True)
-        if statement["type"] == "RL" and "lienAmount" in statement:
+        if statement["type"] in ("CL", "RL") and "lienAmount" in statement:
             lien_amount = str(statement["lienAmount"])
             if lien_amount.isnumeric():
                 statement["lienAmount"] = "$" + "{:0,.2f}".format(float(lien_amount))
@@ -762,6 +762,10 @@ class Report:  # pylint: disable=too-few-public-methods
         if statement.get("deleteSecuritiesActNotices"):
             for notice in statement.get("deleteSecuritiesActNotices"):
                 report_utils.set_notice_date_time(notice)
+        if statement.get("type", "") in ("CL", "RL") and "lienAmount" in statement:
+            lien_amount = str(statement["lienAmount"])
+            if lien_amount.isnumeric():
+                statement["lienAmount"] = "$" + "{:0,.2f}".format(float(lien_amount))
 
     def _set_date_times(self):
         """Replace API ISO UTC strings with local report format strings."""

@@ -24,7 +24,7 @@ import pytz
 from datedelta import datedelta
 from flask import current_app
 
-# from ppr_api.utils.logging import logger
+from .type_tables import RegistrationType, RegistrationTypes
 
 # Local timzone
 LOCAL_TZ = pytz.timezone("America/Los_Angeles")
@@ -181,6 +181,7 @@ REG_TYPE_TO_REG_CLASS = {
     "SE": "MISCLIEN",
     "PN": "MISCLIEN",
     "WL": "MISCLIEN",
+    "CL": "PPSALIEN",
     "FA": "PPSALIEN",
     "FL": "PPSALIEN",
     "FR": "PPSALIEN",
@@ -937,3 +938,19 @@ def report_retry_elapsed(last_ts: _datetime):
     test_ts = (last_ts + timedelta(minutes=15)).replace(tzinfo=timezone.utc)
     # logger.info('Comparing now ' + now.isoformat() + ' with last ts ' + test_ts.isoformat())
     return now > test_ts
+
+
+def is_rl_enabled() -> bool:
+    """If a repairer's lien act timestamp exists, verify the current timestamp is before."""
+    reg_type: RegistrationType = RegistrationType.find_by_registration_type(RegistrationTypes.RL.value)
+    if reg_type and reg_type.act_ts:
+        return now_ts().timestamp() < reg_type.act_ts.timestamp()
+    return True
+
+
+def is_cl_enabled() -> bool:
+    """If a commercial liens act timestamp exists, verify the current timestamp is later."""
+    reg_type: RegistrationType = RegistrationType.find_by_registration_type(RegistrationTypes.CL.value)
+    if reg_type and reg_type.act_ts:
+        return now_ts().timestamp() > reg_type.act_ts.timestamp()
+    return True
