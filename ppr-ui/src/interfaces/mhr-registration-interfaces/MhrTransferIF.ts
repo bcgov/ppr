@@ -35,7 +35,7 @@ export interface MhrTransferApiIF {
   transferDate: string
   ownLand: boolean
   registrationType: ApiTransferTypes
-  transferDocumentType?: ApiTRANSTransfersTypes
+  transferDocumentType?: ApiTransferTypes | ApiTRANSTransfersTypes
   submittingParty: SubmittingPartyIF
   attentionReference?: string
   deleteOwnerGroups?: Array<MhrHomeOwnerGroupIF>
