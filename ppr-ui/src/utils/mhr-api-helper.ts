@@ -18,7 +18,14 @@ import {
   AdminRegistrationIF,
   MhrHistoryRoIF
 } from '@/interfaces'
-import { APIMhrTypes, ErrorCategories, ErrorCodes, ErrorRootCauses, StaffPaymentOptions } from '@/enums'
+import {
+  APIMhrTypes,
+  ApiTransferTypes,
+  ErrorCategories,
+  ErrorCodes,
+  ErrorRootCauses,
+  StaffPaymentOptions
+} from '@/enums'
 import { useSearch } from '@/composables/useSearch'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { addTimestampToDate } from '@/utils'
@@ -589,7 +596,7 @@ export async function deleteMhRegistrationSummary (
 // Draft Requests
 
 // Save a new draft.
-export async function createMhrDraft (type: APIMhrTypes, draft: any): Promise<MhrDraftIF> {
+export async function createMhrDraft (type: APIMhrTypes|ApiTransferTypes, draft: any): Promise<MhrDraftIF> {
   const payload = {
     type,
     registration: draft
