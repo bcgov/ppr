@@ -23,6 +23,7 @@ from ppr_api.exceptions import BusinessException, DatabaseException, ResourceErr
 from ppr_api.models import registration_utils
 from ppr_api.models import utils as model_utils
 from ppr_api.models.registration_utils import AccountRegistrationParams
+from ppr_api.models.type_tables import RegistrationTypes
 from ppr_api.utils.base import BaseEnum
 from ppr_api.utils.logging import logger
 
@@ -47,54 +48,55 @@ ACCOUNT_DRAFT_USED_SUFFIX = "_USED"
 class CrownChargeTypes(BaseEnum):
     """Render an Enum of the financing statement crown charge registration type class."""
 
-    CORP_TAX = "CC"
-    CARBON_TAX = "CT"
-    CONSUMPTION_TAX = "DP"
-    EXCISE_TAX = "ET"
-    FOREST_TAX = "FO"
-    MOTOR_FUEL_TAX = "FT"
-    HOTEL_TAX = "HR"
-    INSURANCE_TAX = "IP"
-    INCOME_TAX = "IT"
-    LOGGING_TAX = "LO"
-    MINERAL_LAND_TAX = "MD"
-    MINING_TAX = "MI"
-    MINERAL_TAX = "MR"
-    OTHER = "OT"
-    PETROLEUM_TAX = "PG"
-    PROV_SALES_TAX = "PS"
-    PROPERTY_TRANSFER_TAX = "PT"
-    RURAL_TAX = "RA"
-    SCHOOL_ACT = "SC"
-    SOCIAL_TAX = "SS"
-    TAX_LIEN = "TL"
-    TOBACCO_TAX = "TO"
-    SPECULATION_TAX = "SV"
+    CORP_TAX = RegistrationTypes.CC.value
+    CARBON_TAX = RegistrationTypes.CT.value
+    CONSUMPTION_TAX = RegistrationTypes.DP.value
+    EXCISE_TAX = RegistrationTypes.ET.value
+    FOREST_TAX = RegistrationTypes.FO.value
+    MOTOR_FUEL_TAX = RegistrationTypes.FT.value
+    HOTEL_TAX = RegistrationTypes.HR.value
+    INSURANCE_TAX = RegistrationTypes.IP.value
+    INCOME_TAX = RegistrationTypes.IT.value
+    LOGGING_TAX = RegistrationTypes.LO.value
+    MINERAL_LAND_TAX = RegistrationTypes.MD.value
+    MINING_TAX = RegistrationTypes.MI.value
+    MINERAL_TAX = RegistrationTypes.MR.value
+    OTHER = RegistrationTypes.OT.value
+    PETROLEUM_TAX = RegistrationTypes.PG.value
+    PROV_SALES_TAX = RegistrationTypes.PS.value
+    PROPERTY_TRANSFER_TAX = RegistrationTypes.PT.value
+    RURAL_TAX = RegistrationTypes.RA.value
+    SCHOOL_ACT = RegistrationTypes.SC.value
+    SOCIAL_TAX = RegistrationTypes.SS.value
+    TAX_LIEN = RegistrationTypes.TL.value
+    TOBACCO_TAX = RegistrationTypes.TO.value
+    SPECULATION_TAX = RegistrationTypes.SV.value
 
 
 class MiscellaneousTypes(BaseEnum):
     """Render an Enum of the financing statement miscellaneous registration type class."""
 
-    HC_NOTICE = "HN"
-    MAINTENANCE = "ML"
-    MH_NOTICE = "MN"
-    POC_NOTICE = "PN"
-    WAGES_UNPAID = "WL"
-    SECURITIES_NOTICE = "SE"
+    HC_NOTICE = RegistrationTypes.HN.value
+    MAINTENANCE = RegistrationTypes.ML.value
+    MH_NOTICE = RegistrationTypes.MN.value
+    POC_NOTICE = RegistrationTypes.PN.value
+    WAGES_UNPAID = RegistrationTypes.WL.value
+    SECURITIES_NOTICE = RegistrationTypes.SE.value
 
 
 class PPSATypes(BaseEnum):
     """Render an Enum of the financing statement PPSA lien registration type class."""
 
-    FORESTRY_CHARGE = "FA"
-    FORESTRY_LIEN = "FL"
-    MARRIAGE_SEPARATION = "FR"
-    FORESTRY_SUB_CHARGE = "FS"
-    LAND_TAX = "LT"
-    MH_LIEN = "MH"
-    REPAIRER_LIEN = "RL"
-    SECURITY_AGREEMENT = "SA"
-    SALE_GOODS = "SG"
+    COMMERCIAL_LIEN = RegistrationTypes.CL.value
+    FORESTRY_CHARGE = RegistrationTypes.FA.value
+    FORESTRY_LIEN = RegistrationTypes.FL.value
+    MARRIAGE_SEPARATION = RegistrationTypes.FR.value
+    FORESTRY_SUB_CHARGE = RegistrationTypes.FS.value
+    LAND_TAX = RegistrationTypes.LT.value
+    MH_LIEN = RegistrationTypes.MH.value
+    REPAIRER_LIEN = RegistrationTypes.RL.value
+    SECURITY_AGREEMENT = RegistrationTypes.SA.value
+    SALE_GOODS = RegistrationTypes.SG.value
 
 
 class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, too-many-public-methods

@@ -73,20 +73,28 @@
         </td>
       </tr>
       {% if type == 'RL' %}
-      <tr>
-        <td>Surrender Date:</td>
-        <td>{{surrenderDate}}</td>
-      </tr>
-      <tr>
-        <td>Lien Amount (CAD):</td>
-        <td>{{lienAmount}}</td>
-      </tr>
-      {% endif %}
-      {% if type == 'SA' %}
-      <tr>
-        <td>Trust Indenture:</td>
-        <td>{% if trustIndenture == true %}Yes{% else %}No{% endif %}</td>
-      </tr>
+        <tr>
+          <td>Surrender Date:</td>
+          <td>{{surrenderDate}}</td>
+        </tr>
+        <tr>
+          <td>Lien Amount (CAD):</td>
+          <td>{{lienAmount}}</td>
+        </tr>
+      {% elif type == 'CL' and surrenderDate is defined %}
+        <tr>
+          <td>Surrender Date:</td>
+          <td>{{surrenderDate}}</td>
+        </tr>
+        <tr>
+          <td>Lien Amount (CAD):</td>
+          <td>{{lienAmount}}</td>
+        </tr>
+      {% elif type == 'SA' %}
+        <tr>
+          <td>Trust Indenture:</td>
+          <td>{% if trustIndenture == true %}Yes{% else %}No{% endif %}</td>
+        </tr>
       {% endif %}
       {% if not changes and clientReferenceId is defined and clientReferenceId != "" %}
       <tr>

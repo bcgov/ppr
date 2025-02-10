@@ -133,6 +133,7 @@ def upgrade():
     sa.Column('registration_type_cl', sa.String(length=10), nullable=False),
     sa.Column('registration_desc', sa.String(length=100), nullable=False),
     sa.Column('registration_act', sa.String(length=60), nullable=False),
+    sa.Column('act_ts', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['registration_type_cl'], ['registration_type_classes.registration_type_cl'], ),
     sa.PrimaryKeyConstraint('registration_type')
     )
@@ -2974,6 +2975,12 @@ def upgrade():
             'registration_type': 'WL',
             'registration_act': 'MISCELLANEOUS REGISTRATIONS ACT',
             'registration_desc': 'LIEN FOR UNPAID WAGES'
+        },
+        {
+            'registration_type_cl': 'PPSALIEN',
+            'registration_type': 'CL',
+            'registration_act': 'COMMERCIAL LIENS ACT',
+            'registration_desc': 'COMMERCIAL LIEN'
         },
         {
             'registration_type_cl': 'PPSALIEN',

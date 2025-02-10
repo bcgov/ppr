@@ -22,6 +22,74 @@ from ppr_api.utils.base import BaseEnum
 from .db import db
 
 
+class RegistrationTypes(BaseEnum):
+    """Render an Enum of the PPR registration types."""
+
+    A1 = "A1"
+    A2 = "A2"
+    A3 = "A3"
+    AA = "AA"
+    AC = "AC"
+    AD = "AD"
+    AM = "AM"
+    AP = "AP"
+    AR = "AR"
+    AS = "AS"
+    AU = "AU"
+    CC = "CC"
+    CL = "CL"
+    CO = "CO"
+    CT = "CT"
+    DC = "DC"
+    DP = "DP"
+    DR = "DR"
+    DT = "DT"
+    ET = "ET"
+    FA = "FA"
+    FL = "FL"
+    FO = "FO"
+    FR = "FR"
+    FS = "FS"
+    FT = "FT"
+    HN = "HN"
+    HR = "HR"
+    IP = "IP"
+    IT = "IT"
+    LO = "LO"
+    LT = "LT"
+    MD = "MD"
+    MH = "MH"
+    MI = "MI"
+    ML = "ML"
+    MN = "MN"
+    MR = "MR"
+    OT = "OT"
+    PD = "PD"
+    PG = "PG"
+    PN = "PN"
+    PS = "PS"
+    PT = "PT"
+    RA = "RA"
+    RC = "RC"
+    RE = "RE"
+    RL = "RL"
+    SA = "SA"
+    SC = "SC"
+    SE = "SE"
+    SG = "SG"
+    SS = "SS"
+    ST = "ST"
+    SU = "SU"
+    SV = "SV"
+    TA = "TA"
+    TF = "TF"
+    TG = "TG"
+    TL = "TL"
+    TM = "TM"
+    TO = "TO"
+    WL = "WL"
+
+
 class SecuritiesActTypes(BaseEnum):
     """Render an Enum of the Securities Act types."""
 
@@ -102,11 +170,29 @@ class RegistrationType(db.Model):  # pylint: disable=too-few-public-methods
     )
     registration_desc = db.mapped_column("registration_desc", db.String(100), nullable=False)
     registration_act = db.mapped_column("registration_act", db.String(60), nullable=False)
+    act_ts = db.mapped_column("act_ts", db.DateTime, nullable=True)
 
     # parent keys
 
     # Relationships - Registration
     registration = db.relationship("Registration", back_populates="reg_type")
+
+    @classmethod
+    def find_all(cls):
+        """Return all the type records."""
+        return db.session.query(RegistrationType).all()
+
+    @classmethod
+    def find_by_registration_type(cls, registration_type: str):
+        """Return the registration type matching the query type."""
+        reg_type = None
+        if registration_type:
+            reg_type = (
+                db.session.query(RegistrationType)
+                .filter(RegistrationType.registration_type == registration_type)
+                .one_or_none()
+            )
+        return reg_type
 
 
 class SearchType(db.Model):  # pylint: disable=too-few-public-methods

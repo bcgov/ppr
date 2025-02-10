@@ -21,6 +21,7 @@ https://docs.google.com/spreadsheets/d/18eTumnf5H6TG2qWXwXJ_iAA-Gc7iNMpnm0ly7ctc
 from ppr_api.models import ClientCode, VehicleCollateral
 from ppr_api.models import utils as model_utils
 from ppr_api.models.registration import MiscellaneousTypes, PPSATypes
+from ppr_api.models.type_tables import RegistrationTypes
 
 # Error messages
 AUTHORIZATION_INVALID = "Authorization Received indicator is required with this registration. "
@@ -53,6 +54,8 @@ SE_RP_MISSING_CODE = "The Securities Act Notice SE type Registering Party must u
 SE_SP_MISSING_CODE = "The Securities Act Notice SE type Secured Party must use an account client party code. "
 SE_RP_INVALID_CODE = "The Securities Act Notice SE type Registering Party client party code is invalid. "
 SE_SP_INVALID_CODE = "The Securities Act Notice SE type Secured Party client party code is invalid. "
+RL_NOT_ALLOWED = "The Repairer's Lien RL type is not allowed: use the CL Commercial Lien type instead. "
+CL_NOT_ALLOWED = "The Commercial Lien CL type is not allowed: use the RL Repairer's Lien type instead. "
 
 GC_NOT_ALLOWED_LIST = [
     MiscellaneousTypes.MH_NOTICE.value,
@@ -260,8 +263,13 @@ def validate_rl(json_data, reg_type: str):
     return error_msg
 
 
-def validate_allowed_type(reg_type: str):
+def validate_allowed_type(reg_type: str) -> str:
     """Check if the submitted type is allowed for new financing statements."""
+    if reg_type and reg_type in (RegistrationTypes.RL, RegistrationTypes.CL):
+        if reg_type == RegistrationTypes.RL.value and not model_utils.is_rl_enabled():
+            return RL_NOT_ALLOWED
+        if reg_type == RegistrationTypes.CL.value and not model_utils.is_cl_enabled():
+            return CL_NOT_ALLOWED
     try:
         test = model_utils.REG_TYPE_NEW_FINANCING_EXCLUDED[reg_type]
         if test:
