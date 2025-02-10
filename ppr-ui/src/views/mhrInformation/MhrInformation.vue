@@ -648,7 +648,9 @@ import {
   UIMHRSearchTypes,
   LocationChangeTypes,
   ErrorCategories,
-  UnitNoteDocTypes, MhApiFrozenDocumentTypes, APIMhrTypes
+  UnitNoteDocTypes,
+  MhApiFrozenDocumentTypes,
+  APIMhrTypes
 } from '@/enums'
 import {
   useAuth,
