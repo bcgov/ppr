@@ -24,7 +24,7 @@ from sqlalchemy.sql import text
 
 from ppr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from ppr_api.models import utils as model_utils
-from ppr_api.models.type_tables import RegistrationTypes
+from ppr_api.models.type_tables import RegistrationType, RegistrationTypes
 from ppr_api.utils.base import BaseEnum
 from ppr_api.utils.logging import logger
 
@@ -171,8 +171,10 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                     statement["lienAmount"] = reg.lien_value
                 if reg.surrender_date:
                     statement["surrenderDate"] = model_utils.format_ts(reg.surrender_date)
-            if reg.registration_type == model_utils.REG_TYPE_SECURITIES_NOTICE:
+            if reg.registration_type == RegistrationTypes.SE.value:
                 statement["securitiesActNotices"] = self.securities_act_notices_json(registration_id)
+            elif reg.registration_type == RegistrationTypes.CL.value:
+                statement["previouslyRL"] = FinancingStatement.is_rl_transition(reg)
 
         if self.trust_indenture:
             for trust in self.trust_indenture:
@@ -620,6 +622,14 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
                     name = {"personName": person_name}
                     names_json.append(name)
         return names_json
+
+    @classmethod
+    def is_rl_transition(cls, reg: Registration) -> bool:
+        """Check if an CL registration type transitioned from RL: commercial lien act timestamp must exist."""
+        reg_type: RegistrationType = RegistrationType.find_by_registration_type(RegistrationTypes.CL.value)
+        if reg_type and reg_type.act_ts:
+            return reg.registration_ts.timestamp() < reg_type.act_ts.timestamp()
+        return False
 
     @staticmethod
     def create_from_json(json_data, account_id: str, user_id: str = None):

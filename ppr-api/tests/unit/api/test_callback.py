@@ -30,8 +30,8 @@ from ppr_api.services.payment import TransactionTypes
 from tests.unit.services.utils import create_header, create_header_account, create_header_account_report
 
 
-MOCK_URL_NO_KEY = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
-MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
+MOCK_URL_NO_KEY = 'https://test.api.connect.gov.bc.ca/mockTarget/auth/api/v1/'
+MOCK_PAY_URL = 'https://test.api.connect.gov.bc.ca/mockTarget/pay/api/v1/'
 # testdata pattern is ({desc}, {status}, {registration_id}, {party_id})
 TEST_MAIL_CALLBACK_DATA = [
     ('Missing reg id', HTTPStatus.BAD_REQUEST, None, 9999999),

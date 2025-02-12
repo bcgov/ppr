@@ -27,8 +27,8 @@ from ppr_api.services.authz import BCOL_HELP, PPR_ROLE, STAFF_ROLE
 from tests.unit.services.utils import create_header, create_header_account
 
 
-MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
-MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
+MOCK_AUTH_URL = 'https://test.api.connect.gov.bc.ca/mockTarget/auth/api/v1/'
+MOCK_PAY_URL = 'https://test.api.connect.gov.bc.ca/mockTarget/pay/api/v1/'
 
 # Valid test search criteria
 AIRCRAFT_DOT_JSON = {

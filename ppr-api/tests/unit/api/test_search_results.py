@@ -31,8 +31,8 @@ from tests.unit.services.utils import create_header, create_header_account, crea
 
 
 SAMPLE_JSON_SUMMARY = copy.deepcopy(SEARCH_SUMMARY)
-MOCK_URL_NO_KEY = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
-MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
+MOCK_URL_NO_KEY = 'https://test.api.connect.gov.bc.ca/mockTarget/auth/api/v1/'
+MOCK_PAY_URL = 'https://test.api.connect.gov.bc.ca/mockTarget/pay/api/v1/'
 TEST_SEARCH_REPORT_FILE = 'tests/unit/api/test-get-search-report.pdf'
 # testdata pattern is ({desc}, {roles}, {status}, {has_account}, {search_id}, {is_report})
 TEST_GET_DATA = [

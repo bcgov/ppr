@@ -207,6 +207,12 @@ TEST_DATA_VALID_CL = [
     (1, False),
     (-1, True),
 ]
+# testdata pattern is (today_offset, valid)
+TEST_DATA_TRANSITION_RL = [
+    (None, False),
+    (1, False),
+    (-1, True),
+]
 
 
 @pytest.mark.parametrize('registration_ts,offset,expiry_ts', TEST_DATA_EXPIRY)
@@ -583,6 +589,19 @@ def test_cl_enabled(session, today_offset, valid):
         session.add(reg_type)
         session.commit()
     test_valid = model_utils.is_cl_enabled()
+    assert test_valid == valid
+
+
+@pytest.mark.parametrize('today_offset,valid', TEST_DATA_TRANSITION_RL)
+def test_rl_transition(session, today_offset, valid):
+    """Assert that checking a CL act timestamp for an RL amendment/renewal tranistion works as expected."""
+    if today_offset:
+        now_offset = model_utils.now_ts_offset(today_offset, True)
+        reg_type: RegistrationType = RegistrationType.find_by_registration_type(RegistrationTypes.CL.value)
+        reg_type.act_ts = now_offset
+        session.add(reg_type)
+        session.commit()
+    test_valid = model_utils.is_rl_transition()
     assert test_valid == valid
 
 

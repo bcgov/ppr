@@ -23,6 +23,7 @@ from ppr_api.utils.logging import logger
 
 from .db import db
 from .securities_act_notice import SecuritiesActNotice
+from .type_tables import RegistrationType, RegistrationTypes
 
 PARAM_TO_ORDER_BY = {
     "registrationNumber": "registration_number",
@@ -380,11 +381,12 @@ def build_account_query_params(params: AccountRegistrationParams, api_filter: bo
 def build_account_base_reg_results(params, rows, api_filter: bool = False) -> dict:
     """Build the account query base registration results from the query result set."""
     results_json = []
+    cl_type: RegistrationType = RegistrationType.find_by_registration_type(RegistrationTypes.CL.value)
     if rows is not None:
         for row in rows:
             reg_class = str(row[3])
             if model_utils.is_financing(reg_class):
-                results_json.append(__build_account_reg_result(params, row, reg_class, api_filter))
+                results_json.append(__build_account_reg_result(params, row, reg_class, api_filter, cl_type))
 
     return results_json
 
@@ -410,7 +412,9 @@ def update_account_reg_results(params, rows, results_json, api_filter: bool = Fa
     return results_json
 
 
-def __build_account_reg_result(params, row, reg_class, api_filter: bool = False) -> dict:
+def __build_account_reg_result(
+    params, row, reg_class, api_filter: bool = False, cl_type: RegistrationType = None
+) -> dict:
     """Build a registration result from a query result set row."""
     reg_num = str(row[0])
     base_reg_num = str(row[6])
@@ -437,6 +441,11 @@ def __build_account_reg_result(params, row, reg_class, api_filter: bool = False)
         result["expand"] = False
     result = set_path(params, result, reg_num, base_reg_num, int(row[15]))
     result = update_summary_optional(result, params.account_id, params.sbc_staff)
+    if result["registrationType"] == RegistrationTypes.CL.value:
+        if cl_type and cl_type.act_ts:
+            result["previouslyRL"] = row[1].timestamp() < cl_type.act_ts.timestamp()
+        else:
+            result["previouslyRL"] = False
     if "accountId" in result:
         del result["accountId"]  # Only use this for report access checking.
     return result
@@ -596,3 +605,61 @@ def update_account_reg_restore(account_id: str, reg_num: str):
     db.session.execute(text(QUERY_UPDATE_ACCOUNT_ID_RESTORE), {"query_account": account_id, "query_reg_num": reg_num})
     logger.info(f"update_account_reg_restore account={account_id} reg_num={reg_num}")
     db.session.commit()
+
+
+def set_registration_basic_info(registration, json_data: dict, registration_type_cl: str):
+    """New registration set up common information from request JSON."""
+    registration.registration_ts = model_utils.now_ts()
+    registration.registration_type_cl = registration_type_cl
+    if registration_type_cl in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
+        json_data = model_utils.cleanup_amendment(json_data)
+        registration.registration_type = model_utils.amendment_change_type(json_data)
+        if registration.registration_type == model_utils.REG_TYPE_AMEND_COURT:
+            registration.registration_type_cl = model_utils.REG_CLASS_AMEND_COURT
+        if "description" in json_data:
+            registration.detail_description = json_data["description"]
+    elif registration_type_cl == model_utils.REG_CLASS_CHANGE:
+        registration.registration_type = json_data["changeType"]
+    elif registration_type_cl == model_utils.REG_CLASS_RENEWAL:
+        registration.registration_type = model_utils.REG_TYPE_RENEWAL
+    elif registration_type_cl == model_utils.REG_CLASS_DISCHARGE:
+        registration.registration_type = model_utils.REG_TYPE_DISCHARGE
+    registration.ver_bypassed = "Y"
+    if "clientReferenceId" in json_data:
+        registration.client_reference_id = json_data["clientReferenceId"]
+
+
+def set_renewal_life(registration, json_data: dict, reg_type: str):
+    """New renewal registration set life from request JSON."""
+    if is_rl_renewal(reg_type):
+        registration.life = model_utils.REPAIRER_LIEN_YEARS
+        # Adding 180 days to existing expiry.
+        registration.financing_statement.expire_date = model_utils.expiry_dt_repairer_lien(
+            registration.financing_statement.expire_date
+        )
+    else:
+        if "lifeInfinite" in json_data and json_data["lifeInfinite"]:
+            registration.life = model_utils.LIFE_INFINITE
+            registration.financing_statement.expire_date = None
+        if "lifeYears" in json_data:
+            registration.life = json_data["lifeYears"]
+            # registration.financing_statement.expire_date = model_utils.expiry_dt_from_years(registration.life)
+            # Replace above line with below: adding years to the existing expiry
+            registration.financing_statement.expire_date = model_utils.expiry_dt_add_years(
+                registration.financing_statement.expire_date, registration.life
+            )
+        elif "expiryDate" in json_data:
+            new_expiry_date = model_utils.expiry_ts_from_iso_format(json_data["expiryDate"])
+            registration.life = new_expiry_date.year - registration.financing_statement.expire_date.year
+            registration.financing_statement.expire_date = new_expiry_date
+        if "lifeInfinite" in json_data and json_data["lifeInfinite"]:
+            registration.financing_statement.life = registration.life
+        else:
+            registration.financing_statement.life += registration.life
+
+
+def is_rl_renewal(reg_type: str) -> bool:
+    """RL renewal only if base registration type is RL and CLA is not enabled."""
+    if RegistrationTypes.RL.value != reg_type:
+        return False
+    return not model_utils.is_rl_transition()

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This module holds common statement registration data."""
-# pylint: disable=too-many-statements, too-many-branches, too-many-lines; Black reformatting
+# pylint: disable=too-many-statements, too-many-branches
 
 import json
 from http import HTTPStatus
@@ -636,10 +636,11 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         registration = Registration()
         registration.id = reg_vals.id  # pylint: disable=invalid-name; allow name of id.
         registration.registration_num = reg_vals.registration_num
-        registration.registration_ts = model_utils.now_ts()
         registration.financing_id = financing_statement.id
         registration.financing_statement = financing_statement
         registration.account_id = account_id
+        registration.base_registration_num = base_registration_num
+        registration_utils.set_registration_basic_info(registration, json_data, registration_type_cl)
         if not draft:
             registration.document_number = reg_vals.document_number
             draft = Draft.create_from_registration(registration, json_data)
@@ -647,34 +648,12 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
             draft.draft = json_data
         draft.account_id = draft.account_id + ACCOUNT_DRAFT_USED_SUFFIX
         registration.draft = draft
-        registration.registration_type_cl = registration_type_cl
-        if registration_type_cl in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
-            json_data = model_utils.cleanup_amendment(json_data)
-            registration.registration_type = model_utils.amendment_change_type(json_data)
-            if registration.registration_type == model_utils.REG_TYPE_AMEND_COURT:
-                registration.registration_type_cl = model_utils.REG_CLASS_AMEND_COURT
-            if "description" in json_data:
-                registration.detail_description = json_data["description"]
-        elif registration_type_cl == model_utils.REG_CLASS_CHANGE:
-            registration.registration_type = json_data["changeType"]
-        elif registration_type_cl == model_utils.REG_CLASS_RENEWAL:
-            registration.registration_type = model_utils.REG_TYPE_RENEWAL
-        elif registration_type_cl == model_utils.REG_CLASS_DISCHARGE:
-            registration.registration_type = model_utils.REG_TYPE_DISCHARGE
-
-        registration.base_registration_num = base_registration_num
-        registration.ver_bypassed = "Y"
         registration.draft.registration_type = registration.registration_type
         registration.draft.registration_type_cl = registration.registration_type_cl
-
-        if "clientReferenceId" in json_data:
-            registration.client_reference_id = json_data["clientReferenceId"]
-
         # All registrations have at least one party (registering).
         registration.parties = Party.create_from_statement_json(
             json_data, registration_type_cl, registration.financing_id
         )
-
         # If get to here all data should be valid: get reg id to close out updated entities.
         registration_id = registration.id
         financing_reg_type = registration.financing_statement.registration[0].registration_type
@@ -682,34 +661,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
             registration.financing_statement.state_type = model_utils.STATE_DISCHARGED
             registration.financing_statement.discharged = "Y"
         elif registration_type_cl == model_utils.REG_CLASS_RENEWAL:
-            if financing_reg_type == model_utils.REG_TYPE_REPAIRER_LIEN:
-                registration.life = model_utils.REPAIRER_LIEN_YEARS
-                # Adding 180 days to existing expiry.
-                registration.financing_statement.expire_date = model_utils.expiry_dt_repairer_lien(
-                    registration.financing_statement.expire_date
-                )
-            else:
-                if "lifeInfinite" in json_data and json_data["lifeInfinite"]:
-                    registration.life = model_utils.LIFE_INFINITE
-                    registration.financing_statement.expire_date = None
-                if "lifeYears" in json_data:
-                    registration.life = json_data["lifeYears"]
-                    # registration.financing_statement.expire_date = model_utils.expiry_dt_from_years(registration.life)
-                    # Replace above line with below: adding years to the existing expiry
-                    registration.financing_statement.expire_date = model_utils.expiry_dt_add_years(
-                        registration.financing_statement.expire_date, registration.life
-                    )
-                elif "expiryDate" in json_data:
-                    new_expiry_date = model_utils.expiry_ts_from_iso_format(json_data["expiryDate"])
-                    registration.life = new_expiry_date.year - registration.financing_statement.expire_date.year
-                    registration.financing_statement.expire_date = new_expiry_date
-
-                # Verify this is updated.
-                if "lifeInfinite" in json_data and json_data["lifeInfinite"]:
-                    registration.financing_statement.life = registration.life
-                else:
-                    registration.financing_statement.life += registration.life
-
+            registration_utils.set_renewal_life(registration, json_data, financing_reg_type)
         # Repairer's lien renewal or amendment can have court order information.
         if (
             registration.registration_type in (model_utils.REG_TYPE_AMEND_COURT, model_utils.REG_TYPE_RENEWAL)
