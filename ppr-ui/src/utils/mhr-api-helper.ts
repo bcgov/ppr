@@ -640,7 +640,11 @@ export async function createMhrDraft (type: APIMhrTypes|ApiTransferTypes, draft:
 }
 
 // Update an existing draft.
-export async function updateMhrDraft (draftId: string, type: APIMhrTypes, draft: any): Promise<MhrDraftIF> {
+export async function updateMhrDraft (
+  draftId: string,
+  type: APIMhrTypes|ApiTransferTypes,
+  draft: any
+): Promise<MhrDraftIF> {
   if (!draftId) {
     draft.error = {
       category: ErrorCategories.REGISTRATION_SAVE,

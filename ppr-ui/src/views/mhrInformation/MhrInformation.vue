@@ -1372,7 +1372,7 @@ export default defineComponent({
         : getMhrTransferType.value?.transferType
 
       const mhrTransferDraft = getMhrInformation.value.draftNumber
-        ? await updateMhrDraft(getMhrInformation.value.draftNumber, getMhrTransferType.value?.transferType, apiData)
+        ? await updateMhrDraft(getMhrInformation.value.draftNumber, draftType, apiData)
         : await createMhrDraft(draftType, apiData)
 
       const newItem: RegTableNewItemI = {
