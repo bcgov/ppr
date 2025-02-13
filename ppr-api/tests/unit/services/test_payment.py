@@ -31,8 +31,8 @@ from ppr_api.services.authz import PPR_ROLE
 from tests.unit.services.utils import helper_create_jwt
 
 
-MOCK_URL_NO_KEY = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
-MOCK_URL = 'https://bcregistry-bcregistry-mock.apigee.net/pay/api/v1/'
+MOCK_URL_NO_KEY = 'https://test.api.connect.gov.bc.ca/mockTarget/pay/api/v1/'
+MOCK_URL = 'https://test.api.connect.gov.bc.ca/pay/api/v1/'
 PAY_DETAILS_SEARCH = {
     'label': 'Search by SERIAL_NUMBER',
     'value': '123456789'

@@ -22,6 +22,7 @@ from ppr_api.callback.utils.exceptions import ReportDataException, ReportExcepti
 from ppr_api.exceptions import BusinessException, DatabaseException
 from ppr_api.models import EventTracking, FinancingStatement, Party, Registration, VerificationReport
 from ppr_api.models import utils as model_utils
+from ppr_api.models.type_tables import RegistrationTypes
 from ppr_api.reports import ReportTypes, get_callback_pdf, get_pdf, get_report_api_payload
 from ppr_api.resources import utils as resource_utils
 from ppr_api.services.authz import is_reg_staff_account, is_sbc_office_account
@@ -63,6 +64,40 @@ CALLBACK_MESSAGES = {
 }
 
 
+def save_rl_transition(registration_class: str, financing_statement: FinancingStatement):
+    """Conditionally update base registration type if RL, CLA is active, and registration is an amendment/renewal."""
+    if registration_class not in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_RENEWAL):
+        return
+    base_reg: Registration = financing_statement.registration[0]
+    if not base_reg or base_reg.registration_type != RegistrationTypes.RL.value:
+        return
+    if not model_utils.is_rl_transition():
+        logger.info(f"RL amend/renewal of {base_reg.registration_num} before CLA transition: reg type unchanged.")
+        return
+    logger.info(f"RL amend/renewal of {base_reg.registration_num} after CLA transition: reg type changing to CL.")
+    base_reg.registration_type = RegistrationTypes.CL.value
+    try:
+        base_reg.save()
+    except Exception as db_exception:  # noqa: B902; handle all db related errors.
+        logger.error(f"RL amend/renewal of {base_reg.registration_num} changing reg type to CL failed: {db_exception}")
+
+
+def get_payment_transaction_type(registration_class: str, financing_statement: FinancingStatement, life: int) -> str:
+    """Derive the payment transction type from the request."""
+    pay_trans_type: str = TransactionTypes.CHANGE.value
+    if registration_class == model_utils.REG_CLASS_AMEND:
+        pay_trans_type = TransactionTypes.AMENDMENT.value
+        if resource_utils.no_fee_amendment(financing_statement.registration[0].registration_type):
+            pay_trans_type = TransactionTypes.AMENDMENT_NO_FEE.value
+    elif registration_class == model_utils.REG_CLASS_RENEWAL and life == model_utils.LIFE_INFINITE:
+        pay_trans_type = TransactionTypes.RENEWAL_INFINITE.value
+    elif registration_class == model_utils.REG_CLASS_RENEWAL:
+        pay_trans_type = TransactionTypes.RENEWAL_LIFE_YEAR.value
+    elif registration_class == model_utils.REG_CLASS_DISCHARGE:
+        pay_trans_type = TransactionTypes.DISCHARGE.value
+    return pay_trans_type
+
+
 def pay_and_save(  # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-positional-arguments
     req: request,
     request_json,
@@ -73,29 +108,19 @@ def pay_and_save(  # pylint: disable=too-many-arguments,too-many-locals,too-many
 ):
     """Set up the registration, pay if there is an account id, and save the data."""
     token: dict = g.jwt_oidc_token_info
-    registration = Registration.create_from_json(
+    registration: Registration = Registration.create_from_json(
         request_json, registration_class, financing_statement, registration_num, account_id
     )
     registration.user_id = token.get("username", None)
-    pay_trans_type = TransactionTypes.CHANGE.value
-    fee_quantity = 1
+    pay_trans_type: str = get_payment_transaction_type(registration_class, financing_statement, registration.life)
+    fee_quantity = 1 if pay_trans_type != TransactionTypes.RENEWAL_LIFE_YEAR.value else registration.life
     pay_ref = None
-    if registration_class == model_utils.REG_CLASS_AMEND:
-        pay_trans_type = TransactionTypes.AMENDMENT.value
-        if resource_utils.no_fee_amendment(financing_statement.registration[0].registration_type):
-            pay_trans_type = TransactionTypes.AMENDMENT_NO_FEE.value
-    elif registration_class == model_utils.REG_CLASS_RENEWAL and registration.life == model_utils.LIFE_INFINITE:
-        pay_trans_type = TransactionTypes.RENEWAL_INFINITE.value
-    elif registration_class == model_utils.REG_CLASS_RENEWAL:
-        fee_quantity = registration.life
-        pay_trans_type = TransactionTypes.RENEWAL_LIFE_YEAR.value
-    elif registration_class == model_utils.REG_CLASS_DISCHARGE:
-        pay_trans_type = TransactionTypes.DISCHARGE.value
     processing_fee = None
-    is_dicharge = pay_trans_type == TransactionTypes.DISCHARGE.value
     if not is_reg_staff_account(account_id):
         # if sbc staff and not 'no fee' then add processing fee
-        if not is_dicharge and is_sbc_office_account(jwt.get_token_auth_header(), account_id):
+        if pay_trans_type != TransactionTypes.DISCHARGE.value and is_sbc_office_account(
+            jwt.get_token_auth_header(), account_id
+        ):
             processing_fee = TransactionTypes.CHANGE_STAFF_PROCESS_FEE.value
         pay_account_id: str = account_id
         payment = Payment(
@@ -108,7 +133,7 @@ def pay_and_save(  # pylint: disable=too-many-arguments,too-many-locals,too-many
         )
     else:
         # if not discharge add process fee
-        if not is_dicharge:
+        if pay_trans_type != TransactionTypes.DISCHARGE.value:
             processing_fee = TransactionTypes.CHANGE_STAFF_PROCESS_FEE.value
         payment_info = resource_utils.build_staff_registration_payment(req, pay_trans_type, fee_quantity)
         payment = Payment(
@@ -138,6 +163,7 @@ def pay_and_save(  # pylint: disable=too-many-arguments,too-many-locals,too-many
                     PAY_REFUND_ERROR.format(account_id, registration_class, invoice_id, repr(cancel_exception))
                 )
         raise DatabaseException(db_exception) from db_exception
+    save_rl_transition(registration_class, financing_statement)
     return registration
 
 

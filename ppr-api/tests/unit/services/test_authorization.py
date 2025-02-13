@@ -23,8 +23,8 @@ from ppr_api.services import authz
 from tests.unit.services.utils import helper_create_jwt
 
 
-MOCK_URL_NO_KEY = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
-MOCK_URL = 'https://bcregistry-bcregistry-mock.apigee.net/auth/api/v1/'
+MOCK_URL_NO_KEY = 'https://test.api.connect.gov.bc.ca/mockTarget/auth/api/v1/'
+MOCK_URL = 'https://test.api.connect.gov.bc.ca/auth/api/v1/'
 
 # testdata pattern is ({description}, {account id}, {valid})
 TEST_SBC_DATA = [

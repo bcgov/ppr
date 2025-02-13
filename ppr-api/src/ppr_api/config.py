@@ -30,7 +30,7 @@ import requests
 def get_mock_auth() -> str:
     """For CI unit tests get mock auth value."""
     try:
-        url: str = "https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/testing/mock-sa-ppr"
+        url: str = "https://test.api.connect.gov.bc.ca/mockTarget/auth/api/v1/testing/mock-sa-ppr"
         headers = {"Content-Type": "application/json"}
         response = requests.get(url, headers=headers, timeout=10.0)
         if response and response.text:

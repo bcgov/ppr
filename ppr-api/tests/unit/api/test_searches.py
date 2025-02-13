@@ -31,8 +31,8 @@ from ppr_api.resources.v1.searches import get_payment_details
 from ppr_api.services.authz import BCOL_HELP, COLIN_ROLE, PPR_ROLE, GOV_ACCOUNT_ROLE, STAFF_ROLE
 from tests.unit.services.utils import create_header, create_header_account
 
-MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
-MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
+MOCK_AUTH_URL = 'https://test.api.connect.gov.bc.ca/mockTarget/auth/api/v1/'
+MOCK_PAY_URL = 'https://test.api.connect.gov.bc.ca/mockTarget/pay/api/v1/'
 
 SAMPLE_JSON_DATA = copy.deepcopy(SEARCH_QUERY)
 # Valid test search criteria

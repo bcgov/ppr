@@ -24,13 +24,14 @@ from flask import current_app
 from registry_schemas.example_data.ppr import FINANCING_STATEMENT
 
 from ppr_api.models import FinancingStatement, Registration, utils as model_utils
+from ppr_api.models.type_tables import RegistrationType, RegistrationTypes
 from ppr_api.resources.utils import get_payment_details
 from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE, BCOL_HELP, GOV_ACCOUNT_ROLE
 from tests.unit.services.utils import create_header, create_header_account, create_header_account_report
 
 
-MOCK_URL_NO_KEY = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
-MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
+MOCK_URL_NO_KEY = 'https://test.api.connect.gov.bc.ca/mockTarget/auth/api/v1/'
+MOCK_PAY_URL = 'https://test.api.connect.gov.bc.ca/mockTarget/pay/api/v1/'
 # prep sample post renewal statement data
 STATEMENT_VALID = {
     'baseRegistrationNumber': 'TEST0001',
@@ -280,6 +281,49 @@ TEST_GET_STATEMENT = [
     ('Mismatch registrations staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.OK, True, 'TEST00R5', 'TEST0001'),
     ('Missing account staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST00R5', 'TEST0005')
 ]
+# testdata pattern is ({desc}, {test data}, {roles}, {status}, {after_cla}, {reg_num})
+TEST_CREATE_RL_DATA = [
+    ('Valid before CLA', STATEMENT_RL_VALID, [PPR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, False, 'TEST0017'),
+    ('Valid after CLA', STATEMENT_VALID, [PPR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, True, 'TEST0017'),
+]
+
+
+@pytest.mark.parametrize('desc,json_data,roles,status,after_cla,reg_num', TEST_CREATE_RL_DATA)
+def test_create_renewal_rl(session, client, jwt, desc, json_data, roles, status, after_cla, reg_num):
+    """Assert that a post renewal registration on an RL type works as expected before and after the CLA transition."""
+    headers = None
+    # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
+    current_app.config.update(AUTH_SVC_URL=MOCK_URL_NO_KEY)
+    headers = create_header_account(jwt, roles, 'test-user', STAFF_ROLE)
+    act_offset: int = -1 if after_cla else 1
+    now_offset = model_utils.now_ts_offset(act_offset, True)
+    reg_type: RegistrationType = RegistrationType.find_by_registration_type(RegistrationTypes.CL.value)
+    reg_type.act_ts = now_offset
+    session.add(reg_type)
+    session.commit()
+    payload = copy.deepcopy(json_data)
+    payload['baseRegistrationNumber'] = reg_num
+    payload['debtorName']['businessName'] = 'TEST 17 DEBTOR INC.'
+    if not after_cla and 'courtOrderInformation' in payload:
+        payload['courtOrderInformation']['orderDate'] = model_utils.format_ts(model_utils.now_ts())
+
+    # test
+    response = client.post('/api/v1/financing-statements/' + reg_num + '/renewals',
+                           json=payload,
+                           headers=headers,
+                           content_type='application/json')
+
+    # check
+    # print(response.json)
+    assert response.status_code == status
+    if status == HTTPStatus.CREATED:
+        statement: FinancingStatement = FinancingStatement.find_by_registration_number(reg_num, 'PS12345', True)
+        reg_type: str = statement.registration[0].registration_type
+        if after_cla:
+            assert reg_type == RegistrationTypes.CL.value
+        else:
+            assert reg_type == RegistrationTypes.RL.value
 
 
 @pytest.mark.parametrize('desc,json_data,roles,status,has_account,reg_num', TEST_CREATE_DATA)

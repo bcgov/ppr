@@ -954,3 +954,11 @@ def is_cl_enabled() -> bool:
     if reg_type and reg_type.act_ts:
         return now_ts().timestamp() > reg_type.act_ts.timestamp()
     return True
+
+
+def is_rl_transition() -> bool:
+    """Check if an RL amendment/renewal is transitioning to a CL: commercial lien act timestamp must exist."""
+    reg_type: RegistrationType = RegistrationType.find_by_registration_type(RegistrationTypes.CL.value)
+    if reg_type and reg_type.act_ts:
+        return now_ts().timestamp() > reg_type.act_ts.timestamp()
+    return False

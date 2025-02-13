@@ -47,9 +47,9 @@ SE_DELETE_MISSING_ID = "Required noticeId missing in delete Securities Act Notic
 SE_DELETE_INVALID_ID = "Invalid deleteId {} in delete Securities Act Notice. "
 
 
-def validate_registration(json_data: dict, account_id: str, financing_statement=None):
+def validate_registration(json_data: dict, account_id: str, financing_statement=None) -> str:
     """Perform all registration data validation checks not covered by schema validation."""
-    error_msg = ""
+    error_msg: str = ""
     if "authorizationReceived" not in json_data or not json_data["authorizationReceived"]:
         error_msg += AUTHORIZATION_INVALID
     error_msg += validate_collateral(json_data, financing_statement)
@@ -58,17 +58,18 @@ def validate_registration(json_data: dict, account_id: str, financing_statement=
     return error_msg
 
 
-def validate_renewal(json_data, financing_statement):
+def validate_renewal(json_data, financing_statement) -> str:
     """Perform all renewal registration data validation checks not covered by schema validation."""
-    error_msg = ""
+    error_msg: str = ""
     if "authorizationReceived" not in json_data or not json_data["authorizationReceived"]:
         error_msg += AUTHORIZATION_INVALID
 
     if not financing_statement:
         return error_msg
 
-    error_msg += validate_life(json_data, financing_statement)
-    if model_utils.REG_TYPE_REPAIRER_LIEN == financing_statement.registration[0].registration_type:
+    rl_renewal: bool = reg_utils.is_rl_renewal(financing_statement.registration[0].registration_type)
+    error_msg += validate_life(json_data, financing_statement, rl_renewal)
+    if rl_renewal:
         if "courtOrderInformation" not in json_data:
             error_msg += COURT_ORDER_MISSING
         elif (
@@ -84,9 +85,9 @@ def validate_renewal(json_data, financing_statement):
     return error_msg
 
 
-def validate_collateral(json_data, financing_statement=None):
+def validate_collateral(json_data, financing_statement=None) -> str:
     """Check amendment, change registration delete collateral ID's are valid."""
-    error_msg = ""
+    error_msg: str = ""
     # Check delete vehicle ID's
     if "deleteVehicleCollateral" in json_data:
         for collateral in json_data["deleteVehicleCollateral"]:
@@ -140,29 +141,23 @@ def find_general_collateral_by_id(collateral_id: int, general_collateral):
     return collateral
 
 
-def validate_life(json_data, financing_statement):
+def validate_life(json_data: dict, financing_statement, rl_renewal: bool) -> str:
     """Validate renewal lifeYears and lifeInfinite by registration type."""
-    error_msg = ""
-    reg_type = financing_statement.registration[0].registration_type
+    error_msg: str = ""
     if financing_statement.life == model_utils.LIFE_INFINITE:
         error_msg += RENEWAL_INVALID
-    elif reg_type == model_utils.REG_TYPE_REPAIRER_LIEN and "lifeInfinite" in json_data and json_data["lifeInfinite"]:
+    elif rl_renewal and "lifeInfinite" in json_data and json_data["lifeInfinite"]:
         error_msg += LI_NOT_ALLOWED
-    elif (
-        reg_type != model_utils.REG_TYPE_REPAIRER_LIEN
-        and "lifeYears" not in json_data
-        and "lifeInfinite" not in json_data
-    ):
+    elif not rl_renewal and "lifeYears" not in json_data and "lifeInfinite" not in json_data:
         error_msg += LIFE_MISSING
     elif json_data.get("lifeYears", -1) > 0 and json_data.get("lifeInfinite"):
         error_msg += LIFE_INVALID
-
     return error_msg
 
 
 def validate_securities_act_access(account_id: str, statement: FinancingStatement) -> str:
     """Validate securities act registration type restricted access by account id."""
-    error_msg = ""
+    error_msg: str = ""
     is_sec_act: bool = statement and statement.registration[0].registration_type == MiscellaneousTypes.SECURITIES_NOTICE
     if account_id and is_sec_act:
         parties = ClientCode.find_by_account_id(account_id, False, True)
@@ -173,7 +168,7 @@ def validate_securities_act_access(account_id: str, statement: FinancingStatemen
 
 def validate_securities_act_notices(statement: FinancingStatement, json_data: dict = None) -> str:
     """Validate securities act registration type amendment notices."""
-    error_msg = ""
+    error_msg: str = ""
     if (
         not json_data
         or not statement

@@ -18,6 +18,7 @@ import pytest
 
 from ppr_api.models import FinancingStatement, utils as model_utils
 from ppr_api.models.registration import CrownChargeTypes
+from ppr_api.models.type_tables import RegistrationType, RegistrationTypes
 from ppr_api.utils.validators import registration_validator as validator
 
 
@@ -475,18 +476,23 @@ TEST_AUTHORIZATION_DATA = [
     (DESC_MISSING_AC, False, validator.AUTHORIZATION_INVALID),
     (DESC_INVALID_AC, False, validator.AUTHORIZATION_INVALID)
 ]
-# testdata pattern is ({base_reg_num}, {json_data}, {valid}, {message content})
+# testdata pattern is ({base_reg_num}, {json_data}, {valid}, {cla_act_offset}, {message content})
 TEST_RENEWAL_DATA = [
-    ('TEST0001', RENEWAL_SA_VALID, True, None),
-    ('TEST0001', RENEWAL_SA_INFINITE_VALID, True, None),
-    ('TEST0017', RENEWAL_RL_VALID, True, None),
-    ('TEST0001', RENEWAL_SA_INVALID, False, 'CourtOrderInformation is not allowed'),
-    ('TEST0012', RENEWAL_SA_VALID, False, validator.RENEWAL_INVALID),
-    ('TEST0001', RENEWAL_SA_LIFE_MISSING, False, validator.LIFE_MISSING),
-    ('TEST0001', RENEWAL_SA_LIFE_INVALID, False, validator.LIFE_INVALID),
-    ('TEST0017', RENEWAL_RL_MISSING, False, validator.COURT_ORDER_MISSING),
-    ('TEST0017', RENEWAL_RL_LIFE_INFINITE, False, validator.LI_NOT_ALLOWED),
-    ('TEST0017', RENEWAL_RL_INVALID_DATE, False, validator.COURT_ORDER_INVALID_DATE)
+    ('TEST0001', RENEWAL_SA_VALID, True, None, None),
+    ('TEST0001', RENEWAL_SA_INFINITE_VALID, True, None, None),
+    ('TEST0017', RENEWAL_RL_VALID, True, 1, None),
+    ('TEST0001', RENEWAL_SA_INVALID, False, None, 'CourtOrderInformation is not allowed'),
+    ('TEST0012', RENEWAL_SA_VALID, False, None, validator.RENEWAL_INVALID),
+    ('TEST0001', RENEWAL_SA_LIFE_MISSING, False, None, validator.LIFE_MISSING),
+    ('TEST0001', RENEWAL_SA_LIFE_INVALID, False, None, validator.LIFE_INVALID),
+    ('TEST0017', RENEWAL_RL_MISSING, False, 1, validator.COURT_ORDER_MISSING),
+    ('TEST0017', RENEWAL_RL_LIFE_INFINITE, False, 1, validator.LI_NOT_ALLOWED),
+    ('TEST0017', RENEWAL_RL_INVALID_DATE, False, 1, validator.COURT_ORDER_INVALID_DATE),
+    ('TEST0017', RENEWAL_SA_VALID, True, -1, None),
+    ('TEST0017', RENEWAL_SA_INFINITE_VALID, True, -1, None),
+    ('TEST0017', RENEWAL_SA_INVALID, False, -1, 'CourtOrderInformation is not allowed'),
+    ('TEST0017', RENEWAL_SA_LIFE_MISSING, False, -1, validator.LIFE_MISSING),
+    ('TEST0017', RENEWAL_SA_LIFE_INVALID, False, -1, validator.LIFE_INVALID),
 ]
 # testdata pattern is ({desc}, {valid}, {add_sp}, {delete_sp}, {add_notice}, {delete_notice}, {message content})
 TEST_AMEND_SE_DATA = [
@@ -499,6 +505,37 @@ TEST_AMEND_SE_DATA = [
     ('Invalid delete missing id', False, False, False, True, True, validator.SE_DELETE_MISSING_ID),
     ('Invalid delete id', False, False, False, True, True, 'Invalid deleteId')
 ]
+# testdata pattern is ({desc}, {valid}, {cla_act_offset}, {message content})
+TEST_AMEND_RL_DATA = [
+    ('Valid before transition', True, 1, None),
+    ('Valid after transition', True, -1, None),
+]
+
+
+@pytest.mark.parametrize('desc,valid,act_offset,message_content', TEST_AMEND_RL_DATA)
+def test_validate_amend_rl(session, desc, valid, act_offset, message_content):
+    """Assert that repairer's lien amendment validation works as expected before and after the CLA timestamp."""
+    # setup
+    json_data = copy.deepcopy(AMENDMENT_VALID)
+    account_id: str = 'PS12345'
+    statement = FinancingStatement.find_by_registration_number('TEST0017', account_id, False)
+    json_data['deleteVehicleCollateral'][0]['vehicleId'] = statement.vehicle_collateral[0].id
+    if act_offset:
+        now_offset = model_utils.now_ts_offset(act_offset, True)
+        reg_type: RegistrationType = RegistrationType.find_by_registration_type(RegistrationTypes.CL.value)
+        reg_type.act_ts = now_offset
+        session.add(reg_type)
+        session.commit()
+
+    if not act_offset or (act_offset > 0 and json_data.get('addGeneralCollateral')):
+        del json_data['addGeneralCollateral']
+    # test
+    error_msg = validator.validate_registration(json_data, account_id, statement)
+    if valid:
+        assert error_msg == ''
+    elif message_content:
+        assert error_msg != ''
+        assert error_msg.find(message_content) != -1
 
 
 @pytest.mark.parametrize('desc,valid,add_sp,delete_sp,add_notice,delete_notice,message_content', TEST_AMEND_SE_DATA)
@@ -574,8 +611,8 @@ def test_validate_authorization(session, desc, valid, message_content):
         assert error_msg.find(message_content) != -1
 
 
-@pytest.mark.parametrize('base_reg_num,data,valid,message_content', TEST_RENEWAL_DATA)
-def test_validate_renewal(session, base_reg_num, data, valid, message_content):
+@pytest.mark.parametrize('base_reg_num,data,valid,act_offset,message_content', TEST_RENEWAL_DATA)
+def test_validate_renewal(session, base_reg_num, data, valid, act_offset, message_content):
     """Assert that renewal registration extra validation works as expected."""
     json_data = copy.deepcopy(data)
     # setup
@@ -584,7 +621,14 @@ def test_validate_renewal(session, base_reg_num, data, valid, message_content):
         statement.life = model_utils.LIFE_INFINITE
     elif base_reg_num == 'TEST0017' and valid and json_data.get('courtOrderInformation'):
         json_data['courtOrderInformation']['orderDate'] = model_utils.format_ts(model_utils.now_ts())
-        
+    if act_offset:
+        now_offset = model_utils.now_ts_offset(act_offset, True)
+        reg_type: RegistrationType = RegistrationType.find_by_registration_type(RegistrationTypes.CL.value)
+        reg_type.act_ts = now_offset
+        session.add(reg_type)
+        session.commit()
+        json_data['baseRegistrationNumber'] = base_reg_num
+
     # test
     error_msg = validator.validate_renewal(json_data, statement)
     if valid:
