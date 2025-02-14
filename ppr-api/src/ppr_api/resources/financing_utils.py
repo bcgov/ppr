@@ -64,7 +64,7 @@ CALLBACK_MESSAGES = {
 }
 
 
-def save_rl_transition(registration_class: str, financing_statement: FinancingStatement):
+def save_rl_transition(registration_class: str, financing_statement: FinancingStatement, reg_id: int):
     """Conditionally update base registration type if RL, CLA is active, and registration is an amendment/renewal."""
     if registration_class not in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_RENEWAL):
         return
@@ -76,6 +76,7 @@ def save_rl_transition(registration_class: str, financing_statement: FinancingSt
         return
     logger.info(f"RL amend/renewal of {base_reg.registration_num} after CLA transition: reg type changing to CL.")
     base_reg.registration_type = RegistrationTypes.CL.value
+    base_reg.detail_description = str(reg_id)  # Description not used for base registrations
     try:
         base_reg.save()
     except Exception as db_exception:  # noqa: B902; handle all db related errors.
@@ -152,18 +153,16 @@ def pay_and_save(  # pylint: disable=too-many-arguments,too-many-locals,too-many
         # just pass it along
         raise bus_exception
     except Exception as db_exception:  # noqa: B902; handle all db related errors.
-        logger.error(SAVE_ERROR_MESSAGE.format(account_id, registration_class, repr(db_exception)))
+        logger.error(SAVE_ERROR_MESSAGE.format(account_id, registration_class, str(db_exception)))
         if account_id and invoice_id is not None:
             logger.info(PAY_REFUND_MESSAGE.format(account_id, registration_class, invoice_id))
             try:
                 payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id)
                 payment.cancel_payment(invoice_id)
             except SBCPaymentException as cancel_exception:
-                logger.error(
-                    PAY_REFUND_ERROR.format(account_id, registration_class, invoice_id, repr(cancel_exception))
-                )
+                logger.error(PAY_REFUND_ERROR.format(account_id, registration_class, invoice_id, str(cancel_exception)))
         raise DatabaseException(db_exception) from db_exception
-    save_rl_transition(registration_class, financing_statement)
+    save_rl_transition(registration_class, financing_statement, registration.id)
     return registration
 
 
@@ -211,13 +210,13 @@ def pay_and_save_financing(req: request, request_json, account_id):  # pylint: d
     try:
         statement.save()
     except Exception as db_exception:  # noqa: B902; handle all db related errors.
-        logger.error(SAVE_ERROR_MESSAGE.format(account_id, "financing", repr(db_exception)))
+        logger.error(SAVE_ERROR_MESSAGE.format(account_id, "financing", str(db_exception)))
         if account_id and invoice_id is not None:
             logger.info(PAY_REFUND_MESSAGE.format(account_id, "financing", invoice_id))
             try:
                 payment.cancel_payment(invoice_id)
             except SBCPaymentException as cancel_exception:
-                logger.error(PAY_REFUND_ERROR.format(account_id, "financing", invoice_id, repr(cancel_exception)))
+                logger.error(PAY_REFUND_ERROR.format(account_id, "financing", invoice_id, str(cancel_exception)))
         raise DatabaseException(db_exception) from db_exception
     return statement
 
@@ -238,7 +237,7 @@ def get_mail_verification_data(registration_id: int, registration: Registration,
         report_data["cover"] = cover_data
         return report_data
     except Exception as err:  # pylint: disable=broad-except # noqa F841;
-        msg = f"Mail verification json data generation failed for id={registration_id}: " + repr(err)
+        msg = f"Mail verification json data generation failed for id={registration_id}: " + str(err)
         # logger.error(msg)
         raise ReportDataException(msg) from err
 
@@ -253,7 +252,7 @@ def get_verification_report_data(registration_id: int, json_data, account_id: st
         report_data = {"coverLetterData": cover_data, "verificationData": verification_data}
         return report_data
     except Exception as err:  # pylint: disable=broad-except # noqa F841;
-        msg = f"Mail verification report data generation failed for id={registration_id}: " + repr(err)
+        msg = f"Mail verification report data generation failed for id={registration_id}: " + str(err)
         # logger.error(msg)
         raise ReportDataException(msg) from err
 

@@ -1,6 +1,6 @@
 <div class="container pt-4 no-page-break">
 
-    <div class="statement-title">{{change.changeType}}</div>
+    <div class="statement-title">{{change.changeType}} {% if change.transitioned is defined and change.transitioned %}(as Commercial Lien){% endif%}</div>
     <div class="separator-statement mt-1"></div>
 
     <table class="no-page-break section-data statement-table mt-4" role="presentation">

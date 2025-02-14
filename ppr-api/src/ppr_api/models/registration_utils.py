@@ -210,8 +210,28 @@ def build_account_collapsed_filter_json(
                 ):
                     statement["expand"] = True
         if changes:
+            changes = set_transition_registration(statement, changes)
             statement["changes"] = changes
+        if statement.get("transitionTS"):
+            del statement["transitionTS"]
     return financing_json
+
+
+def set_transition_registration(statement: dict, changes):
+    """Conditionally set amend/renewal registration that transitioned RL registration type to CL."""
+    if statement.get("transitionTS") and statement.get("registrationType") == RegistrationTypes.CL.value:
+        change_match: str = ""
+        transition_ts = model_utils.ts_from_iso_format(statement.get("transitionTS"))
+        for change in changes:
+            if change.get("registrationClass") in ("RENEWAL", "AMENDMENT"):
+                change_ts = model_utils.ts_from_iso_format(change.get("createDateTime"))
+                if change_ts > transition_ts:
+                    change_match = change.get("createDateTime")
+        for change in changes:
+            if change.get("createDateTime") == change_match:
+                change["transitioned"] = True
+                break
+    return changes
 
 
 def set_path(params: AccountRegistrationParams, result, reg_num: str, base_reg_num: str, pending_count: int = 0):
@@ -400,7 +420,7 @@ def update_account_reg_results(params, rows, results_json, api_filter: bool = Fa
             reg_class = str(row[3])
             if not model_utils.is_financing(reg_class):
                 # This is faster than eliminating duplicates in the db query.
-                reg_summary = __build_account_reg_result(params, row, reg_class, api_filter)
+                reg_summary = __build_account_reg_result(params, row, reg_class, api_filter, None)
                 if not last_reg_num:
                     last_reg_num = reg_summary["registrationNumber"]
                     changes_json.append(reg_summary)
@@ -443,9 +463,10 @@ def __build_account_reg_result(
     result = update_summary_optional(result, params.account_id, params.sbc_staff)
     if result["registrationType"] == RegistrationTypes.CL.value:
         if cl_type and cl_type.act_ts:
-            result["previouslyRL"] = row[1].timestamp() < cl_type.act_ts.timestamp()
+            result["transitioned"] = row[1] < cl_type.act_ts
+            result["transitionTS"] = model_utils.format_ts(cl_type.act_ts)
         else:
-            result["previouslyRL"] = False
+            result["transitioned"] = False
     if "accountId" in result:
         del result["accountId"]  # Only use this for report access checking.
     return result
