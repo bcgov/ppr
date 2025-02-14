@@ -309,7 +309,7 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
     const location: MhrRegistrationHomeLocationIF = cleanEmpty(getMhrRegistrationLocation.value)
 
     // Work around require to satisfy schema validations. Currently, not collected by UI.
-    if (!location.address.postalCode) location.address.postalCode = 'A1A 1A1'
+    if (!location.address.postalCode) location.address.postalCode = ''
 
     // otherType is not required by API and locationType should have otherType's value (#14751)
     if (location.otherType) {
