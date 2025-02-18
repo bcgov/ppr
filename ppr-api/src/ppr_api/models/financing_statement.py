@@ -174,7 +174,7 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
             if reg.registration_type == RegistrationTypes.SE.value:
                 statement["securitiesActNotices"] = self.securities_act_notices_json(registration_id)
             elif reg.registration_type == RegistrationTypes.CL.value:
-                statement["previouslyRL"] = FinancingStatement.is_rl_transition(reg)
+                statement["transitioned"] = FinancingStatement.is_rl_transition(reg)
 
         if self.trust_indenture:
             for trust in self.trust_indenture:
@@ -223,11 +223,19 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         """Add history of changes in reverse chronological order to financing statement json."""
         if self.include_changes_json and self.registration and len(self.registration) > 1:
             changes = []
+            trans_id: int = 0
+            if (
+                self.registration[0].registration_type == RegistrationTypes.CL.value
+                and self.registration[0].detail_description
+            ):
+                trans_id = int(self.registration[0].detail_description)
             for reg in reversed(self.registration):
                 if reg.registration_type_cl not in ("PPSALIEN", "MISCLIEN", "CROWNLIEN") and (
                     self.verification_reg_id < 1 or reg.id <= self.verification_reg_id
                 ):
                     statement_json = reg.json
+                    if trans_id > 0 and reg.id == trans_id:
+                        statement_json["transitioned"] = True
                     statement_json["statementType"] = model_utils.REG_CLASS_TO_STATEMENT_TYPE[reg.registration_type_cl]
                     changes.append(statement_json)
             statement["changes"] = changes
