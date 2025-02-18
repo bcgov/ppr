@@ -649,7 +649,9 @@ import {
   UIMHRSearchTypes,
   LocationChangeTypes,
   ErrorCategories,
-  UnitNoteDocTypes, MhApiFrozenDocumentTypes
+  UnitNoteDocTypes,
+  MhApiFrozenDocumentTypes,
+  APIMhrTypes
 } from '@/enums'
 import {
   useAuth,
@@ -861,6 +863,7 @@ export default defineComponent({
       isTransferDueToDeath,
       isTransferWithoutBillOfSale,
       isTransferDueToSaleOrGift,
+      isTransferNonGiftBillOfSale,
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will
     } = useTransferOwners()
@@ -1367,10 +1370,13 @@ export default defineComponent({
     const onSave = async (): Promise<void> => {
       localState.loading = true
       const apiData = await buildApiData(true)
+      const draftType = (isTransferNonGiftBillOfSale.value || isTransferWithoutBillOfSale.value)
+        ? APIMhrTypes.TRANSFER_OF_SALE
+        : getMhrTransferType.value?.transferType
 
       const mhrTransferDraft = getMhrInformation.value.draftNumber
-        ? await updateMhrDraft(getMhrInformation.value.draftNumber, getMhrTransferType.value?.transferType, apiData)
-        : await createMhrDraft(getMhrTransferType.value?.transferType, apiData)
+        ? await updateMhrDraft(getMhrInformation.value.draftNumber, draftType, apiData)
+        : await createMhrDraft(draftType, apiData)
 
       const newItem: RegTableNewItemI = {
         addedReg: mhrTransferDraft.draftNumber,

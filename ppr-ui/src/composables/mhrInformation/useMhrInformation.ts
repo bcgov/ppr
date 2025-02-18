@@ -385,9 +385,10 @@ export const useMhrInformation = () => {
       }
     }
 
-    // find transfer type from array based on draft reg type
+    // find transfer type from array based on draft transfer document type or registration type
     const draftTransferType: TransferTypeSelectIF = roleBasedTransferTypes()
-      .find(type => type.transferType === draft.registrationType)
+        .find(type => type.transferType === draft.transferDocumentType) ||
+      roleBasedTransferTypes().find(type => type.transferType === draft.registrationType)
 
     // Set draft transfer type
     setMhrTransferType(draftTransferType)

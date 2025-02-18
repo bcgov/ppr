@@ -12,18 +12,18 @@
     <v-autocomplete
       v-model="selected"
       class="registrationTypeAhead rounded-top"
-      hideDetails
-      itemTitle="text"
+      hide-details
+      item-title="text"
       variant="filled"
-      returnObject
+      return-object
       density="compact"
       color="primary"
       :class="{ 'reg-filter': isClearable, 'bg-white': isLightBackGround }"
       :items="displayItems"
       :label="dropdownLabel"
       :clearable="isClearable"
-      :clearIcon="'mdi-close'"
-      persistentClear
+      :clear-icon="'mdi-close'"
+      persistent-clear
       @update:search="showAllGroups"
       @update:menu="hideAllGroups"
     >
@@ -32,7 +32,7 @@
           <v-list-item
             :id="`reg-type-drop-${item.raw.group}`"
             class="registration-list-item"
-            noGutters
+            no-gutters
             @click="toggleGroup(item.raw.group)"
           >
             <v-row
@@ -73,10 +73,11 @@
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { RegistrationOtherDialog } from '@/components/dialogs'
 import { APIRegistrationTypes } from '@/enums'
-import { RegistrationTypeIF } from '@/interfaces'
+import type { RegistrationTypeIF } from '@/interfaces'
 import { RegistrationTypes } from '@/resources'
 import { registrationOtherDialog } from '@/resources/dialogOptions'
 import { usePprRegistration } from '@/composables'
+import { getFeatureFlag } from '@/utils'
 
 export default defineComponent({
   name: 'RegistrationBarTypeAheadList',
@@ -123,9 +124,10 @@ export default defineComponent({
         return !props.isLightBackGround ? 'filled' : 'plain'
       }),
       displayItems: computed(() => {
-        const registrationTypes = !isSecurityActNoticeEnabled.value
-          ? RegistrationTypes.filter(item => item?.registrationTypeAPI !== APIRegistrationTypes.SECURITY_ACT_NOTICE)
-          : RegistrationTypes
+        // Filter out the repairers lien registration type if the feature flag is enabled
+        const registrationTypes = getFeatureFlag('cla-enabled')
+          ? RegistrationTypes.filter(item => item?.registrationTypeAPI !== APIRegistrationTypes.REPAIRERS_LIEN)
+          : RegistrationTypes.filter(item => item?.registrationTypeAPI !== APIRegistrationTypes.COMMERCIAL_LIEN)
         return filterListByGroupStatus(registrationTypes, localState.displayGroup)
       })
     })

@@ -289,7 +289,7 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
     parsedOwnerGroups.forEach((ownerGroup: MhrRegistrationHomeOwnerGroupIF) => {
       ownerGroup.owners = Object.values(ownerGroup.owners)
 
-      // @ts-ignore - TODO: Mhr-Submission - api asks for number, maybe fix this once step 3 is finished?
+      // @ts-ignore
       ownerGroup.groupId = parseInt(ownerGroup.groupId)
 
       ownerGroup.type = Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === ownerGroup.type)
@@ -311,7 +311,7 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
     const location: MhrRegistrationHomeLocationIF = cleanEmpty(getMhrRegistrationLocation.value)
 
     // Work around require to satisfy schema validations. Currently, not collected by UI.
-    if (!location.address.postalCode) location.address.postalCode = 'A1A 1A1'
+    if (!location.address.postalCode) location.address.postalCode = ''
 
     // otherType is not required by API and locationType should have otherType's value (#14751)
     if (location.otherType) {

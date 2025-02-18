@@ -5,7 +5,7 @@ import {
   UIMhrDescriptionTypes,
   UIRegistrationTypes
 } from '@/enums'
-import { MhRegistrationTypeIF, RegistrationTypeIF } from '@/interfaces'
+import type { MhRegistrationTypeIF, RegistrationTypeIF } from '@/interfaces'
 
 export const RegistrationTypesMiscellaneousCC: Array<RegistrationTypeIF> = [
   {
@@ -254,6 +254,15 @@ export const RegistrationTypesStandard: Array<RegistrationTypeIF> = [
     registrationTypeUI: UIRegistrationTypes.REPAIRERS_LIEN,
     registrationTypeAPI: APIRegistrationTypes.REPAIRERS_LIEN,
     text: `${UIRegistrationTypes.REPAIRERS_LIEN} (${APIRegistrationTypes.REPAIRERS_LIEN})`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 3,
+    registrationTypeUI: UIRegistrationTypes.COMMERCIAL_LIEN,
+    registrationTypeAPI: APIRegistrationTypes.COMMERCIAL_LIEN,
+    text: `${UIRegistrationTypes.COMMERCIAL_LIEN} (${APIRegistrationTypes.COMMERCIAL_LIEN})`
   },
   {
     class: 'registration-list-item',

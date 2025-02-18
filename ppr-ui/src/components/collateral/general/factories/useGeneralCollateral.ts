@@ -3,6 +3,7 @@ import { APIRegistrationTypes } from '@/enums'
 export const useGeneralCollateral = () => {
   const hasGeneralCollateral = (registrationType: APIRegistrationTypes): boolean => {
     const ghArray = [
+      APIRegistrationTypes.COMMERCIAL_LIEN,
       APIRegistrationTypes.SECURITY_AGREEMENT,
       APIRegistrationTypes.SECURITY_ACT_NOTICE,
       APIRegistrationTypes.SALE_OF_GOODS,

@@ -18,8 +18,14 @@ import type {
   AdminRegistrationIF,
   MhrHistoryRoIF
 } from '@/interfaces'
-import type { APIMhrTypes} from '@/enums';
-import { ErrorCategories, ErrorCodes, ErrorRootCauses, StaffPaymentOptions } from '@/enums'
+import type { APIMhrTypes ,
+  ApiTransferTypes} from '@/enums';
+import {
+  ErrorCategories,
+  ErrorCodes,
+  ErrorRootCauses,
+  StaffPaymentOptions
+} from '@/enums'
 import { useSearch } from '@/composables/useSearch'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { addTimestampToDate } from '@/utils'
@@ -588,7 +594,7 @@ export async function deleteMhRegistrationSummary (
 // Draft Requests
 
 // Save a new draft.
-export async function createMhrDraft (type: APIMhrTypes, draft: any): Promise<MhrDraftIF> {
+export async function createMhrDraft (type: APIMhrTypes|ApiTransferTypes, draft: any): Promise<MhrDraftIF> {
   const payload = {
     type,
     registration: draft
@@ -632,8 +638,11 @@ export async function createMhrDraft (type: APIMhrTypes, draft: any): Promise<Mh
 }
 
 // Update an existing draft.
-export async function updateMhrDraft (draftId: string, type: APIMhrTypes, draft: any): Promise<MhrDraftIF> {
-  if (!draftId) {
+export async function updateMhrDraft (
+  draftId: string,
+  type: APIMhrTypes|ApiTransferTypes,
+  draft: any
+): Promise<MhrDraftIF> {  if (!draftId) {
     draft.error = {
       category: ErrorCategories.REGISTRATION_SAVE,
       statusCode: StatusCodes.BAD_REQUEST,
