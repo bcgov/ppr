@@ -65,7 +65,10 @@ export default defineNuxtConfig({
       title: 'Assets UI',
       htmlAttrs: { dir: 'ltr' },
       link: [
-        { rel: 'icon', type: 'image/png', href: './src/assets/favicon.png' },
+        {
+          rel: 'icon',
+          type: 'image/png',
+          href: './src/assets/favicon.png' },
         {
           rel: 'stylesheet',
           type: 'text/css',
@@ -73,7 +76,8 @@ export default defineNuxtConfig({
       ],
       script: [
         {
-          src: 'https://ws1.postescanada-canadapost.ca/js/addresscomplete-2.30.js?key=tr28-mh11-ud79-br91&app=14466&culture=en',
+          src: `https://ws1.postescanada-canadapost.ca/js/addresscomplete-2.30.js?key=tr28-mh11-ud79-br91&app=
+          14466&culture=en`,
           type: 'text/javascript'
         }
       ]
@@ -87,9 +91,6 @@ export default defineNuxtConfig({
     '@': path.resolve(__dirname, './src'),
     '@sbc': path.resolve(__dirname, './node_modules/sbc-common-components/src')
   },
-  // resolve: {
-  //   extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue', '.scss', '.css']
-  // },
   ui: {
     icons: ['mdi']
   },

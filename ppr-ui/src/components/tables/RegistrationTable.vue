@@ -73,7 +73,7 @@
                   />
                   <template v-if="header.value === 'registrationType'">
                     <RegistrationBarTypeAheadList
-                      v-if="false"
+                      v-if="hasRPPR"
                       id="reg-type-select"
                       class="reg-type-ahead-input"
                       :default-label="'Registration Type'"
