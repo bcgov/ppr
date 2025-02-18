@@ -1,10 +1,5 @@
 <template>
   <div class="pa-0 ma-0">
-    <GenColSummary
-      :set-show-history="false"
-      :set-show-amend-link="!amendMode"
-      @init-gen-col-amend="amendMode = $event"
-    />
     <v-container
       v-if="registrationFlowType === RegistrationFlowType.AMENDMENT && amendMode"
     >

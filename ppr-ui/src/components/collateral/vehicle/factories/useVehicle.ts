@@ -1,6 +1,6 @@
 import { reactive, toRefs, computed } from 'vue'
 import { VehicleTypes, VehicleTypesNoMH } from '@/resources'
-import { VehicleCollateralIF } from '@/interfaces'
+import type { VehicleCollateralIF } from '@/interfaces'
 import { useStore } from '@/store/store'
 import { ActionTypes, APIRegistrationTypes, RegistrationFlowType } from '@/enums'
 import { cloneDeep, isEqual } from 'lodash'
@@ -119,6 +119,7 @@ export const useVehicle = (props, context) => {
     const vhArray = [
       APIRegistrationTypes.SECURITY_AGREEMENT,
       APIRegistrationTypes.REPAIRERS_LIEN,
+      APIRegistrationTypes.COMMERCIAL_LIEN,
       APIRegistrationTypes.MARRIAGE_MH,
       APIRegistrationTypes.LAND_TAX_LIEN,
       APIRegistrationTypes.MANUFACTURED_HOME_LIEN,

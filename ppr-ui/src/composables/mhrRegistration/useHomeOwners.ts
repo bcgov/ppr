@@ -1,5 +1,5 @@
 import { computed, reactive, readonly, ref, toRefs, watch } from 'vue'
-import {
+import type {
   MhrHomeOwnerGroupIF,
   MhrRegistrationFractionalOwnershipIF,
   MhrRegistrationHomeOwnerGroupIF,
@@ -489,7 +489,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
   /** Return true if the specified owner has been modified from current state **/
   const isCorrectedOwner = (owner: MhrRegistrationHomeOwnerIF): boolean => {
     const currentOwner = getMhrBaselineOwnerById(owner.ownerId)
-    const isEqualName = !!owner.individualName
+    const isEqualName = owner.individualName
       ? deepChangesComparison(currentOwner.individualName, owner.individualName)
       : deepChangesComparison(currentOwner.organizationName, owner.organizationName)
 

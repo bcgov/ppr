@@ -289,7 +289,7 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
     parsedOwnerGroups.forEach((ownerGroup: MhrRegistrationHomeOwnerGroupIF) => {
       ownerGroup.owners = Object.values(ownerGroup.owners)
 
-      // @ts-ignore - TODO: Mhr-Submission - api asks for number, maybe fix this once step 3 is finished?
+      // @ts-ignore
       ownerGroup.groupId = parseInt(ownerGroup.groupId)
 
       ownerGroup.type = Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === ownerGroup.type)

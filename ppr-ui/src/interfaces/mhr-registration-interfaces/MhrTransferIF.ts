@@ -1,4 +1,4 @@
-import {
+import type {
   MhrRegistrationHomeOwnerGroupIF,
   MhrHomeOwnerGroupIF,
   PaymentIF,
@@ -7,7 +7,7 @@ import {
   TransferTypeSelectIF,
   MhrRegistrationIF
 } from '@/interfaces'
-import { APIMhrTypes, ApiTRANSTransfersTypes, ApiTransferTypes } from '@/enums'
+import type { APIMhrTypes, ApiTRANSTransfersTypes, ApiTransferTypes } from '@/enums'
 
 export interface MhrTransferIF {
   mhrNumber: string
