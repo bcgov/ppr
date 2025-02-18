@@ -2,7 +2,7 @@
   <v-container class="px-2">
     <v-row
       v-if="showConfirm"
-      noGutters
+      no-gutters
       class="pb-4"
     >
       <v-col cols="10">
@@ -13,7 +13,7 @@
     </v-row>
     <v-row
       v-if="showAmendLink"
-      noGutters
+      no-gutters
       class="px-0"
     >
       <v-col cols="10">
@@ -105,7 +105,7 @@
           class="badge-delete"
           variant="elevated"
           color="greyLighten"
-          xSmall
+          x-small
         >
           <b>DELETED</b>
         </v-chip>
@@ -123,7 +123,7 @@
         <v-chip
           color="primary"
           variant="elevated"
-          xSmall
+          x-small
         >
           <b>ADDED</b>
         </v-chip>
@@ -160,7 +160,7 @@
         <v-row
           v-for="(item, index) in generalCollateral"
           :key="index"
-          noGutters
+          no-gutters
         >
           <v-col
             v-if="item.addedDateTime"
@@ -178,7 +178,7 @@
                 class="badge-delete"
                 color="greyLighten"
                 variant="elevated"
-                xSmall
+                x-small
               >
                 <b>DELETED</b>
               </v-chip>
@@ -196,7 +196,7 @@
               <v-chip
                 color="primary"
                 variant="elevated"
-                xSmall
+                x-small
               >
                 <b>ADDED</b>
               </v-chip>
@@ -259,7 +259,7 @@ import {
 } from 'vue'
 import { useStore } from '@/store/store'
 import { RegistrationFlowType } from '@/enums'
-import { GeneralCollateralIF } from '@/interfaces'
+import type { GeneralCollateralIF } from '@/interfaces'
 import { pacificDate } from '@/utils'
 import { cloneDeep } from 'lodash'
 import { storeToRefs } from 'pinia'

@@ -8,6 +8,7 @@ export const defaultFlagSet: LDFlagSet = {
   'financing-statement': false,
   'ppr-ui-enabled': true, // PPR Search -  default true: Should remove from codebase,
   'ppr-sa-notice-enabled': false, // PPR Security Act Notice
+  'cla-enabled': false, // Enables the Commercial Lien Registration flows
   'bcregistry-ui-mhr-enabled': true,
   'search-registration-number': true,
   'search-serial-number': true,

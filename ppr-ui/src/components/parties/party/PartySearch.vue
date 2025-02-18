@@ -225,7 +225,6 @@ export default defineComponent({
 
 <style lang="scss" module>
 @import '@/assets/styles/theme.scss';
-
 .close-btn-row {
   height: 1rem;
 }

@@ -1,5 +1,5 @@
 import { computed, reactive, readonly, ref, toRefs, watch } from 'vue'
-import {
+import type {
   MhrHomeOwnerGroupIF,
   MhrRegistrationFractionalOwnershipIF,
   MhrRegistrationHomeOwnerGroupIF,
@@ -260,10 +260,10 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
     }
 
     // Remove first group option when there is existing SO/JT
-    if (!showGroups.value && homeOwnerGroups.length && isMhrTransfer) dropDownItems.shift()
+    if (!showGroups.value && homeOwnerGroups.length) dropDownItems.shift()
 
     // Handle Edit Defaults
-    if (!dropDownItems.length) return [{ title: 'Group 1 (New Group)', value: DEFAULT_GROUP_ID }]
+    if (!dropDownItems.length) return [{ title: 'Group 1 (New Group)', value: DEFAULT_GROUP_ID + 1 }]
 
     // Only return groups that have NOT been REMOVED
     return dropDownItems.filter(item => {
@@ -489,7 +489,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
   /** Return true if the specified owner has been modified from current state **/
   const isCorrectedOwner = (owner: MhrRegistrationHomeOwnerIF): boolean => {
     const currentOwner = getMhrBaselineOwnerById(owner.ownerId)
-    const isEqualName = !!owner.individualName
+    const isEqualName = owner.individualName
       ? deepChangesComparison(currentOwner.individualName, owner.individualName)
       : deepChangesComparison(currentOwner.organizationName, owner.organizationName)
 

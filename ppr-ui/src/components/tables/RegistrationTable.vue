@@ -9,9 +9,9 @@
       v-if="showDatePicker"
       id="ranged-date-picker"
       ref="datePicker"
-      :defaultStartDate="getPstDateObj(submittedStartDate)"
-      :defaultEndDate="getPstDateObj(submittedEndDate)"
-      :defaultMaxDate="new Date()"
+      :default-start-date="getPstDateObj(submittedStartDate)"
+      :default-end-date="getPstDateObj(submittedEndDate)"
+      :default-max-date="new Date()"
       @submit="updateDateRange($event)"
     />
 
@@ -24,7 +24,7 @@
         'registration-table': true,
         'min-table-height': showDatePicker
       }"
-      fixedHeader
+      fixed-header
     >
       <template #default>
         <thead v-if="setHeaders.length > 1">
@@ -39,7 +39,7 @@
             >
               <v-row
                 class="reg-header-row"
-                noGutters
+                no-gutters
                 @click="toggleOrderBy(header.value, header.sortable)"
               >
                 <v-col
@@ -49,14 +49,14 @@
                   <!-- Date Sort Icon/Button -->
                   <SortingIcon
                     v-if="header.value === orderBy && header.sortable"
-                    :sortAsc="sortAsc"
-                    @sortEvent="dateSortHandler(setRegistrationHistory, 'createDateTime', $event)"
+                    :sort-asc="sortAsc"
+                    @sort-event="dateSortHandler(setRegistrationHistory, 'createDateTime', $event)"
                   />
                 </v-col>
               </v-row>
               <v-row
                 class="reg-filter-row py-2"
-                noGutters
+                no-gutters
               >
                 <v-col>
                   <v-text-field
@@ -64,8 +64,8 @@
                     v-model="registrationNumber"
                     variant="filled"
                     color="primary"
-                    singleLine
-                    :hideDetails="true"
+                    single-line
+                    :hide-details="true"
                     type="text"
                     label="Number"
                     density="compact"
@@ -73,13 +73,13 @@
                   />
                   <template v-if="header.value === 'registrationType'">
                     <RegistrationBarTypeAheadList
-                      v-if="hasRPPR"
+                      v-if="false"
                       id="reg-type-select"
                       class="reg-type-ahead-input"
-                      :defaultLabel="'Registration Type'"
-                      :defaultDense="true"
-                      :defaultClearable="true"
-                      :defaultClear="shouldClearType"
+                      :default-label="'Registration Type'"
+                      :default-dense="true"
+                      :default-clearable="true"
+                      :default-clear="shouldClearType"
                       @selected="selectRegistration($event)"
                     />
                     <v-select
@@ -87,14 +87,14 @@
                       id="txt-type"
                       v-model="registrationType"
                       :items="registrationTypes"
-                      singleLine
-                      itemTitle="registrationTypeUI"
-                      itemValue="registrationTypeAPI"
+                      single-line
+                      item-title="registrationTypeUI"
+                      item-value="registrationTypeAPI"
                       class="table-registration-types registration-type-select"
                       variant="filled"
                       color="primary"
                       clearable
-                      hideDetails
+                      hide-details
                       density="compact"
                       label="Registration Type"
                       aria-hidden="true"
@@ -111,15 +111,15 @@
                       id="txt-type"
                       v-model="registrationType"
                       :items="mhrRegistrationTypes"
-                      :menuProps="isMiscTransfersEnabled ? { maxHeight: 440, width: 500 } : {}"
-                      singleLine
-                      itemTitle="registrationTypeUI"
-                      itemValue="registrationTypeAPI"
+                      :menu-props="isMiscTransfersEnabled ? { maxHeight: 440, width: 500 } : {}"
+                      single-line
+                      item-title="registrationTypeUI"
+                      item-value="registrationTypeAPI"
                       class="table-registration-types registration-type-select"
                       variant="filled"
                       color="primary"
                       clearable
-                      hideDetails
+                      hide-details
                       density="compact"
                       label="Registration Type"
                       aria-hideen="true"
@@ -140,7 +140,7 @@
                           >
                             <v-row
                               :id="`transfer-type-group-${item.raw.group}`"
-                              noGutters
+                              no-gutters
                               @click="toggleGroup(item.raw.group)"
                             >
                               <v-col>
@@ -154,7 +154,7 @@
                                   size="18"
                                   color="primary"
                                   class="mt-n2"
-                                  :appendIcon="displayGroup[item.raw.group] ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+                                  :append-icon="displayGroup[item.raw.group] ? 'mdi-chevron-up' : 'mdi-chevron-down'"
                                 />
                               </v-col>
                             </v-row>
@@ -183,16 +183,16 @@
                     id="reg-date-text-field"
                     v-model="dateTxt"
                     class="reg-textfield date-filter"
-                    appendInnerIcon="mdi-calendar"
+                    append-inner-icon="mdi-calendar"
                     density="compact"
                     clearable
                     variant="filled"
                     color="primary"
-                    hideDetails
+                    hide-details
                     label="Date"
-                    singleLine
-                    persistentClear
-                    :clearIcon="'mdi-close'"
+                    single-line
+                    persistent-clear
+                    :clear-icon="'mdi-close'"
                     aria-hidden="true"
                     @click="showDatePicker = true"
                   />
@@ -201,8 +201,8 @@
                     v-model="documentId"
                     variant="filled"
                     color="primary"
-                    singleLine
-                    hideDetails="true"
+                    single-line
+                    hide-details="true"
                     type="text"
                     label="Document ID"
                     density="compact"
@@ -212,11 +212,11 @@
                     v-if="isPpr && header.value === 'statusType'"
                     v-model="status"
                     :items="statusTypes"
-                    hideDetails
-                    singleLine
+                    hide-details
+                    single-line
                     variant="filled"
                     color="primary"
-                    itemClass="list-item"
+                    item-class="list-item"
                     label="Status"
                     clearable
                     density="compact"
@@ -226,11 +226,11 @@
                     v-else-if="header.value === 'statusType'"
                     v-model="status"
                     :items="mhStatusTypes"
-                    hideDetails
-                    singleLine
+                    hide-details
+                    single-line
                     variant="filled"
                     color="primary"
-                    itemClass="list-item"
+                    item-class="list-item"
                     label="Status"
                     clearable
                     density="compact"
@@ -241,8 +241,8 @@
                     v-model="registeredBy"
                     variant="filled"
                     color="primary"
-                    singleLine
-                    hideDetails="true"
+                    single-line
+                    hide-details="true"
                     type="text"
                     label="Registered By"
                     density="compact"
@@ -253,8 +253,8 @@
                     v-model="registeringParty"
                     variant="filled"
                     color="primary"
-                    singleLine
-                    hideDetails="true"
+                    single-line
+                    hide-details="true"
                     type="text"
                     label="Submitting Party"
                     density="compact"
@@ -264,8 +264,8 @@
                     v-model="folioNumber"
                     variant="filled"
                     color="primary"
-                    singleLine
-                    hideDetails="true"
+                    single-line
+                    hide-details="true"
                     type="text"
                     label=""
                     density="compact"
@@ -319,16 +319,16 @@
             <TableRow
               :ref="setRowRef(item)"
               class="registration-data-table"
-              :setAddRegEffect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(item))"
-              :setDisableActionShadow="overrideWidth"
-              :setHeaders="headers"
-              :setIsExpanded="item.expand || isNewRegParentItem(item)"
-              :setItem="item"
-              :isPpr="isPpr"
+              :set-add-reg-effect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(item))"
+              :set-disable-action-shadow="overrideWidth"
+              :set-headers="headers"
+              :set-is-expanded="item.expand || isNewRegParentItem(item)"
+              :set-item="item"
+              :is-ppr="isPpr"
               @action="emitRowAction($event)"
               @error="emitError($event)"
-              @freezeScroll="freezeTableScroll = $event"
-              @toggleExpand="item.expand = !item.expand"
+              @freeze-scroll="freezeTableScroll = $event"
+              @toggle-expand="item.expand = !item.expand"
             />
 
             <!-- Children items -->
@@ -338,14 +338,14 @@
                 :key="`change-${childItem.documentId || childItem.registrationNumber}`"
                 :ref="setRowRef(childItem)"
                 class="registration-data-table"
-                :isPpr="isPpr"
-                :setAddRegEffect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(childItem))"
-                :setDisableActionShadow="overrideWidth"
-                :setChild="true"
-                :setHeaders="setHeaders"
-                :setItem="childItem"
+                :is-ppr="isPpr"
+                :set-add-reg-effect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(childItem))"
+                :set-disable-action-shadow="overrideWidth"
+                :set-child="true"
+                :set-headers="setHeaders"
+                :set-item="childItem"
                 @action="emitRowAction($event)"
-                @freezeScroll="freezeTableScroll = $event"
+                @freeze-scroll="freezeTableScroll = $event"
               />
             </template>
           </template>
@@ -392,7 +392,7 @@ import {
 import { useStore } from '@/store/store'
 import RegistrationBarTypeAheadList from '@/components/registration/RegistrationBarTypeAheadList.vue'
 import { SortingIcon, TableRow } from './common'
-import {
+import type {
   RegistrationSummaryIF,
   AccountProductSubscriptionIF,
   RegistrationTypeIF,
@@ -408,7 +408,7 @@ import {
   AccountProductCodes,
   AccountProductRoles,
   TableActions,
-  mapMhrDescriptionToCodes
+  mapMhrDescriptionToCodes, APIRegistrationTypes
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
 import {
@@ -421,7 +421,7 @@ import {
 import { storeToRefs } from 'pinia'
 import { useTableFeatures, useTransferOwners } from '@/composables'
 import { RangeDatePicker } from '@/components/common'
-import { dateToYyyyMmDd, yyyyMmDdToPacificDate, localTodayDate } from '@/utils'
+import { dateToYyyyMmDd, yyyyMmDdToPacificDate, localTodayDate, getFeatureFlag } from '@/utils'
 import TableObserver from '@/components/tables/common/TableObserver.vue'
 
 export default defineComponent({
@@ -549,7 +549,14 @@ export default defineComponent({
       showDatePicker: false,
       statusTypes: [...StatusTypes],
       mhStatusTypes: MhStatusTypes,
-      registrationTypes: [...RegistrationTypesStandard].slice(1),
+      registrationTypes: computed(() => {
+        // Filter out the repairers lien registration type if the feature flag is enabled
+        const registrationTypes = getFeatureFlag('cla-enabled')
+          ? RegistrationTypesStandard.filter(item => item?.registrationTypeAPI !== APIRegistrationTypes.REPAIRERS_LIEN)
+          : RegistrationTypesStandard.filter(item => item?.registrationTypeAPI !== APIRegistrationTypes.COMMERCIAL_LIEN)
+
+        return [...registrationTypes].slice(1)
+      }),
       mhrRegistrationTypes: computed(() =>
         isMiscTransfersEnabled
           ? MHRegistrationTypes.filter(item =>
@@ -730,7 +737,7 @@ export default defineComponent({
     const updateDateRange = (dates: { endDate: Date, startDate: Date }) => {
       if (!(dates.endDate && dates.startDate)) dateTxt.value = ''
       else dateTxt.value = 'Custom'
-      
+
       submittedStartDate.value = dateToYyyyMmDd(dates.startDate)
       submittedEndDate.value = dateToYyyyMmDd(dates.endDate)
       localState.showDatePicker = false
@@ -761,7 +768,7 @@ export default defineComponent({
       if(!date) return null
       // Regular expression to match timezone offset (e.g., +05:00 or Z for UTC)
       const timeZoneRegex = /([+-]\d{2}:\d{2}|Z)$/;
-      
+
       if(timeZoneRegex.test(date)) {
         return new Date(date)
       }
