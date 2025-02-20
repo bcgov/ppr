@@ -7,7 +7,7 @@
   >
     <v-row
       v-if="renewalView"
-      noGutters
+      no-gutters
       class="summary-header pa-2 mb-8 ml-n8 mr-n10"
     >
       <v-col
@@ -18,8 +18,8 @@
           mdi-calendar-clock
         </v-icon>
         <label class="pl-3">
-          <strong>Renewal Length and <span v-if="showTrustIndenture">Trust Indenture</span>
-            <span v-else>Terms</span>
+          <strong>
+            Renewal Length<span v-if="showTrustIndenture"> and Trust Indenture</span>
           </strong>
         </label>
       </v-col>
@@ -27,7 +27,7 @@
 
     <v-row
       v-if="renewalView"
-      noGutters
+      no-gutters
     >
       <v-col
         cols="12"
@@ -40,7 +40,7 @@
     <div>
       <v-row
         class="pt-6"
-        noGutters
+        no-gutters
       >
         <v-col
           cols="3"
@@ -59,7 +59,7 @@
             <v-radio
               id="length-in-years"
               class="years-radio mt-2"
-              :hideDetails="false"
+              :hide-details="false"
               label=""
               value="false"
               @click="setLifeInfinite(false)"
@@ -67,7 +67,7 @@
             <v-radio
               id="length-infinite"
               class="infinite-radio mt-10"
-              :hideDetails="false"
+              :hide-details="false"
               label=""
               value="true"
               @click="setLifeInfinite(true)"
@@ -79,12 +79,12 @@
             id="life-years-field"
             v-model="lifeYearsEdit"
             autocomplete="off"
-            :errorMessages="lifeYearsMessage || ''"
+            :error-messages="lifeYearsMessage || ''"
             variant="filled"
             color="primary"
             :readonly="lifeYearsDisabled"
             :hint="lifeYearsHint"
-            persistentHint
+            persistent-hint
             label="Length in Years"
           />
           <p class="pt-5">
@@ -104,7 +104,7 @@
       </v-row>
       <v-row
         v-if="renewalView"
-        noGutters
+        no-gutters
         class="py-6"
       >
         <v-col
@@ -131,7 +131,7 @@
       </v-row>
       <v-row
         v-if="showTrustIndenture"
-        noGutters
+        no-gutters
         class="pt-6"
       >
         <v-col
@@ -154,7 +154,7 @@
             id="trust-indenture-checkbox"
             v-model="trustIndenture"
             class="trust-checkbox mt-n4"
-            hideDetails
+            hide-details
             :hint="trustIndentureHint"
             label=""
           />
@@ -165,7 +165,7 @@
         >
           <v-tooltip
             location="top"
-            contentClass="top-tooltip pa-5"
+            content-class="top-tooltip pa-5"
             transition="fade-transition"
           >
             <template #activator="{ props }">
@@ -194,7 +194,7 @@ import {
   onMounted
 } from 'vue'
 import { useStore } from '@/store/store'
-import { LengthTrustIF } from '@/interfaces'
+import type { LengthTrustIF } from '@/interfaces'
 import { formatExpiryDate, isInt } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
 import { getFinancingFee } from '@/composables/fees/factories'

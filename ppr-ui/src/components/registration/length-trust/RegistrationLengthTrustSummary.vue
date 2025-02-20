@@ -12,7 +12,7 @@
     </h2>
     <v-row
       v-else
-      noGutters
+      no-gutters
       class="summary-header py-2"
     >
       <v-col
@@ -48,7 +48,7 @@
     >
       <v-row
         v-if="showErrorSummary && !isSecurityActNotice"
-        noGutters
+        no-gutters
         class="pb-6"
       >
         <v-col cols="auto">
@@ -65,7 +65,7 @@
           </span>
         </v-col>
       </v-row>
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col
           cols="3"
           class="generic-label"
@@ -81,14 +81,14 @@
       </v-row>
       <v-row
         v-if="renewalView"
-        noGutters
+        no-gutters
         class="pt-8"
       >
         <v-col
           cols="3"
           class="generic-label"
         >
-          New Expiry
+          New Expiry Date and Time
         </v-col>
         <v-col
           id="new-expiry"
@@ -99,7 +99,7 @@
       </v-row>
       <v-row
         v-if="showTrustIndenture"
-        noGutters
+        no-gutters
         class="pt-6"
       >
         <v-col
@@ -117,7 +117,7 @@
       </v-row>
       <v-row
         v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
-        noGutters
+        no-gutters
         class="pt-6"
       >
         <v-col
@@ -132,7 +132,7 @@
       </v-row>
       <v-row
         v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
-        noGutters
+        no-gutters
         class="pt-6"
       >
         <v-col
@@ -161,7 +161,7 @@ import { useStore } from '@/store/store'
 import { useRoute, useRouter } from 'vue-router'
 
 // local
-import { LengthTrustIF } from '@/interfaces'
+import type { LengthTrustIF } from '@/interfaces'
 import { convertDate, formatExpiryDate, isInt } from '@/utils'
 import { APIRegistrationTypes, RouteNames, RegistrationFlowType } from '@/enums'
 import { getFinancingFee } from '@/composables/fees/factories'
