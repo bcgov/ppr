@@ -962,3 +962,11 @@ def is_rl_transition() -> bool:
     if reg_type and reg_type.act_ts:
         return now_ts().timestamp() > reg_type.act_ts.timestamp()
     return False
+
+
+def get_cl_transition_ts() -> _datetime:
+    """Look up the commercial lien act timestamp."""
+    reg_type: RegistrationType = RegistrationType.find_by_registration_type(RegistrationTypes.CL.value)
+    if reg_type and reg_type.act_ts:
+        return reg_type.act_ts
+    return None

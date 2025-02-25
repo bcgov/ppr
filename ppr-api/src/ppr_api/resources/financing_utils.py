@@ -76,7 +76,6 @@ def save_rl_transition(registration_class: str, financing_statement: FinancingSt
         return
     logger.info(f"RL amend/renewal of {base_reg.registration_num} after CLA transition: reg type changing to CL.")
     base_reg.registration_type = RegistrationTypes.CL.value
-    base_reg.detail_description = str(reg_id)  # Description not used for base registrations
     try:
         base_reg.save()
     except Exception as db_exception:  # noqa: B902; handle all db related errors.

@@ -450,7 +450,9 @@ TEST_PAY_TYPE_FINANCING = [
     ('PS', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
     ('RA', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
     ('SS', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
-    ('TL', 99, 1, TransactionTypes.FINANCING_NO_FEE.value)
+    ('TL', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('CL', 5, 5, TransactionTypes.FINANCING_CL.value),
+    ('CL', 99, 1, TransactionTypes.FINANCING_CL_INFINITE.value)
 ]
 # testdata pattern is ({desc}, {status}, {registration_id}, {party_id})
 TEST_VERIFICATION_CALLBACK_DATA = [

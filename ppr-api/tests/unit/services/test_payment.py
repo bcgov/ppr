@@ -32,7 +32,7 @@ from tests.unit.services.utils import helper_create_jwt
 
 
 MOCK_URL_NO_KEY = 'https://test.api.connect.gov.bc.ca/mockTarget/pay/api/v1/'
-MOCK_URL = 'https://test.api.connect.gov.bc.ca/pay/api/v1/'
+MOCK_URL = 'https://test.api.connect.gov.bc.ca/pay-dev/api/v1/'
 PAY_DETAILS_SEARCH = {
     'label': 'Search by SERIAL_NUMBER',
     'value': '123456789'
@@ -43,6 +43,7 @@ PAY_DETAILS_REGISTRATION = {
 }
 # testdata pattern is ({pay_trans_type}, {quantity}, {filing_type})
 TEST_PAY_TYPE_FILING_TYPE = [
+    (TransactionTypes.FINANCING_CL.value, 5, 'CLREG'),
     (TransactionTypes.FINANCING_LIFE_YEAR.value, 5, 'FSREG'),
     (TransactionTypes.SEARCH.value, 1, 'SERCH'),
     (TransactionTypes.AMENDMENT.value, 1, 'FSCHG'),
@@ -51,6 +52,7 @@ TEST_PAY_TYPE_FILING_TYPE = [
     (TransactionTypes.FINANCING_FR.value, 1, 'FLREG'),
     (TransactionTypes.FINANCING_NO_FEE.value, 1, 'NCREG'),
     (TransactionTypes.FINANCING_INFINITE.value, 1, 'INFRG'),
+    (TransactionTypes.FINANCING_CL_INFINITE.value, 1, 'INFRG'),
     (TransactionTypes.RENEWAL_INFINITE.value, 1, 'INFRN'),
     (TransactionTypes.RENEWAL_LIFE_YEAR.value, 3, 'FSREN')
 ]
@@ -70,10 +72,15 @@ TEST_PAY_STAFF_REGISTRATION = [
     (TransactionTypes.DISCHARGE.value, None, None, None, True),
     (TransactionTypes.FINANCING_NO_FEE.value, None, None, None, True),
     (TransactionTypes.FINANCING_INFINITE.value, None, None, None, True),
+    (TransactionTypes.FINANCING_CL_INFINITE.value, None, None, None, True),
     (TransactionTypes.FINANCING_LIFE_YEAR.value, None, None, None, True),
     (TransactionTypes.FINANCING_LIFE_YEAR.value, '12345', None, None, False),
     (TransactionTypes.FINANCING_LIFE_YEAR.value, None, '62345', None, False),
     (TransactionTypes.FINANCING_LIFE_YEAR.value, None, '62345', '72345', False),
+    (TransactionTypes.FINANCING_CL.value, None, None, None, True),
+    (TransactionTypes.FINANCING_CL.value, '12345', None, None, False),
+    (TransactionTypes.FINANCING_CL.value, None, '62345', None, False),
+    (TransactionTypes.FINANCING_CL.value, None, '62345', '72345', False),
     (TransactionTypes.RENEWAL_LIFE_YEAR.value, None, None, None, True),
     (TransactionTypes.AMENDMENT.value, '12345', None, None, False),
     (TransactionTypes.AMENDMENT.value, None, None, None, True),

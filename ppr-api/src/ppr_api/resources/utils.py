@@ -20,6 +20,7 @@ from ppr_api.exceptions import BusinessException, DatabaseException, ResourceErr
 from ppr_api.models import EventTracking, MailReport, Party, Registration, VerificationReport
 from ppr_api.models import utils as model_utils
 from ppr_api.models.registration import AccountRegistrationParams, CrownChargeTypes, MiscellaneousTypes, PPSATypes
+from ppr_api.models.type_tables import RegistrationTypes
 from ppr_api.services.authz import is_bcol_help, is_reg_staff_account, is_sbc_office_account, user_orgs
 from ppr_api.services.payment import TransactionTypes
 from ppr_api.services.payment.exceptions import SBCPaymentException
@@ -478,14 +479,20 @@ def get_payment_type_financing(registration):
     if registration.registration_type_cl in (model_utils.REG_CLASS_CROWN, model_utils.REG_CLASS_MISC):
         pay_trans_type = TransactionTypes.FINANCING_NO_FEE.value
         fee_quantity = 1
-    elif registration.registration_type in (model_utils.REG_TYPE_LAND_TAX_MH, model_utils.REG_TYPE_TAX_MH):
+    elif registration.registration_type in (RegistrationTypes.LT.value, RegistrationTypes.MH.value):
         pay_trans_type = TransactionTypes.FINANCING_NO_FEE.value
         fee_quantity = 1
-    elif registration.registration_type == model_utils.REG_TYPE_MARRIAGE_SEPARATION:
+    elif registration.registration_type == RegistrationTypes.FR.value:
         pay_trans_type = TransactionTypes.FINANCING_FR.value
         fee_quantity = 1
-    elif registration.registration_type == model_utils.REG_TYPE_REPAIRER_LIEN:
+    elif registration.registration_type == RegistrationTypes.RL.value:
         fee_quantity = 1
+    elif registration.registration_type == RegistrationTypes.CL.value:
+        if registration.life != model_utils.LIFE_INFINITE:
+            pay_trans_type = TransactionTypes.FINANCING_CL.value
+        else:
+            pay_trans_type = TransactionTypes.FINANCING_CL_INFINITE.value
+            fee_quantity = 1
     elif registration.life == model_utils.LIFE_INFINITE:
         pay_trans_type = TransactionTypes.FINANCING_INFINITE.value
         fee_quantity = 1
