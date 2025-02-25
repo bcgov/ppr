@@ -41,6 +41,8 @@ TRANSACTION_TO_FILING_TYPE = {
     "FINANCING_LIFE_YEAR": "FSREG",
     "FINANCING_INFINITE": "INFRG",
     "FINANCING_STAFF_PROCESS_FEE": "PRFEEB",
+    "FINANCING_CL": "CLREG",  # Special flat rate fee for the CL registration type.
+    "FINANCING_CL_INFINITE": "INFRG",
     "RENEWAL_LIFE_YEAR": "FSREN",
     "RENEWAL_INFINITE": "INFRN",
     "SEARCH": "SERCH",
@@ -52,6 +54,7 @@ TRANSACTION_TO_FILING_TYPE = {
 
 # Mapping from normal filing type to staff version of filing type
 TO_STAFF_FILING_TYPE = {
+    "CLREG": "CLRGS",
     "FSCHG": "FSCHS",
     "FLREG": "FLRGS",
     "FSREG": "FSRGS",
@@ -365,8 +368,8 @@ class SBCPaymentClient(BaseClient):
             data["details"][0]["value"] = self.detail_value
         else:
             del data["details"]
-        logger.debug("staff registration create payment payload: ")
-        logger.debug(json.dumps(data))
+        logger.info("staff registration create payment payload: ")
+        logger.info(json.dumps(data))
         invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data, include_account=True)
         return SBCPaymentClient.build_pay_reference(invoice_data, self.api_url)
 

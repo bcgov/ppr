@@ -220,17 +220,12 @@ def build_account_collapsed_filter_json(
 def set_transition_registration(statement: dict, changes):
     """Conditionally set amend/renewal registration that transitioned RL registration type to CL."""
     if statement.get("transitionTS") and statement.get("registrationType") == RegistrationTypes.CL.value:
-        change_match: str = ""
         transition_ts = model_utils.ts_from_iso_format(statement.get("transitionTS"))
         for change in changes:
             if change.get("registrationClass") in ("RENEWAL", "AMENDMENT"):
                 change_ts = model_utils.ts_from_iso_format(change.get("createDateTime"))
                 if change_ts > transition_ts:
-                    change_match = change.get("createDateTime")
-        for change in changes:
-            if change.get("createDateTime") == change_match:
-                change["transitioned"] = True
-                break
+                    change["transitioned"] = True
     return changes
 
 
