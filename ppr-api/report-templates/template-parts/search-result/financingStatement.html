@@ -16,7 +16,11 @@
   <table class="business-details-table-grey" role="presentation">
     <tr>
       <td>Registration Description:</td>
-      <td>{{ detail.financingStatement.registrationDescription }}</td>
+      <td>{{ detail.financingStatement.registrationDescription }}
+          {% if detail.financingStatement.type == 'CL' and detail.financingStatement.transitioned is defined  and detail.financingStatement.transitioned %}
+            <span style="font-style: italic;">(Continued from Repairers Lien)</span>
+          {% endif %}
+      </td>
     </tr>
     <tr>
       <td>Act:</td>
@@ -56,15 +60,6 @@
         <td>Lien Amount (CAD):</td>
         <td>{{detail.financingStatement.lienAmount}}</td>
       </tr>
-    {% elif detail.financingStatement.type == 'CL' and detail.financingStatement.surrenderDate is defined %}
-      <tr>
-        <td>Surrender Date:</td>
-        <td>{{detail.financingStatement.surrenderDate}}</td>
-      </tr>
-      <tr>
-        <td>Lien Amount (CAD):</td>
-        <td>{{detail.financingStatement.lienAmount}}</td>
-      </tr>      
     {% elif detail.financingStatement.type == 'SA' %}
       <tr>
         <td>Trust Indenture:</td>
@@ -95,8 +90,23 @@
       </td>
     </tr>
   {% endif %}
-
   </table>
+
+  {% if detail.financingStatement.type == 'CL' and detail.financingStatement.transitioned is defined and detail.financingStatement.transitioned %}
+    <table class="business-details-table-grey mt-2" role="presentation">
+      <tr><td colspan="2">Historical Information from Repairers Lien</td></tr>
+      <tr>
+        <td>Surrender Date:</td>
+        <td>{{detail.financingStatement.surrenderDate}}</td>
+      </tr>
+      <tr>
+        <td>Lien Amount (CAD):</td>
+        <td>{{detail.financingStatement.lienAmount}}</td>
+      </tr>      
+    </table>
+  {% endif %}
+</div>
+
 </div>
 
 <div class="no-page-break">

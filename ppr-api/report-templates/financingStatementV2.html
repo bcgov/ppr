@@ -81,15 +81,6 @@
           <td>Lien Amount (CAD):</td>
           <td>{{lienAmount}}</td>
         </tr>
-      {% elif type == 'CL' and surrenderDate is defined %}
-        <tr>
-          <td>Surrender Date:</td>
-          <td>{{surrenderDate}}</td>
-        </tr>
-        <tr>
-          <td>Lien Amount (CAD):</td>
-          <td>{{lienAmount}}</td>
-        </tr>
       {% elif type == 'SA' %}
         <tr>
           <td>Trust Indenture:</td>
@@ -135,10 +126,22 @@
           </td>
         </tr>
       {% endif %}
-
     </table>
-  </div>
 
+    {% if type == 'CL' and transitioned is defined and transitioned %}
+      <table class="business-details-table-grey mt-2" role="presentation">
+        <tr><td colspan="2">Historical Information from Repairers Lien</td></tr>
+        <tr>
+          <td>Surrender Date:</td>
+          <td>{{surrenderDate}}</td>
+        </tr>
+        <tr>
+          <td>Lien Amount (CAD):</td>
+          <td>{{lienAmount}}</td>
+        </tr>
+      </table>
+    {% endif %}
+  </div>
 
   {% if changes  %}
   <div class="no-page-break">

@@ -223,18 +223,15 @@ class FinancingStatement(db.Model):  # pylint: disable=too-many-instance-attribu
         """Add history of changes in reverse chronological order to financing statement json."""
         if self.include_changes_json and self.registration and len(self.registration) > 1:
             changes = []
-            trans_id: int = 0
-            if (
-                self.registration[0].registration_type == RegistrationTypes.CL.value
-                and self.registration[0].detail_description
-            ):
-                trans_id = int(self.registration[0].detail_description)
+            cl_timestamp = None
+            if statement.get("transitioned"):
+                cl_timestamp = model_utils.get_cl_transition_ts()
             for reg in reversed(self.registration):
                 if reg.registration_type_cl not in ("PPSALIEN", "MISCLIEN", "CROWNLIEN") and (
                     self.verification_reg_id < 1 or reg.id <= self.verification_reg_id
                 ):
                     statement_json = reg.json
-                    if trans_id > 0 and reg.id == trans_id:
+                    if cl_timestamp and reg.registration_ts > cl_timestamp:
                         statement_json["transitioned"] = True
                     statement_json["statementType"] = model_utils.REG_CLASS_TO_STATEMENT_TYPE[reg.registration_type_cl]
                     changes.append(statement_json)

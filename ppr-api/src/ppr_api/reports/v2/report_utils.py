@@ -32,6 +32,7 @@ FOOTER_COVER_PATH = "/static/v2/footer_cover.html"
 FOOTER_MAIL_PATH = "/static/v2/footer_mail.html"
 FOOTER_SEARCH_LIGHT = "/static/v2/footer_light.html"
 HEADER_TITLE_REPLACE = "{{TITLE}}"
+HEADER_TRANSITION_REPLACE = "<!-- TRANSITION -->"
 HEADER_SUBTITLE_REPLACE = "{{SUBTITLE}}"
 HEADER_SUBJECT_REPLACE = "{{SUBJECT}}"
 HEADER_BADGE_REPLACE = "{{BADGE}}"
@@ -102,7 +103,12 @@ TO_AMEND_TYPE_DESCRIPTION = {
     "AS": "Amendment - Secured Parties Amended",
     "AU": "Amendment - Collateral Amended",
 }
+# Map post go-live amendment descriptions
+TO_REG_TYPE_TRANSITION = {
+    "CL": "Continued from Repairers Lien",
+}
 REPORT_ERR_MSG = "Report service error report type={type}, status={code}, message={msg}"
+HEADER_TRANSITION = '<div class="report-type-transition">{text}</div>'
 
 
 class ReportTypes(BaseEnum):
@@ -380,6 +386,26 @@ def get_report_meta_data(report_type: str = "") -> dict:
     return data
 
 
+def get_reg_header_badge_text(request_data: dict) -> str:
+    """Get gotenberg registration report header conditional badge text from report data."""
+    badge_text: str = ""
+    if request_data["templateVars"].get("statusType") == "HEX":
+        badge_text = '<span class="badge-gold">EXPIRED</span>'
+    elif request_data["templateVars"].get("statusType") == "HDC":
+        badge_text = '<span class="badge-gold">DISCHARGED</span>'
+    elif (
+        request_data["templateVars"].get("changes")
+        and request_data["templateVars"]["changes"][0]["statementType"] == "AMENDMENT_STATEMENT"
+    ):
+        badge_text = '<span class="badge-gold">AMENDED</span>'
+    elif (
+        request_data["templateVars"].get("changes")
+        and request_data["templateVars"]["changes"][0]["statementType"] == "RENEWAL_STATEMENT"
+    ):
+        badge_text = '<span class="badge-gold">RENEWED</span>'
+    return badge_text
+
+
 def get_report_files(request_data: dict, report_type: str, mail: bool = False, large_search: bool = False) -> dict:
     """Get gotenberg report generation source file data."""
     files = copy.deepcopy(REPORT_FILES)
@@ -388,26 +414,19 @@ def get_report_files(request_data: dict, report_type: str, mail: bool = False, l
     subtitle_text = request_data["templateVars"].get("meta_subtitle", "")
     footer_text = request_data["templateVars"].get("footer_content", "")
     if report_type in (ReportTypes.FINANCING_STATEMENT_REPORT, ReportTypes.COVER_PAGE_REPORT):
-        subject_text = request_data["templateVars"].get("meta_subject", "")
+        subject_text: str = request_data["templateVars"].get("meta_subject", "")
+        reg_type: str = request_data["templateVars"].get("type", "")
         if report_type == ReportTypes.COVER_PAGE_REPORT:
             files["header.html"] = get_cover_header_data(title_text, subtitle_text, subject_text)
         else:
-            badge_text: str = ""
-            if request_data["templateVars"].get("statusType") == "HEX":
-                badge_text = '<span class="badge-gold">EXPIRED</span>'
-            elif request_data["templateVars"].get("statusType") == "HDC":
-                badge_text = '<span class="badge-gold">DISCHARGED</span>'
-            elif (
-                request_data["templateVars"].get("changes")
-                and request_data["templateVars"]["changes"][0]["statementType"] == "AMENDMENT_STATEMENT"
-            ):
-                badge_text = '<span class="badge-gold">AMENDED</span>'
-            elif (
-                request_data["templateVars"].get("changes")
-                and request_data["templateVars"]["changes"][0]["statementType"] == "RENEWAL_STATEMENT"
-            ):
-                badge_text = '<span class="badge-gold">RENEWED</span>'
-            files["header.html"] = get_reg_header_data(title_text, subtitle_text, subject_text, mail, badge_text)
+            badge_text: str = get_reg_header_badge_text(request_data)
+            if not request_data["templateVars"].get("transitioned") or not TO_REG_TYPE_TRANSITION.get(reg_type):
+                files["header.html"] = get_reg_header_data(title_text, subtitle_text, subject_text, mail, badge_text)
+            else:
+                trans_text: str = TO_REG_TYPE_TRANSITION.get(reg_type)
+                header_file: str = get_reg_header_data(title_text, subtitle_text, subject_text, mail, badge_text)
+                header_file = header_file.replace(HEADER_TRANSITION_REPLACE, HEADER_TRANSITION.format(text=trans_text))
+                files["header.html"] = header_file
     elif large_search:
         files["header.html"] = get_search_light_header_data(title_text, subtitle_text)
     else:
