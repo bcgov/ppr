@@ -194,7 +194,7 @@ importers:
         version: 9.31.0(eslint@8.57.1)
       eslint-plugin-vuetify:
         specifier: ^2.0.5
-        version: 2.5.1(eslint@8.57.1)(vuetify@3.7.4)
+        version: 2.5.1(eslint@8.57.1)(vuetify@3.7.4(typescript@5.7.2)(vite-plugin-vuetify@2.0.4)(vue@3.5.13(typescript@5.7.2)))
       happy-dom:
         specifier: ^14.12.0
         version: 14.12.3
@@ -7380,7 +7380,7 @@ snapshots:
 
   '@nuxtjs/eslint-config-typescript@12.1.0(eslint-plugin-import-x@0.5.3(eslint@8.57.1)(typescript@5.7.2))(eslint@8.57.1)(typescript@5.7.2)':
     dependencies:
-      '@nuxtjs/eslint-config': 12.0.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.7.2))(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1)
+      '@nuxtjs/eslint-config': 12.0.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.7.2))(eslint-import-resolver-typescript@3.7.0(eslint-plugin-import-x@0.5.3(eslint@8.57.1)(typescript@5.7.2))(eslint-plugin-import@2.31.0)(eslint@8.57.1))(eslint@8.57.1)
       '@typescript-eslint/eslint-plugin': 6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.7.2))(eslint@8.57.1)(typescript@5.7.2)
       '@typescript-eslint/parser': 6.21.0(eslint@8.57.1)(typescript@5.7.2)
       eslint: 8.57.1
@@ -7393,10 +7393,10 @@ snapshots:
       - supports-color
       - typescript
 
-  '@nuxtjs/eslint-config@12.0.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.7.2))(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1)':
+  '@nuxtjs/eslint-config@12.0.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.7.2))(eslint-import-resolver-typescript@3.7.0(eslint-plugin-import-x@0.5.3(eslint@8.57.1)(typescript@5.7.2))(eslint-plugin-import@2.31.0)(eslint@8.57.1))(eslint@8.57.1)':
     dependencies:
       eslint: 8.57.1
-      eslint-config-standard: 17.1.0(eslint-plugin-import@2.31.0)(eslint-plugin-n@15.7.0(eslint@8.57.1))(eslint-plugin-promise@6.6.0(eslint@8.57.1))(eslint@8.57.1)
+      eslint-config-standard: 17.1.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.7.2))(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1))(eslint-plugin-n@15.7.0(eslint@8.57.1))(eslint-plugin-promise@6.6.0(eslint@8.57.1))(eslint@8.57.1)
       eslint-plugin-import: 2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.7.2))(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1)
       eslint-plugin-n: 15.7.0(eslint@8.57.1)
       eslint-plugin-node: 11.1.0(eslint@8.57.1)
@@ -8482,8 +8482,8 @@ snapshots:
   '@vue/eslint-config-standard@8.0.1(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.7.2))(eslint-plugin-vue@9.31.0(eslint@8.57.1))(eslint@8.57.1)':
     dependencies:
       eslint: 8.57.1
-      eslint-config-standard: 17.1.0(eslint-plugin-import@2.31.0)(eslint-plugin-n@15.7.0(eslint@8.57.1))(eslint-plugin-promise@6.6.0(eslint@8.57.1))(eslint@8.57.1)
-      eslint-import-resolver-custom-alias: 1.3.2(eslint-plugin-import@2.31.0)
+      eslint-config-standard: 17.1.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.7.2))(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1))(eslint-plugin-n@15.7.0(eslint@8.57.1))(eslint-plugin-promise@6.6.0(eslint@8.57.1))(eslint@8.57.1)
+      eslint-import-resolver-custom-alias: 1.3.2(eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.7.2))(eslint@8.57.1))
       eslint-import-resolver-node: 0.3.9
       eslint-plugin-import: 2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.7.2))(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1)
       eslint-plugin-n: 15.7.0(eslint@8.57.1)
@@ -8583,7 +8583,7 @@ snapshots:
       date-fns-tz: 1.3.8(date-fns@2.30.0)
       vue: 3.5.13(typescript@5.7.2)
 
-  '@vuetify/loader-shared@2.0.3(vue@3.5.13(typescript@5.7.2))(vuetify@3.7.4)':
+  '@vuetify/loader-shared@2.0.3(vue@3.5.13(typescript@5.7.2))(vuetify@3.7.4(typescript@5.7.2)(vite-plugin-vuetify@2.0.4)(vue@3.5.13(typescript@5.7.2)))':
     dependencies:
       upath: 2.0.1
       vue: 3.5.13(typescript@5.7.2)
@@ -9679,7 +9679,7 @@ snapshots:
       find-up-simple: 1.0.0
       parse-gitignore: 2.0.0
 
-  eslint-config-standard@17.1.0(eslint-plugin-import@2.31.0)(eslint-plugin-n@15.7.0(eslint@8.57.1))(eslint-plugin-promise@6.6.0(eslint@8.57.1))(eslint@8.57.1):
+  eslint-config-standard@17.1.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.7.2))(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1))(eslint-plugin-n@15.7.0(eslint@8.57.1))(eslint-plugin-promise@6.6.0(eslint@8.57.1))(eslint@8.57.1):
     dependencies:
       eslint: 8.57.1
       eslint-plugin-import: 2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.7.2))(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1)
@@ -9691,7 +9691,7 @@ snapshots:
       '@types/eslint': 8.56.12
       pathe: 1.1.2
 
-  eslint-import-resolver-custom-alias@1.3.2(eslint-plugin-import@2.31.0):
+  eslint-import-resolver-custom-alias@1.3.2(eslint-plugin-import@2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.7.2))(eslint@8.57.1)):
     dependencies:
       eslint-plugin-import: 2.31.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.7.2))(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1)
       glob-parent: 6.0.2
@@ -9722,7 +9722,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1):
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.7.0(eslint-plugin-import-x@0.5.3(eslint@8.57.1)(typescript@5.7.2))(eslint-plugin-import@2.31.0)(eslint@8.57.1))(eslint@8.57.1):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
@@ -9773,7 +9773,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.7.0)(eslint@8.57.1)
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.7.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.7.0(eslint-plugin-import-x@0.5.3(eslint@8.57.1)(typescript@5.7.2))(eslint-plugin-import@2.31.0)(eslint@8.57.1))(eslint@8.57.1)
       hasown: 2.0.2
       is-core-module: 2.15.1
       is-glob: 4.0.3
@@ -9899,7 +9899,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-vuetify@2.5.1(eslint@8.57.1)(vuetify@3.7.4):
+  eslint-plugin-vuetify@2.5.1(eslint@8.57.1)(vuetify@3.7.4(typescript@5.7.2)(vite-plugin-vuetify@2.0.4)(vue@3.5.13(typescript@5.7.2))):
     dependencies:
       eslint: 8.57.1
       eslint-plugin-vue: 9.31.0(eslint@8.57.1)
@@ -12126,7 +12126,7 @@ snapshots:
     dependencies:
       xmlchars: 2.2.0
 
-  sbc-common-components@4.0.10(typescript@5.7.2)(vite-plugin-vuetify@2.0.4):
+  sbc-common-components@4.0.10(typescript@5.7.2)(vite-plugin-vuetify@2.0.4(vite@5.4.11(@types/node@22.10.1)(sass@1.32.13)(terser@5.36.0))(vue@3.5.13(typescript@5.7.2))(vuetify@3.7.4)):
     dependencies:
       '@mdi/font': 4.9.95
       '@vue/compiler-dom': 3.5.13
@@ -12145,7 +12145,7 @@ snapshots:
       vue-i18n: 9.14.2(vue@3.3.4)
       vue-router: 4.5.0(vue@3.3.4)
       vuelidate: 0.7.7
-      vuetify: 3.7.4(typescript@5.7.2)(vite-plugin-vuetify@2.0.4)(vue@3.3.4)
+      vuetify: 3.7.4(typescript@5.7.2)(vite-plugin-vuetify@2.0.4(vite@5.4.11(@types/node@22.10.1)(sass@1.32.13)(terser@5.36.0))(vue@3.5.13(typescript@5.7.2))(vuetify@3.7.4))(vue@3.3.4)
     transitivePeerDependencies:
       - '@vue/composition-api'
       - debug
@@ -12887,7 +12887,7 @@ snapshots:
 
   vite-plugin-vuetify@2.0.4(vite@5.4.11(@types/node@22.10.1)(sass@1.32.13)(terser@5.36.0))(vue@3.5.13(typescript@5.7.2))(vuetify@3.7.4):
     dependencies:
-      '@vuetify/loader-shared': 2.0.3(vue@3.5.13(typescript@5.7.2))(vuetify@3.7.4)
+      '@vuetify/loader-shared': 2.0.3(vue@3.5.13(typescript@5.7.2))(vuetify@3.7.4(typescript@5.7.2)(vite-plugin-vuetify@2.0.4)(vue@3.5.13(typescript@5.7.2)))
       debug: 4.3.7(supports-color@9.4.0)
       upath: 2.0.1
       vite: 5.4.11(@types/node@22.10.1)(sass@1.32.13)(terser@5.36.0)
@@ -13139,7 +13139,7 @@ snapshots:
       - vue
       - webpack-plugin-vuetify
 
-  vuetify@3.7.4(typescript@5.7.2)(vite-plugin-vuetify@2.0.4)(vue@3.3.4):
+  vuetify@3.7.4(typescript@5.7.2)(vite-plugin-vuetify@2.0.4(vite@5.4.11(@types/node@22.10.1)(sass@1.32.13)(terser@5.36.0))(vue@3.5.13(typescript@5.7.2))(vuetify@3.7.4))(vue@3.3.4):
     dependencies:
       vue: 3.3.4
     optionalDependencies:
