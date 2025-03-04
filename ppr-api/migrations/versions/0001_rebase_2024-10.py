@@ -1032,7 +1032,7 @@ def upgrade():
     public_get_registration_num = PGFunction(
         schema="public",
         signature="get_registration_num()",
-        definition="RETURNS VARCHAR\n    LANGUAGE plpgsql\n    AS\n    $$\n    BEGIN\n        RETURN trim(to_char(nextval('registration_num_q_seq'), '000000')) || 'Q';\n    END\n    ; \n    $$"
+        definition="RETURNS VARCHAR\n    LANGUAGE plpgsql\n    AS\n    $$\n    BEGIN\n        RETURN trim(to_char(nextval('registration_num_r_seq'), '000000')) || 'R';\n    END\n    ; \n    $$"
     )
     op.create_entity(public_get_registration_num)
 
@@ -3414,7 +3414,7 @@ def downgrade():
     public_get_registration_num = PGFunction(
         schema="public",
         signature="get_registration_num()",
-        definition="RETURNS VARCHAR\n    LANGUAGE plpgsql\n    AS\n    $$\n    BEGIN\n        RETURN trim(to_char(nextval('registration_num_q_seq'), '000000')) || 'Q';\n    END\n    ; \n    $$"
+        definition="RETURNS VARCHAR\n    LANGUAGE plpgsql\n    AS\n    $$\n    BEGIN\n        RETURN trim(to_char(nextval('registration_num_r_seq'), '000000')) || 'R';\n    END\n    ; \n    $$"
     )
     op.drop_entity(public_get_registration_num)
 
