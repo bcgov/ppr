@@ -30,7 +30,7 @@ def upgrade():
     # ### Manually create sequences and add them to pk columns. ###
     # PPR sequences
     op.execute(CreateSequence(Sequence('document_number_seq', start=100000, increment=1)))
-    op.execute(CreateSequence(Sequence('registration_num_q_seq', start=100000, increment=1)))
+    op.execute(CreateSequence(Sequence('registration_num_r_seq', start=100000, increment=1)))
     op.execute(CreateSequence(Sequence('account_bcol_id_seq', start=1, increment=1)))
     op.execute(CreateSequence(Sequence('address_id_seq', start=1, increment=1)))
     op.execute(CreateSequence(Sequence('code_branch_id_seq', start=7162, increment=1, minvalue=7162, maxvalue=8999)))
@@ -3589,7 +3589,7 @@ def downgrade():
 
     # Manually added drop sequence commands ###
     op.execute(DropSequence(Sequence('document_number_seq')))
-    op.execute(DropSequence(Sequence('registration_num_q_seq')))
+    op.execute(DropSequence(Sequence('registration_num_r_seq')))
     op.execute(DropSequence(Sequence('account_bcol_id_seq')))
     op.execute(DropSequence(Sequence('address_id_seq')))
     op.execute(DropSequence(Sequence('code_branch_id_seq')))
