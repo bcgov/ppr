@@ -99,8 +99,8 @@ SELECTED_JSON_COMBO = [
 ]
 
 
-MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
-MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
+MOCK_AUTH_URL = 'https://test.api.connect.gov.bc.ca/mockTarget/auth/api/v1/'
+MOCK_PAY_URL = 'https://test.api.connect.gov.bc.ca/mockTarget/pay/api/v1/'
 TEST_SEARCH_REPORT_FILE = 'tests/unit/api/test-get-search-report.pdf'
 
 # testdata pattern is ({desc}, {json_data}, {search_id}, {roles}, {account_id}, {status})

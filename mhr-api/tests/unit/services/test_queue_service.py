@@ -19,7 +19,7 @@ from flask import current_app
 from mhr_api.services.queue_service import GoogleQueueService
 
 
-SUB_URL = 'https://bcregistry-dev.apigee.net/ppr-sub/api/v1/'
+SUB_URL = 'https://test.api.connect.gov.bc.ca/ppr-sub-dev/api/v1/'
 TEST_PAYLOAD = {
     'searchId': 999999999
 }

@@ -112,8 +112,8 @@ LOCATION_PARK_MINIMAL= {
     'taxCertificate': True,
     'taxExpiryDate': '2035-01-31T08:00:00+00:00'
 }
-MOCK_AUTH_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/'
-MOCK_PAY_URL = 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/pay/api/v1/'
+MOCK_AUTH_URL = 'https://test.api.connect.gov.bc.ca/mockTarget/auth/api/v1/'
+MOCK_PAY_URL = 'https://test.api.connect.gov.bc.ca/mockTarget/pay/api/v1/'
 DOC_ID_VALID = '63166035'
 
 # testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account}, {ownland})
