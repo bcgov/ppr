@@ -481,12 +481,10 @@ def enqueue_registration_report(
         GoogleQueueService().publish_registration_report(payload)
         logger.info(f"Enqueue registration report successful for id={registration.id}.")
         if (
-            json_data.get("usergroup") == STAFF_ROLE
-            and registration.account_id == STAFF_ROLE
-            and current_app.config.get("DOC_CREATE_REC_TOPIC")
-        ):
+            json_data.get("usergroup") == STAFF_ROLE or registration.account_id == STAFF_ROLE
+        ) and current_app.config.get("DOC_CREATE_REC_TOPIC"):
             enqueue_doc_record(registration, json_data)
-        elif json_data.get("usergroup") == STAFF_ROLE:
+        elif json_data.get("usergroup") == STAFF_ROLE or registration.account_id == STAFF_ROLE:
             logger.info("Staff registration but skipping queuing of DRS record: DOC_CREATE_REC_TOPIC not configured.")
     except DatabaseException as db_err:
         # Just log, do not return an error response.

@@ -30,7 +30,7 @@ import requests
 def get_mock_auth() -> str:
     """For CI unit tests get mock auth value."""
     try:
-        url: str = "https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/testing/mock-sa-ppr"
+        url: str = "https://test.api.connect.gov.bc.ca/mockTarget/auth/api/v1/testing/mock-sa-ppr"
         headers = {"Content-Type": "application/json"}
         response = requests.get(url, headers=headers, timeout=10.0)
         if response and response.text:
@@ -170,8 +170,8 @@ class Config:  # pylint: disable=too-few-public-methods
     GCP_PS_SEARCH_REPORT_TOPIC = os.getenv("GCP_PS_SEARCH_REPORT_TOPIC", "mhr-search-report")
     GCP_PS_REGISTRATION_REPORT_TOPIC = os.getenv("GCP_PS_REGISTRATION_REPORT_TOPIC", "mhr-registration-report")
 
-    GATEWAY_URL = os.getenv("GATEWAY_URL", "https://bcregistry-dev.apigee.net")
-    GATEWAY_LTSA_URL = os.getenv("GATEWAY_LTSA_URL", "https://bcregistry-test.apigee.net/ltsa/api/v1")
+    GATEWAY_URL = os.getenv("GATEWAY_URL", "https://test.api.connect.gov.bc.ca")
+    GATEWAY_LTSA_URL = os.getenv("GATEWAY_LTSA_URL", "https://test.api.connect.gov.bc.ca/ltsa-dev/api/v1")
     SUBSCRIPTION_API_KEY = os.getenv("SUBSCRIPTION_API_KEY")
     GATEWAY_API_KEY = os.getenv("GATEWAY_API_KEY")
 
