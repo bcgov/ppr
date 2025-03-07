@@ -131,7 +131,13 @@
     >
       <div v-if="isPpr && !!item.registrationType">
         {{ getRegistrationType(item.registrationType) }}
-        <span v-if="isPpr && !isChild"> - Base Registration</span>
+        <span v-if="isPpr && isChild && !!item.transitioned">(as Commercial Lien)</span>
+        <span v-if="isPpr && !isChild">
+          <span v-if="isTransitionedCommercialLien(item)" class="font-italic font-weight-medium">
+            <br>Continued from original Repairers Lien Base Registration {{ item.baseRegistrationNumber }}
+          </span>
+          <span v-else>- Base Registration</span>
+        </span>
       </div>
       <div
         v-else
@@ -713,7 +719,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
-import { stripChars, multipleWordsToTitleCase, isWithinMinutes } from '@/utils'
+import { stripChars, multipleWordsToTitleCase, isWithinMinutes, getFeatureFlag } from '@/utils'
 import { getRegistrationSummary, registrationPDF } from '@/utils/ppr-api-helper'
 import { mhRegistrationPDF, getMHRegistrationSummary } from '@/utils/mhr-api-helper'
 import { useStore } from '@/store/store'
@@ -842,6 +848,10 @@ export default defineComponent({
       return !props.isPpr && !localState.isChild &&
         item.statusType === MhApiStatusTypes.FROZEN &&
         item.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT
+    }
+
+    const isTransitionedCommercialLien = (item: any): boolean => {
+      return item.registrationType === APIRegistrationTypes.COMMERCIAL_LIEN && !!item.transitioned
     }
 
 
@@ -1055,6 +1065,9 @@ export default defineComponent({
     }
 
     const isRepairersLienAmendDisabled = (item: RegistrationSummaryIF): boolean => {
+      // return if the repairers lien transition is enabled
+      if (getFeatureFlag('cla-enabled')) return false
+
       const changes = item?.changes as RegistrationSummaryIF[]
       // if there are amendments, get the vehicle count from the first array element
       if (changes) {
@@ -1220,6 +1233,7 @@ export default defineComponent({
     }, { deep: true, immediate: true })
 
     return {
+      isTransitionedCommercialLien,
       openMhrHistory,
       hasRequiredTransfer,
       multipleWordsToTitleCase,

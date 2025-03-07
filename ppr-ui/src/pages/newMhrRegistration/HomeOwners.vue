@@ -432,7 +432,6 @@ import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } fro
 import { useStore } from '@/store/store'
 import { AddEditHomeOwner, HomeOwnersTable } from '@/components/mhrRegistration/HomeOwners'
 import PreviousHomeOwners from '@/components/mhrRegistration/HomeOwners/PreviousHomeOwners.vue'
-import { BaseDialog } from '@/components/dialogs'
 import { SimpleHelpToggle } from '@/components/common'
 import {
   useHomeOwners,
@@ -454,7 +453,6 @@ export default defineComponent({
   name: 'HomeOwners',
   components: {
     AddEditHomeOwner,
-    BaseDialog,
     HomeOwnersTable,
     SimpleHelpToggle,
     PreviousHomeOwners

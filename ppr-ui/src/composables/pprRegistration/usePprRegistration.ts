@@ -112,7 +112,8 @@ export const usePprRegistration = () => {
     let lengthTrust = null
 
     if (flowType === RegistrationFlowType.RENEWAL) {
-      const isRepairsLien = registrationType.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN
+      const isRepairsLien = registrationType.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN &&
+        !getFeatureFlag('cla-enabled')
       lengthTrust = {
         valid: !!isRepairsLien,
         showInvalid: false,
@@ -133,6 +134,7 @@ export const usePprRegistration = () => {
       } as LengthTrustIF
     }
 
+    console.log('usePprRegistration.initPprUpdateFilling lengthTrust: ', lengthTrust)
     setLengthTrust(lengthTrust)
 
     if (flowType !== RegistrationFlowType.DISCHARGE) {

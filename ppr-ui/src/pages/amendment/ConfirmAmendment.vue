@@ -128,7 +128,7 @@
                   v-if="showSecuredParties || showDebtors ||
                     showVehicleCollateral || showLengthTrustIndenture"
                 />
-                <gen-col-summary
+                <GenColSummary
                   class="py-6 px-4"
                   :set-show-amend-link="false"
                   :set-show-history="false"
@@ -146,7 +146,7 @@
                 v-if="showSecuredParties || showDebtors || showVehicleCollateral ||
                   showGeneralCollateral || showLengthTrustIndenture"
               />
-              <amendment-description
+              <AmendmentDescription
                 class="pt-4"
                 :is-summary="true"
               />
@@ -243,19 +243,6 @@ import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'v
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import {
-  CautionBox,
-  CourtOrder,
-  CertifyInformation,
-  FolioNumberSummary,
-  StickyContainer
-} from '@/components/common'
-import { BaseDialog, StaffPaymentDialog } from '@/components/dialogs'
-import { GenColSummary } from '@/components/collateral/general'
-import { SecuredPartySummary, DebtorSummary } from '@/components/parties/summaries'
-import { RegisteringPartyChange } from '@/components/parties/party'
-import { AmendmentDescription, RegistrationLengthTrustAmendment } from '@/components/registration'
-import { VehicleCollateral } from '@/components/collateral/vehicle'
 import { unsavedChangesDialog } from '@/resources/dialogOptions'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import {
@@ -285,28 +272,13 @@ import type {
 } from '@/interfaces'
 import type { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { useAuth, useNavigation } from '@/composables'
-import SecuritiesActNoticesPanels from '@/components/registration/securities-act-notices/SecuritiesActNoticesPanels.vue'
+import { GenColSummary } from '@/components/collateral'
+import { AmendmentDescription } from '@/components/registration'
 
 
 export default defineComponent({
   name: 'ConfirmAmendment',
-  components: {
-    SecuritiesActNoticesPanels,
-    AmendmentDescription,
-    BaseDialog,
-    StaffPaymentDialog,
-    CautionBox,
-    CertifyInformation,
-    FolioNumberSummary,
-    RegisteringPartyChange,
-    SecuredPartySummary,
-    DebtorSummary,
-    VehicleCollateral,
-    GenColSummary,
-    CourtOrder,
-    RegistrationLengthTrustAmendment,
-    StickyContainer
-  },
+  components: { AmendmentDescription, GenColSummary },
   props: {
     appReady: {
       type: Boolean,

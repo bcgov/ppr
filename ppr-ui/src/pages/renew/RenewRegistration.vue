@@ -41,9 +41,16 @@
               descriptions of any previous amendments or court orders, you will
               need to conduct a separate search.
             </p>
+
+            <CautionBox
+              class="mt-7"
+              :set-msg="cautionTxt"
+              :set-important-word="'Important'"
+            />
+
           </div>
           <registration-length-trust
-            v-if="registrationType !== registrationTypeRL"
+            v-if="registrationType !== registrationTypeRL || isRlTransition"
             :set-show-invalid="showInvalid"
             class="mt-15"
             :is-renewal="true"
@@ -54,6 +61,34 @@
             class="mt-15"
             :is-renewal="true"
           />
+
+          <!-- Historical Repairers Lien Information -->
+          <v-card
+            v-if="isRlTransition"
+            flat
+            class="mt-1 bg-white pa-6 rounded"
+          >
+            <v-row no-gutters>
+              <InfoChip action="HISTORICAL" />
+            </v-row>
+            <v-row no-gutters class="mt-4">
+              <v-col cols="3" class="generic-label">
+                Surrender Date
+              </v-col>
+              <v-col cols="9">
+                {{ convertDate(new Date(getLengthTrust.surrenderDate), false, false) }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters class="mt-4">
+              <v-col cols="3" class="generic-label">
+                Amount of Lien
+              </v-col>
+              <v-col cols="9">
+                {{ lienAmountSummary }}
+              </v-col>
+            </v-row>
+          </v-card>
+
           <div class="summary-header mt-15 pa-4 rounded-top">
             <v-icon color="darkBlue">
               mdi-account-multiple-plus
@@ -84,11 +119,11 @@
             :set-enable-no-data-action="false"
           />
           <collateral
-            class="mt-15"
+            class="mt-15 mb-6"
             :is-summary="true"
           />
           <CourtOrder
-            v-if="registrationType === registrationTypeRL"
+            v-if="registrationType === registrationTypeRL && !isRlTransition"
             :set-show-errors="showInvalid"
             :set-require-court-order="true"
             class="mt-15"
@@ -125,7 +160,6 @@ import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'v
 import { useRoute } from 'vue-router'
 import { useStore } from '@/store/store'
 import { StickyContainer, CourtOrder } from '@/components/common'
-import { BaseDialog } from '@/components/dialogs'
 import { RegistrationLengthTrust, RegistrationRepairersLien } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import {
@@ -136,7 +170,7 @@ import {
 import { notCompleteDialog } from '@/resources/dialogOptions'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { getFinancingStatement } from '@/utils/ppr-api-helper'
-import { getFeatureFlag, pacificDate } from '@/utils'
+import { convertDate, getFeatureFlag, pacificDate } from '@/utils'
 import type {
   UIRegistrationTypes
 } from '@/enums';
@@ -156,7 +190,6 @@ import { useAuth, useNavigation, usePprRegistration } from '@/composables'
 export default defineComponent({
   name: 'RenewRegistrations',
   components: {
-    BaseDialog,
     RegistrationLengthTrust,
     RegistrationRepairersLien,
     Collateral,
@@ -181,6 +214,7 @@ export default defineComponent({
 
     const {
       // Getters
+      isRlTransition,
       getLengthTrust,
       getRegistrationType,
       getConfirmDebtorName,
@@ -200,6 +234,13 @@ export default defineComponent({
       showCancelDialog: false,
       showInvalid: false,
       errMsg: '',
+      cautionTxt: computed((): string => {
+        return isRlTransition.value
+          ? 'Repairers Lien (RL) registrations amended, renewed or discharged after the coming into force of the ' +
+          'Commercial Liens Act on DATE TBD are continued as Commercial Lien (CL) registrations.'
+          :'The Registry will provide the verification statement to all Secured Parties named in this ' +
+          'registration.'
+      }),
       asOfDateTime: computed((): string => {
         // return formatted date
         if (localState.financingStatementDate) {
@@ -229,7 +270,21 @@ export default defineComponent({
       }),
       registrationTypeRL: computed(() => {
         return APIRegistrationTypes.REPAIRERS_LIEN
-      })
+      }),
+      lienAmountSummary: computed((): string => {
+        if (getLengthTrust.value.lienAmount) {
+          // Format as CDN currency.
+          const currency = getLengthTrust.value.lienAmount
+            ?.replace('$', '')
+            ?.replaceAll(',', '')
+          const lienFloat = parseFloat(currency)
+          if (isNaN(lienFloat)) {
+            return getLengthTrust.value.lienAmount
+          }
+          return '$' + lienFloat.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
+        }
+        return 'Not entered'
+      }),
     })
 
     onMounted(() => {
@@ -337,7 +392,10 @@ export default defineComponent({
     })
 
     return {
+      convertDate,
       setValid,
+      getLengthTrust,
+      isRlTransition,
       confirmRenewal,
       handleDialogResp,
       ...toRefs(localState)

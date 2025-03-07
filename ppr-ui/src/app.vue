@@ -32,9 +32,8 @@ import {
   ProductCode
 } from '@/enums'
 import type {
-  DialogOptionsIF, ErrorIF, UserInfoIF, UserSettingsIF  
+  DialogOptionsIF, ErrorIF, UserInfoIF, UserSettingsIF
 } from '@/interfaces'
-import { useAuth, useNavigation } from '@/composables'
 
 export default defineComponent({
   name: 'App',

@@ -16,8 +16,8 @@ import type {
   VehicleCollateralIF
 } from '@/interfaces'
 import {
-  convertToISO8601LastMinute,
-  removeEmptyProperties,
+  convertToISO8601LastMinute, getFeatureFlag,
+  removeEmptyProperties
 } from '@/utils'
 import {
   createAmendmentStatement,
@@ -769,7 +769,8 @@ export async function saveRenewal (stateModel:StateModelIF): Promise<RenewRegist
   registration.registeringParty = cleanupParty(registration.registeringParty)
 
   // No lifeYears, lifeInfinite for RL renewal
-  if (stateModel.registration.registrationType.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN) {
+  if (stateModel.registration.registrationType.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN &&
+    !getFeatureFlag('cla-enabled')) {
     registration.courtOrderInformation = stateModel.registration.courtOrderInformation
     if (registration.courtOrderInformation.orderDate.length === 10) {
       // add current time to date

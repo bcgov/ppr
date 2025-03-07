@@ -31,7 +31,6 @@ import {
   watch
 } from 'vue'
 import { useStore } from '@/store/store'
-import { BaseDialog } from '.'
 import { DialogContent } from './common'
 import type { SettingOptions } from '@/enums'
 import type { DialogOptionsIF, UserSettingsIF } from '@/interfaces'
@@ -40,7 +39,6 @@ import { updateUserSettings } from '@/utils/ppr-api-helper'
 export default defineComponent({
   name: 'ConfirmationDialog',
   components: {
-    BaseDialog,
     DialogContent
   },
   props: {

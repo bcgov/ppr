@@ -1,11 +1,11 @@
 <template>
   <v-row
     id="reg-party-change"
-    noGutters
+    no-gutters
   >
     <v-col v-if="!openChangeScreen">
       <RegisteringParty
-        @changeRegisteringParty="changeRegisteringParty"
+        @change-registering-party="changeRegisteringParty"
       />
     </v-col>
     <v-col
@@ -33,15 +33,15 @@
           </span>
         </div>
         <PartySearch
-          :isAutoCompleteDisabled="addEditInProgress"
-          :isRegisteringParty="true"
-          @showSecuredPartyAdd="initAdd"
-          @hideSearch="resetData"
+          :is-auto-complete-disabled="addEditInProgress"
+          :is-registering-party="true"
+          @show-secured-party-add="initAdd"
+          @hide-search="resetData"
         />
         <EditParty
           v-if="showAddRegisteringParty"
-          :isRegisteringParty="true"
-          @resetEvent="resetData"
+          :is-registering-party="true"
+          @reset-event="resetData"
         />
         <div
           v-if="!showAddRegisteringParty"
@@ -75,16 +75,10 @@ import {
   computed
 } from 'vue'
 import { useStore } from '@/store/store'
-import { EditParty, PartySearch, RegisteringParty } from '@/components/parties/party'
-import { PartyIF } from '@/interfaces'
+import type { PartyIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({
-  components: {
-    PartySearch,
-    EditParty,
-    RegisteringParty
-  },
   props: {
     isSummary: {
       type: Boolean,

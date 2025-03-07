@@ -142,12 +142,10 @@ import { FeeSummaryTypes } from '@/composables/fees/enums'
 import type { ErrorIF, MhrRegistrationIF, RegTableNewItemI, StepIF } from '@/interfaces'
 import type { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { outOfDateOwnersDialogOptions } from '@/resources/dialogOptions/confirmationDialogs'
-import { BaseDialog } from '@/components/dialogs'
 
 export default defineComponent({
   name: 'MhrRegistration',
   components: {
-    BaseDialog,
     ButtonFooter,
     Stepper,
     StickyContainer

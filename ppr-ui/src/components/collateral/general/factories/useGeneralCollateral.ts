@@ -1,4 +1,5 @@
 import { APIRegistrationTypes } from '@/enums'
+import { getFeatureFlag } from '@/utils'
 
 export const useGeneralCollateral = () => {
   const hasGeneralCollateral = (registrationType: APIRegistrationTypes): boolean => {
@@ -42,6 +43,9 @@ export const useGeneralCollateral = () => {
       APIRegistrationTypes.TOBACCO_TAX,
       APIRegistrationTypes.SPECULATION_VACANCY_TAX
     ]
+    // Add feature flag checks for specific registration types
+    if (getFeatureFlag('cla-enabled')) ghArray.push(APIRegistrationTypes.REPAIRERS_LIEN)
+
     return ghArray.includes(registrationType)
   }
 

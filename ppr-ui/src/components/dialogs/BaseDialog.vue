@@ -9,7 +9,7 @@
       v-if="options"
       class="pa-10"
     >
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col cols="11">
           <h2 class="dialog-title">
             {{ options.title }}
@@ -18,9 +18,9 @@
             <!-- can be replaced with <template v-slot:content> -->
             <slot name="content">
               <DialogContent
-                :setBaseText="options.text"
-                :setExtraText="options.textExtra"
-                :setHasContactInfo="options.hasContactInfo"
+                :set-base-text="options.text"
+                :set-extra-text="options.textExtra"
+                :set-has-contact-info="options.hasContactInfo"
               />
             </slot>
           </div>
@@ -49,7 +49,7 @@
             :label="setConfirmActionLabel"
             :ripple="false"
             density="compact"
-            hideDetails
+            hide-details
             data-test-id="confirm-action-checkbox"
           />
         </v-col>
@@ -60,7 +60,7 @@
             id="dismiss-dialog-checkbox"
             v-model="isDismissDialogChecked"
             class="ma-0 pt-4"
-            hideDetails
+            hide-details
           >
             <template #label>
               <p class="ma-0">
@@ -74,9 +74,9 @@
         <!-- can be replaced with <template v-slot:buttons> -->
         <slot name="buttons">
           <DialogButtons
-            :setAcceptText="options.acceptText"
-            :setCancelText="options.cancelText"
-            :reverseButtons="reverseActionButtons"
+            :set-accept-text="options.acceptText"
+            :set-cancel-text="options.cancelText"
+            :reverse-buttons="reverseActionButtons"
             @proceed="proceed($event)"
           />
         </slot>
@@ -98,16 +98,12 @@ import {
 import DialogButtons from './common/DialogButtons.vue'
 import DialogContent from './common/DialogContent.vue'
 // local types/helpers/etc.
-import { DialogOptionsIF } from '@/interfaces' // eslint-disable-line
+import type { DialogOptionsIF } from '@/interfaces'
 import { SettingOptions } from '@/enums'
 import { useUserAccess } from '@/composables'
 
 export default defineComponent({
   name: 'BaseDialog',
-  components: {
-    DialogButtons,
-    DialogContent
-  },
   props: {
     setAttach: { type: String, default: '' },
     setDisplay: { type: Boolean, default: false },

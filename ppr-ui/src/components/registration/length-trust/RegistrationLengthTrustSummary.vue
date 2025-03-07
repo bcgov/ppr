@@ -116,7 +116,7 @@
         </v-col>
       </v-row>
       <v-row
-        v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
+        v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN && !isRlTransition"
         no-gutters
         class="pt-6"
       >
@@ -131,7 +131,7 @@
         </v-col>
       </v-row>
       <v-row
-        v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
+        v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN && !isRlTransition"
         no-gutters
         class="pt-6"
       >
@@ -181,6 +181,7 @@ export default defineComponent({
     const { setLengthTrust } = useStore()
     const {
       // Getters
+      isRlTransition,
       getLengthTrust,
       getRegistrationType,
       getRegistrationExpiryDate,
@@ -224,7 +225,8 @@ export default defineComponent({
           if (getLengthTrust.value.lifeInfinite) {
             return 'No Expiry'
           }
-          if ((getRegistrationExpiryDate.value) && ((registrationType === APIRegistrationTypes.REPAIRERS_LIEN))) {
+          if ((getRegistrationExpiryDate.value) && ((registrationType === APIRegistrationTypes.REPAIRERS_LIEN)) &&
+            !isRlTransition.value) {
             const expiryDate = getRegistrationExpiryDate.value
             const newExpDate = new Date(new Date(expiryDate).toLocaleString('en-US', { timeZone: 'America/Vancouver' }))
             newExpDate.setDate(newExpDate.getDate() + 180)
@@ -242,7 +244,7 @@ export default defineComponent({
         return ''
       }),
       lengthSummary: computed((): string => {
-        if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
+        if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN && !isRlTransition.value) {
           return '180 Days'
         }
         if (!getLengthTrust.value.lifeInfinite && getRegistrationFlowType.value === RegistrationFlowType.NEW &&
@@ -327,6 +329,7 @@ export default defineComponent({
     }
 
     return {
+      isRlTransition,
       goToLengthTrust,
       APIRegistrationTypes,
       registrationType,

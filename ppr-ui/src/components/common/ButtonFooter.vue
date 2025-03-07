@@ -114,7 +114,6 @@ import { useStore } from '@/store/store'
 import { throttle } from 'lodash'
 import { saveFinancingStatement, saveFinancingStatementDraft } from '@/utils'
 import { RouteNames } from '@/enums'
-import { BaseDialog } from '@/components/dialogs'
 import StaffPaymentDialog from '@/components/dialogs/StaffPaymentDialog.vue'
 import type {
   ButtonConfigIF, DialogOptionsIF, DraftIF, ErrorIF, FinancingStatementIF, RegTableNewItemI, StateModelIF
@@ -125,7 +124,6 @@ import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   components: {
-    BaseDialog,
     StaffPaymentDialog
   },
   props: {

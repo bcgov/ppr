@@ -1,8 +1,8 @@
 <template>
   <div class="mhr-transfer-type mt-8">
     <BaseDialog
-      :setOptions="changeTransferType"
-      :setDisplay="showTransferChangeDialog"
+      :set-options="changeTransferType"
+      :set-display="showTransferChangeDialog"
       @proceed="handleTypeChangeDialogResp($event)"
     />
 
@@ -16,7 +16,7 @@
         v-model="isValid"
       >
         <!-- Transfer Type Selector -->
-        <v-row noGutters>
+        <v-row no-gutters>
           <v-col cols="3">
             <label
               class="generic-label"
@@ -33,14 +33,14 @@
               variant="filled"
               color="primary"
               :items="transferTypesSelector"
-              itemTitle="textLabel"
-              itemValue="transferType"
+              item-title="textLabel"
+              item-value="transferType"
               label="Transfer Type"
               data-test-id="transfer-type-selector"
               :rules="transferTypeRules"
               :disabled="disableSelect"
-              :menuProps="isMiscTransfersEnabled ? { maxHeight: 392 } : {}"
-              returnObject
+              :menu-props="isMiscTransfersEnabled ? { maxHeight: 392 } : {}"
+              return-object
             >
               <template
                 v-if="isMiscTransfersEnabled"
@@ -60,23 +60,23 @@
                     <v-row
                       :id="`transfer-type-drop-${item.raw.group}`"
                       class="border-bottom"
-                      noGutters
+                      no-gutters
                       @click="toggleGroup(item.raw.group)"
                     >
-                      <v-col alignSelf="center">
+                      <v-col align-self="center">
                         <span class="transfer-type-list-header px-1">{{ item.raw.textLabel }}</span>
                       </v-col>
                       <v-col
                         cols="auto"
                         class="py-0"
-                        alignSelf="center"
+                        align-self="center"
                       >
                         <v-btn
                           variant="plain"
                           size="18"
                           color="primary"
                           class="mt-n2"
-                          :appendIcon="displayGroup[item.raw.group] ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+                          :append-icon="displayGroup[item.raw.group] ? 'mdi-chevron-up' : 'mdi-chevron-down'"
                         />
                       </v-col>
                     </v-row>
@@ -92,7 +92,7 @@
                 >
                   <v-tooltip
                     location="right"
-                    contentClass="right-tooltip pa-5"
+                    content-class="right-tooltip pa-5"
                     transition="fade-transition"
                     data-test-id="suffix-tooltip"
                   >
@@ -136,9 +136,9 @@
                   >
                     <v-row
                       :id="`transfer-type-drop-${item.raw.group}`"
-                      noGutters
+                      no-gutters
                     >
-                      <v-col alignSelf="center">
+                      <v-col align-self="center">
                         <span class="transfer-type-list-header px-1">{{ item.raw.textLabel }}</span>
                       </v-col>
                     </v-row>
@@ -154,7 +154,7 @@
                 >
                   <v-tooltip
                     location="right"
-                    contentClass="right-tooltip pa-5"
+                    content-class="right-tooltip pa-5"
                     transition="fade-transition"
                     data-test-id="suffix-tooltip"
                   >
@@ -187,7 +187,7 @@
 
         <!-- Declared Value -->
         <v-row
-          noGutters
+          no-gutters
           class="mt-3"
         >
           <v-col cols="3">
@@ -201,7 +201,7 @@
           </v-col>
 
           <v-col cols="9">
-            <v-row noGutters>
+            <v-row no-gutters>
               <span class="mt-4">$</span>
               <v-text-field
                 id="declared-value"
@@ -214,7 +214,7 @@
                 :disabled="disableSelect"
                 :rules="declaredValueRules"
                 :hint="declaredHomeValueHint"
-                :persistentHint="true"
+                :persistent-hint="true"
                 data-test-id="declared-value"
               />
               <span class="mt-4">.00</span>
@@ -228,7 +228,6 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
-import { BaseDialog } from '@/components/dialogs'
 import {
   ClientTransferTypes,
   QualifiedSupplierTransferTypes,
@@ -240,14 +239,13 @@ import {
 import { useStore } from '@/store/store'
 import { changeTransferType } from '@/resources/dialogOptions'
 import { useInputRules, useTransferOwners } from '@/composables'
-import { FormIF, TransferTypeSelectIF } from '@/interfaces'
+import type { FormIF, TransferTypeSelectIF } from '@/interfaces'
 import { ApiTransferTypes } from '@/enums'
 import { cloneDeep } from 'lodash'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'TransferType',
-  components: { BaseDialog },
   props: {
     validate: { type: Boolean, default: false },
     disableSelect: { type: Boolean, default: false }
