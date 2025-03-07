@@ -107,7 +107,6 @@ import type { MhrSubTypes} from '@/enums';
 import { RouteNames } from '@/enums'
 import QsSelectAccess from './QsSelectAccess.vue'
 import { ButtonFooter, Stepper } from '@/components/common'
-import BaseDialog from '@/components/dialogs/BaseDialog.vue'
 import { MhrUserAccessButtonFooterConfig } from '@/resources/buttonFooterConfig'
 import { useAuth, useNavigation, useUserAccess } from '@/composables'
 import type { ErrorIF } from '@/interfaces'
@@ -117,7 +116,6 @@ export default defineComponent({
   name: 'UserAccess',
   components: {
     Stepper,
-    BaseDialog,
     ButtonFooter,
     QsSelectAccess
   },

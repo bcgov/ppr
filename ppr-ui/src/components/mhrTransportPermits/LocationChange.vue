@@ -241,7 +241,6 @@ import { useInputRules } from '@/composables/useInputRules'
 import { useMhrInfoValidation, useTransportPermits } from '@/composables'
 import { storeToRefs } from "pinia"
 import { changeTransportPermitLocationTypeDialog } from '@/resources/dialogOptions'
-import { BaseDialog } from '@/components/dialogs'
 import { cloneDeep } from 'lodash'
 import QsTaxCertificateHelp from '@/components/mhrTransportPermits/HelpContent/QsTaxCertificateHelp.vue'
 import StaffTaxCertificateHelp from '@/components/mhrTransportPermits/HelpContent/StaffTaxCertificateHelp.vue'

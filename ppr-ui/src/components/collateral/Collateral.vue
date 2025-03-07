@@ -124,8 +124,6 @@ import {
 } from 'vue'
 import { useStore } from '@/store/store'
 import { useRouter } from 'vue-router'
-import { GeneralCollateral } from './general'
-import { VehicleCollateral } from './vehicle'
 import { ActionTypes, APIRegistrationTypes, RegistrationFlowType } from '@/enums'
 import type {
   AddCollateralIF,
@@ -137,10 +135,6 @@ import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'Collateral',
-  components: {
-    GeneralCollateral,
-    VehicleCollateral
-  },
   props: {
     isSummary: {
       type: Boolean,

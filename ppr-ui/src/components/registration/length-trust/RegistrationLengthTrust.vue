@@ -19,7 +19,9 @@
         </v-icon>
         <label class="pl-3">
           <strong>
-            Renewal Length<span v-if="showTrustIndenture"> and Trust Indenture</span>
+            Renewal Length
+            <span v-if="showTrustIndenture"> and Trust Indenture</span>
+            <span v-if="isRlTransition"> and Historical Information</span>
           </strong>
         </label>
       </v-col>
@@ -217,6 +219,7 @@ export default defineComponent({
     const { setLengthTrust } = useStore()
     const {
       // Getters
+      isRlTransition,
       getLengthTrust,
       getRegistrationType,
       getRegistrationExpiryDate
@@ -402,6 +405,7 @@ export default defineComponent({
     )
 
     return {
+      isRlTransition,
       setLifeInfinite,
       infinityPreselected,
       APIRegistrationTypes,

@@ -174,13 +174,11 @@ import { ProductStatus, RouteNames } from '@/enums'
 import { getFeatureFlag } from '@/utils'
 import { searchHistory } from '@/utils/ppr-api-helper'
 import { getQualifiedSupplier, updateQualifiedSupplier } from '@/utils/mhr-api-helper'
-import { useSearch } from '@/composables/useSearch'
 import type {
   ErrorIF,
   ManufacturedHomeSearchResponseIF,
   SearchResponseIF
 } from '@/interfaces'
-import { useAuth, useNavigation, useTransportPermits, useUserAccess } from '@/composables'
 
 export default defineComponent({
   name: 'Dashboard',

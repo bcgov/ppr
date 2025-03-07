@@ -135,7 +135,6 @@ import {
   StickyContainer
 } from '@/components/common'
 import { RegisteringPartyChange } from '@/components/parties/party'
-import { BaseDialog } from '@/components/dialogs'
 import { notCompleteDialog } from '@/resources/dialogOptions'
 import { getFeatureFlag, saveDischarge, scrollToFirstVisibleErrorComponent } from '@/utils'
 import type { APIRegistrationTypes, UIRegistrationTypes } from '@/enums';
@@ -152,7 +151,6 @@ import { useAuth, useNavigation } from '@/composables'
 export default defineComponent({
   name: 'ConfirmDischarge',
   components: {
-    BaseDialog,
     CautionBox,
     DischargeConfirmSummary,
     FolioNumberSummary,

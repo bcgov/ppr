@@ -677,7 +677,6 @@ import {
 import { HomeLocationReview, YourHomeReview } from '@/components/mhrRegistration/ReviewConfirm'
 import { HomeOwners } from '../index'
 import { UnitNotePanels } from '@/components/unitNotes'
-import { BaseDialog } from '@/components/dialogs'
 import {
   QSLockedStateUnitNoteTypes,
   StaffTransferTypes,
@@ -734,7 +733,6 @@ export default defineComponent({
   components: {
     TransportPermitDetails,
     Attention,
-    BaseDialog,
     CautionBox,
     FolioOrReferenceNumber,
     HomeOwners,

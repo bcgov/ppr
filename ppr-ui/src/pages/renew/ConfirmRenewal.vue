@@ -134,7 +134,7 @@ import {
   StickyContainer,
   CautionBox
 } from '@/components/common'
-import { BaseDialog, StaffPaymentDialog } from '@/components/dialogs'
+import { StaffPaymentDialog } from '@/components/dialogs'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
 import { RegisteringPartyChange } from '@/components/parties/party'
 import { notCompleteDialog } from '@/resources/dialogOptions'
@@ -155,7 +155,6 @@ import { useAuth, useNavigation } from '@/composables'
 export default defineComponent({
   name: 'ConfirmRenewal',
   components: {
-    BaseDialog,
     StaffPaymentDialog,
     CourtOrder,
     FolioNumberSummary,
@@ -183,6 +182,7 @@ export default defineComponent({
     } = useStore()
     const {
       // Getters
+      isRlTransition,
       getStateModel,
       getLengthTrust,
       isRoleStaffBcol,
@@ -238,7 +238,8 @@ export default defineComponent({
         return ''
       }),
       showCourtOrderInfo: computed((): boolean => {
-        return (getRegistrationType.value && localState.registrationType === APIRegistrationTypes.REPAIRERS_LIEN)
+        return getRegistrationType.value && localState.registrationType === APIRegistrationTypes.REPAIRERS_LIEN &&
+        !isRlTransition.value
       })
     })
 

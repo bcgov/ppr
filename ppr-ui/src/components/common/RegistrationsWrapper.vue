@@ -233,7 +233,7 @@ import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { RegistrationBar } from '@/components/registration'
 import { RegistrationTable } from '@/components/tables'
-import { BaseDialog, RegistrationConfirmation } from '@/components/dialogs'
+import { RegistrationConfirmation } from '@/components/dialogs'
 import {
   AllRegistrationTypes,
   mhRegistrationTableHeaders,
@@ -317,7 +317,6 @@ import { UnitNotesInfo } from '@/resources/unitNotes'
 export default defineComponent({
   name: 'RegistrationsWrapper',
   components: {
-    BaseDialog,
     RegistrationConfirmation,
     RegistrationBar,
     RegistrationTable

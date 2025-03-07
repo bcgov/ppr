@@ -30,19 +30,23 @@
               <b>{{ asOfDateTime }}.</b><br><br>
               To view the full history of this registration including descriptions of any amendments and
               any court orders, you will need to conduct a separate search.
-              <span v-if="registrationType === registrationTypeRL">
+              <span v-if="registrationType === registrationTypeRL && !isRlTransition">
                 <br><br>The only amendment allowed for a Repairer's Lien is the removal
                 of some (but not all) of the vehicle collateral.
               </span>
             </p>
+            <p v-if="isRlTransition" class="pt-5">
+              <b>Note</b>: The Registry will provide the verification statement to all Secured Parties named in this
+              registration.
+            </p>
           </div>
           <CautionBox
-            class="mt-9"
+            class="mt-7"
             :set-msg="cautionTxt"
-            :set-important-word="'Note'"
+            :set-important-word="isRlTransition ? 'Important' : 'Note'"
           />
           <RegistrationLengthTrustAmendment
-            v-if="registrationType !== registrationTypeRL"
+            v-if="registrationType !== registrationTypeRL || isRlTransition"
             :set-show-error-bar="errorBar"
             class="mt-15"
             @length-trust-open="lengthTrustOpen = $event"
@@ -76,7 +80,7 @@
             Secured Parties
           </h3>
           <SecuredParties
-            v-if="registrationType !== registrationTypeRL"
+            v-if="registrationType !== registrationTypeRL || isRlTransition"
             :set-show-invalid="showInvalid"
             class="pt-4"
             :set-show-error-bar="errorBar"
@@ -98,7 +102,7 @@
             </p>
           </div>
           <SecuredPartySummary
-            v-if="registrationType === registrationTypeRL"
+            v-if="registrationType === registrationTypeRL && !isRlTransition"
             class="secured-party-summary"
             :set-enable-no-data-action="false"
           />
@@ -106,7 +110,7 @@
             Debtors
           </h3>
           <Debtors
-            v-if="registrationType !== registrationTypeRL"
+            v-if="registrationType !== registrationTypeRL || isRlTransition"
             :set-show-invalid="showInvalid"
             :set-show-error-bar="errorBar"
             @set-debtor-valid="setValidDebtor($event)"
@@ -121,7 +125,7 @@
             </span>
           </div>
           <DebtorSummary
-            v-if="registrationType === registrationTypeRL"
+            v-if="registrationType === registrationTypeRL && !isRlTransition"
             class="debtor-summary"
             :set-enable-no-data-action="false"
           />
@@ -183,17 +187,6 @@ import { useRoute } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { isEqual } from 'lodash'
-import { CautionBox, StickyContainer, CourtOrder } from '@/components/common'
-import { BaseDialog } from '@/components/dialogs'
-import { Debtors } from '@/components/parties/debtor'
-import { SecuredParties } from '@/components/parties/party'
-import {
-  AmendmentDescription,
-  RegistrationLengthTrustAmendment,
-  RegistrationLengthTrustSummary, SecuritiesActNotices
-} from '@/components/registration'
-import { Collateral } from '@/components/collateral'
-import { RegisteringPartySummary, SecuredPartySummary, DebtorSummary } from '@/components/parties/summaries'
 import { unsavedChangesDialog } from '@/resources/dialogOptions'
 import {
   getFeatureFlag,
@@ -202,8 +195,7 @@ import {
   setupAmendmentStatementFromDraft
 } from '@/utils'
 import { getFinancingStatement } from '@/utils/ppr-api-helper'
-import type {
-  UIRegistrationTypes} from '@/enums';
+import type { UIRegistrationTypes } from '@/enums'
 import {
   APIRegistrationTypes,
   RouteNames,
@@ -219,27 +211,9 @@ import type {
   FinancingStatementIF,
   RegTableNewItemI
 } from '@/interfaces'
-import { useSecuredParty } from '@/composables/parties'
-import { useAuth, useNavigation, usePprRegistration } from '@/composables'
 
 export default defineComponent({
   name: 'AmendRegistration',
-  components: {
-    SecuritiesActNotices,
-    AmendmentDescription,
-    BaseDialog,
-    CautionBox,
-    CourtOrder,
-    Collateral,
-    Debtors,
-    RegistrationLengthTrustAmendment,
-    RegistrationLengthTrustSummary,
-    RegisteringPartySummary,
-    SecuredParties,
-    SecuredPartySummary,
-    DebtorSummary,
-    StickyContainer
-  },
   props: {
     appReady: {
       type: Boolean,
@@ -266,6 +240,7 @@ export default defineComponent({
     const {
       // Getters
       getStateModel,
+      isRlTransition,
       getLengthTrust,
       getAddCollateral,
       hasUnsavedChanges,
@@ -284,8 +259,6 @@ export default defineComponent({
     const { isSecuredPartiesRestricted } = useSecuredParty()
 
     const localState = reactive({
-      cautionTxt: 'The Registry will provide the verification statement to all Secured Parties named in this ' +
-        'registration.',
       dataLoaded: false,
       dataLoadError: false,
       feeType: FeeSummaryTypes.AMEND,
@@ -309,6 +282,13 @@ export default defineComponent({
       options: unsavedChangesDialog as DialogOptionsIF,
       showCancelDialog: false,
       submitting: false,
+      cautionTxt: computed((): string => {
+        return isRlTransition.value
+          ? 'Repairers Lien (RL) registrations amended, renewed or discharged after the coming into force of the ' +
+          'Commercial Liens Act on DATE TBD are continued as Commercial Lien (CL) registrations.'
+          :'The Registry will provide the verification statement to all Secured Parties named in this ' +
+          'registration.'
+      }),
       asOfDateTime: computed((): string => {
         // return formatted date
         if (localState.financingStatementDate) {
@@ -670,6 +650,7 @@ export default defineComponent({
       saveDraft,
       setStore,
       isCrownError,
+      isRlTransition,
       handleDialogResp,
       confirmAmendment,
       isSecurityActNotice,
