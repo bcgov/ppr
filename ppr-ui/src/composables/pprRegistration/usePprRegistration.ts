@@ -133,8 +133,7 @@ export const usePprRegistration = () => {
         lienAmount: statement.lienAmount || null
       } as LengthTrustIF
     }
-
-    console.log('usePprRegistration.initPprUpdateFilling lengthTrust: ', lengthTrust)
+    
     setLengthTrust(lengthTrust)
 
     if (flowType !== RegistrationFlowType.DISCHARGE) {
