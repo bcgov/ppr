@@ -110,7 +110,7 @@ describe('Confirm Amendment registration component', () => {
     expect(wrapper.findComponent(StickyContainer).vm.$props.setSubmitBtn).toBe('Register Amendment and Pay')
     expect(wrapper.findComponent(StickyContainer).vm.$props.setFeeType).toBe(FeeSummaryTypes.AMEND)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setErrMsg).toBe('')
-    // dialog
+    // // dialog
     expect(wrapper.findComponent(BaseDialog).exists()).toBe(true)
     expect(wrapper.findComponent(StaffPaymentDialog).exists()).toBe(true)
   })

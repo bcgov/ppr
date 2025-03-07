@@ -131,7 +131,6 @@ import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { FolioNumberSummary, StickyContainer, StaffPayment } from '@/components/common'
-import { BaseDialog } from '@/components/dialogs'
 import { RouteNames, UIMHRSearchTypeValues, StaffPaymentOptions, ErrorCategories } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { notCompleteSearchDialog } from '@/resources/dialogOptions'
@@ -148,7 +147,6 @@ import { useAuth, useNavigation } from '@/composables'
 export default defineComponent({
   name: 'ConfirmMHRSearch',
   components: {
-    BaseDialog,
     FolioNumberSummary,
     StickyContainer,
     SearchedResultsMhr,

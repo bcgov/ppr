@@ -136,7 +136,6 @@ import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'v
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
-import { BaseDialog } from '@/components/dialogs'
 import { RegistrationLengthTrustSummary, SecuritiesActNoticesPanels } from '@/components/registration'
 import { Collateral } from '@/components/collateral'
 import { DebtorSummary, RegisteringPartySummary, SecuredPartySummary } from '@/components/parties/summaries'
@@ -158,7 +157,6 @@ import { useAuth, useNavigation, usePprRegistration } from '@/composables'
 export default defineComponent({
   name: 'DischargeRegistration',
   components: {
-    BaseDialog,
     RegistrationLengthTrustSummary,
     Collateral,
     DebtorSummary,

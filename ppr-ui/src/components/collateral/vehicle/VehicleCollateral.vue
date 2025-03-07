@@ -108,7 +108,8 @@
     fluid
   >
     <v-row
-      v-if="(hasVehicleCollateral() || hasOptionalVehicleCollateral()) && !isRepairersLienAmendment"
+      v-if="(hasVehicleCollateral() || hasOptionalVehicleCollateral()) &&
+        (!isRepairersLienAmendment || isRlTransition)"
       no-gutters
       class="pb-4 pt-10 pl-1"
     >
@@ -424,6 +425,7 @@ import { vehicleTableHeaders, VehicleTypes } from '@/resources'
 import { useVehicle } from './factories/useVehicle'
 import { cloneDeep } from 'lodash'
 import { storeToRefs } from 'pinia'
+import { getFeatureFlag } from '@/utils'
 
 export default defineComponent({
   components: {
@@ -449,6 +451,7 @@ export default defineComponent({
   setup (props, context) {
     const { setVehicleCollateral } = useStore()
     const {
+      isRlTransition,
       getVehicleCollateral,
       getRegistrationFlowType,
       getOriginalAddCollateral,
@@ -555,7 +558,7 @@ export default defineComponent({
         currentVehicle.action = ActionTypes.REMOVED
         newVCollateral.splice(index, 1, currentVehicle)
       } else {
-         
+
         newVCollateral.splice(index, 1)
       }
       setVehicleCollateral(newVCollateral)
@@ -608,6 +611,8 @@ export default defineComponent({
     }
 
     return {
+      isRlTransition,
+      getFeatureFlag,
       removeVehicle,
       initEdit,
       initAdd,

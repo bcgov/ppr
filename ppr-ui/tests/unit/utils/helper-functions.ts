@@ -11,7 +11,6 @@ import {
 } from '../test-data'
 import { nextTick } from 'vue'
 import { useStore } from '@/store/store'
-import MockNuxtPage from '../mocks/MockNuxtPage.vue'
 import {
   AddCollateral,
   AddSecuredPartiesAndDebtors,

@@ -95,7 +95,6 @@ import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { StickyContainer } from '@/components/common'
-import { BaseDialog } from '@/components/dialogs'
 import { UnitNotesInfo } from '@/resources/unitNotes'
 import { notCompleteDialog } from '@/resources/dialogOptions/cancelDialogs'
 import { UnitNoteAdd, UnitNoteReview } from '@/components/unitNotes'
@@ -107,7 +106,6 @@ import { RouteNames, UnitNoteDocTypes } from '@/enums'
 export default defineComponent({
   name: 'MhrUnitNote',
   components: {
-    BaseDialog,
     StickyContainer,
     UnitNoteAdd,
     UnitNoteReview

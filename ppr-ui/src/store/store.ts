@@ -172,6 +172,11 @@ export const useStore = defineStore('assetsStore', () => {
   const getUserProductSubscriptionsCodes = computed<ProductCode[]>((): ProductCode[] => {
     return state.value.userProductSubscriptionsCodes
   })
+  /** Returns true if CLA is enabled the current registration type is RepairersLien **/
+  const isRlTransition = computed((): boolean => {
+    return getFeatureFlag('cla-enabled') &&
+      getRegistrationType.value?.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN
+  })
   /** The registration collateral object. */
   const getAddCollateral = computed((): AddCollateralIF => {
     return state.value.registration.collateral
@@ -1601,6 +1606,7 @@ export const useStore = defineStore('assetsStore', () => {
     getSearchDebtorName,
 
     // Registration getters
+    isRlTransition,
     getCertifyInformation,
     getCourtOrderInformation,
     getCurrentRegistrationsTab,

@@ -72,7 +72,8 @@ export default defineNuxtConfig({
         {
           rel: 'stylesheet',
           type: 'text/css',
-          href: 'https://ws1.postescanada-canadapost.ca/css/addresscomplete-2.30.min.css?key=tr28-mh11-ud79-br91' }
+          href: 'https://ws1.postescanada-canadapost.ca/css/addresscomplete-2.30.min.css?key=tr28-mh11-ud79-br91'
+        }
       ],
       script: [
         {
@@ -116,6 +117,8 @@ export default defineNuxtConfig({
     typeCheck: false
   },
   vite: {
+    // Configure Vite's logging level
+    logLevel: 'silent', // Options: 'info', 'warn', 'error', 'silent'
     optimizeDeps: {
       include: [
         'vuelidate',

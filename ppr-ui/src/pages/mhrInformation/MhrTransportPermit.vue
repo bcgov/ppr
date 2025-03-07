@@ -482,7 +482,6 @@ import { useStore } from "@/store/store"
 import { storeToRefs } from "pinia"
 import { computed, reactive } from "vue"
 import { HomeLocationReview } from '@/components/mhrRegistration'
-import { BaseDialog } from '@/components/dialogs'
 import { confirmNewTransportPermit } from '@/resources/dialogOptions'
 import { pacificDate } from '@/utils'
 

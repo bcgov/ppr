@@ -3,8 +3,8 @@
     <!-- Insert Table Dialog -->
     <BaseDialog
       :width="'450px'"
-      :setDisplay="displayTableInput"
-      :setOptions="insertTableOptions"
+      :set-display="displayTableInput"
+      :set-options="insertTableOptions"
       @proceed="handleDialogAction($event)"
     >
       <template #content>
@@ -38,7 +38,7 @@
         v-for="tool in wysiwygToolkitConfig"
         :key="tool.id"
         location="top"
-        contentClass="top-tooltip text-center toolbar-tooltip"
+        content-class="top-tooltip text-center toolbar-tooltip"
         transition="fade-transition"
       >
         <template #activator="{ props }">
@@ -92,8 +92,7 @@
 
 <script lang="ts">
 import { defineComponent, reactive, toRefs, watch, onMounted, computed } from 'vue'
-import BaseDialog from '@/components/dialogs/BaseDialog.vue'
-import { DialogOptionsIF, WysiwygToolsIF } from '@/interfaces'
+import type { DialogOptionsIF, WysiwygToolsIF } from '@/interfaces'
 import { useInputRules } from '@/composables'
 
 // External editor package and extensions
@@ -112,7 +111,6 @@ import { wysiwygToolkitConfig } from '@/resources'
 export default defineComponent({
   name: 'WysiwygEditor',
   components: {
-    BaseDialog,
     EditorContent
   },
   props: {

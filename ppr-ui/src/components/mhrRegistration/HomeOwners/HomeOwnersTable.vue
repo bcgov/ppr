@@ -9,10 +9,10 @@
     <v-table
       id="mhr-home-owners-table"
       class="home-owners-table"
-      itemKey="groupId"
+      item-key="groupId"
       role="presentation"
       :class="{ 'review-mode': isReadonlyTable }"
-      :groupBy="showGroups ? 'groupId' : null"
+      :group-by="showGroups ? 'groupId' : null"
     >
       <thead class="simple">
         <tr>
@@ -76,13 +76,13 @@
               }"
             >
               <TableGroupHeader
-                :groupId="group.groupId"
-                :groupNumber="getGroupNumberById(group.groupId)"
+                :group-id="group.groupId"
+                :group-number="getGroupNumberById(group.groupId)"
                 :owners="hasActualOwners(group.owners) ? group.owners : []"
-                :ownerGroups="homeOwnerGroups"
-                :showEditActions="showEditActions && enableTransferOwnerGroupActions()"
-                :disableGroupHeader="disableGroupHeader(group.groupId)"
-                :isMhrTransfer="isMhrTransfer"
+                :owner-groups="homeOwnerGroups"
+                :show-edit-actions="showEditActions && enableTransferOwnerGroupActions()"
+                :disable-group-header="disableGroupHeader(group.groupId)"
+                :is-mhr-transfer="isMhrTransfer"
               />
             </div>
             <!-- End of Table Group Header -->
@@ -104,7 +104,7 @@
                     class="error-text my-6 text-center"
                     :data-test-id="`no-owners-msg-group-${homeOwners.indexOf(item)}`"
                   >
-                    <HomeOwnersGroupError :groupId="group.groupId" />
+                    <HomeOwnersGroupError :group-id="group.groupId" />
                   </div>
                 </div>
               </div>
@@ -116,8 +116,8 @@
               >
                 <!-- Mixed owners error for Registrations -->
                 <HomeOwnersMixedRolesError
-                  :groupId="item.groupId"
-                  :showBorderError="isInvalidOwnerGroup(item.groupId)"
+                  :group-id="item.groupId"
+                  :show-border-error="isInvalidOwnerGroup(item.groupId)"
                 />
               </tr>
 
@@ -128,11 +128,11 @@
                 >
                   <v-expand-transition>
                     <AddEditHomeOwner
-                      :editHomeOwner="item"
-                      :isHomeOwnerPerson="!item.organizationName"
-                      :isMhrTransfer="isMhrTransfer"
-                      :showTableError="validateTransfer && (isAddingMode || isEditingMode)"
-                      :disableOwnerRemoval="isDisabledForSJTChanges(item) || isDisabledForWillChanges(item)"
+                      :edit-home-owner="item"
+                      :is-home-owner-person="!item.organizationName"
+                      :is-mhr-transfer="isMhrTransfer"
+                      :show-table-error="validateTransfer && (isAddingMode || isEditingMode)"
+                      :disable-owner-removal="isDisabledForSJTChanges(item) || isDisabledForWillChanges(item)"
                       @cancel="currentlyEditingHomeOwnerId = -1"
                       @remove="removeOwnerHandler(item)"
                     />
@@ -660,12 +660,12 @@
                   <v-expand-transition class="ml-4">
                     <BusinessRemovalForm
                       v-if="item.partyType === HomeOwnerPartyTypes.OWNER_BUS"
-                      :historicalOwner="item"
+                      :historical-owner="item"
                       :validate="validateTransfer"
                     />
                     <DeathCertificate
                       v-else
-                      :deceasedOwner="item"
+                      :deceased-owner="item"
                       :validate="validateTransfer"
                     />
                   </v-expand-transition>
@@ -684,7 +684,7 @@
                   class="deceased-review-info pt-0 mt-1 mb-2"
                 >
                   <v-row
-                    noGutters
+                    no-gutters
                     class="ml-8"
                   >
                     <v-col cols="12">
@@ -705,7 +705,7 @@
                   class="deceased-review-info pt-0 mt-1 mb-2"
                 >
                   <v-row
-                    noGutters
+                    no-gutters
                     class="ml-8"
                   >
                     <v-col cols="12">
@@ -797,24 +797,24 @@
                 >
                   <BusinessRemovalForm
                     v-if="item.partyType === HomeOwnerPartyTypes.OWNER_BUS"
-                    :historicalOwner="item"
+                    :historical-owner="item"
                     :validate="validateTransfer"
                   />
                   <v-expand-transition v-else>
                     <SupportingDocuments
                       :key="item.ownerId"
-                      :deletedOwner="item"
+                      :deleted-owner="item"
                       :validate="validateTransfer"
-                      :isSecondOptionDisabled="TransToExec.hasOnlyOneOwnerInGroup(item.groupId)"
-                      :isSecondOptionError="TransToExec.isAllGroupOwnersWithDeathCerts(item.groupId)"
-                      :hasDeathCertForFirstOption="isTransferToExecutorUnder25Will"
-                      @handleDocOptionOneSelected="TransToExec.resetGrantOfProbate(group.groupId, item.ownerId)"
+                      :is-second-option-disabled="TransToExec.hasOnlyOneOwnerInGroup(item.groupId)"
+                      :is-second-option-error="TransToExec.isAllGroupOwnersWithDeathCerts(item.groupId)"
+                      :has-death-cert-for-first-option="isTransferToExecutorUnder25Will"
+                      @handle-doc-option-one-selected="TransToExec.resetGrantOfProbate(group.groupId, item.ownerId)"
                     >
                       <template #deathCert>
                         <DeathCertificate
-                          :deceasedOwner="item"
+                          :deceased-owner="item"
                           :validate="validateTransfer"
-                          :isDisabled="isGlobalEditingMode"
+                          :is-disabled="isGlobalEditingMode"
                         />
                       </template>
                     </SupportingDocuments>
@@ -848,8 +848,8 @@
     </v-table>
   </v-card>
   <BaseDialog
-    :setOptions="mhrDeceasedOwnerChanges"
-    :setDisplay="showOwnerChangesDialog"
+    :set-options="mhrDeceasedOwnerChanges"
+    :set-display="showOwnerChangesDialog"
     @proceed="handleOwnerChangesDialogResp($event)"
   />
 </template>
@@ -876,12 +876,11 @@ import {
   HomeOwnersGroupError,
   SupportingDocuments
 } from '@/components/mhrTransfers'
-import { BaseDialog } from '@/components/dialogs'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
 import { mhrDeceasedOwnerChanges } from '@/resources/dialogOptions'
 import { yyyyMmDdToPacificDate } from '@/utils/date-helper'
 import { InfoChip } from '@/components/common'
-import { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
+import type { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { ActionTypes, HomeOwnerPartyTypes, HomeTenancyTypes, SupportingDocumentsOptions } from '@/enums'
 import { storeToRefs } from 'pinia'
 
@@ -889,7 +888,6 @@ export default defineComponent({
   name: 'HomeOwnersTable',
   components: {
     BaseAddress,
-    BaseDialog,
     BusinessRemovalForm,
     AddEditHomeOwner,
     TableGroupHeader,

@@ -1,21 +1,21 @@
 <template>
   <BaseDialog
-    :setDisplay="display"
-    :setOptions="options"
+    :set-display="display"
+    :set-options="options"
     @proceed="proceed($event)"
   >
     <template #content>
       <StaffPayment
-        :staffPaymentData="staffPaymentData"
+        :staff-payment-data="staffPaymentData"
         :validate="validating"
-        :displaySideLabel="false"
-        :displayPriorityCheckbox="false"
+        :display-side-label="false"
+        :display-priority-checkbox="false"
         @update:staff-payment-data="onStaffPaymentDataUpdate($event)"
         @valid="valid = $event"
       />
       <v-row
         v-if="showCertifiedCheckbox"
-        noGutters
+        no-gutters
       >
         <v-col>
           <v-checkbox
@@ -23,7 +23,7 @@
             v-model="certify"
             class="mt-2"
             label="Make this a Certified Search ($25.00)"
-            hideDetails
+            hide-details
           />
         </v-col>
       </v-row>
@@ -41,15 +41,13 @@ import {
 } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import BaseDialog from '@/components/dialogs/BaseDialog.vue'
 import StaffPayment from '@/components/common/StaffPayment.vue'
 import { StaffPaymentOptions } from '@/enums'
-import { DialogOptionsIF, StaffPaymentIF } from '@/interfaces'
+import type { DialogOptionsIF, StaffPaymentIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'StaffPaymentDialog',
   components: {
-    BaseDialog,
     StaffPayment
   },
   props: {
