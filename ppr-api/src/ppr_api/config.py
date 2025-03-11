@@ -83,7 +83,8 @@ class Config:  # pylint: disable=too-few-public-methods
     PAY_API_URL = os.getenv("PAY_API_URL", "")
     PAY_API_VERSION = os.getenv("PAY_API_VERSION", "")
     REPORT_API_URL = os.getenv("REPORT_API_URL", "https://gotenberg-p56lvhvsqa-nn.a.run.app")
-
+    REPORT_SVC_LARGE_URL = os.getenv("REPORT_API_LARGE_URL", "")
+    
     AUTH_SVC_URL = f"{AUTH_API_URL + AUTH_API_VERSION}"
     PAYMENT_SVC_URL = f"{PAY_API_URL + PAY_API_VERSION}"
     REPORT_SVC_URL = f"{REPORT_API_URL}"

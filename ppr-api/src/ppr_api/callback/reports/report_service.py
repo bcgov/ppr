@@ -17,6 +17,7 @@ from ppr_api.callback.utils.exceptions import ReportDataException, ReportExcepti
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import Party, Registration, SearchResult
 from ppr_api.models import utils as model_utils
+from ppr_api.models.search_result import SCORE_LARGE_REPORT
 from ppr_api.reports import ReportTypes, get_callback_pdf, get_verification_mail
 from ppr_api.services.payment.client import SBCPaymentClient
 from ppr_api.utils.logging import logger
@@ -25,7 +26,7 @@ from ppr_api.utils.logging import logger
 def get_search_report(search_id: str):
     """Generate a search result report."""
     logger.info("Search report request id=" + search_id)
-    search_detail = SearchResult.find_by_search_id(int(search_id), False)
+    search_detail: SearchResult = SearchResult.find_by_search_id(int(search_id), False)
     if search_detail is None:
         logger.info("No search report data found for id=" + search_id)
         raise ReportDataException("No search report data found for id=" + search_id)
@@ -35,6 +36,8 @@ def get_search_report(search_id: str):
         account_id = search_detail.search.account_id
         account_name = search_detail.account_name
         token = SBCPaymentClient.get_sa_token()
+        if search_detail.score and search_detail.score == SCORE_LARGE_REPORT:
+            report_data["largeContainer"] = True
         return get_callback_pdf(report_data, account_id, ReportTypes.SEARCH_DETAIL_REPORT.value, token, account_name)
     except Exception as err:  # pylint: disable=broad-except # noqa F841;
         logger.error("Search report generation failed for id=" + search_id)
