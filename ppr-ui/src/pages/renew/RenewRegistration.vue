@@ -41,14 +41,12 @@
               descriptions of any previous amendments or court orders, you will
               need to conduct a separate search.
             </p>
-
-            <CautionBox
-              class="mt-7"
-              :set-msg="cautionTxt"
-              :set-important-word="'Important'"
-            />
-
           </div>
+          <CautionBox
+            class="mt-7"
+            :set-msg="cautionTxt"
+            :set-important-word="'Important'"
+          />
           <registration-length-trust
             v-if="registrationType !== registrationTypeRL || isRlTransition"
             :set-show-invalid="showInvalid"
@@ -215,6 +213,7 @@ export default defineComponent({
     const {
       // Getters
       isRlTransition,
+      rlTransitionDate,
       getLengthTrust,
       getRegistrationType,
       getConfirmDebtorName,
@@ -237,7 +236,7 @@ export default defineComponent({
       cautionTxt: computed((): string => {
         return isRlTransition.value
           ? 'Repairers Lien (RL) registrations amended, renewed or discharged after the coming into force of the ' +
-          'Commercial Liens Act on DATE TBD are continued as Commercial Lien (CL) registrations.'
+          `Commercial Liens Act on ${ rlTransitionDate.value } are continued as Commercial Lien (CL) registrations.`
           :'The Registry will provide the verification statement to all Secured Parties named in this ' +
           'registration.'
       }),

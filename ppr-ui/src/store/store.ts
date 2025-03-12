@@ -177,6 +177,10 @@ export const useStore = defineStore('assetsStore', () => {
     return getFeatureFlag('cla-enabled') &&
       getRegistrationType.value?.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN
   })
+  /** Returns the Repairers Lien transition date. **/
+  const rlTransitionDate = computed((): string => {
+    return 'June 30th, 2025' // DATE-TBD: To be set when known
+  })
   /** The registration collateral object. */
   const getAddCollateral = computed((): AddCollateralIF => {
     return state.value.registration.collateral
@@ -1607,6 +1611,7 @@ export const useStore = defineStore('assetsStore', () => {
 
     // Registration getters
     isRlTransition,
+    rlTransitionDate,
     getCertifyInformation,
     getCourtOrderInformation,
     getCurrentRegistrationsTab,

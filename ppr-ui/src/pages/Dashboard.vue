@@ -62,6 +62,36 @@
         </template>
       </CautionBox>
 
+      <CautionBox
+        v-if="showCommercialLiensMessaging"
+        class="mb-10"
+      >
+        <template #contentSLot>
+          <PreClaMessage />
+          <!-- Post Message to be enabled following the CLA Launch -->
+          <!-- <PostClaMessage /> -->
+        </template>
+        <template
+          v-if="true"
+          #appendSLot
+        >
+          <v-row no-gutters>
+            <v-col>
+              <v-btn
+                variant="plain"
+                class="msg-hide-icon float-right"
+                :ripple="false"
+                @click="hideRlMessage(true)"
+              >
+                <v-icon color="primary">
+                  mdi-close
+                </v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
+        </template>
+      </CautionBox>
+
       <!-- Only Render for DEALERS who have NOT accepted the Updated Qualified Supplier Agreement Terms -->
       <DealerInfo
         v-if="displayDealerInfo"
@@ -170,7 +200,7 @@ import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'v
 import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { ProductStatus, RouteNames } from '@/enums'
+import { ProductStatus, RouteNames, SettingOptions } from '@/enums'
 import { getFeatureFlag } from '@/utils'
 import { searchHistory } from '@/utils/ppr-api-helper'
 import { getQualifiedSupplier, updateQualifiedSupplier } from '@/utils/mhr-api-helper'
@@ -222,6 +252,8 @@ export default defineComponent({
       hasPprEnabled,
       isRoleStaffBcol,
       isRoleStaffReg,
+      getUserSettings,
+      getAccountId,
       getSearchHistory,
       getUserServiceFee,
       getSearchHistoryLength,
@@ -272,6 +304,11 @@ export default defineComponent({
       }),
       enableDashboardTabs: computed((): boolean => {
         return localState.hasPPR && localState.hasMhrTableEnabled
+      }),
+      showCommercialLiensMessaging: computed((): boolean => {
+        return getFeatureFlag('cla-enabled') && getUserSettings.value[SettingOptions.MISCELLANEOUS_PREFERENCES]?.some(
+          setting => setting.accountId === getAccountId.value && setting[SettingOptions.RL_MSG_HIDE] === false
+        )
       })
     })
 
@@ -370,6 +407,11 @@ export default defineComponent({
       localState.loading = false
     }
 
+    /** Update Qualified Supplier status message - locally and user settings **/
+    const hideRlMessage = async (hideMsg: boolean): Promise<void> => {
+      await useUserAccess().updateUserMiscSettings(SettingOptions.RL_MSG_HIDE, hideMsg)
+    }
+
     watch(() => props.appReady, (val: boolean) => {
       onAppReady(val)
     })
@@ -393,8 +435,10 @@ export default defineComponent({
       snackBarEvent,
       setSearchedType,
       setSearchedValue,
+      hideRlMessage,
       qsMsgContent,
       hideStatusMsg,
+      getFeatureFlag,
       getUserServiceFee,
       setSearchDebtorName,
       redirectRegistryHome,

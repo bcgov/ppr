@@ -43,16 +43,34 @@
               Review your Amendment and complete the additional information before registering.
             </p>
           </div>
+
+          <p
+            v-if="isRlTransition"
+            class="mt-4"
+          >
+            <b>Note</b>: The Registry will provide the verification statement to all Secured Parties named in this
+            registration.
+          </p>
+
           <CautionBox
+            v-else
             class="mt-9"
             style="margin-bottom: 60px;"
             :set-msg="cautionTxt"
             :set-important-word="'Note'"
           />
 
+          <CautionBox
+            v-if="isRlTransition"
+            class="mt-7"
+            :set-msg="`Repairers Lien (RL) registrations amended, renewed or discharged after the coming into force of
+              the Commercial Liens Act on ${ rlTransitionDate } are continued as Commercial Lien (CL) registrations.`"
+            :set-important-word="'Important'"
+          />
+
           <v-row
             no-gutters
-            class="summary-header pa-2 mt-4 rounded-top"
+            class="summary-header pa-2 mt-7 rounded-top"
           >
             <v-col
               cols="12"
@@ -302,6 +320,8 @@ export default defineComponent({
     } = useStore()
     const {
       // Getters
+      rlTransitionDate,
+      isRlTransition,
       getStateModel,
       getLengthTrust,
       isRoleStaffBcol,
@@ -628,6 +648,8 @@ export default defineComponent({
       setFolioValid,
       isRoleStaffBcol,
       handleDialogResp,
+      rlTransitionDate,
+      isRlTransition,
       scrollToInvalid,
       submitAmendment,
       goToReviewAmendment,

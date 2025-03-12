@@ -1,6 +1,6 @@
 <template>
   <div class="ma-0 pa-0">
-    <v-row noGutters>
+    <v-row no-gutters>
       <v-col class="tombstone-header">
         <h1 class="fs-20 lh-30">
           {{ header }}
@@ -13,7 +13,7 @@
         <v-row
           v-if="!isMhrInformation && !isMhrCorrection && !isMhrReRegistration"
           justify="end"
-          noGutters
+          no-gutters
         >
           <v-col
             class="generic-label"
@@ -40,7 +40,7 @@
           v-else-if="isMhrInformation || isMhrCorrection || isMhrReRegistration"
           justify="end"
           class="fs-16 pr-5"
-          noGutters
+          no-gutters
         >
           <v-col>
             <div
@@ -57,7 +57,7 @@
                 v-if="showAmendedRegStatusBadge"
                 action="AMENDED"
                 :baseline="getMhrOriginalTransportPermitRegStatus"
-                :currentState="getMhrInformation.statusType"
+                :current-state="getMhrInformation.statusType"
                 style="position: absolute"
               />
               <div v-else-if="showRestoredStatusBadge">
@@ -75,10 +75,11 @@
     <v-row
       v-if="!isMhrInformation && !isMhrCorrection && !isMhrReRegistration"
       class="pt-1 tombstone-sub-header"
-      noGutters
+      no-gutters
     >
       <v-col>
-        <p>{{ registrationType }}</p>
+        <p>{{ isRlTransition ? 'Commercial Lien' : registrationType }}</p>
+        <p v-if="isRlTransition">(Continued from Repairers Lien {{ getRegistrationNumber }})</p>
       </v-col>
       <v-col
         class="ml-16 tombstone-info"
@@ -86,7 +87,7 @@
       >
         <v-row
           justify="end"
-          noGutters
+          no-gutters
         >
           <v-col
             class="generic-label"
@@ -109,7 +110,7 @@
     <!-- Mhr Amend/Correct Btns -->
     <v-row
       v-if="isMhrChangesEnabled && isRouteName(RouteNames.MHR_INFORMATION) && !isCancelledMhr"
-      noGutters
+      no-gutters
       class="mt-2 mb-n4"
     >
       <!-- Public Amendment Btn -->
@@ -199,7 +200,7 @@
 import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { useStore } from '@/store/store'
 import { formatExpiryDate, pacificDate } from '@/utils'
-import { RegistrationTypeIF } from '@/interfaces'
+import type { RegistrationTypeIF } from '@/interfaces'
 import { MhApiStatusTypes, MhUIStatusTypes, RouteNames } from '@/enums'
 import { useMhrCorrections, useMhrInformation, useNavigation, useTransportPermits } from '@/composables'
 import { storeToRefs } from 'pinia'
@@ -222,6 +223,7 @@ export default defineComponent({
   },
   setup (props) {
     const {
+      isRlTransition,
       getRegistrationCreationDate,
       getRegistrationExpiryDate,
       getRegistrationNumber,
@@ -297,11 +299,13 @@ export default defineComponent({
       isRouteName,
       isCancelledMhr,
       isMhrCorrection,
+      isRlTransition,
       initMhrCorrection,
       isMhrChangesEnabled,
       MhrCorrectionStaff,
       MhrCorrectionClient,
       MhrPublicAmendment,
+      getRegistrationNumber,
       getMhrOriginalTransportPermitRegStatus,
       isCancelChangeLocationActive,
       isExtendChangeLocationActive,

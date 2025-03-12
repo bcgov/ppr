@@ -12,8 +12,21 @@
       >
         <v-col cols="11">
           <p class="dialog-title">
-            <b>{{ optionsValue.title }}</b>
+            <b>{{ optionsValue.title }}
+              <span v-if="isRlReg">as Commercial Lien</span>
+            </b>
           </p>
+
+          <template v-if="isRlReg">
+            <p class="dialog-text py-5 ma-0">
+              A Repairers Lien (RL) to be {{ getRegistrationLabel(optionsValue.label) }} will be registered as a
+              Commercial Lien (CL) and must comply with
+              {{ optionsValue.label.split(' ').slice(1).join(' ').toLowerCase() }} requirements under the Commercial
+              Liens Act and Personal Property Security Regulation.
+            </p>
+            <v-divider class="horizontal-divider mx-1 my-1" />
+          </template>
+
           <p class="dialog-text py-5 ma-0">
             To ensure you are performing {{ optionsValue.label }} on the correct
             registration (Base Registration Number: {{ regNumber }}) please
@@ -88,18 +101,18 @@
 </template>
 
 <script lang="ts">
-// external
 import {
   defineComponent,
   reactive,
   toRefs,
-  watch
+  watch,
+  computed
 } from 'vue'
 import { useStore } from '@/store/store'
-
-// local
-import { DebtorNameIF, DialogOptionsIF } from '@/interfaces' // eslint-disable-line
+import type { DebtorNameIF, DialogOptionsIF } from '@/interfaces'
 import { debtorNames } from '@/utils/ppr-api-helper'
+import { APIRegistrationTypes } from '@/enums'
+import { getFeatureFlag } from '@/utils'
 
 export default defineComponent({
   props: {
@@ -123,6 +136,7 @@ export default defineComponent({
   emits: ['proceed'],
   setup (props, context) {
     const { setRegistrationConfirmDebtorName } = useStore()
+    const { getRegTableBaseRegs } = storeToRefs(useStore())
     const localState = reactive({
       validationErrors: '',
       userInput: null,
@@ -131,7 +145,12 @@ export default defineComponent({
       attachValue: props.attach,
       displayValue: props.display,
       regNumber: props.registrationNumber,
-      fullDebtorInfo: null
+      fullDebtorInfo: null,
+      isRlReg: computed(() => {
+        return getFeatureFlag('cla-enabled') && getRegTableBaseRegs.value?.some(reg =>
+           reg.baseRegistrationNumber === props.registrationNumber &&
+            reg.registrationType === APIRegistrationTypes.REPAIRERS_LIEN)
+      })
     })
 
     const submit = (): void => {
@@ -183,6 +202,20 @@ export default defineComponent({
       localState.fullDebtorInfo = names
     }
 
+    /** Get the registration label for the dialog title. */
+    const getRegistrationLabel = (label: string): string => {
+      switch (label) {
+        case 'an Amendment':
+          return 'amended'
+        case 'a Total Discharge':
+          return 'discharged'
+        case 'a Renewal':
+          return 'renewed'
+        default:
+          return ''
+      }
+    }
+
     watch(
       () => props.registrationNumber,
       (val: string) => {
@@ -224,6 +257,7 @@ export default defineComponent({
     return {
       submit,
       exit,
+      getRegistrationLabel,
       ...toRefs(localState)
     }
   }
