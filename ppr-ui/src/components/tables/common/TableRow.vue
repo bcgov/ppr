@@ -439,7 +439,7 @@
                 location="bottom right"
                 content-class="left-tooltip pa-2 mr-2 pl-4"
                 transition="fade-transition"
-                :disabled="true"
+                :disabled="!isRepairersLienAmendDisabled(item)"
               >
                 <template #activator="{ props }">
                   <div v-bind="props">
