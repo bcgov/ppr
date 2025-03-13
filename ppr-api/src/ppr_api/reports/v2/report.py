@@ -73,6 +73,10 @@ class Report:  # pylint: disable=too-few-public-methods
         http = requests.Session()
         http.mount("https://", adapter)
         response = http.post(url=url, headers=headers, data=meta_data, files=files, timeout=RS_TIMEOUT)
+        if response.status_code == HTTPStatus.BAD_GATEWAY and self.large_container:
+            response = http.post(url=url, headers=headers, data=meta_data, files=files, timeout=RS_TIMEOUT)
+        if response.status_code == HTTPStatus.BAD_GATEWAY and self.large_container:
+            response = http.post(url=url, headers=headers, data=meta_data, files=files, timeout=RS_TIMEOUT)
         logger.info(
             "Account {0} report type {1} response status: {2}.".format(
                 self._account_id, self._report_key, response.status_code

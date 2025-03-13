@@ -274,7 +274,7 @@ def post_callback(search_id: str):  # pylint: disable=too-many-branches, too-man
             )
         logger.debug("report api call status=" + str(status_code) + " headers=" + json.dumps(headers))
         if status_code not in (HTTPStatus.OK, HTTPStatus.CREATED):
-            message = f"Status code={status_code}. Response: " + raw_data
+            message = f"Status code={status_code}. Response: {raw_data}"
             return callback_error(
                 resource_utils.CallbackExceptionCodes.REPORT_ERR, search_id, HTTPStatus.INTERNAL_SERVER_ERROR, message
             )
