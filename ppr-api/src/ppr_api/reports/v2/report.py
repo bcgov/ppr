@@ -42,17 +42,27 @@ class Report:  # pylint: disable=too-few-public-methods
         self._report_key = report_type
         self._account_id = account_id
         self._account_name = account_name
+        self.large_container: bool = False
 
     def get_payload_data(self):
         """Generate report data including template data for report api call."""
         return self._setup_report_data()
 
+    def get_report_service_token(self):
+        """Generate an oath token for the report service."""
+        rs_url: str = current_app.config.get("REPORT_SVC_LARGE_URL") if self.large_container else None
+        return GoogleStorageTokenService.get_report_api_token(rs_url)
+
     def send_request(self, uri: str, meta_data, files, rs_token):
         """Post report generation request to the report service with a retry strategy on 502, 503 responses."""
         url = current_app.config.get("REPORT_SVC_URL") + uri
+        if self.large_container:
+            if current_app.config.get("REPORT_SVC_LARGE_URL"):
+                url = current_app.config.get("REPORT_SVC_LARGE_URL") + uri
+            logger.info(f"Large search report request url={url}")
         headers = {}
         if not rs_token:
-            rs_token = GoogleStorageTokenService.get_report_api_token()
+            rs_token = self.get_report_service_token()
         if rs_token:
             headers["Authorization"] = "Bearer {}".format(rs_token)
         logger.debug(
@@ -63,6 +73,10 @@ class Report:  # pylint: disable=too-few-public-methods
         http = requests.Session()
         http.mount("https://", adapter)
         response = http.post(url=url, headers=headers, data=meta_data, files=files, timeout=RS_TIMEOUT)
+        if response.status_code == HTTPStatus.BAD_GATEWAY and self.large_container:
+            response = http.post(url=url, headers=headers, data=meta_data, files=files, timeout=RS_TIMEOUT)
+        if response.status_code == HTTPStatus.BAD_GATEWAY and self.large_container:
+            response = http.post(url=url, headers=headers, data=meta_data, files=files, timeout=RS_TIMEOUT)
         logger.info(
             "Account {0} report type {1} response status: {2}.".format(
                 self._account_id, self._report_key, response.status_code
@@ -75,6 +89,8 @@ class Report:  # pylint: disable=too-few-public-methods
         if report_type:
             self._report_key = report_type
         if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT:
+            if self._report_data.get("largeContainer"):
+                self.large_container = True
             large_threshold: int = current_app.config.get("REPORT_SEARCH_LIGHT")
             large_search: bool = self._report_data.get("totalResultsSize", 0) >= large_threshold
             self._report_data["search_large"] = large_search
@@ -82,6 +98,7 @@ class Report:  # pylint: disable=too-few-public-methods
                 logger.debug("Search report generating as 2 report api calls.")
                 return self.get_search_pdf()
             logger.debug("Generating large search report.")
+            self.large_container = True
             return self.get_large_search_pdf()
         if self._report_key == ReportTypes.VERIFICATION_STATEMENT_MAIL_REPORT:
             return self.get_registration_mail_pdf()
@@ -101,7 +118,7 @@ class Report:  # pylint: disable=too-few-public-methods
         # 1: Generate the search pdf with no TOC page numbers or total page count.
         data = self._setup_report_data()
         meta_data = report_utils.get_report_meta_data(self._report_key)
-        token = GoogleStorageTokenService.get_report_api_token()
+        token = self.get_report_service_token()
         files = report_utils.get_report_files(data, self._report_key, False, False)
         response_reg = self.send_request(SINGLE_URI, meta_data, files, token)
         if response_reg.status_code != HTTPStatus.OK:

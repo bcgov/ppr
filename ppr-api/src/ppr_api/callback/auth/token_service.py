@@ -83,12 +83,14 @@ class GoogleStorageTokenService(TokenService):  # pylint: disable=too-few-public
         return cls.credentials
 
     @classmethod
-    def get_report_api_token(cls):
+    def get_report_api_token(cls, rs_url: str = None):
         """Generate an OAuth access token with IAM configured auth mhr api container to report api container."""
-        audience = current_app.config.get("REPORT_API_AUDIENCE")
+        audience: str = rs_url if rs_url else current_app.config.get("REPORT_API_AUDIENCE")
+        if rs_url:
+            logger.info(f"Getting report service token for {rs_url}")
         if not audience:
             return None
         auth_req = google.auth.transport.requests.Request()
         token = google.oauth2.id_token.fetch_id_token(auth_req, audience)
-        logger.info("Call successful: obtained token.")
+        logger.debug("Call successful: obtained token.")
         return token
