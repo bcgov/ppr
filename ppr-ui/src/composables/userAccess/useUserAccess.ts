@@ -258,7 +258,7 @@ export const useUserAccess = () => {
     if (clearModel) await setMhrQsInformation(defaultQsInfo)
 
     // Add or remove DBA property based on Product Type
-     
+
     const { dbaName, ...baseQsInfo } = getMhrQsInformation.value
     const formattedQsInfoModel = [MhrSubTypes.MANUFACTURER, MhrSubTypes.DEALERS].includes(val)
       ? { ...getMhrQsInformation.value, dbaName: getMhrQsInformation.value.dbaName || '' }
@@ -300,14 +300,13 @@ export const useUserAccess = () => {
   /** Update Misc Preference in User Profile by specifying key and value to update **/
   const updateUserMiscSettings = async (settingKey: SettingOptions, settingValue: string | boolean) => {
     let miscSettings = getUserSettings.value[SettingOptions.MISCELLANEOUS_PREFERENCES] || []
-
     // Update existing account setting if it exists, otherwise create new misc setting for account.
     if (miscSettings?.find(setting => setting.accountId === getAccountId.value)) {
       miscSettings = miscSettings.map(pref => pref.accountId === getAccountId.value
         ? { ...pref, [settingKey]: settingValue }
         : pref
       )
-    } else miscSettings.push({ accountId: getAccountId.value, [SettingOptions.QS_STATUS_MSG_HIDE]: settingValue })
+    } else miscSettings.push({ accountId: getAccountId.value, [settingKey]: settingValue })
 
     await updateUserSettings(SettingOptions.MISCELLANEOUS_PREFERENCES, miscSettings)
     await setUserSettings({ ...getUserSettings.value, [SettingOptions.MISCELLANEOUS_PREFERENCES]: miscSettings })

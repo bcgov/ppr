@@ -119,7 +119,7 @@
             :ripple="false"
             :disabled="isGlobalEditingMode"
             data-test-id="add-person-btn"
-            @click="validationHandler"
+            @click="AddOwnerValidationHandler()"
           >
             <v-icon class="pr-1">
               mdi-account-plus
@@ -134,7 +134,7 @@
             :ripple="false"
             :disabled="isGlobalEditingMode"
             data-test-id="add-org-btn"
-            @click="validationHandler"
+            @click="AddOwnerValidationHandler(true)"
           >
             <v-icon class="pr-1">
               mdi-domain-plus
@@ -610,10 +610,17 @@ export default defineComponent({
       )
     })
 
-    const validationHandler = () => {
-     return localState.hasHomeOwnersTableErrors
-       ? localState.showError = true
-       : localState.showAddPersonSection = true, localState.showError = false
+    const AddOwnerValidationHandler = (isOrg = false) => {
+      if (localState.hasHomeOwnersTableErrors) {
+        localState.showError = true
+      } else {
+        localState.showError = false
+        if (isOrg) {
+          localState.showAddPersonOrganizationSection = true
+        } else {
+          localState.showAddPersonSection = true
+        }
+      }
     }
 
     const hideShowRemovedOwners = (forceShow: boolean = false): void => {
@@ -700,7 +707,7 @@ export default defineComponent({
     })
 
     return {
-      validationHandler,
+      AddOwnerValidationHandler,
       isRoleStaff,
       isMhrCorrection,
       getTotalOwnershipAllocationStatus,
