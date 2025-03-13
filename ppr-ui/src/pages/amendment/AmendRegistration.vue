@@ -241,6 +241,7 @@ export default defineComponent({
       // Getters
       getStateModel,
       isRlTransition,
+      rlTransitionDate,
       getLengthTrust,
       getAddCollateral,
       hasUnsavedChanges,
@@ -285,7 +286,7 @@ export default defineComponent({
       cautionTxt: computed((): string => {
         return isRlTransition.value
           ? 'Repairers Lien (RL) registrations amended, renewed or discharged after the coming into force of the ' +
-          'Commercial Liens Act on DATE TBD are continued as Commercial Lien (CL) registrations.'
+          `Commercial Liens Act on ${ rlTransitionDate.value } are continued as Commercial Lien (CL) registrations.`
           :'The Registry will provide the verification statement to all Secured Parties named in this ' +
           'registration.'
       }),

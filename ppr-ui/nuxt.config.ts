@@ -21,7 +21,7 @@ const aboutText = (aboutText1 && aboutText2)
       : ''
 
 export default defineNuxtConfig({
-  compatibilityDate: '2024-11-01',
+  compatibilityDate: '2025-03-07',
   devtools: { enabled: true },
   components: [
     '~/components', // Auto-import components from the components directory
@@ -50,6 +50,7 @@ export default defineNuxtConfig({
     '~/components/registration',
     '~/components/registration/length-trust',
     '~/components/registration/securities-act-notices',
+    '~/components/registration/repairers-lien-messaging',
     '~/components/search',
     '~/components/tables',
     '~/components/tables/common',

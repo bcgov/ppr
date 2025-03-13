@@ -42,6 +42,15 @@
               Review your renewal and complete the additional information before registering.
             </p>
           </div>
+
+          <CautionBox
+            v-if="isRlTransition"
+            class="mt-7"
+            :set-msg="`Repairers Lien (RL) registrations amended, renewed or discharged after the coming into force of
+              the Commercial Liens Act on ${ rlTransitionDate } are continued as Commercial Lien (CL) registrations.`"
+            :set-important-word="'Important'"
+          />
+
           <h2 class="pt-14">
             Registering Party for this Renewal
             <v-tooltip
@@ -182,6 +191,7 @@ export default defineComponent({
     } = useStore()
     const {
       // Getters
+      rlTransitionDate,
       isRlTransition,
       getStateModel,
       getLengthTrust,
@@ -320,6 +330,8 @@ export default defineComponent({
     }
 
     return {
+      rlTransitionDate,
+      isRlTransition,
       submitButton,
       setShowWarning,
       isRoleStaffBcol,

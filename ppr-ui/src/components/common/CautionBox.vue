@@ -4,9 +4,11 @@
     :class="{ 'alert-box': setAlert }"
   >
     <slot name="prependSLot" />
-    <p class="mb-0">
-      <b>{{ setImportantWord }}:</b> <span v-html="setMsg" />
-    </p>
+    <slot name="contentSLot">
+      <p class="mb-0">
+        <b>{{ setImportantWord }}:</b> <span v-html="setMsg" />
+      </p>
+    </slot>
     <slot name="appendSLot" />
   </div>
 </template>

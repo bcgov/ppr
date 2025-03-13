@@ -452,7 +452,9 @@
                         <v-icon size="small">
                           mdi-pencil
                         </v-icon>
-                        <span class="ml-1">Amend</span>
+                        <span class="ml-1">Amend
+                          <span v-if="isRepairersLienAndTransitioning(item)">as Commercial Lien</span>
+                        </span>
                       </v-list-item-subtitle>
                     </v-list-item>
                   </div>
@@ -489,7 +491,9 @@
                         <v-icon size="small">
                           mdi-calendar-clock
                         </v-icon>
-                        <span class="ml-1">Renew</span>
+                        <span class="ml-1">Renew
+                          <span v-if="isRepairersLienAndTransitioning(item)">as Commercial Lien</span>
+                        </span>
                       </v-list-item-subtitle>
                     </v-list-item>
                   </div>
@@ -1102,6 +1106,10 @@ export default defineComponent({
       return item.registrationType === APIRegistrationTypes.REPAIRERS_LIEN
     }
 
+    const isRepairersLienAndTransitioning = (item: RegistrationSummaryIF): boolean => {
+      return isRepairersLien(item) && getFeatureFlag('cla-enabled')
+    }
+
     const isExemptOrCancelled = (statusType: MhApiStatusTypes): boolean =>
       [MhApiStatusTypes.EXEMPT, MhApiStatusTypes.CANCELLED].includes(statusType)
 
@@ -1257,6 +1265,7 @@ export default defineComponent({
       isElegibleDocId,
       isExpired,
       isRepairersLien,
+      isRepairersLienAndTransitioning,
       isExemptOrCancelled,
       isRenewalDisabled,
       isRepairersLienAmendDisabled,
