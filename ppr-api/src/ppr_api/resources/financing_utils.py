@@ -65,16 +65,20 @@ CALLBACK_MESSAGES = {
 
 
 def save_rl_transition(registration_class: str, financing_statement: FinancingStatement, reg_id: int):
-    """Conditionally update base registration type if RL, CLA is active, and registration is an amendment/renewal."""
-    if registration_class not in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_RENEWAL):
+    """Conditionally update base registration type if it is currently RL and CLA is active."""
+    if registration_class not in (
+        model_utils.REG_CLASS_AMEND,
+        model_utils.REG_CLASS_RENEWAL,
+        model_utils.REG_CLASS_DISCHARGE,
+    ):
         return
     base_reg: Registration = financing_statement.registration[0]
     if not base_reg or base_reg.registration_type != RegistrationTypes.RL.value:
         return
     if not model_utils.is_rl_transition():
-        logger.info(f"RL amend/renewal of {base_reg.registration_num} before CLA transition: reg type unchanged.")
+        logger.info(f"RL registration on {base_reg.registration_num} before CLA transition: reg type unchanged.")
         return
-    logger.info(f"RL amend/renewal of {base_reg.registration_num} after CLA transition: reg type changing to CL.")
+    logger.info(f"RL registration on {base_reg.registration_num} after CLA transition: reg type changing to CL.")
     base_reg.registration_type = RegistrationTypes.CL.value
     try:
         base_reg.save()

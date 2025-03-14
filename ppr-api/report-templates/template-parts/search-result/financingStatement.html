@@ -18,7 +18,7 @@
       <td>Registration Description:</td>
       <td>{{ detail.financingStatement.registrationDescription }}
           {% if detail.financingStatement.type == 'CL' and detail.financingStatement.transitioned is defined  and detail.financingStatement.transitioned %}
-            <span style="font-style: italic;">(Continued from Repairers Lien)</span>
+            <span style="font-style: italic;">(Converted from Repairers Lien)</span>
           {% endif %}
       </td>
     </tr>
