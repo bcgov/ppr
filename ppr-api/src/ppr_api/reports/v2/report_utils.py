@@ -105,7 +105,7 @@ TO_AMEND_TYPE_DESCRIPTION = {
 }
 # Map post go-live amendment descriptions
 TO_REG_TYPE_TRANSITION = {
-    "CL": "Continued from Repairers Lien",
+    "CL": "Converted from Repairers Lien",
 }
 REPORT_ERR_MSG = "Report service error report type={type}, status={code}, message={msg}"
 HEADER_TRANSITION = '<div class="report-type-transition">{text}</div>'

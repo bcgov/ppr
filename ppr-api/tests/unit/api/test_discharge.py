@@ -225,7 +225,10 @@ def test_create_discharge_rl(session, client, jwt, desc, json_data, roles, statu
     if status == HTTPStatus.CREATED:
         statement: FinancingStatement = FinancingStatement.find_by_registration_number(reg_num, 'PS12345', True)
         reg_type: str = statement.registration[0].registration_type
-        assert reg_type == RegistrationTypes.RL.value
+        if after_cla:
+            assert reg_type == RegistrationTypes.CL.value
+        else:
+            assert reg_type == RegistrationTypes.RL.value
 
 
 @pytest.mark.parametrize('desc,json_data,roles,status,has_account,reg_num', TEST_CREATE_DATA)
