@@ -79,7 +79,7 @@
     >
       <v-col>
         <p>{{ isRlTransition ? 'Commercial Lien' : registrationType }}</p>
-        <p v-if="isRlTransition">(Continued from Repairers Lien {{ getRegistrationNumber }})</p>
+        <p v-if="isRlTransition"><i>(Continued from Repairers Lien {{ getRegistrationNumber }})</i></p>
       </v-col>
       <v-col
         class="ml-16 tombstone-info"

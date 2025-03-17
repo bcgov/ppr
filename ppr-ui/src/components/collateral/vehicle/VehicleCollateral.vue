@@ -288,7 +288,7 @@
                         v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT
                           || (registrationFlowType === RegistrationFlowType.AMENDMENT && (!item.action ||
                             item.action === ActionTypes.ADDED)) &&
-                          (registrationType !== APIRegistrationTypes.REPAIRERS_LIEN)"
+                          (registrationType !== APIRegistrationTypes.REPAIRERS_LIEN || isRlTransition)"
                         class="actions-border actions__more"
                       >
                         <v-menu
@@ -470,7 +470,7 @@ export default defineComponent({
       showEditVehicle: [false],
       isRepairersLienAmendment: computed((): boolean => {
         return registrationFlowType === RegistrationFlowType.AMENDMENT &&
-          registrationType === APIRegistrationTypes.REPAIRERS_LIEN
+          registrationType === APIRegistrationTypes.REPAIRERS_LIEN && !isRlTransition.value
       }),
       isLastDelete: computed((): boolean => {
         if (localState.isRepairersLienAmendment) {

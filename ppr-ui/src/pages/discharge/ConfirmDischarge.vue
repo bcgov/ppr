@@ -32,8 +32,20 @@
             <p class="ma-0">
               Confirm your Total Discharge and complete the additional information before registering.
             </p>
+            <p v-if="isRlTransition" class="pt-5">
+              <b>Note</b>: The Registry will provide the verification statement to all Secured Parties named in this
+              registration.
+            </p>
           </div>
+          <CautionBox
+            v-if="isRlTransition"
+            class="mt-7"
+            :set-msg="`After the Commercial Liens Act takes effect on ${ rlTransitionDate }, any amendments,
+            renewals, or discharges of Repairers Lien (RL) registrations will be registered as Commercial Lien (CL).`"
+            :set-important-word="'Important'"
+          />
           <caution-box
+            v-else
             class="mt-9"
             :set-msg="cautionTxt"
           />
@@ -176,6 +188,8 @@ export default defineComponent({
     } = useStore()
     const {
       // Getters
+      isRlTransition,
+      rlTransitionDate,
       getStateModel,
       isRoleStaffBcol,
       getConfirmDebtorName,
@@ -292,6 +306,8 @@ export default defineComponent({
     }
 
     return {
+      isRlTransition,
+      rlTransitionDate,
       goToDischarge,
       setShowWarning,
       isRoleStaffBcol,

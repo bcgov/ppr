@@ -134,7 +134,7 @@
         <span v-if="isPpr && isChild && !!item.transitioned">(as Commercial Lien)</span>
         <span v-if="isPpr && !isChild">
           <span v-if="isTransitionedCommercialLien(item)" class="font-italic font-weight-medium">
-            <br>Continued from original Repairers Lien Base Registration {{ item.baseRegistrationNumber }}
+            <br>Converted from Repairers Lien Base Registration {{ item.baseRegistrationNumber }}
           </span>
           <span v-else>- Base Registration</span>
         </span>

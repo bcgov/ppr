@@ -7,8 +7,8 @@
       <v-icon color="darkBlue">
         mdi-calendar-clock
       </v-icon>
-      <h3 class="fs-16 lh-24 ml-3">
-        Current Expiry
+      <h3 class="fs-16 lh-24 ml-3 pr-2">
+        Current Expiry Date and Time
         <span v-if="showTrustIndenture"> and Trust Indenture</span>
         <span v-if="isRlTransition"> and Historical Information</span>
       </h3>
@@ -25,9 +25,9 @@
       >
         <v-col
           cols="3"
-          class="generic-label"
+          class="generic-label pr-2"
         >
-          Current Expiry
+          Current Expiry Date and Time
         </v-col>
         <v-col
           id="current-expiry"

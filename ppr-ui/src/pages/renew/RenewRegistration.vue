@@ -235,8 +235,8 @@ export default defineComponent({
       errMsg: '',
       cautionTxt: computed((): string => {
         return isRlTransition.value
-          ? 'Repairers Lien (RL) registrations amended, renewed or discharged after the coming into force of the ' +
-          `Commercial Liens Act on ${ rlTransitionDate.value } are continued as Commercial Lien (CL) registrations.`
+          ? `After the Commercial Liens Act takes effect on ${ rlTransitionDate.value }, any amendments, renewals, or
+          discharges of Repairers Lien (RL) registrations will be registered as Commercial Lien (CL).`
           :'The Registry will provide the verification statement to all Secured Parties named in this ' +
           'registration.'
       }),

@@ -108,7 +108,6 @@ export default defineComponent({
   },
   emits: ['selected'],
   setup (props, { emit }) {
-    const { isSecurityActNoticeEnabled } = usePprRegistration()
     const localState = reactive({
       displayGroup: {
         1: false,
@@ -126,7 +125,9 @@ export default defineComponent({
       displayItems: computed(() => {
         // Filter out the repairers lien registration type if the feature flag is enabled
         const registrationTypes = getFeatureFlag('cla-enabled')
-          ? RegistrationTypes.filter(item => item?.registrationTypeAPI !== APIRegistrationTypes.REPAIRERS_LIEN)
+          ? props.defaultClearable
+            ? RegistrationTypes
+            : RegistrationTypes.filter(item => item?.registrationTypeAPI !== APIRegistrationTypes.REPAIRERS_LIEN)
           : RegistrationTypes.filter(item => item?.registrationTypeAPI !== APIRegistrationTypes.COMMERCIAL_LIEN)
         return filterListByGroupStatus(registrationTypes, localState.displayGroup)
       })
