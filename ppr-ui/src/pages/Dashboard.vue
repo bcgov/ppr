@@ -306,8 +306,9 @@ export default defineComponent({
         return localState.hasPPR && localState.hasMhrTableEnabled
       }),
       showCommercialLiensMessaging: computed((): boolean => {
-        return getFeatureFlag('cla-enabled') && getUserSettings.value[SettingOptions.MISCELLANEOUS_PREFERENCES]?.some(
-          setting => setting.accountId === getAccountId.value && setting[SettingOptions.RL_MSG_HIDE] === false
+        return getFeatureFlag('cla-enabled') &&
+          !getUserSettings.value[SettingOptions.MISCELLANEOUS_PREFERENCES]?.some(
+          setting => setting.accountId === getAccountId.value && !!setting[SettingOptions.RL_MSG_HIDE]
         )
       })
     })

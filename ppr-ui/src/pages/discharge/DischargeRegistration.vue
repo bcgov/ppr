@@ -36,8 +36,20 @@
               To view the full history of this registration including descriptions of any
               previous amendments or court orders, you will need to conduct a separate search.
             </p>
+            <p v-if="isRlTransition" class="pt-5">
+              <b>Note</b>: The Registry will provide the verification statement to all Secured Parties named in this
+              registration.
+            </p>
           </div>
+          <CautionBox
+            v-if="isRlTransition"
+            class="mt-7"
+            :set-msg="`After the Commercial Liens Act takes effect on ${ rlTransitionDate }, any amendments,
+            renewals, or discharges of Repairers Lien (RL) registrations will be registered as Commercial Lien (CL).`"
+            :set-important-word="'Important'"
+          />
           <caution-box
+            v-else
             class="mt-9"
             :set-msg="cautionTxt"
             :set-important-word="'Note'"
@@ -153,10 +165,12 @@ import {
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import type { ErrorIF, DialogOptionsIF } from '@/interfaces'
 import { useAuth, useNavigation, usePprRegistration } from '@/composables'
+import { CautionBox } from '@/components/common'
 
 export default defineComponent({
   name: 'DischargeRegistration',
   components: {
+    CautionBox,
     RegistrationLengthTrustSummary,
     Collateral,
     DebtorSummary,
@@ -179,6 +193,8 @@ export default defineComponent({
     const { initPprUpdateFilling, isSecurityActNotice } = usePprRegistration()
     const {
       // Getters
+      isRlTransition,
+      rlTransitionDate,
       getRegistrationType,
       getConfirmDebtorName
     } = storeToRefs(useStore())
@@ -297,6 +313,8 @@ export default defineComponent({
     }
 
     return {
+      isRlTransition,
+      rlTransitionDate,
       confirmDischarge,
       handleDialogResp,
       isSecurityActNotice,
