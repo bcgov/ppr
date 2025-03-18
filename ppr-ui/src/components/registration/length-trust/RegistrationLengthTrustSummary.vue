@@ -116,7 +116,7 @@
         </v-col>
       </v-row>
       <v-row
-        v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN && !isRlTransition"
+        v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
         no-gutters
         class="pt-6"
       >
@@ -131,7 +131,7 @@
         </v-col>
       </v-row>
       <v-row
-        v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN && !isRlTransition"
+        v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
         no-gutters
         class="pt-6"
       >

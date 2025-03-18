@@ -13,16 +13,23 @@
         <v-col cols="11">
           <p class="dialog-title">
             <b>{{ optionsValue.title }}
-              <span v-if="isRlReg">as Commercial Lien</span>
+              <span v-if="isRlReg && !isDischarge(optionsValue.label)">as Commercial Lien</span>
             </b>
           </p>
 
           <template v-if="isRlReg">
-            <p class="dialog-text py-5 ma-0">
+            <p
+              v-if="!isDischarge(optionsValue.label)"
+              class="dialog-text py-5 ma-0"
+            >
               A Repairers Lien (RL) to be {{ getRegistrationLabel(optionsValue.label) }} will be registered as a
               Commercial Lien (CL) and must comply with
               {{ optionsValue.label.split(' ').slice(1).join(' ').toLowerCase() }} requirements under the Commercial
               Liens Act and Personal Property Security Regulation.
+            </p>
+            <p v-else class="dialog-text py-5 ma-0">
+              The Repairers Lien (RL) will be discharged as a Commercial Lien (CL) under the Commercial Liens Act and
+              Personal Property Security Regulation.
             </p>
             <v-divider class="horizontal-divider mx-1 my-1" />
           </template>
@@ -207,13 +214,16 @@ export default defineComponent({
       switch (label) {
         case 'an Amendment':
           return 'amended'
-        case 'a Total Discharge':
-          return 'discharged'
         case 'a Renewal':
           return 'renewed'
         default:
           return ''
       }
+    }
+
+    /** Get the registration label for the dialog title. */
+    const isDischarge = (label: string): boolean => {
+      return label.includes('Discharge')
     }
 
     watch(
@@ -257,6 +267,7 @@ export default defineComponent({
     return {
       submit,
       exit,
+      isDischarge,
       getRegistrationLabel,
       ...toRefs(localState)
     }
