@@ -173,10 +173,6 @@ export default defineComponent({
     isRenewal: {
       type: Boolean,
       default: false
-    },
-    isDischarge: {
-      type: Boolean,
-      default: false
     }
   },
   setup (props) {
