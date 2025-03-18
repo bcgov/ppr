@@ -222,7 +222,7 @@ def set_transition_registration(statement: dict, changes):
     if statement.get("transitionTS") and statement.get("registrationType") == RegistrationTypes.CL.value:
         transition_ts = model_utils.ts_from_iso_format(statement.get("transitionTS"))
         for change in changes:
-            if change.get("registrationClass") in ("RENEWAL", "AMENDMENT"):
+            if change.get("registrationClass") in ("RENEWAL", "AMENDMENT", "DISCHARGE"):
                 change_ts = model_utils.ts_from_iso_format(change.get("createDateTime"))
                 if change_ts > transition_ts:
                     change["transitioned"] = True
