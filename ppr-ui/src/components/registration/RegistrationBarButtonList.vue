@@ -1,3 +1,36 @@
+<script lang="ts">
+import { defineComponent, reactive, toRefs } from 'vue'
+import { RegistrationTypes } from '@/resources'
+import { UIRegistrationTypes, APIRegistrationTypes } from '@/enums'
+import { getFeatureFlag } from '@/utils'
+
+export default defineComponent({
+  name: 'RegistrationBarButtonList',
+  emits: ['selected'],
+  setup (props, { emit }) {
+    const localState = reactive({
+      registrationTypes: UIRegistrationTypes,
+      registrationTypeValues: APIRegistrationTypes,
+      showMenu: false
+    })
+    const selectRegistration = (val: APIRegistrationTypes) => {
+      const reg = RegistrationTypes.find(
+        function (reg) {
+          if (reg.registrationTypeAPI === val) {
+            return true
+          }
+        })
+      emit('selected', reg)
+    }
+
+    return {
+      getFeatureFlag,
+      selectRegistration,
+      ...toRefs(localState)
+    }
+  }
+})
+</script>
 <template>
   <v-container
     id="reg-btn-list"
@@ -51,7 +84,20 @@
           </v-list-item>
 
           <v-list-item
-            id="btn-reparers"
+            v-if="getFeatureFlag('cla-enabled')"
+            id="btn-commercial-lien"
+            class="copy-normal"
+            @click="selectRegistration(registrationTypeValues.COMMERCIAL_LIEN)"
+          >
+            <v-list-item-title>
+              {{ registrationTypes.COMMERCIAL_LIEN }}
+              ({{ registrationTypeValues.COMMERCIAL_LIEN }})
+            </v-list-item-title>
+          </v-list-item>
+
+          <v-list-item
+            v-else
+            id="btn-repairers"
             class="copy-normal"
             @click="selectRegistration(registrationTypeValues.REPAIRERS_LIEN)"
           >
@@ -154,37 +200,6 @@
     </div>
   </v-container>
 </template>
-<script lang="ts">
-import { defineComponent, reactive, toRefs } from 'vue'
-import { RegistrationTypes } from '@/resources'
-import { UIRegistrationTypes, APIRegistrationTypes } from '@/enums'
-
-export default defineComponent({
-  name: 'RegistrationBarButtonList',
-  emits: ['selected'],
-  setup (props, { emit }) {
-    const localState = reactive({
-      registrationTypes: UIRegistrationTypes,
-      registrationTypeValues: APIRegistrationTypes,
-      showMenu: false
-    })
-    const selectRegistration = (val: APIRegistrationTypes) => {
-      const reg = RegistrationTypes.find(
-        function (reg) {
-          if (reg.registrationTypeAPI === val) {
-            return true
-          }
-        })
-      emit('selected', reg)
-    }
-
-    return {
-      selectRegistration,
-      ...toRefs(localState)
-    }
-  }
-})
-</script>
 <style lang="scss" scoped>
 @import "@/assets/styles/theme.scss";
 .registration-bar-btn {

@@ -416,7 +416,7 @@ import {
   RegistrationTypesStandard,
   StatusTypes,
   MhStatusTypes,
-  MHRegistrationTypesOrg
+  MHRegistrationTypesOrg, RegistrationTypes
 } from '@/resources'
 import { storeToRefs } from 'pinia'
 import { useTableFeatures, useTransferOwners } from '@/composables'
@@ -550,10 +550,14 @@ export default defineComponent({
       statusTypes: [...StatusTypes],
       mhStatusTypes: MhStatusTypes,
       registrationTypes: computed(() => {
-        // Filter out the repairers lien registration type if the feature flag is enabled
-        const registrationTypes = getFeatureFlag('cla-enabled')
-          ? RegistrationTypesStandard.filter(item => item?.registrationTypeAPI !== APIRegistrationTypes.REPAIRERS_LIEN)
-          : RegistrationTypesStandard.filter(item => item?.registrationTypeAPI !== APIRegistrationTypes.COMMERCIAL_LIEN)
+        let registrationTypes = RegistrationTypesStandard
+
+        // Filter out the commercial lien registration type if the feature flag is disabled
+        if(!getFeatureFlag('cla-enabled')){
+          registrationTypes = RegistrationTypesStandard.filter(item =>
+            item?.registrationTypeAPI !== APIRegistrationTypes.COMMERCIAL_LIEN
+          )
+        }
 
         return [...registrationTypes].slice(1)
       }),
