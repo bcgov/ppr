@@ -131,7 +131,7 @@
     >
       <div v-if="isPpr && !!item.registrationType">
         {{ getRegistrationType(item.registrationType) }}
-        <span v-if="isPpr && isChild && !!item.transitioned">(as Commercial Lien)</span>
+        <span v-if="isPpr && isChild && !!item.transitioned"><i>(as Commercial Lien)</i></span>
         <span v-if="isPpr && !isChild">
           <span v-if="isTransitionedCommercialLien(item)" class="font-italic font-weight-medium">
             <br>Converted from Repairers Lien Base Registration {{ item.baseRegistrationNumber }}
