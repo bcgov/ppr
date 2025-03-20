@@ -862,7 +862,6 @@ export default defineComponent({
       isTransferNonGiftBillOfSale,
       isTransferWithoutBillOfSale,
       isTransferDueToSaleOrGift,
-      isTransferNonGiftBillOfSale,
       isTransferToExecutorProbateWill,
       isTransferToExecutorUnder25Will
     } = useTransferOwners()

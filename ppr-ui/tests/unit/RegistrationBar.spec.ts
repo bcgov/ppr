@@ -24,7 +24,7 @@ const registrationButton = '#registration-bar-btn'
 const registrationButtonDropdown = '#registration-more-actions-btn'
 // basic drop down selects
 const selectSecurity = '#btn-security'
-const selectReparers = '#btn-reparers'
+const selectReparers = '#btn-repairers'
 const selectMarriage = '#btn-marriage'
 const selectLand = '#btn-land'
 const selectSale = '#btn-sale'
