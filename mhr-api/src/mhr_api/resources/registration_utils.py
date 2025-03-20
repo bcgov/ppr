@@ -548,21 +548,18 @@ def get_batch_report_data(registration: MhrRegistration, json_data: dict, curren
             if json_data.get("newLocation"):
                 batch_data["location"] = json_data.get("newLocation")
                 del batch_data["newLocation"]
-            batch_data["ppr"] = {
-                "baseRegistrationNumber": ppr_registrations[0]["financingStatement"].get("baseRegistrationNumber"),
-                "registrationDescription": ppr_registrations[0]["financingStatement"].get("registrationDescription"),
-            }
             if not batch_data.get("ownerGroups") and current_json and current_json.get("ownerGroups"):
                 batch_data["ownerGroups"] = current_json.get("ownerGroups")
-            secured_parties = []
-            debtors = []
+            batch_ppr = []
             for reg in ppr_registrations:
-                for secured_party in reg["financingStatement"].get("securedParties"):
-                    secured_parties.append(secured_party)
-                for debtor in reg["financingStatement"].get("debtors"):
-                    debtors.append(debtor)
-            batch_data["ppr"]["securedParties"] = secured_parties
-            batch_data["ppr"]["debtors"] = debtors
+                report_ppr = {
+                    "baseRegistrationNumber": reg["financingStatement"].get("baseRegistrationNumber"),
+                    "registrationDescription": reg["financingStatement"].get("registrationDescription"),
+                    "securedParties": reg["financingStatement"].get("securedParties"),
+                    "debtors": reg["financingStatement"].get("debtors"),
+                }
+                batch_ppr.append(report_ppr)
+            batch_data["pprRegistrations"] = batch_ppr
             logger.debug("batch NOC location report setup complete.")
     except Exception as err:  # noqa: B902; do not alter app processing
         msg = f"Enqueue MHR registration report batch data setup failed for id={registration.id}: " + str(err)

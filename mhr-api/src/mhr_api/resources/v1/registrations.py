@@ -453,21 +453,44 @@ def get_batch_noc_location_report(registrations):
     for reg in registrations:
         reg_data = reg.get("reportData")
         if reg_data.get("ppr") and reg_data["ppr"].get("securedParties"):
-            logger.info("Generating noc location report(s) for reg id=" + str(reg_data.get("registrationId")))
-            for party in reg_data["ppr"].get("securedParties"):
-                rep_data = copy.deepcopy(reg_data)
-                rep_data["ppr"]["securedParty"] = party
-                raw_data, status_code, headers = get_callback_pdf(
-                    rep_data, STAFF_ROLE, ReportTypes.MHR_REGISTRATION_STAFF, None, None
-                )
-                if status_code in (HTTPStatus.OK, HTTPStatus.CREATED):
-                    reports.append(raw_data)
-                else:
-                    logger.error(
-                        str(reg.get("registrationId")) + " report api call failed: " + raw_data.get_data(as_text=True)
-                    )
-                    return raw_data, status_code, headers
+            reports = get_batch_noc_location_data_v1(reg.get("registrationId"), reg_data, reports)
+        elif reg_data.get("pprRegistrations"):
+            reports = get_batch_noc_location_data_v2(reg.get("registrationId"), reg_data, reports)
     return Report.batch_merge(reports)
+
+
+def get_batch_noc_location_data_v1(reg_id: int, reg_data: dict, reports):
+    """Build the location registration report data original format from an MHR registration."""
+    logger.info(f"Generating noc location report(s) for reg id={reg_id}")
+    for party in reg_data["ppr"].get("securedParties"):
+        rep_data = copy.deepcopy(reg_data)
+        rep_data["ppr"]["securedParty"] = party
+        raw_data, status_code, headers = get_callback_pdf(
+            rep_data, STAFF_ROLE, ReportTypes.MHR_REGISTRATION_STAFF, None, None
+        )
+        if status_code in (HTTPStatus.OK, HTTPStatus.CREATED):
+            reports.append(raw_data)
+        else:
+            logger.error(f"{reg_id} report api call failed headers={headers} response={raw_data}")
+    return reports
+
+
+def get_batch_noc_location_data_v2(reg_id: int, reg_data: dict, reports):
+    """Build the location registration report data from an MHR registration."""
+    logger.info(f"Generating noc location report(s) for reg id={reg_id}")
+    for ppr_reg in reg_data.get("pprRegistrations"):
+        for party in ppr_reg.get("securedParties"):
+            rep_data = copy.deepcopy(reg_data)
+            rep_data["ppr"] = ppr_reg
+            rep_data["ppr"]["securedParty"] = party
+            raw_data, status_code, headers = get_callback_pdf(
+                rep_data, STAFF_ROLE, ReportTypes.MHR_REGISTRATION_STAFF, None, None
+            )
+            if status_code in (HTTPStatus.OK, HTTPStatus.CREATED):
+                reports.append(raw_data)
+            else:
+                logger.error(f"{reg_id} report api call failed headers={headers} response={raw_data}")
+    return reports
 
 
 def get_batch_manufacturer_report(registrations):
