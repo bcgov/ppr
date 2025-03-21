@@ -1,7 +1,7 @@
 steps:
   # install / setup ci
   - name: node:16.14.2
-    entrypoint: npm
+    entrypoint: pnpm
     dir: "ppr-ui"
     args: ['install']
 
@@ -17,7 +17,7 @@ steps:
   #
   - name: node:16.14.2
     dir: "ppr-ui"
-    entrypoint: npm
+    entrypoint: pnpm
     env:
       - 'VUE_APP_ADDRESS_COMPLETE_KEY=$_VUE_APP_ADDRESS_COMPLETE_KEY'
       - 'VUE_APP_PPR_LD_CLIENT_ID=$_VUE_APP_PPR_LD_CLIENT_ID'
@@ -59,7 +59,7 @@ steps:
     secretEnv: ['TOKEN']
 availableSecrets:
   secretManager:
-  - versionName: projects/$PROJECT_ID/secrets/token-pr-review/versions/latest
-    env: 'TOKEN'
+    - versionName: projects/$PROJECT_ID/secrets/token-pr-review/versions/latest
+      env: 'TOKEN'
 options:
-    dynamic_substitutions: true
+  dynamic_substitutions: true

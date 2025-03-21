@@ -1,11 +1,10 @@
 // // setup.ts
-import { afterEach, beforeAll, vi } from 'vitest'
+import { afterEach, beforeAll, expect, vi } from 'vitest'
 import { config } from '@vue/test-utils'
 import { dataTestId } from './unit/plugins'
 import { createPinia, setActivePinia } from 'pinia'
 import * as matchers from 'vitest-axe/matchers'
 import 'vitest-axe/extend-expect'
-import { expect } from 'vitest'
 
 import 'vuetify/styles'
 import * as components from 'vuetify/components'
