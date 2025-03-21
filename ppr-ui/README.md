@@ -1,30 +1,75 @@
-# ppr-ui
+# Nuxt Minimal Starter
 
-## Project setup
-```
-npm install
-```
+Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+## Setup
 
-### Compiles and minifies for production
-```
-npm run build
-```
+Make sure to install dependencies:
 
-### Run your unit tests
-```
-npm run test:unit
-```
+```bash
+# pnpm
+pnpm install
 
-### Lints and fixes files
-```
-npm run lint
+# ppnpm
+ppnpm install
+
+# yarn
+yarn install
+
+# bun
+bun install
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## Development Server
 
+Start the development server on `http://localhost:3000`:
+
+```bash
+# pnpm
+pnpm run dev
+
+# ppnpm
+ppnpm dev
+
+# yarn
+yarn dev
+
+# bun
+bun run dev
+```
+
+## Production
+
+Build the application for production:
+
+```bash
+# pnpm
+pnpm run build
+
+# ppnpm
+ppnpm build
+
+# yarn
+yarn build
+
+# bun
+bun run build
+```
+
+Locally preview production build:
+
+```bash
+# pnpm
+pnpm run preview
+
+# ppnpm
+ppnpm preview
+
+# yarn
+yarn preview
+
+# bun
+bun run preview
+```
+
+Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.

@@ -2,11 +2,11 @@ import { useStore } from '@/store/store'
 import { createComponent } from './utils'
 import { RegistrationFlowType, RouteNames, UIRegistrationTypes } from '@/enums'
 import { mockedSelectSecurityAgreement } from './test-data'
-import { AddSecuredPartiesAndDebtors } from '@/views'
+import { AddSecuredPartiesAndDebtors } from '@/pages'
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { Parties } from '@/components/parties'
-import { LengthTrustIF } from '@/interfaces'
+import type { LengthTrustIF } from '@/interfaces'
 import { RegistrationTypes } from '@/resources'
 
 const store = useStore()

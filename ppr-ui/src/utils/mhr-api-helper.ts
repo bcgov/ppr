@@ -1,7 +1,7 @@
 // Libraries
 import { axios } from '@/utils/axios-ppr'
 import { StatusCodes } from 'http-status-codes'
-import {
+import type {
   ErrorDetailIF,
   ErrorIF,
   ExemptionIF,
@@ -18,22 +18,14 @@ import {
   AdminRegistrationIF,
   MhrHistoryRoIF
 } from '@/interfaces'
-import {
-  APIMhrTypes,
-  ApiTransferTypes,
-  ErrorCategories,
-  ErrorCodes,
-  ErrorRootCauses,
-  StaffPaymentOptions
-} from '@/enums'
+import type { APIMhrTypes, ApiTransferTypes} from '@/enums'
+import { ErrorCategories, ErrorCodes, ErrorRootCauses, StaffPaymentOptions } from '@/enums'
 import { useSearch } from '@/composables/useSearch'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { addTimestampToDate } from '@/utils'
 import { trim } from 'lodash'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { AxiosError } from 'axios'
-
-const { mapMhrSearchType } = useSearch()
 
 // Create default request base URL and headers.
 function getDefaultConfig (): object {
@@ -55,7 +47,7 @@ export async function mhrSearch (
       }
 
       // Map query return type to differentiate between ppr & mhr in ui
-      data.searchQuery.type = mapMhrSearchType(data.searchQuery.type, true)
+      data.searchQuery.type = useSearch().mapMhrSearchType(data.searchQuery.type, true)
 
       // need a unique value for the data table (can't use the index in the list)
       const results = data.results

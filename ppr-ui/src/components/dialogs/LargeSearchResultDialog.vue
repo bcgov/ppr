@@ -1,7 +1,7 @@
 <template>
   <BaseDialog
-    :setDisplay="setDisplay"
-    :setOptions="setOptions"
+    :set-display="setDisplay"
+    :set-options="setOptions"
     @proceed="proceed($event)"
   >
     <template #content>
@@ -25,14 +25,10 @@ import {
   reactive,
   toRefs
 } from 'vue'
-import BaseDialog from './BaseDialog.vue'
-import { DialogOptionsIF } from '@/interfaces'
+import type { DialogOptionsIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'LargeSearchResultDialog',
-  components: {
-    BaseDialog
-  },
   props: {
     setDisplay: {
       type: Boolean,

@@ -5,9 +5,9 @@
     class="group-header"
   >
     <BaseDialog
-      setAttach="#mhr-home-owners-list"
-      :setDisplay="showDeleteGroupDialog"
-      :setOptions="{
+      set-attach="#mhr-home-owners-list"
+      :set-display="showDeleteGroupDialog"
+      :set-options="{
         title: 'Delete Group',
         text:
           'Deleting a group also deletes all of the owners in the group. ' +
@@ -361,9 +361,9 @@
             class="mt-5"
           >
             <FractionalOwnership
-              :groupId="groupId"
-              :fractionalData="fractionalData"
-              :isMhrTransfer="isMhrTransfer"
+              :group-id="groupId"
+              :fractional-data="fractionalData"
+              :is-mhr-transfer="isMhrTransfer"
             />
           </v-form>
         </v-col>
@@ -397,13 +397,12 @@
 </template>
 
 <script lang="ts">
-import { BaseDialog } from '@/components/dialogs'
 import { InfoChip } from '@/components/common'
 import { useHomeOwners, useMhrCorrections, useTransferOwners } from '@/composables'
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import FractionalOwnership from './FractionalOwnership.vue'
 import { find } from 'lodash'
-import {
+import type {
   FormIF,
   MhrRegistrationFractionalOwnershipIF,
   MhrHomeOwnerGroupIF,
@@ -416,7 +415,6 @@ import { toTitleCase } from '@/utils'
 export default defineComponent({
   name: 'TableGroupHeader',
   components: {
-    BaseDialog,
     FractionalOwnership,
     InfoChip
   },

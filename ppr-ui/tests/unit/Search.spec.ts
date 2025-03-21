@@ -1,9 +1,9 @@
 import { nextTick } from 'vue'
 import { createComponent } from './utils'
-import { Search } from '@/views'
+import { Search } from '@/pages'
 import { RouteNames, UISearchTypes } from '@/enums'
 import { useStore } from '@/store/store'
-import { SearchedResultPpr } from '@/components/tables'
+import SearchedResultsPpr from '@/components/tables/ppr/SearchedResultsPpr.vue'
 import { SearchTypes } from '@/resources'
 import { mockedSearchResponse } from './test-data'
 
@@ -29,7 +29,7 @@ describe('Search component', () => {
     expect(wrapper.find(resultsInfo).exists()).toBe(false)
     expect(wrapper.find(noResultsInfo).exists()).toBe(false)
     expect(wrapper.find(folioHeader).exists()).toBe(false)
-    expect(wrapper.findComponent(SearchedResultPpr).exists()).toBe(false)
+    expect(wrapper.findComponent(SearchedResultsPpr).exists()).toBe(false)
   })
   it('renders the Results component and displays search data elements with filled result set.', async () => {
     await store.setSearchedType(SearchTypes[1])
@@ -57,7 +57,7 @@ describe('Search component', () => {
     expect(folioDisplay.length).toBe(1)
     expect(folioDisplay.at(0).text()).toContain(wrapper.vm.folioNumber)
     expect(wrapper.find(noResultsInfo).exists()).toBe(false)
-    expect(wrapper.findComponent(SearchedResultPpr).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResultsPpr).exists()).toBe(true)
   })
   it('renders the Results component and displays search data elements with empty result set.', async () => {
     const response = mockedSearchResponse[UISearchTypes.SERIAL_NUMBER]
@@ -88,6 +88,6 @@ describe('Search component', () => {
     const folioDisplay = wrapper.findAll(folioHeader)
     expect(folioDisplay.length).toBe(1)
     expect(folioDisplay.at(0).text()).toContain(wrapper.vm.folioNumber)
-    expect(wrapper.findComponent(SearchedResultPpr).exists()).toBe(true)
+    expect(wrapper.findComponent(SearchedResultsPpr).exists()).toBe(true)
   })
 })

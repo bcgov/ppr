@@ -1,4 +1,4 @@
-import { QsReviewConfirm } from '@/views'
+import { QsReviewConfirm } from '@/pages'
 import { createComponent, setupMockUser } from './utils'
 import { convertDate, defaultFlagSet } from '@/utils'
 import { useStore } from '@/store/store'

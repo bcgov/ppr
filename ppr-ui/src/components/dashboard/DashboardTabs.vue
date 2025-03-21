@@ -51,22 +51,22 @@
         continuous
       >
         <RegistrationsWrapper
-          isTabView
-          :isPpr="isPprTab"
-          :appReady="appReady"
-          :appLoadingData="appLoadingData"
-          @snackBarMsg="snackBarEvent($event)"
+          is-tab-view
+          :is-ppr="isPprTab"
+          :app-ready="appReady"
+          :app-loading-data="appLoadingData"
+          @snack-bar-msg="snackBarEvent($event)"
         />
       </v-window-item>
       <v-window-item
         :value="1"
       >
         <RegistrationsWrapper
-          isTabView
-          :isMhr="isMhrTab"
-          :appReady="appReady"
-          :appLoadingData="appLoadingData"
-          @snackBarMsg="snackBarEvent($event)"
+          is-tab-view
+          :is-mhr="isMhrTab"
+          :app-ready="appReady"
+          :app-loading-data="appLoadingData"
+          @snack-bar-msg="snackBarEvent($event)"
         />
       </v-window-item>
     </v-window>
@@ -154,7 +154,6 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 
 .ppr-mhr-tabs {
-  height: 68px;
   display: block;
   overflow: visible;
 }

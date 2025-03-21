@@ -1,8 +1,8 @@
 import { UIRegistrationTypes } from '@/enums'
 import { FeeSummaryDefaults, FeeSummaryTypes } from '../enums'
-import { FeeSummaryI, RegistrationLengthI } from '../interfaces'
+import type { FeeSummaryI, RegistrationLengthI } from '../interfaces'
 import { defaultFeeSummaries } from '../resources'
-import { isInt } from '@/utils'
+import { getFeatureFlag, isInt } from '@/utils'
 import { getFinancingFee } from '@/composables/fees/factories'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
@@ -148,7 +148,7 @@ export function getFeeSummary (
     if (hasNoCharge(registrationType)) {
       return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
     }
-    if (registrationType === UIRegistrationTypes.REPAIRERS_LIEN) {
+    if (registrationType === UIRegistrationTypes.REPAIRERS_LIEN && !getFeatureFlag('cla-enabled')) {
       return { ...defaultFeeSummaries[FeeSummaryDefaults.DEFAULT_5] }
     }
     if (registrationType === UIRegistrationTypes.MARRIAGE_MH) {
@@ -177,7 +177,7 @@ export function getFeeHint (
     if (hasNoCharge(registrationType) || registrationType === UIRegistrationTypes.MARRIAGE_MH) {
       return 'Infinite Registration (default)'
     }
-    if (registrationType === UIRegistrationTypes.REPAIRERS_LIEN) {
+    if (registrationType === UIRegistrationTypes.REPAIRERS_LIEN && !getFeatureFlag('cla-enabled')) {
       return '180 Day Registration (default)'
     }
     if (registrationLength.lifeInfinite) {

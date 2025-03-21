@@ -1,6 +1,6 @@
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import {
+import type {
   MhrRegistrationDescriptionIF,
   MhrRegistrationHomeLocationIF,
   MhrRegistrationHomeOwnerGroupIF,
@@ -21,14 +21,16 @@ import {
 } from '@/enums'
 import {
   cleanEmpty,
+  fromDisplayPhone
+} from '@/utils'
+import {
   createMhrDraft,
-  fromDisplayPhone,
   getMhrDrafts,
   getMhrManufacturerInfo,
   mhrRegistrationHistory,
   updateMhrDraft
-} from '@/utils'
-import { orderBy } from 'lodash'
+} from '@/utils/mhr-api-helper'
+import { debounce, orderBy } from 'lodash'
 import { useHomeOwners, useMhrCorrections } from '@/composables'
 
 export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
@@ -287,7 +289,7 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
     parsedOwnerGroups.forEach((ownerGroup: MhrRegistrationHomeOwnerGroupIF) => {
       ownerGroup.owners = Object.values(ownerGroup.owners)
 
-      // @ts-ignore - TODO: Mhr-Submission - api asks for number, maybe fix this once step 3 is finished?
+      // @ts-ignore
       ownerGroup.groupId = parseInt(ownerGroup.groupId)
 
       ownerGroup.type = Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === ownerGroup.type)
@@ -374,12 +376,12 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
     return data
   }
 
-  const fetchMhRegistrations = async (sortOptions: RegistrationSortIF = null): Promise<void> => {
+  const fetchMhRegistrations = debounce(async (sortOptions: RegistrationSortIF = null): Promise<void> => {
     const draftFilings = await getMhrDrafts(sortOptions)
     const myMhrHistory = await mhrRegistrationHistory(true, sortOptions)
     const filteredMhrHistory = addHistoryDraftsToMhr(myMhrHistory, draftFilings, sortOptions)
     setMhrTableHistory(filteredMhrHistory)
-  }
+  }, 10)
 
   const mhrDraftHandler = async (): Promise<MhrDraftIF> => {
 

@@ -1,17 +1,20 @@
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { computed, ComputedRef, reactive } from 'vue'
+import type { ComputedRef} from 'vue';
+import { computed, reactive } from 'vue'
 import {
   deepChangesComparison,
+  fromDisplayPhone,
+  getFeatureFlag
+} from '@/utils'
+import {
   deleteEmptyProperties,
   fetchMhRegistration,
-  fromDisplayPhone,
-  getFeatureFlag,
   getMhrDraft
-} from '@/utils'
+} from '@/utils/mhr-api-helper'
 import { ActionTypes, APIRegistrationTypes, HomeCertificationOptions, MhApiStatusTypes, RouteNames } from '@/enums'
 import { useNavigation, useNewMhrRegistration, useTransportPermits } from '@/composables'
-import {
+import type {
   AdminRegistrationIF,
   HomeSectionIF,
   MhRegistrationSummaryIF,

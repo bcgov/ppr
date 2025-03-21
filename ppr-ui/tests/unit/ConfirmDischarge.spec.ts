@@ -9,7 +9,7 @@ import { usePprRegistration } from '@/composables'
 import { RegistrationFlowType, RouteNames } from '@/enums'
 import { createComponent } from './utils'
 import flushPromises from 'flush-promises'
-import { ConfirmDischarge } from '@/views'
+import { ConfirmDischarge } from '@/pages'
 import {
   CautionBox,
   CertifyInformation,

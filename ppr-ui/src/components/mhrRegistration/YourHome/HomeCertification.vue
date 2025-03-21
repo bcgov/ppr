@@ -6,7 +6,7 @@
     rounded
     :class="{ 'py-10': isMhrManufacturerRegistration }"
   >
-    <v-row noGutters>
+    <v-row no-gutters>
       <v-col
         cols="12"
         sm="3"
@@ -19,7 +19,7 @@
           v-if="showUpdatedBadge"
           :action="correctionState.action"
           :baseline="correctionState.homeCertification.baseline"
-          :currentState="correctionState.homeCertification.currentState"
+          :current-state="correctionState.homeCertification.currentState"
         />
       </v-col>
       <v-col
@@ -31,7 +31,7 @@
             v-model="certificationOption"
             class="mt-0 certification-option-btns"
             inline
-            hideDetails="true"
+            hide-details="true"
             :disabled="hasNoCertification"
             :class="{ 'disabled-radio': hasNoCertification }"
             data-test-id="certification-option-btns"
@@ -58,8 +58,8 @@
         </template>
 
         <!-- CSA Section -->
-        <div v-show="isCsaOption">
-          <v-row noGutters>
+        <div v-if="isCsaOption">
+          <v-row no-gutters>
             <v-col cols="12">
               <v-form
                 id="csa-form"
@@ -101,10 +101,9 @@
 
         <!-- Engineer Section -->
         <div
-          v-if="!isMhrManufacturerRegistration"
-          v-show="isEngineerOption"
+          v-if="!isMhrManufacturerRegistration && isEngineerOption"
         >
-          <v-row noGutters>
+          <v-row no-gutters>
             <v-col cols="12">
               <v-form
                 id="engineer-form"
@@ -136,10 +135,10 @@
                   ref="datePicker"
                   class=""
                   title="Date of Engineer's Report"
-                  :minDate="minDate"
-                  :maxDate="today"
-                  :initialValue="engineerDate"
-                  :inputRules="required('Select a date of engineer\'s report')"
+                  :min-date="minDate"
+                  :max-date="today"
+                  :initial-value="engineerDate"
+                  :input-rules="required('Select a date of engineer\'s report')"
                   @emit-date="engineerDate = $event"
                   @emit-cancel="engineerDate = ''"
                 />
@@ -159,11 +158,11 @@
             v-model="hasNoCertification"
             label="There is no certification available for this home."
             class="mt-8 pt-0 mb-n4 float-left"
-            hideDetails
+            hide-details
           />
           <v-tooltip
             location="top"
-            contentClass="top-tooltip"
+            content-class="top-tooltip"
             transition="fade-transition"
           >
             <template #activator="{ props }">
@@ -189,20 +188,14 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
-import { InputFieldDatePicker, UpdatedBadge } from '@/components/common'
 import { HomeCertificationOptions } from '@/enums'
-import { useInputRules, useMhrCorrections, useMhrValidations, useUpdatedBadges } from '@/composables'
 import { useStore } from '@/store/store'
 import { createDateFromPacificTime, localTodayDate } from '@/utils/date-helper'
 import { storeToRefs } from 'pinia'
-import { FormIF } from '@/interfaces'
+import type { FormIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'HomeCertification',
-  components: {
-    InputFieldDatePicker,
-    UpdatedBadge
-  },
   props: {
     validate: {
       type: Boolean,

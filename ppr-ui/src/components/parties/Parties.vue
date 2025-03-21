@@ -10,7 +10,7 @@
     v-else
     class="pa-0 noGutters"
   >
-    <v-row noGutters>
+    <v-row no-gutters>
       <v-col
         cols="auto"
         class="generic-label"
@@ -19,7 +19,7 @@
       </v-col>
     </v-row>
     <v-row
-      noGutters
+      no-gutters
       class="pt-6"
     >
       <v-col
@@ -65,7 +65,7 @@
       </v-col>
     </v-row>
     <v-row
-      noGutters
+      no-gutters
       class="pb-4 pt-10"
     >
       <v-col>
@@ -74,7 +74,7 @@
           <v-tooltip
             v-if="!isRoleStaffSbc"
             class="registering-tooltip"
-            contentClass="top-tooltip pa-5"
+            content-class="top-tooltip pa-5"
             transition="fade-transition"
             location="top"
           >
@@ -99,18 +99,18 @@
     <RegisteringPartyChange />
     <v-row
       v-if="!!parties.registeringParty && !!parties.registeringParty.action"
-      noGutters
+      no-gutters
     >
       <v-col>
         <CautionBox
           class="mt-4 mb-8"
-          :setMsg="cautionTxt"
-          :setImportantWord="'Note'"
+          :set-msg="cautionTxt"
+          :set-important-word="'Note'"
         />
       </v-col>
     </v-row>
     <v-row
-      noGutters
+      no-gutters
       class="py-4"
     >
       <v-col>
@@ -119,7 +119,7 @@
       </v-col>
     </v-row>
     <v-row
-      noGutters
+      no-gutters
       class="py-4"
     >
       <v-col>
@@ -145,11 +145,11 @@ import {
   SecuredParties
 } from '@/components/parties/party'
 import { CautionBox } from '@/components/common'
-import { AddPartiesIF, PartyIF } from '@/interfaces'
+import type { AddPartiesIF, PartyIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
 import { useSecuredParty } from '@/composables/parties'
 import { usePprRegistration } from '@/composables'
-import { partyCodeAccount } from '@/utils'
+import { partyCodeAccount } from '@/utils/ppr-api-helper'
 
 export default defineComponent({
   components: {

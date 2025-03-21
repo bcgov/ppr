@@ -7,12 +7,12 @@ import {
   mockedFinancingStatementRepairers,
   mockedPartyCodeSearchResults
 } from './test-data'
-import { ConfirmRenewal } from '@/views'
+import { ConfirmRenewal } from '@/pages'
 import { FolioNumberSummary, StickyContainer, CertifyInformation, CourtOrder } from '@/components/common'
 import { BaseDialog, StaffPaymentDialog } from '@/components/dialogs'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
 import { RegistrationFlowType, RouteNames } from '@/enums'
-import { StateModelIF } from '@/interfaces'
+import type { StateModelIF } from '@/interfaces'
 import flushPromises from 'flush-promises'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { RegisteringPartyChange } from '@/components/parties/party'

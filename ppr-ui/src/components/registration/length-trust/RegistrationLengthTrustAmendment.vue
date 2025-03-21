@@ -7,8 +7,10 @@
       <v-icon color="darkBlue">
         mdi-calendar-clock
       </v-icon>
-      <h3 class="fs-16 lh-24 ml-3">
-        Current Expiry<span v-if="showTrustIndenture"> and Trust Indenture</span>
+      <h3 class="fs-16 lh-24 ml-3 pr-2">
+        Current Expiry Date and Time
+        <span v-if="showTrustIndenture"> and Trust Indenture</span>
+        <span v-if="isRlTransition"> and Historical Information</span>
       </h3>
     </header>
     <v-card
@@ -18,14 +20,14 @@
       :class="{ 'border-error-left': showErrorBar && editInProgress }"
     >
       <v-row
-        noGutters
+        no-gutters
         class="pt-6"
       >
         <v-col
           cols="3"
-          class="generic-label"
+          class="generic-label pr-2"
         >
-          Current Expiry
+          Current Expiry Date and Time
         </v-col>
         <v-col
           id="current-expiry"
@@ -36,7 +38,7 @@
       </v-row>
       <v-row
         v-if="showTrustIndenture && !showEditTrustIndenture"
-        noGutters
+        no-gutters
         class="pt-6"
       >
         <v-col
@@ -46,7 +48,7 @@
           Trust Indenture
           <div v-if="trustIndentureModified">
             <v-chip
-              xSmall
+              x-small
               variant="elevated"
               color="primary"
             >
@@ -101,27 +103,28 @@
       <!-- Edit -->
       <v-row
         v-if="showEditTrustIndenture"
-        noGutters
+        no-gutters
       >
         <v-col
           cols="12"
           class="edit-debtor-container pa-0"
         >
           <edit-trust-indenture
-            :currentTrustIndenture="trustIndenture"
-            @editTrustIndenture="resetEdit"
-            @resetEvent="resetEdit"
+            :current-trust-indenture="trustIndenture"
+            @edit-trust-indenture="resetEdit"
+            @reset-event="resetEdit"
           />
         </v-col>
       </v-row>
     </v-card>
+
     <v-container
       v-else
       class="bg-white pa-0 noGutters"
       fluid
     >
       <v-row
-        noGutters
+        no-gutters
         class="py-8"
       >
         <v-col
@@ -131,7 +134,7 @@
           Trust Indenture
           <div v-if="trustIndentureModified">
             <v-chip
-              xSmall
+              x-small
               variant="elevated"
               color="primary"
             >
@@ -147,6 +150,33 @@
         </v-col>
       </v-row>
     </v-container>
+
+    <!-- Historical Repairers Lien Information -->
+    <v-card
+      v-if="isRlTransition"
+      flat
+      class="mt-1 bg-white pa-6 rounded"
+    >
+      <v-row no-gutters>
+        <InfoChip action="HISTORICAL" />
+      </v-row>
+      <v-row no-gutters class="mt-4">
+        <v-col cols="3" class="generic-label">
+          Surrender Date
+        </v-col>
+        <v-col cols="9">
+          {{ convertDate(new Date(getLengthTrust.surrenderDate), false, false) }}
+        </v-col>
+      </v-row>
+      <v-row no-gutters class="mt-4">
+        <v-col cols="3" class="generic-label">
+          Amount of Lien
+        </v-col>
+        <v-col cols="9">
+          {{ lienAmountSummary }}
+        </v-col>
+      </v-row>
+    </v-card>
   </div>
 </template>
 
@@ -161,16 +191,12 @@ import {
   onMounted
 } from 'vue'
 import { useStore } from '@/store/store'
-import EditTrustIndenture from './EditTrustIndenture.vue'
-import { LengthTrustIF } from '@/interfaces'
-import { formatExpiryDate } from '@/utils'
+import type { LengthTrustIF } from '@/interfaces'
+import { convertDate, formatExpiryDate } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({
-  components: {
-    EditTrustIndenture
-  },
   props: {
     isSummary: {
       type: Boolean,
@@ -186,6 +212,7 @@ export default defineComponent({
     const { setLengthTrust } = useStore()
     const {
       // Getters
+      isRlTransition,
       getLengthTrust,
       getOriginalLengthTrust,
       getRegistrationType,
@@ -230,6 +257,20 @@ export default defineComponent({
       }),
       trustIndentureModified: computed((): boolean => {
         return localState.lengthTrust.trustIndenture !== localState.originalTrustIndenture
+      }),
+      lienAmountSummary: computed((): string => {
+        if (getLengthTrust.value.lienAmount) {
+          // Format as CDN currency.
+          const currency = getLengthTrust.value.lienAmount
+            ?.replace('$', '')
+            ?.replaceAll(',', '')
+          const lienFloat = parseFloat(currency)
+          if (isNaN(lienFloat)) {
+            return getLengthTrust.value.lienAmount
+          }
+          return '$' + lienFloat.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
+        }
+        return 'Not entered'
       })
     })
 
@@ -268,15 +309,18 @@ export default defineComponent({
     )
 
     return {
+      getLengthTrust,
       APIRegistrationTypes,
       resetEdit,
       initEdit,
+      isRlTransition,
       registrationType,
       undoTrustIndenture,
       modal,
       ...toRefs(localState)
     }
-  }
+  },
+  methods: { convertDate }
 })
 </script>
 

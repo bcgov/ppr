@@ -1,18 +1,17 @@
 import { createComponent } from './utils'
 import { useStore } from '@/store/store'
 import { RegistrationFlowType, RouteNames, UIRegistrationTypes } from '@/enums'
-import { AddCollateral } from '@/views'
+import { AddCollateral } from '@/pages'
 import { mockedSelectSecurityAgreement } from './test-data'
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { Collateral } from '@/components/collateral'
 import flushPromises from 'flush-promises'
-import { LengthTrustIF } from '@/interfaces'
+import type { LengthTrustIF } from '@/interfaces'
 import { RegistrationTypes } from '@/resources'
 import { nextTick } from 'vue'
 import { expect, it } from 'vitest'
 import { axe } from 'vitest-axe'
-import { shallowMount } from '@vue/test-utils'
 
 const store = useStore()
 

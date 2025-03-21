@@ -45,7 +45,7 @@
         v-model="serviceAgreementConfirm"
         class="pa-0"
         color="primary"
-        hideDetails
+        hide-details
       >
         <template #label>
           <span
@@ -64,7 +64,7 @@
 <script lang="ts">
 import { defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
 import { useUserAccess } from '@/composables'
-import { getQsServiceAgreements } from '@/utils'
+import { getQsServiceAgreements } from '@/utils/mhr-api-helper'
 import { useStore } from '@/store/store'
 import VuePdfEmbed from 'vue-pdf-embed'
 import { storeToRefs } from 'pinia'

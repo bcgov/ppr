@@ -1,6 +1,6 @@
 // Libraries
 import { nextTick } from 'vue'
-import { useStore } from '../../src/store/store'
+import { useStore } from '@/store/store'
 
 // Components
 import { HomeCertification } from '@/components/mhrRegistration'
@@ -44,67 +44,67 @@ describe('Home Certification - staff', () => {
     expect(wrapper.find(getTestId('certification-option-btns')).exists()).toBe(true)
 
     // Verify Forms hidden before radio btn selection
-    expect(wrapper.find('#csa-form').isVisible()).toBe(false)
-    expect(wrapper.find('#engineer-form').isVisible()).toBe(false)
-    expect(wrapper.find('#no-certification-checkbox').isVisible()).toBe(true)
+    expect(wrapper.find('#csa-form').exists()).toBe(false)
+    expect(wrapper.find('#engineer-form').exists()).toBe(false)
+    expect(wrapper.find('#no-certification-checkbox').exists()).toBe(true)
     expect(wrapper.find(getTestId('no-certification-tooltip')).exists()).toBe(true)
   })
 
   it('opens the CSA Form when selected', async () => {
     // Verify Forms hidden before radio btn selection
-    expect(wrapper.find('#csa-form').isVisible()).toBe(false)
-    expect(wrapper.find('#engineer-form').isVisible()).toBe(false)
+    expect(wrapper.find('#csa-form').exists()).toBe(false)
+    expect(wrapper.find('#engineer-form').exists()).toBe(false)
 
     // Click the btn
     await wrapper.find('#csa-option').setValue(true)
 
     // Verify CSA Form
-    expect(wrapper.find('#csa-form').isVisible()).toBe(true)
-    expect(wrapper.find('#csa-number').isVisible()).toBe(true)
-    expect(wrapper.find('#csa-standard').isVisible()).toBe(true)
+    expect(wrapper.find('#csa-form').exists()).toBe(true)
+    expect(wrapper.find('#csa-number').exists()).toBe(true)
+    expect(wrapper.find('#csa-standard').exists()).toBe(true)
 
     // Verify Engineer Form
-    expect(wrapper.find('#engineer-form').isVisible()).toBe(false)
-    expect(wrapper.find('#engineer-name').isVisible()).toBe(false)
+    expect(wrapper.find('#engineer-form').exists()).toBe(false)
+    expect(wrapper.find('#engineer-name').exists()).toBe(false)
     expect(wrapper.find('#date-of-engineer-report').exists()).toBe(false)
   })
 
   it('opens the Engineer Form when selected', async () => {
     // Verify Forms hidden before radio btn selection
-    expect(wrapper.find('#csa-form').isVisible()).toBe(false)
-    expect(wrapper.find('#engineer-form').isVisible()).toBe(false)
+    expect(wrapper.find('#csa-form').exists()).toBe(false)
+    expect(wrapper.find('#engineer-form').exists()).toBe(false)
 
     // Click the btn
     await wrapper.find('#engineer-option').setValue(true)
 
     // Verify Engineer Form
-    expect(wrapper.find('#engineer-form').isVisible()).toBe(true)
-    expect(wrapper.find('#engineer-name').isVisible()).toBe(true)
-    expect(wrapper.find('#date-of-engineer-report').isVisible()).toBe(true)
+    expect(wrapper.find('#engineer-form').exists()).toBe(true)
+    expect(wrapper.find('#engineer-name').exists()).toBe(true)
+    expect(wrapper.find('#date-of-engineer-report').exists()).toBe(true)
 
     // Verify CSA Form
-    expect(wrapper.find('#csa-form').isVisible()).toBe(false)
-    expect(wrapper.find('#csa-number').isVisible()).toBe(false)
-    expect(wrapper.find('#csa-standard').isVisible()).toBe(false)
+    expect(wrapper.find('#csa-form').exists()).toBe(false)
+    expect(wrapper.find('#csa-number').exists()).toBe(false)
+    expect(wrapper.find('#csa-standard').exists()).toBe(false)
   })
 
   it('toggles between form options', async () => {
     // Verify Forms hidden before radio btn selection
-    expect(wrapper.find('#csa-form').isVisible()).toBe(false)
-    expect(wrapper.find('#engineer-form').isVisible()).toBe(false)
+    expect(wrapper.find('#csa-form').exists()).toBe(false)
+    expect(wrapper.find('#engineer-form').exists()).toBe(false)
 
     // Click the btn
     await wrapper.find('#engineer-option').setValue(true)
 
     // Verify Engineer Form
-    expect(wrapper.find('#engineer-form').isVisible()).toBe(true)
-    expect(wrapper.find('#engineer-name').isVisible()).toBe(true)
-    expect(wrapper.find('#date-of-engineer-report').isVisible()).toBe(true)
+    expect(wrapper.find('#engineer-form').exists()).toBe(true)
+    expect(wrapper.find('#engineer-name').exists()).toBe(true)
+    expect(wrapper.find('#date-of-engineer-report').exists()).toBe(true)
 
     // Verify CSA Form
-    expect(wrapper.find('#csa-form').isVisible()).toBe(false)
-    expect(wrapper.find('#csa-number').isVisible()).toBe(false)
-    expect(wrapper.find('#csa-standard').isVisible()).toBe(false)
+    expect(wrapper.find('#csa-form').exists()).toBe(false)
+    expect(wrapper.find('#csa-number').exists()).toBe(false)
+    expect(wrapper.find('#csa-standard').exists()).toBe(false)
 
     // Verify Form Toggle
 
@@ -112,13 +112,13 @@ describe('Home Certification - staff', () => {
     await wrapper.find('#csa-option').setValue(true)
 
     // Verify CSA Form
-    expect(wrapper.find('#csa-form').isVisible()).toBe(true)
-    expect(wrapper.find('#csa-number').isVisible()).toBe(true)
-    expect(wrapper.find('#csa-standard').isVisible()).toBe(true)
+    expect(wrapper.find('#csa-form').exists()).toBe(true)
+    expect(wrapper.find('#csa-number').exists()).toBe(true)
+    expect(wrapper.find('#csa-standard').exists()).toBe(true)
 
     // Verify Engineer Form
-    expect(wrapper.find('#engineer-form').isVisible()).toBe(false)
-    expect(wrapper.find('#engineer-name').isVisible()).toBe(false)
+    expect(wrapper.find('#engineer-form').exists()).toBe(false)
+    expect(wrapper.find('#engineer-name').exists()).toBe(false)
     expect(wrapper.find('#date-of-engineer-report').exists()).toBe(false)
   })
 
@@ -130,10 +130,10 @@ describe('Home Certification - staff', () => {
 
   it('collapses form if no certification checkbox is selected', async () => {
     await wrapper.find('#csa-option').setValue(true)
-    expect(wrapper.find('#csa-form').isVisible()).toBe(true)
+    expect(wrapper.find('#csa-form').exists()).toBe(true)
 
     await wrapper.find('#no-certification-checkbox').setValue(true)
-    expect(wrapper.find('#csa-form').isVisible()).toBe(false)
+    expect(wrapper.find('#csa-form').exists()).toBe(false)
   })
 
   it('disables buttons if no certification checkbox is selected', async () => {
@@ -185,7 +185,7 @@ describe('Home Certification - manufacturer', () => {
     expect(wrapper.find(getTestId('certification-option-btns')).exists()).toBe(false)
 
     // Verify only csa-form is shown
-    expect(wrapper.find('#csa-form').isVisible()).toBe(true)
+    expect(wrapper.find('#csa-form').exists()).toBe(true)
     expect(wrapper.find('#engineer-form').exists()).toBe(false)
     expect(wrapper.find('#no-certification').exists()).toBe(false)
     expect(wrapper.find(getTestId('no-certification-tooltip')).exists()).toBe(false)

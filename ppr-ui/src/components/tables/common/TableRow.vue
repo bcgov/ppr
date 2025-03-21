@@ -14,7 +14,7 @@
       v-if="inSelectedHeaders('registrationNumber') || inSelectedHeaders('mhrNumber')"
       :class="{'border-left': (isChild || setIsExpanded), 'fix-td-width': hasRequiredTransfer(item) }"
     >
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col
           v-if="item.changes"
           class="pr-2"
@@ -131,7 +131,13 @@
     >
       <div v-if="isPpr && !!item.registrationType">
         {{ getRegistrationType(item.registrationType) }}
-        <span v-if="isPpr && !isChild"> - Base Registration</span>
+        <span v-if="isPpr && isChild && !!item.transitioned"><i>(as Commercial Lien)</i></span>
+        <span v-if="isPpr && !isChild">
+          <span v-if="isTransitionedCommercialLien(item)" class="font-italic font-weight-medium">
+            <br>Converted from Repairers Lien Base Registration {{ item.baseRegistrationNumber }}
+          </span>
+          <span v-else>- Base Registration</span>
+        </span>
       </div>
       <div
         v-else
@@ -144,7 +150,7 @@
         <v-tooltip
           v-if="item.registrationDescription === APIMhrDescriptionTypes.CONVERTED"
           class="pa-2"
-          contentClass="top-tooltip"
+          content-class="top-tooltip"
           location="top"
           transition="fade-transition"
         >
@@ -215,7 +221,7 @@
         <v-tooltip
           v-if="!isDraft(item)"
           class="pa-2"
-          contentClass="top-tooltip"
+          content-class="top-tooltip"
           location="top"
           transition="fade-transition"
         >
@@ -310,7 +316,7 @@
       </v-btn>
       <v-tooltip
         v-else-if="!isDraft(item)"
-        contentClass="top-tooltip"
+        content-class="top-tooltip"
         location="top"
         transition="fade-transition"
       >
@@ -340,7 +346,7 @@
       <v-row
         v-if="isPpr && (!isChild || isDraft(item))"
         class="actions pr-4"
-        noGutters
+        no-gutters
       >
         <v-col
           cols="10"
@@ -431,7 +437,7 @@
             >
               <v-tooltip
                 location="bottom right"
-                contentClass="left-tooltip pa-2 mr-2 pl-4"
+                content-class="left-tooltip pa-2 mr-2 pl-4"
                 transition="fade-transition"
                 :disabled="!isRepairersLienAmendDisabled(item)"
               >
@@ -446,7 +452,9 @@
                         <v-icon size="small">
                           mdi-pencil
                         </v-icon>
-                        <span class="ml-1">Amend</span>
+                        <span class="ml-1">Amend
+                          <span v-if="isRepairersLienAndTransitioning(item)">as Commercial Lien</span>
+                        </span>
                       </v-list-item-subtitle>
                     </v-list-item>
                   </div>
@@ -468,7 +476,7 @@
               </v-list-item>
               <v-tooltip
                 location="bottom right"
-                contentClass="left-tooltip pa-2 mr-2"
+                content-class="left-tooltip pa-2 mr-2"
                 transition="fade-transition"
                 :disabled="!isRenewalDisabled(item)"
               >
@@ -483,7 +491,9 @@
                         <v-icon size="small">
                           mdi-calendar-clock
                         </v-icon>
-                        <span class="ml-1">Renew</span>
+                        <span class="ml-1">Renew
+                          <span v-if="isRepairersLienAndTransitioning(item)">as Commercial Lien</span>
+                        </span>
                       </v-list-item-subtitle>
                     </v-list-item>
                   </div>
@@ -509,7 +519,7 @@
       <v-row
         v-else-if="isEnabledMhr(item)"
         class="actions pr-4"
-        noGutters
+        no-gutters
       >
         <v-col
           class="edit-action pa-0"
@@ -655,7 +665,7 @@
       <v-row
         v-else-if="!isPpr && isDraft(item)"
         class="actions pr-4"
-        noGutters
+        no-gutters
       >
         <v-col
           class="edit-action"
@@ -713,14 +723,13 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
-import {
-  getRegistrationSummary, mhRegistrationPDF, registrationPDF, stripChars,
-  multipleWordsToTitleCase, getMHRegistrationSummary, isWithinMinutes
-} from '@/utils'
+import { stripChars, multipleWordsToTitleCase, isWithinMinutes, getFeatureFlag } from '@/utils'
+import { getRegistrationSummary, registrationPDF } from '@/utils/ppr-api-helper'
+import { mhRegistrationPDF, getMHRegistrationSummary } from '@/utils/mhr-api-helper'
 import { useStore } from '@/store/store'
 import InfoChip from '@/components/common/InfoChip.vue'
 
-import {
+import type {
   BaseHeaderIF,
   DraftResultIF,
   MhRegistrationSummaryIF,
@@ -843,6 +852,10 @@ export default defineComponent({
       return !props.isPpr && !localState.isChild &&
         item.statusType === MhApiStatusTypes.FROZEN &&
         item.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT
+    }
+
+    const isTransitionedCommercialLien = (item: any): boolean => {
+      return item.registrationType === APIRegistrationTypes.COMMERCIAL_LIEN && !!item.transitioned
     }
 
 
@@ -1056,6 +1069,9 @@ export default defineComponent({
     }
 
     const isRepairersLienAmendDisabled = (item: RegistrationSummaryIF): boolean => {
+      // return if the repairers lien transition is enabled
+      if (getFeatureFlag('cla-enabled')) return false
+
       const changes = item?.changes as RegistrationSummaryIF[]
       // if there are amendments, get the vehicle count from the first array element
       if (changes) {
@@ -1088,6 +1104,10 @@ export default defineComponent({
 
     const isRepairersLien = (item: RegistrationSummaryIF): boolean => {
       return item.registrationType === APIRegistrationTypes.REPAIRERS_LIEN
+    }
+
+    const isRepairersLienAndTransitioning = (item: RegistrationSummaryIF): boolean => {
+      return isRepairersLien(item) && getFeatureFlag('cla-enabled')
     }
 
     const isExemptOrCancelled = (statusType: MhApiStatusTypes): boolean =>
@@ -1221,6 +1241,7 @@ export default defineComponent({
     }, { deep: true, immediate: true })
 
     return {
+      isTransitionedCommercialLien,
       openMhrHistory,
       hasRequiredTransfer,
       multipleWordsToTitleCase,
@@ -1244,6 +1265,7 @@ export default defineComponent({
       isElegibleDocId,
       isExpired,
       isRepairersLien,
+      isRepairersLienAndTransitioning,
       isExemptOrCancelled,
       isRenewalDisabled,
       isRepairersLienAmendDisabled,

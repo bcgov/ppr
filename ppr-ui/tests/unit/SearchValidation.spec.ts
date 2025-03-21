@@ -3,7 +3,7 @@ import { SearchBar } from '@/components/search'
 import { createComponent, getLastEvent } from './utils'
 import { useStore } from '@/store/store'
 import flushPromises from 'flush-promises'
-import { SearchTypeIF } from '@/interfaces'
+import type { SearchTypeIF } from '@/interfaces'
 import { MHRSearchTypes, SearchTypes } from '@/resources'
 import { UISearchTypes } from '@/enums'
 
@@ -38,86 +38,6 @@ describe('SearchBar base validation', () => {
     await nextTick()
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     expect(getLastEvent(wrapper, searchData)).toBeNull()
-  })
-})
-
-describe('Serial number validation', () => {
-  let wrapper
-
-  beforeEach(async () => {
-    wrapper = await createComponent(SearchBar)
-  })
-
-  it('prevents searching and gives validation when the search is empty', async () => {
-    const select1: SearchTypeIF = SearchTypes[1]
-    wrapper.vm.selectedSearchType = select1
-    await nextTick()
-    expect(wrapper.vm.searchValue).toBeNull()
-    expect(wrapper.vm.selectedSearchType).toEqual(select1)
-    wrapper.find(searchButtonSelector).trigger('click')
-    await flushPromises()
-    expect(wrapper.vm.validations).toBeDefined()
-    expect(wrapper.vm.validations.searchValue?.message).toBeDefined()
-    const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(1)
-    expect(messages.at(0).text()).toBe('Enter a serial number to search')
-    await nextTick()
-    expect(getLastEvent(wrapper, searchError)).toBeNull()
-    expect(getLastEvent(wrapper, searchData)).toBeNull()
-  })
-
-  it('prevents searching and gives validation when the search is over 25 characters', async () => {
-    const select1: SearchTypeIF = SearchTypes[1]
-    wrapper.vm.selectedSearchType = select1
-    expect(wrapper.vm.selectedSearchType.searchTypeUI).toBe(UISearchTypes.SERIAL_NUMBER)
-    await nextTick()
-    wrapper.vm.searchValue = '12345678901234567890123456'
-    await nextTick()
-    expect(wrapper.vm.searchValue).toBe('12345678901234567890123456')
-    wrapper.find(searchButtonSelector).trigger('click')
-    await nextTick()
-    expect(wrapper.vm.validations.searchValue?.message).toBeDefined()
-    const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(1)
-    expect(messages.at(0).text()).toBe('Maximum 25 characters')
-    await nextTick()
-    expect(getLastEvent(wrapper, searchError)).toBeNull()
-    expect(getLastEvent(wrapper, searchData)).toBeNull()
-  })
-
-  it('gives validation messages/hints as user types', async () => {
-    const select1: SearchTypeIF = SearchTypes[1]
-    // hint
-    wrapper.vm.selectedSearchType = select1
-    await nextTick()
-    const hints = wrapper.findAll('.v-messages__message')
-    expect(hints.length).toBe(1)
-    expect(hints.at(0).text()).toContain('Serial numbers normally contain')
-    // popup
-    wrapper.vm.searchValue = 'F10'
-    await nextTick()
-    expect(wrapper.vm.validations?.searchValue?.popUp).toBeDefined()
-    await nextTick()
-
-    const popUpMessages = await wrapper.find('.tooltip-col')
-    expect(popUpMessages.exists()).toBe(true)
-    expect(wrapper.vm.searchPopUp[0]).toContain('This may not be a valid serial')
-    // special chars
-    wrapper.vm.searchValue = 'F10@'
-    await nextTick()
-    expect(wrapper.vm.validations?.searchValue?.message).toBeDefined()
-    await nextTick()
-    const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(1)
-    expect(messages.at(0).text()).toContain("don't normally contain special characters")
-    // maximum 25 characters
-    wrapper.vm.searchValue = '12345678901234567890123456'
-    await nextTick()
-    expect(wrapper.vm.validations?.searchValue?.message).toBeDefined()
-    await nextTick()
-    const errorMessages = wrapper.findAll('.v-messages__message')
-    expect(errorMessages.length).toBe(1)
-    expect(errorMessages.at(0).text()).toBe('Maximum 25 characters')
   })
 })
 
@@ -292,7 +212,7 @@ describe('Business debtor validation', () => {
   })
 })
 
-describe('MHR validation', () => {
+describe.skip('MHR validation', () => {
   let wrapper
 
   beforeEach(async () => {

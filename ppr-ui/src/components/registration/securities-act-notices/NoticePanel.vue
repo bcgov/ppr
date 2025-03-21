@@ -6,22 +6,22 @@
     <!-- Remove Notice Dialog -->
     <BaseDialog
       id="removeNoticeDialog"
-      setAttach="#securities-act-notices"
-      :setDisplay="showRemoveNoticeDialog"
-      :setOptions="confirmRemoveNoticeDialog"
+      set-attach="#securities-act-notices"
+      :set-display="showRemoveNoticeDialog"
+      :set-options="confirmRemoveNoticeDialog"
       @proceed="removeNotice"
     />
 
     <!-- Default Notice Title Content -->
     <v-expansion-panel-title
-      disableIconRotate
+      disable-icon-rotate
       :disabled="true"
-      :hideActions="isSummary"
+      :hide-actions="isSummary"
       :class="{ 'removed-item': notice.action === ActionTypes.REMOVED }"
     >
       <v-expand-transition>
         <v-row
-          noGutters
+          no-gutters
           class="py-3"
         >
           <v-col
@@ -114,7 +114,7 @@
                 variant="plain"
                 color="primary"
                 v-bind="props"
-                minWidth="10"
+                min-width="10"
                 width="45"
                 :disabled="disableActions"
                 :ripple="false"
@@ -195,9 +195,9 @@
       <AddEditNotice
         v-if="editNotice"
         class="px-0 mx-0"
-        isEditing
+        is-editing
         :notice="notice"
-        :isAmendment="isAmendment"
+        :is-amendment="isAmendment"
         @cancel="togglePanel(true)"
         @done="handleEditNotice"
       />
@@ -205,10 +205,10 @@
       <AddEditCourtOrder
         v-else-if="addCourtOrder || (editOrder && notice.securitiesActOrders[editOrderIndex]?.courtOrder)"
         class="px-0 mx-0"
-        :isEditing="!!notice.securitiesActOrders?.[editOrderIndex]"
-        :courtOrderProp="notice.securitiesActOrders?.[editOrderIndex]"
-        :isAmendment="isAmendment"
-        @isValid="isValidOrder = $event"
+        :is-editing="!!notice.securitiesActOrders?.[editOrderIndex]"
+        :court-order-prop="notice.securitiesActOrders?.[editOrderIndex]"
+        :is-amendment="isAmendment"
+        @is-valid="isValidOrder = $event"
         @cancel="togglePanel(true)"
         @done="handleAddEditOrder"
       />
@@ -217,10 +217,10 @@
       <AddEditCommissionOrder
         v-else-if="addCommissionOrder || editOrder"
         class="px-0 mx-0"
-        :isEditing="!!notice.securitiesActOrders?.[editOrderIndex]"
-        :commissionOrderProp="notice.securitiesActOrders?.[editOrderIndex]"
-        :isAmendment="isAmendment"
-        @isValid="isValidOrder = $event"
+        :is-editing="!!notice.securitiesActOrders?.[editOrderIndex]"
+        :commission-order-prop="notice.securitiesActOrders?.[editOrderIndex]"
+        :is-amendment="isAmendment"
+        @is-valid="isValidOrder = $event"
         @cancel="togglePanel(true)"
         @done="handleAddEditOrder"
       />
@@ -235,7 +235,7 @@
           v-if="notice?.securitiesActOrders?.length"
           class="py-4 px-7 mt-n1"
           disabled
-          hideActions
+          hide-actions
         >
           <!-- Order Review Components -->
           <div class="order-content">
@@ -244,9 +244,9 @@
               :key="index"
               class="rounded-all"
               :order="order"
-              :isAmendment="isAmendment"
-              :hasRemovedOrders="notice.action === ActionTypes.REMOVED"
-              :hasAddedParentNotice="notice.action === ActionTypes.ADDED"
+              :is-amendment="isAmendment"
+              :has-removed-orders="notice.action === ActionTypes.REMOVED"
+              :has-added-parent-notice="notice.action === ActionTypes.ADDED"
             >
               <template
                 v-if="!isSummary && notice.action !== ActionTypes.REMOVED"
@@ -300,7 +300,7 @@
                         variant="plain"
                         color="primary"
                         v-bind="props"
-                        minWidth="10"
+                        min-width="10"
                         width="45"
                         :disabled="disableActions"
                         :ripple="false"
@@ -357,7 +357,7 @@
 
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
-import { AddEditSaNoticeIF, CourtOrderIF } from '@/interfaces'
+import type { AddEditSaNoticeIF, CourtOrderIF } from '@/interfaces'
 import { ActionTypes, saNoticeTypeMapping } from '@/enums'
 import { yyyyMmDdToPacificDate } from '@/utils/date-helper'
 import {
@@ -370,7 +370,6 @@ import { InfoChip } from '@/components/common'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { confirmRemoveNoticeDialog } from '@/resources/dialogOptions'
-import { BaseDialog } from '@/components/dialogs'
 import { cloneDeep, isEqual, omit } from 'lodash'
 
 /** Composables **/

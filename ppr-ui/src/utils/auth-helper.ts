@@ -3,16 +3,18 @@ import { axios } from '@/utils/axios-auth'
 import { StatusCodes } from 'http-status-codes'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // Interfaces, Enums
-import {
+import type {
   AccountProductCodes,
   AccountProductMemberships,
   AccountProductRoles,
-  AccountTypes,
-  ErrorCategories,
   ErrorCodes,
   ProductCode
-} from '@/enums'
+} from '@/enums';
 import {
+  AccountTypes,
+  ErrorCategories
+} from '@/enums'
+import type {
   AccountAdminInfoIF,
   AccountProductSubscriptionIF,
   AddressIF,
@@ -21,8 +23,8 @@ import {
   UserInfoIF,
   UserProductSubscriptionIF
 } from '@/interfaces'
-import { partyCodeSearch } from '@/utils'
-import { AccountInfoIF } from '@/interfaces/account-interfaces/account-info-interface'
+import { partyCodeSearch } from '@/utils/ppr-api-helper'
+import type { AccountInfoIF } from '@/interfaces/account-interfaces/account-info-interface'
 
 /** Gets Keycloak JWT and parses it. */
 function getJWT (): any {

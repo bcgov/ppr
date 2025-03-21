@@ -2,11 +2,11 @@
   <v-row
     id="pid-number"
     class="pid-text-input"
-    noGutters
+    no-gutters
   >
     <BaseDialog
-      :setOptions="dialogOptions"
-      :setDisplay="showNotFoundDialog"
+      :set-options="dialogOptions"
+      :set-display="showNotFoundDialog"
       @proceed="dialogRetry($event)"
     />
 
@@ -26,11 +26,11 @@
         maxlength="3"
         variant="filled"
         color="primary"
-        persistentHint
+        persistent-hint
         autofocus
         hint="Parcel identifier must contain 9 digits"
         :readonly="enablePidLoader"
-        :errorMessages="invalidPidMsg"
+        :error-messages="invalidPidMsg"
         :disabled="disable"
         @paste="parsePaste($event)"
       />
@@ -106,17 +106,13 @@
 import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
 import { useInputRules } from '@/composables'
 import { ltsaDetails } from '@/utils/ltsa-api-helper'
-import { BaseDialog } from '@/components/dialogs'
 import { pidNotFoundDialog } from '@/resources/dialogOptions'
-import { LtsaDetailsIF, PidInfoIF } from '@/interfaces/ltsa-api-interfaces'
-import { FormIF } from '@/interfaces'
+import type { LtsaDetailsIF, PidInfoIF } from '@/interfaces/ltsa-api-interfaces'
+import type { FormIF } from '@/interfaces'
 
 
 export default defineComponent({
   name: 'PidNumber',
-  components: {
-    BaseDialog
-  },
   props: {
     pidNumber: { type: String, default: '' },
     disable: { type: Boolean, default: false },

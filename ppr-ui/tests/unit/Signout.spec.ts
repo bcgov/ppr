@@ -1,5 +1,5 @@
 import { createComponent } from './utils'
-import { Signout } from '@/views'
+import { Signout } from '@/pages'
 import flushPromises from 'flush-promises'
 import SbcSignout from 'sbc-common-components/src/components/SbcSignout.vue'
 import KeyCloakService from '@sbc/services/keycloak.services'

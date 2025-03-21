@@ -1,6 +1,6 @@
 // Libraries
 import { ActionTypes, APIAmendmentTypes, APIRegistrationTypes, DraftTypes } from '@/enums'
-import {
+import type {
   AddCollateralIF,
   AddEditSaNoticeIF,
   AddPartiesIF,
@@ -16,20 +16,22 @@ import {
   VehicleCollateralIF
 } from '@/interfaces'
 import {
-  convertToISO8601LastMinute,
+  convertToISO8601LastMinute, getFeatureFlag,
+  removeEmptyProperties
+} from '@/utils'
+import {
   createAmendmentStatement,
   createDischarge,
   createDraft,
   createFinancingStatement,
   createRenewal,
   getDraft,
-  removeEmptyProperties,
   staffAmendment,
   staffDischarge,
   staffFinancingStatement,
   staffRenewal,
   updateDraft
-} from '@/utils'
+} from '@/utils/ppr-api-helper'
 import { RegistrationTypes } from '@/resources'
 import { usePprRegistration } from '@/composables'
 import { cloneDeep } from 'lodash'
@@ -767,7 +769,8 @@ export async function saveRenewal (stateModel:StateModelIF): Promise<RenewRegist
   registration.registeringParty = cleanupParty(registration.registeringParty)
 
   // No lifeYears, lifeInfinite for RL renewal
-  if (stateModel.registration.registrationType.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN) {
+  if (stateModel.registration.registrationType.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN &&
+    !getFeatureFlag('cla-enabled')) {
     registration.courtOrderInformation = stateModel.registration.courtOrderInformation
     if (registration.courtOrderInformation.orderDate.length === 10) {
       // add current time to date

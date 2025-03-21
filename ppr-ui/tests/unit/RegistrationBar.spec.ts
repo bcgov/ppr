@@ -1,10 +1,11 @@
-import { RegistrationBar, RegistrationBarTypeAheadList } from '@/components/registration'
+import { nextTick } from 'vue'
+import { RegistrationBar, RegistrationBarButtonList, RegistrationBarTypeAheadList } from '@/components/registration'
 import {
   RegistrationTypesMiscellaneousCC,
   RegistrationTypesStandard
 } from '@/resources'
 import { AccountProductCodes, AccountProductMemberships, UIRegistrationTypes } from '@/enums'
-import { RegistrationTypeIF } from '@/interfaces'
+import type { RegistrationTypeIF } from '@/interfaces'
 import { useStore } from '@/store/store'
 import { createComponent, getLastEvent } from './utils'
 import flushPromises from 'flush-promises'
@@ -15,7 +16,7 @@ const standardRegistrations: Array<RegistrationTypeIF> = RegistrationTypesStanda
 const miscCrownChargeRegistrations: Array<RegistrationTypeIF> = RegistrationTypesMiscellaneousCC
 
 // Events
-const selectedType = 'selectedRegistrationType'
+const selectedType = 'selected'
 
 // Input field selectors / buttons
 const registrationBar = '.registration-bar'
@@ -23,7 +24,7 @@ const registrationButton = '#registration-bar-btn'
 const registrationButtonDropdown = '#registration-more-actions-btn'
 // basic drop down selects
 const selectSecurity = '#btn-security'
-const selectReparers = '#btn-reparers'
+const selectReparers = '#btn-repairers'
 const selectMarriage = '#btn-marriage'
 const selectLand = '#btn-land'
 const selectSale = '#btn-sale'
@@ -43,12 +44,11 @@ describe('RegistrationBar select basic drop down tests', () => {
         roles: []
       }
     })
-    wrapper = await createComponent(RegistrationBar)
+    wrapper = await createComponent(RegistrationBarButtonList)
   })
 
   it('renders with default registration button', async () => {
-    expect(wrapper.findComponent(RegistrationBar).exists()).toBe(true)
-    expect(wrapper.find(registrationBar).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationBarButtonList).exists()).toBe(true)
     /** verify test setup:
     * 1) account subscription with no roles
     * 2) default registration is set to security agreement
@@ -113,6 +113,7 @@ describe('RegistrationBar rppr subscribed autocomplete tests', () => {
     // verify edit role set
     const accountProductSubscriptions = store.getStateModel.accountProductSubscriptions
     expect(accountProductSubscriptions[AccountProductCodes.RPPR].roles).toEqual(['edit'])
+
     // check autocomplete displayed
     const autocomplete = wrapper.findComponent(RegistrationBarTypeAheadList)
     expect(autocomplete.text()).toContain('Start a New Personal Property Registration')
@@ -120,6 +121,6 @@ describe('RegistrationBar rppr subscribed autocomplete tests', () => {
     autocomplete.vm.$emit('selected', miscCrownChargeRegistrations[3])
     await flushPromises()
     // check emit
-    expect(getLastEvent(wrapper, selectedType)).toBe(miscCrownChargeRegistrations[3])
+    expect(getLastEvent(autocomplete, selectedType)).toBe(miscCrownChargeRegistrations[3])
   })
 })

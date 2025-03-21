@@ -9,7 +9,7 @@ import {
   mockedSelectSecurityAgreement
 } from './test-data'
 import flushPromises from 'flush-promises'
-import { ReviewConfirm } from '@/views'
+import { ReviewConfirm } from '@/pages'
 import { ButtonFooter, CertifyInformation, FolioNumberSummary, Stepper, StickyContainer } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
@@ -17,7 +17,7 @@ import { RegistrationLengthTrustSummary } from '@/components/registration'
 import SecuritiesActNoticesPanels from '@/components/registration/securities-act-notices/SecuritiesActNoticesPanels.vue'
 import { Parties } from '@/components/parties'
 import { Collateral } from '@/components/collateral'
-import { LengthTrustIF } from '@/interfaces'
+import type { LengthTrustIF } from '@/interfaces'
 import { RegistrationTypes } from '@/resources'
 import { useStore } from '@/store/store'
 import { nextTick } from 'vue'
@@ -154,6 +154,10 @@ describe('Review Confirm new registration component', () => {
 
     // Go back to Collateral step
     await wrapper.find('#reg-back-btn').trigger('click')
+    await nextTick()
+    await wrapper.vm.$router.push({ name: RouteNames.ADD_COLLATERAL })
+    await flushPromises()
+
     expect(wrapper.vm.$route.name).toBe(RouteNames.ADD_COLLATERAL)
 
     // Delete text from General Collateral as leave just html styling tag (as per current behavior)

@@ -7,13 +7,33 @@
   >
     <v-card>
       <v-row
-        noGutters
+        no-gutters
         class="pl-10 pt-7"
       >
         <v-col cols="11">
           <p class="dialog-title">
-            <b>{{ optionsValue.title }}</b>
+            <b>{{ optionsValue.title }}
+              <span v-if="isRlReg && !isDischarge(optionsValue.label)">as Commercial Lien</span>
+            </b>
           </p>
+
+          <template v-if="isRlReg">
+            <p
+              v-if="!isDischarge(optionsValue.label)"
+              class="dialog-text py-5 ma-0"
+            >
+              A Repairers Lien (RL) to be {{ getRegistrationLabel(optionsValue.label) }} will be registered as a
+              Commercial Lien (CL) and must comply with
+              {{ optionsValue.label.split(' ').slice(1).join(' ').toLowerCase() }} requirements under the Commercial
+              Liens Act and Personal Property Security Regulation.
+            </p>
+            <p v-else class="dialog-text py-5 ma-0">
+              The Repairers Lien (RL) will be discharged as a Commercial Lien (CL) under the Commercial Liens Act and
+              Personal Property Security Regulation.
+            </p>
+            <v-divider class="horizontal-divider mx-1 my-1" />
+          </template>
+
           <p class="dialog-text py-5 ma-0">
             To ensure you are performing {{ optionsValue.label }} on the correct
             registration (Base Registration Number: {{ regNumber }}) please
@@ -24,20 +44,20 @@
           <v-autocomplete
             id="debtor-drop"
             v-model="userInput"
-            autoSelectFirst
+            auto-select-first
             :items="debtors"
             variant="filled"
             clearable
             class="debtor-drop"
             no-data-text="Debtor not found."
             label="Enter a Debtor (last name of individual person or full business name)"
-            :errorMessages="validationErrors ? validationErrors : ''"
-            persistentHint
-            returnObject
+            :error-messages="validationErrors ? validationErrors : ''"
+            persistent-hint
+            return-object
           />
         </v-col>
         <v-col cols="1">
-          <v-row noGutters>
+          <v-row no-gutters>
             <v-btn
               id="close-btn"
               color="primary"
@@ -51,7 +71,7 @@
         </v-col>
       </v-row>
       <v-row
-        noGutters
+        no-gutters
         justify="center"
         class="pt-1 pb-7"
       >
@@ -88,18 +108,18 @@
 </template>
 
 <script lang="ts">
-// external
 import {
   defineComponent,
   reactive,
   toRefs,
-  watch
+  watch,
+  computed
 } from 'vue'
 import { useStore } from '@/store/store'
-
-// local
-import { DebtorNameIF, DialogOptionsIF } from '@/interfaces' // eslint-disable-line
-import { debtorNames } from '@/utils'
+import type { DebtorNameIF, DialogOptionsIF } from '@/interfaces'
+import { debtorNames } from '@/utils/ppr-api-helper'
+import { APIRegistrationTypes } from '@/enums'
+import { getFeatureFlag } from '@/utils'
 
 export default defineComponent({
   props: {
@@ -123,6 +143,7 @@ export default defineComponent({
   emits: ['proceed'],
   setup (props, context) {
     const { setRegistrationConfirmDebtorName } = useStore()
+    const { getRegTableBaseRegs } = storeToRefs(useStore())
     const localState = reactive({
       validationErrors: '',
       userInput: null,
@@ -131,7 +152,12 @@ export default defineComponent({
       attachValue: props.attach,
       displayValue: props.display,
       regNumber: props.registrationNumber,
-      fullDebtorInfo: null
+      fullDebtorInfo: null,
+      isRlReg: computed(() => {
+        return getFeatureFlag('cla-enabled') && getRegTableBaseRegs.value?.some(reg =>
+           reg.baseRegistrationNumber === props.registrationNumber &&
+            reg.registrationType === APIRegistrationTypes.REPAIRERS_LIEN)
+      })
     })
 
     const submit = (): void => {
@@ -183,6 +209,23 @@ export default defineComponent({
       localState.fullDebtorInfo = names
     }
 
+    /** Get the registration label for the dialog title. */
+    const getRegistrationLabel = (label: string): string => {
+      switch (label) {
+        case 'an Amendment':
+          return 'amended'
+        case 'a Renewal':
+          return 'renewed'
+        default:
+          return ''
+      }
+    }
+
+    /** Get the registration label for the dialog title. */
+    const isDischarge = (label: string): boolean => {
+      return label.includes('Discharge')
+    }
+
     watch(
       () => props.registrationNumber,
       (val: string) => {
@@ -224,6 +267,8 @@ export default defineComponent({
     return {
       submit,
       exit,
+      isDischarge,
+      getRegistrationLabel,
       ...toRefs(localState)
     }
   }
