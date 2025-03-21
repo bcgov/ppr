@@ -1,9 +1,20 @@
 steps:
   # install / setup ci
-  - name: node:20.5.1
-    entrypoint: pnpm
+  - name: 'node:20.1'
+    env:
+      - 'VUE_APP_ADDRESS_COMPLETE_KEY=$_VUE_APP_ADDRESS_COMPLETE_KEY'
+      - 'VUE_APP_PPR_LD_CLIENT_ID=$_VUE_APP_PPR_LD_CLIENT_ID'
+      - 'VUE_APP_PPR_API_KEY=$_VUE_APP_PPR_API_KEY'
+      - 'VUE_APP_MHR_API_KEY=$_VUE_APP_MHR_API_KEY'
+      - 'VUE_APP_LTSA_API_KEY=$_VUE_APP_LTSA_API_KEY'
+      - 'VUE_APP_REGISTRIES_SEARCH_API_KEY=$_VUE_APP_REGISTRIES_SEARCH_API_KEY'
     dir: "ppr-ui"
-    args: ['install']
+    script: |
+      #!/usr/bin/env bash
+      cp .env.example .env
+      npm install --global pnpm
+      pnpm install
+      pnpm build
 
   # setup .env
   - name: 'bash'

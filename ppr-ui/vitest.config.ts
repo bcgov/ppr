@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 
 export default defineVitestConfig({
   test: {
+    dir: 'tests',
     server: {
       deps: {
         inline: ['vuetify', 'vue-pdf-embed']
@@ -10,18 +11,18 @@ export default defineVitestConfig({
     },
     globals: true,
     testTimeout: 60000,
-    silent: true,
+    silent: false,
     setupFiles: '../tests/setup.ts',
     onConsoleLog (log) {
       if (log.includes('warn')) return false // Filter out Vue warnings while preserving errors and logs.
       if (log.includes('error')) return false // Filter out failed network requests vs mocking them all.
     },
-    dir: 'tests',
-    environment: 'jsdom',
+    environment: 'nuxt',
     environmentOptions: {
       nuxt: {
         rootDir: fileURLToPath(new URL('./', import.meta.url)),
-        domEnvironment: (process.env.VITEST_DOM_ENV as 'happy-dom' | 'jsdom') ?? 'happy-dom',
+        domEnvironment:
+          (process.env.VITEST_DOM_ENV as 'happy-dom' | 'jsdom') ?? 'happy-dom',
         overrides: {
           runtimeConfig: {
             public: {

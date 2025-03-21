@@ -32,7 +32,7 @@
           </v-icon>
         </v-btn>
         <v-icon
-          v-show="step.valid"
+          v-if="step.valid"
           class="step__btn2"
           size="30"
           color="green-darken-3"
@@ -41,7 +41,7 @@
           mdi-check-circle
         </v-icon>
         <v-icon
-          v-show="showInvalid(step)"
+          v-if="showInvalid(step)"
           class="step__btn2"
           size="30"
           color="error"
@@ -51,7 +51,7 @@
         </v-icon>
       </div>
       <v-btn
-        v-show="!isCurrentStep(step)"
+        v-if="!isCurrentStep(step)"
         class="step__label pre-line"
         variant="plain"
         color="primary"
@@ -65,7 +65,7 @@
         />
       </v-btn>
       <v-btn
-        v-show="isCurrentStep(step)"
+        v-if="isCurrentStep(step)"
         class="step__label__current pre-line"
         variant="plain"
         color="primary"

@@ -1,7 +1,7 @@
 import { beforeEach } from 'vitest'
 import { nextTick } from 'vue'
 import { useStore } from '@/store/store'
-import { StepIF } from '@/interfaces'
+import type { StepIF } from '@/interfaces'
 import { ProductCode, RouteNames } from '@/enums'
 import { MhrRegistrationType } from '@/resources'
 import { createComponent, getTestId } from './utils'
@@ -48,8 +48,8 @@ describe('Stepper - MHR Staff Registration', () => {
     const validIcon = wrapper.find(getTestId(`step-valid-${expectedSteps[0].id}`))
     const invalidIcon = wrapper.find(getTestId(`step-invalid-${expectedSteps[0].id}`))
 
-    expect(validIcon.isVisible()).toBe(false)
-    expect(invalidIcon.isVisible()).toBe(false)
+    expect(validIcon.exists()).toBe(false)
+    expect(invalidIcon.exists()).toBe(false)
   })
 
   it('check stepper validation icon - validation flag on, step invalid', async () => {
@@ -61,8 +61,8 @@ describe('Stepper - MHR Staff Registration', () => {
     const validIcon = wrapper.find(getTestId(`step-valid-${expectedSteps[0].id}`))
     const invalidIcon = wrapper.find(getTestId(`step-invalid-${expectedSteps[0].id}`))
 
-    expect(validIcon.isVisible()).toBe(false)
-    expect(invalidIcon.isVisible()).toBe(true)
+    expect(validIcon.exists()).toBe(false)
+    expect(invalidIcon.exists()).toBe(true)
   })
 
   it('check stepper validation icon - step valid', async () => {
@@ -76,8 +76,8 @@ describe('Stepper - MHR Staff Registration', () => {
     const validIcon = wrapper.find(getTestId(`step-valid-${expectedSteps[2].id}`)) // Your home valid step
     const invalidIcon = wrapper.find(getTestId(`step-invalid-${expectedSteps[2].id}`))
 
-    expect(validIcon.isVisible()).toBe(true)
-    expect(invalidIcon.isVisible()).toBe(false)
+    expect(validIcon.exists()).toBe(true)
+    expect(invalidIcon.exists()).toBe(false)
   })
 })
 
@@ -146,7 +146,7 @@ describe('Stepper - MHR Manufacturer Registration', () => {
     const btnForCurrentStep = wrapper.find(getTestId(`current-${expectedSteps[1].id}`))
 
 
-    expect(btnForNotCurrentStep.isVisible()).toBe(false)
-    expect(btnForCurrentStep.isVisible()).toBe(true)
+    expect(btnForNotCurrentStep.exists()).toBe(false)
+    expect(btnForCurrentStep.exists()).toBe(true)
   })
 })
