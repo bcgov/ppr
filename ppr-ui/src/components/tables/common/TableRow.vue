@@ -1,3 +1,582 @@
+<script lang="ts">
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
+import { stripChars, multipleWordsToTitleCase, isWithinMinutes, getFeatureFlag } from '@/utils'
+import { getRegistrationSummary, registrationPDF } from '@/utils/ppr-api-helper'
+import { mhRegistrationPDF, getMHRegistrationSummary } from '@/utils/mhr-api-helper'
+import { useStore } from '@/store/store'
+
+import type {
+  BaseHeaderIF,
+  DraftResultIF,
+  MhRegistrationSummaryIF,
+  RegistrationSummaryIF
+} from '@/interfaces'
+
+import {
+  APIMhrDescriptionTypes,
+  APIMhrTypes,
+  APIRegistrationTypes,
+  APIStatusTypes,
+  DraftTypes,
+  TableActions,
+  UIRegistrationClassTypes,
+  UITransferTypes,
+  MhApiStatusTypes,
+  MhApiFrozenDocumentTypes,
+  UnitNoteDocTypes,
+  HomeLocationTypes
+} from '@/enums'
+import { useRegistration } from '@/composables/useRegistration'
+import { useExemptions, useMhrInformation, useTransferOwners } from '@/composables'
+import moment from 'moment'
+import { storeToRefs } from 'pinia'
+import { QSLockedStateUnitNoteTypes } from '@/resources'
+
+export default defineComponent({
+  name: 'TableRow',
+  props: {
+    isPpr: { type: Boolean, default: false },
+    setAddRegEffect: { type: Boolean, default: false },
+    setDisableActionShadow: { type: Boolean, default: false },
+    setChild: { type: Boolean, default: false },
+    setHeaders: { type: Array as () => BaseHeaderIF[], default: [] as BaseHeaderIF[] },
+    setIsExpanded: { type: Boolean, default: false },
+    closeSubMenu: { type: Boolean, default: false },
+    setItem: {
+      default: () => {
+      },
+      type: Object as () => RegistrationSummaryIF | DraftResultIF | MhRegistrationSummaryIF | any
+    }
+  },
+  emits: ['action', 'error', 'freezeScroll', 'toggleExpand'],
+  setup (props, { emit }) {
+    const {
+      getAccountLabel,
+      isRoleQualifiedSupplier,
+      isRoleStaff,
+      isRoleStaffSbc,
+      isRoleStaffBcol,
+      isRoleStaffReg,
+      getMhRegTableBaseRegs,
+      hasDrsEnabled
+    } = storeToRefs(useStore())
+
+    const {
+      getFormattedDate,
+      getRegistrationType,
+      getStatusDescription,
+      getRegisteringName,
+      registrationNumber,
+      registeringParty,
+      hasRenewal,
+      securedParties
+    } = useRegistration(null)
+    const { isTransAffi } = useTransferOwners()
+    const { hasQsTransferOrExemptionBlockingLien } = useMhrInformation()
+    const { isExemptionEnabled, isNonResExemptionEnabled, hasChildResExemption } = useExemptions()
+
+    const localState = reactive({
+      loadingPDF: '',
+      rollover: false,
+      menuToggleState: false,
+      applyAddedRegEffect: computed((): boolean => {
+        return props.setAddRegEffect
+      }),
+      applyRolloverEffect: computed((): boolean => {
+        return localState.rollover || props.setIsExpanded
+      }),
+      disableActionShadow: computed((): boolean => {
+        return props.setDisableActionShadow
+      }),
+      headers: computed(() => {
+        return props.setHeaders
+      }),
+      isChild: computed(() => {
+        return props.setChild
+      }),
+      item: computed<any>(() => {
+        if (!isDraft(props.setItem) && !props.setChild) {
+          // if base reg && not draft check to update expand
+          const baseReg = props.setItem as RegistrationSummaryIF
+          if (baseReg.expand !== undefined && (baseReg.expand !== props.setIsExpanded)) {
+            toggleExpand(props.setItem)
+          }
+        }
+        return props.setItem
+      }),
+      enableOpenEdit: computed(() => {
+        return (isRoleQualifiedSupplier.value || isRoleStaffReg.value || isRoleStaff.value || isRoleStaffSbc.value) &&
+          !isRoleStaffBcol.value
+      }),
+      hasLienForQS: computed(() => {
+        return isRoleQualifiedSupplier.value &&
+          localState.item.lienRegistrationType &&
+          hasQsTransferOrExemptionBlockingLien.value
+      }),
+      hasLockedForQS: computed(() => {
+        return  hasLockedState(localState.item) && isRoleQualifiedSupplier.value
+      })
+    })
+
+    const documentRecordUrl = (documentId: string) => {
+      const configDocumentUrl = sessionStorage.getItem('DOCUMENTS_URL')
+      return `${configDocumentUrl}/document-records/${documentId}`
+    }
+
+    const hasRequiredTransfer = (item: MhRegistrationSummaryIF) => {
+      return !props.isPpr && !localState.isChild &&
+        item.statusType === MhApiStatusTypes.FROZEN &&
+        item.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT
+    }
+
+    const isTransitionedCommercialLien = (item: any): boolean => {
+      return item.registrationType === APIRegistrationTypes.COMMERCIAL_LIEN && !!item.transitioned
+    }
+
+
+    const deleteDraft = (item: DraftResultIF): void => {
+      emit('action', {
+        action: TableActions.DELETE,
+        docId: item.documentId,
+        regNum: item.baseRegistrationNumber
+      })
+    }
+
+    const tooltipTxtPdf = (item: RegistrationSummaryIF) => {
+      // Display messaging for client accounts when the submitting party doesn't match the current account
+      const isNotMhrSubmittingParty = !props.isPpr && item.submittingParty?.toUpperCase() !==
+        getAccountLabel.value?.toUpperCase()
+
+      // Sbc Staff can't rely on Submitting Party Match and cannot view all docs like Reg Staff
+      // Fall through to the 'download' messaging if user is SBC and this filing is recent.
+      const isRecentSbcFiling = isRoleStaffSbc.value && isWithinMinutes(item.createDateTime, 10)
+
+      if (isNotMhrSubmittingParty && !isRoleStaffReg.value && !isRecentSbcFiling) {
+        return 'Documents are only available to the Submitting Party of this filing. To view the details of this' +
+          ' registration you must conduct a search.'
+      }
+
+      const isVerificationStatement = !item.registeringName && props.isPpr
+      if (isVerificationStatement) {
+        return 'Verification Statements are only available to Secured Parties or the Registering Party of this ' +
+          'filing. To view the details of this registration you must conduct a search.'
+      }
+
+      // Display Legacy messaging if the filing was flagged as completed in the legacy system
+      if (isRoleStaffReg.value && item.legacy) {
+        return 'Document only available in the legacy system.'
+      }
+
+      return 'This document PDF is still being generated. Click the ' +
+        '<i class="v-icon notranslate mdi mdi-information-outline" style="font-size:18px; margin-bottom:4px;"></i>' +
+        ' icon to see if your PDF is ready to download. <br>' +
+        'Note: Large documents may take up to 20 minutes to generate.'
+    };
+
+
+    const downloadPDF = async (item: RegistrationSummaryIF): Promise<any> => {
+      localState.loadingPDF = item.path
+      const pdf = props.isPpr ? await registrationPDF(item.path) : await mhRegistrationPDF(item.path)
+      if (pdf.error) {
+        emit('error', pdf.error)
+      } else {
+        /* solution from https://github.com/axios/axios/issues/1392 */
+
+        // it is necessary to create a new blob object with mime-type explicitly set
+        // otherwise only Chrome works like it should
+        const blob = new Blob([pdf], { type: 'application/pdf' })
+
+        // IE doesn't allow using a blob object directly as link href
+        // instead it is necessary to use msSaveOrOpenBlob
+        if (window.navigator && (window.navigator as any).msSaveOrOpenBlob) {
+          (window.navigator as any).msSaveOrOpenBlob(blob, item.path)
+        } else {
+          // for other browsers, create a link pointing to the ObjectURL containing the blob
+          const url = window.URL.createObjectURL(blob)
+          const a = window.document.createElement('a')
+          window.document.body.appendChild(a)
+          a.setAttribute('style', 'display: none')
+          a.href = url
+          // Format (PPR): [Date (in YYYY-MM-DD format)] BCPPR [Two Letter Registration Type Code
+          // (only for Standard Registrations)] [Verification Statement Type] - [Registration Number]
+          // Example: 2022-01-03 BCPPR SA Registration Verification - 100559B
+
+          // Format (MHR): [Date (in YYYY-MM-DD format)] BCMHR [Registration || Transfer] - [Registration Number]
+          // Example: 2023-03-13 BCMHR Registration - 150378
+
+          const today = new Date()
+          const regType = props.isPpr ? '_BCPPR_' : isMhrTransfer(item) ? '_BCMHR_Transfer' : '_BCMHR_Registration'
+          const regClass = getRegistrationClass(item.registrationClass) || ''
+          if (regClass === 'Registration Verification') {
+            a.download = today.toISOString().slice(0, 10) + regType +
+              item.registrationType + '_' + regClass.replace(/ /g, '_') + '_' + item.registrationNumber
+          } else {
+            a.download = today.toISOString().slice(0, 10) + regType +
+              regClass.replace(/ /g, '_') + '_' + (item.registrationNumber || item.baseRegistrationNumber)
+          }
+          a.click()
+          window.URL.revokeObjectURL(url)
+          a.remove()
+        }
+      }
+      localState.loadingPDF = ''
+    }
+
+    const editDraft = (item: DraftResultIF): void => {
+      if (item?.type === DraftTypes.FINANCING_STATEMENT) {
+        emit('action', { action: TableActions.EDIT_NEW, docId: item.documentId })
+      } else if (item?.type === DraftTypes.AMENDMENT_STATEMENT) {
+        emit('action', {
+          action: TableActions.EDIT_AMEND,
+          docId: item.documentId,
+          regNum: item.baseRegistrationNumber
+        })
+      }
+    }
+
+    const isEnabledMhr = (item: MhRegistrationSummaryIF) => {
+      return [MhApiStatusTypes.ACTIVE, MhApiStatusTypes.FROZEN, MhApiStatusTypes.EXEMPT, MhApiStatusTypes.CANCELLED]
+          .includes(item.statusType as MhApiStatusTypes) &&
+        localState.enableOpenEdit && (item.registrationDescription === APIMhrDescriptionTypes.REGISTER_NEW_UNIT ||
+          item.registrationDescription === APIMhrDescriptionTypes.CONVERTED)
+    }
+
+    const openMhr = (item: MhRegistrationSummaryIF): void => {
+      let action: TableActions
+
+      switch (item.registrationType) {
+        case APIMhrTypes.REGISTRY_STAFF_ADMIN:
+          action = item.registrationDescription === APIMhrDescriptionTypes.RE_REGISTER_NEW_UNIT
+            ? TableActions.OPEN_DRAFT_RE_REGISTRATION : TableActions.OPEN_DRAFT_CORRECTION
+          break
+        case APIMhrTypes.MANUFACTURED_HOME_REGISTRATION:
+          action = item.draftNumber ? TableActions.EDIT_NEW_MHR : TableActions.OPEN_MHR
+          break
+        default:
+          action = TableActions.OPEN_MHR
+          break
+      }
+
+      emit('action', {
+        action: action,
+        mhrInfo: item
+      })
+    }
+
+    const openExemption = (docType: UnitNoteDocTypes, item: MhRegistrationSummaryIF): void => {
+      emit('action', {
+        action: docType,
+        mhrInfo: item
+      })
+    }
+
+    const openMhrHistory = (item) => {
+      emit('action', {
+        action: TableActions.OPEN_MHR_HISTORY,
+        mhrInfo: item
+      })
+    }
+
+    const isMhrTransfer = (item: any): boolean => {
+      const formattedTransferTypes = [
+        UITransferTypes.SALE_OR_GIFT,
+        UITransferTypes.SURVIVING_JOINT_TENANT,
+        UITransferTypes.TO_ADMIN_NO_WILL,
+        UITransferTypes.TO_EXECUTOR_PROBATE_WILL,
+        UITransferTypes.TO_EXECUTOR_UNDER_25K_WILL
+      ].map(type => stripChars(type).toUpperCase())
+
+      return [MhApiStatusTypes.ACTIVE, MhApiStatusTypes.FROZEN].includes(item.statusType) &&
+        formattedTransferTypes.includes(stripChars(item.registrationDescription))
+    }
+
+    const removeMhrDraft = (item: MhRegistrationSummaryIF): void => {
+      emit('action', { action: TableActions.DELETE, regNum: item.draftNumber })
+    }
+
+    const getRegistrationClass = (regClass: string): string => {
+      return UIRegistrationClassTypes[regClass]
+    }
+
+    const freezeScrolling = (isMenuOpen: boolean) => {
+      emit('freezeScroll', isMenuOpen)
+    }
+
+    const handleAction = (item, action: TableActions): void => {
+      const registrationNumber = props.isPpr
+        ? item.baseRegistrationNumber
+        : item.mhrNumber
+
+      emit('action', { action, regNum: registrationNumber })
+    }
+
+    const inSelectedHeaders = (search: string) => {
+      return localState.headers.find(header => {
+        return header.value === search
+      })
+    }
+
+    const isActive = (item: RegistrationSummaryIF): boolean => {
+      return item.statusType === APIStatusTypes.ACTIVE
+    }
+
+    const hasFrozenParentReg = (item: MhRegistrationSummaryIF): boolean => {
+      const parentReg = item.mhrNumber && getMhRegTableBaseRegs.value?.find(reg => reg.mhrNumber === item.mhrNumber)
+      return parentReg?.statusType === MhApiStatusTypes.FROZEN
+    }
+
+    // locked state for MHR based on API response (eg. TAXN Unit Note is blocking QS)
+    const hasLockedState = (item: MhRegistrationSummaryIF): boolean => {
+      const parentReg: MhRegistrationSummaryIF =
+        item.mhrNumber && getMhRegTableBaseRegs.value?.find(reg => reg.mhrNumber === item.mhrNumber)
+      // For QS status will be frozen, but for Staff it will be Active, so no locked state would be shown
+      return (isRoleQualifiedSupplier.value && parentReg?.statusType === MhApiStatusTypes.FROZEN) &&
+        (QSLockedStateUnitNoteTypes.includes(parentReg?.frozenDocumentType) ||
+          parentReg?.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT)
+    }
+
+    const isDischarged = (item: RegistrationSummaryIF): boolean => {
+      return item.statusType === APIStatusTypes.DISCHARGED
+    }
+
+    const isRenewalDisabled = (item: RegistrationSummaryIF): boolean => {
+      return (item.expireDays === -99)
+    }
+
+    const isRepairersLienAmendDisabled = (item: RegistrationSummaryIF): boolean => {
+      // return if the repairers lien transition is enabled
+      if (getFeatureFlag('cla-enabled')) return false
+
+      const changes = item?.changes as RegistrationSummaryIF[]
+      // if there are amendments, get the vehicle count from the first array element
+      if (changes) {
+        const lastChange = changes[0]
+        return (lastChange.vehicleCount === 1)
+      }
+      return (item.vehicleCount === 1)
+    }
+
+    const isDraft = (item: any): boolean => {
+      // RegistrationSummaryIF | DraftResultIF | MhrDraftApiIF
+      return props.isPpr
+        ? item.type !== undefined
+        : (item.statusType === MhApiStatusTypes.DRAFT || item.statusType === undefined || !item.mhrNumber)
+    }
+
+    /**
+     * Checks if the given document ID is elegibile, returns true if the document ID is eligible
+     * Rules:
+     * - Document ID to link out to record if one exists, otherwise show NA.
+     * - Ignore 8 digit long IDs that start with '1', '8', '9', or 'REG'.
+     */
+    const isElegibleDocId = (docId: string): boolean => {
+      return docId && !(docId.length === 8 && /^[189]|REG/.test(docId));
+    }
+
+    const isExpired = (item: RegistrationSummaryIF): boolean => {
+      return item.statusType === APIStatusTypes.EXPIRED
+    }
+
+    const isRepairersLien = (item: RegistrationSummaryIF): boolean => {
+      return item.registrationType === APIRegistrationTypes.REPAIRERS_LIEN
+    }
+
+    const isRepairersLienAndTransitioning = (item: RegistrationSummaryIF): boolean => {
+      return isRepairersLien(item) && getFeatureFlag('cla-enabled')
+    }
+
+    const isExemptOrCancelled = (statusType: MhApiStatusTypes): boolean =>
+      [MhApiStatusTypes.EXEMPT, MhApiStatusTypes.CANCELLED].includes(statusType)
+
+    const refresh = async (item: RegistrationSummaryIF): Promise<void> => {
+      // could be base reg or child reg
+      if (item.registeringName) {
+        // will always return base reg
+        const resp = await getRegistrationSummary(item.registrationNumber, true)
+        if (resp.error) {
+          // log error, but otherwise ignore it
+          console.error('Refreshing registration failed: ', resp.error)
+        } else {
+          if (item.registrationNumber === resp.registrationNumber) item.path = resp.path
+          else {
+            // find child in changes and set path to that
+            const changes = resp?.changes as RegistrationSummaryIF[]
+            const child = changes.find(reg => reg.registrationNumber === item.registrationNumber)
+            if (!child) {
+              // log error, but otherwise ignore it
+              console.error(
+                `Could not find registration ${item.registrationNumber} within base reg changes: `,
+                resp.changes
+              )
+            } else {
+              item.path = child.path
+            }
+          }
+        }
+        // Mhr Handling
+      } else if (
+        (item.submittingParty?.toUpperCase() === getAccountLabel.value?.toUpperCase()) || isRoleStaffReg.value ||
+        isRoleStaffSbc.value && isWithinMinutes(item.createDateTime, 10)
+      ) {
+        const resp = await getMHRegistrationSummary(item.baseRegistrationNumber, true)
+        if (resp.error) {
+          // log error, but otherwise ignore it
+          console.error('Refreshing registration failed: ', resp.error)
+        } else {
+          if (item.documentRegistrationNumber === resp.documentRegistrationNumber) item.path = resp.path
+          else {
+            // find child in changes and set path to that
+            const changes = resp?.changes as RegistrationSummaryIF[]
+            const child = changes.find(reg => reg.documentRegistrationNumber === item.documentRegistrationNumber)
+            if (!child) {
+              // log error, but otherwise ignore it
+              console.error(
+                `Could not find registration ${item.documentRegistrationNumber} within base reg changes: `,
+                resp.changes
+              )
+            } else {
+              item.path = child.path
+            }
+          }
+        }
+      }
+    }
+
+    const showExpireDays = (item: RegistrationSummaryIF): string => {
+      if (localState.isChild && props.isPpr) return ''
+      if (isExpired(item) || isDischarged(item)) return '—'
+
+      const days = item.expireDays
+      // -9999 indicates the notice of caution has been cancelled
+      if ([null, undefined, -9999, 9999].includes(days)) {
+        return 'N/A'
+      }
+      if (days === -99) {
+        return 'Infinite'
+      }
+      if (days <= 0) {
+        return 'Expired'
+      } else {
+        if (days > 364) {
+          const today = new Date()
+          const expireDate = new Date()
+          // expireDate.setDate(expireDate.getDate() + days)
+          const dateExpiry = moment.utc(new Date(
+            Date.UTC(
+              expireDate.getUTCFullYear(),
+              expireDate.getUTCMonth(),
+              expireDate.getUTCDate()
+            )
+          )).add(days, 'days')
+          const dateToday = moment.utc(new Date(
+            Date.UTC(
+              today.getUTCFullYear(),
+              today.getUTCMonth(),
+              today.getUTCDate()
+            )
+          ))
+
+          // year difference
+          const years = dateExpiry.diff(dateToday, 'years')
+          if (years > 0) {
+            dateExpiry.subtract(years, 'year')
+          }
+          // day difference
+          const daysDiff = dateExpiry.diff(dateToday, 'days')
+          let yearText = ' years '
+          if (years === 1) {
+            yearText = ' year '
+          }
+
+          return years.toString() + yearText + daysDiff.toString() + ' days'
+        }
+        if (days <= 2) {
+          return `<span class="error-text">${days} ${days === 1 ? 'day' : 'days' }</span>`
+        }
+        return days.toString() + ' days'
+      }
+    }
+
+    const toggleExpand = (val: any) => {
+      emit('toggleExpand', val)
+    }
+
+    const hasLien = (item: any): boolean => {
+      // Future state might require type handling
+      return !!item.lienRegistrationType
+    }
+
+    // Hide cancelled document decs for Notice Of Redemption for child item in MHR table
+    const showCancelledDocumentDescription = (mhrTableChildItem): boolean => {
+      // Notice of Redemption is cancelled only by Notice of Tax Sale, so check for type to hide the desc
+      return mhrTableChildItem.cancelledDocumentType !== UnitNoteDocTypes.NOTICE_OF_TAX_SALE
+    }
+
+    watch(() => props.setItem, () => {
+    }, { deep: true, immediate: true })
+
+    return {
+      isTransitionedCommercialLien,
+      openMhrHistory,
+      hasRequiredTransfer,
+      multipleWordsToTitleCase,
+      freezeScrolling,
+      APIMhrDescriptionTypes,
+      getFormattedDate,
+      getRegistrationType,
+      getStatusDescription,
+      getRegisteringName,
+      showExpireDays,
+      deleteDraft,
+      editDraft,
+      handleAction,
+      refresh,
+      registrationNumber,
+      registeringParty,
+      securedParties,
+      isActive,
+      isDischarged,
+      isDraft,
+      isElegibleDocId,
+      isExpired,
+      isRepairersLien,
+      isRepairersLienAndTransitioning,
+      isExemptOrCancelled,
+      isRenewalDisabled,
+      isRepairersLienAmendDisabled,
+      isRoleStaffReg,
+      isRoleQualifiedSupplier,
+      isExemptionEnabled,
+      hasChildResExemption,
+      hasRenewal,
+      downloadPDF,
+      inSelectedHeaders,
+      TableActions,
+      toggleExpand,
+      tooltipTxtPdf,
+      openMhr,
+      openExemption,
+      isEnabledMhr,
+      removeMhrDraft,
+      isMhrTransfer,
+      hasLien,
+      showCancelledDocumentDescription,
+      isTransAffi,
+      hasFrozenParentReg,
+      hasLockedState,
+      MhApiFrozenDocumentTypes,
+      UnitNoteDocTypes,
+      HomeLocationTypes,
+      isNonResExemptionEnabled,
+      MhApiStatusTypes,
+      documentRecordUrl,
+      hasDrsEnabled,
+      ...toRefs(localState)
+    }
+  }
+})
+</script>
+
 <template>
   <tr
     ref="tableRowRef"
@@ -10,34 +589,50 @@
       'added-reg-effect': applyAddedRegEffect,
     }"
   >
-    <td
-      v-if="inSelectedHeaders('registrationNumber') || inSelectedHeaders('mhrNumber')"
-      :class="{'border-left': (isChild || setIsExpanded), 'fix-td-width': hasRequiredTransfer(item) }"
-    >
+    <td>
       <v-row no-gutters>
         <v-col
           v-if="item.changes"
           class="pr-2"
           cols="auto"
         >
-          <v-btn
-            class="btn-row-expand-arr icon-large"
-            color="primary"
-            size="small"
-            icon
-            :aria-label="isPpr ? 'Expand Amendments' : 'Expand History'"
-            role="button"
-            @click="toggleExpand(item)"
-            @mouseover="rollover = true"
-            @mouseleave="rollover = false"
-          >
-            <v-icon v-if="setIsExpanded">
-              mdi-chevron-up
-            </v-icon>
-            <v-icon v-else>
-              mdi-chevron-down
-            </v-icon>
-          </v-btn>
+          <v-row no-gutters>
+            <v-btn
+              class="btn-row-expand-arr icon-large"
+              color="primary"
+              size="small"
+              icon
+              :aria-label="isPpr ? 'Expand Amendments' : 'Expand History'"
+              role="button"
+              @click="toggleExpand(item)"
+              @mouseover="rollover = true"
+              @mouseleave="rollover = false"
+            >
+              <v-icon v-if="setIsExpanded">
+                mdi-chevron-up
+              </v-icon>
+              <v-icon v-else>
+                mdi-chevron-down
+              </v-icon>
+            </v-btn>
+          </v-row>
+          <v-row no-gutters>
+            <v-btn
+              v-if="item.changes"
+              class="btn-row-expand-txt btn-txt pa-0 generic-link"
+              color="primary"
+              variant="plain"
+              @click="toggleExpand(item)"
+              @mouseover="rollover = true"
+              @mouseleave="rollover = false"
+            >
+              <label style="cursor: pointer;">
+                <span v-if="!setIsExpanded">View </span>
+                <span v-else>Hide </span>
+                History
+              </label>
+            </v-btn>
+          </v-row>
         </v-col>
         <v-col
           v-if="isRoleStaffReg && isChild && hasFrozenParentReg(item) &&
@@ -52,6 +647,13 @@
             mdi-alert
           </v-icon>
         </v-col>
+      </v-row>
+    </td>
+    <td
+      v-if="inSelectedHeaders('registrationNumber') || inSelectedHeaders('mhrNumber')"
+      :class="{'border-left': (isChild || setIsExpanded), 'fix-td-width': hasRequiredTransfer(item) }"
+    >
+      <v-row no-gutters>
         <v-col style="padding-top: 2px;">
           <p
             v-if="isDraft(item)"
@@ -65,7 +667,7 @@
             v-if="isChild || (isDraft(item) && item.baseRegistrationNumber)"
             :class="!(isRoleStaffReg && isChild && hasFrozenParentReg(item) &&
               (isTransAffi(item.registrationType) || isDraft(item)))
-              ? 'pl-9'
+              ? 'pl-1'
               : 'pl-1'"
           >
             <p
@@ -170,21 +772,48 @@
           </div>
         </v-tooltip>
       </div>
+    </td>
+    <td
+      v-if="inSelectedHeaders('vs')"
+      :class="isChild || item.expanded ? 'border-left': ''"
+    >
       <v-btn
-        v-if="item.changes"
-        class="btn-row-expand-txt btn-txt pa-0 generic-link"
-        color="primary"
+        v-if="!isDraft(item) && item.path"
+        :id="`pdf-btn-${item.id}`"
+        class="pdf-btn px-0 mt-n3"
         variant="plain"
-        @click="toggleExpand(item)"
-        @mouseover="rollover = true"
-        @mouseleave="rollover = false"
+        :loading="item.path === loadingPDF"
+        aria-label="Download PDF"
+        @click="downloadPDF(item)"
       >
-        <label style="cursor: pointer;">
-          <span v-if="!setIsExpanded">View </span>
-          <span v-else>Hide </span>
-          {{ isPpr ? 'Amendments' : 'History' }}
-        </label>
+        <img
+          src="@/assets/svgs/pdf-icon-blue.svg"
+          role="img"
+        >
+        <span
+          class="pl-1"
+          aria-hidden="true"
+        >PDF</span>
       </v-btn>
+      <v-tooltip
+        v-else-if="!isDraft(item)"
+        content-class="top-tooltip"
+        location="top"
+        transition="fade-transition"
+      >
+        <template #activator="{ props }">
+          <v-icon
+            color="primary"
+            v-bind="props"
+            @click="refresh(item)"
+          >
+            mdi-information-outline
+          </v-icon>
+        </template>
+        <div>
+          <span v-html="tooltipTxtPdf(item)" />
+        </div>
+      </v-tooltip>
     </td>
     <td
       v-if="inSelectedHeaders('createDateTime')"
@@ -292,48 +921,6 @@
       :class="isChild || item.expanded ? 'border-left': ''"
       v-html="showExpireDays(item)"
     />
-    <td
-      v-if="inSelectedHeaders('vs')"
-      :class="isChild || item.expanded ? 'border-left': ''"
-    >
-      <v-btn
-        v-if="!isDraft(item) && item.path"
-        :id="`pdf-btn-${item.id}`"
-        class="pdf-btn px-0 mt-n3"
-        variant="plain"
-        :loading="item.path === loadingPDF"
-        aria-label="Download PDF"
-        @click="downloadPDF(item)"
-      >
-        <img
-          src="@/assets/svgs/pdf-icon-blue.svg"
-          role="img"
-        >
-        <span
-          class="pl-1"
-          aria-hidden="true"
-        >PDF</span>
-      </v-btn>
-      <v-tooltip
-        v-else-if="!isDraft(item)"
-        content-class="top-tooltip"
-        location="top"
-        transition="fade-transition"
-      >
-        <template #activator="{ props }">
-          <v-icon
-            color="primary"
-            v-bind="props"
-            @click="refresh(item)"
-          >
-            mdi-information-outline
-          </v-icon>
-        </template>
-        <div>
-          <span v-html="tooltipTxtPdf(item)" />
-        </div>
-      </v-tooltip>
-    </td>
 
     <!--Action Btns-->
     <td
@@ -720,587 +1307,6 @@
     </td>
   </tr>
 </template>
-
-<script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
-import { stripChars, multipleWordsToTitleCase, isWithinMinutes, getFeatureFlag } from '@/utils'
-import { getRegistrationSummary, registrationPDF } from '@/utils/ppr-api-helper'
-import { mhRegistrationPDF, getMHRegistrationSummary } from '@/utils/mhr-api-helper'
-import { useStore } from '@/store/store'
-import InfoChip from '@/components/common/InfoChip.vue'
-
-import type {
-  BaseHeaderIF,
-  DraftResultIF,
-  MhRegistrationSummaryIF,
-  RegistrationSummaryIF
-} from '@/interfaces'
-
-import {
-  APIMhrDescriptionTypes,
-  APIMhrTypes,
-  APIRegistrationTypes,
-  APIStatusTypes,
-  DraftTypes,
-  TableActions,
-  UIRegistrationClassTypes,
-  UITransferTypes,
-  MhApiStatusTypes,
-  MhApiFrozenDocumentTypes,
-  UnitNoteDocTypes,
-  HomeLocationTypes
-} from '@/enums'
-import { useRegistration } from '@/composables/useRegistration'
-import { useExemptions, useMhrInformation, useTransferOwners } from '@/composables'
-import moment from 'moment'
-import { storeToRefs } from 'pinia'
-import { QSLockedStateUnitNoteTypes } from '@/resources'
-
-export default defineComponent({
-  name: 'TableRow',
-  components: { InfoChip },
-  props: {
-    isPpr: { type: Boolean, default: false },
-    setAddRegEffect: { type: Boolean, default: false },
-    setDisableActionShadow: { type: Boolean, default: false },
-    setChild: { type: Boolean, default: false },
-    setHeaders: { type: Array as () => BaseHeaderIF[], default: [] as BaseHeaderIF[] },
-    setIsExpanded: { type: Boolean, default: false },
-    closeSubMenu: { type: Boolean, default: false },
-    setItem: {
-      default: () => {
-      },
-      type: Object as () => RegistrationSummaryIF | DraftResultIF | MhRegistrationSummaryIF | any
-    }
-  },
-  emits: ['action', 'error', 'freezeScroll', 'toggleExpand'],
-  setup (props, { emit }) {
-    const {
-      getAccountLabel,
-      isRoleQualifiedSupplier,
-      isRoleStaff,
-      isRoleStaffSbc,
-      isRoleStaffBcol,
-      isRoleStaffReg,
-      getMhRegTableBaseRegs,
-      hasDrsEnabled
-    } = storeToRefs(useStore())
-
-    const {
-      getFormattedDate,
-      getRegistrationType,
-      getStatusDescription,
-      getRegisteringName,
-      registrationNumber,
-      registeringParty,
-      hasRenewal,
-      securedParties
-    } = useRegistration(null)
-    const { isTransAffi } = useTransferOwners()
-    const { hasQsTransferOrExemptionBlockingLien } = useMhrInformation()
-    const { isExemptionEnabled, isNonResExemptionEnabled, hasChildResExemption } = useExemptions()
-
-    const localState = reactive({
-      loadingPDF: '',
-      rollover: false,
-      menuToggleState: false,
-      applyAddedRegEffect: computed((): boolean => {
-        return props.setAddRegEffect
-      }),
-      applyRolloverEffect: computed((): boolean => {
-        return localState.rollover || props.setIsExpanded
-      }),
-      disableActionShadow: computed((): boolean => {
-        return props.setDisableActionShadow
-      }),
-      headers: computed(() => {
-        return props.setHeaders
-      }),
-      isChild: computed(() => {
-        return props.setChild
-      }),
-      item: computed<any>(() => {
-        if (!isDraft(props.setItem) && !props.setChild) {
-          // if base reg && not draft check to update expand
-          const baseReg = props.setItem as RegistrationSummaryIF
-          if (baseReg.expand !== undefined && (baseReg.expand !== props.setIsExpanded)) {
-            toggleExpand(props.setItem)
-          }
-        }
-        return props.setItem
-      }),
-      enableOpenEdit: computed(() => {
-        return (isRoleQualifiedSupplier.value || isRoleStaffReg.value || isRoleStaff.value || isRoleStaffSbc.value) &&
-          !isRoleStaffBcol.value
-      }),
-      hasLienForQS: computed(() => {
-        return isRoleQualifiedSupplier.value &&
-          localState.item.lienRegistrationType &&
-          hasQsTransferOrExemptionBlockingLien.value
-      }),
-      hasLockedForQS: computed(() => {
-       return  hasLockedState(localState.item) && isRoleQualifiedSupplier.value
-      })
-    })
-
-    const documentRecordUrl = (documentId: string) => {
-      const configDocumentUrl = sessionStorage.getItem('DOCUMENTS_URL')
-      return `${configDocumentUrl}/document-records/${documentId}`
-    }
-
-    const hasRequiredTransfer = (item: MhRegistrationSummaryIF) => {
-      return !props.isPpr && !localState.isChild &&
-        item.statusType === MhApiStatusTypes.FROZEN &&
-        item.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT
-    }
-
-    const isTransitionedCommercialLien = (item: any): boolean => {
-      return item.registrationType === APIRegistrationTypes.COMMERCIAL_LIEN && !!item.transitioned
-    }
-
-
-    const deleteDraft = (item: DraftResultIF): void => {
-      emit('action', {
-        action: TableActions.DELETE,
-        docId: item.documentId,
-        regNum: item.baseRegistrationNumber
-      })
-    }
-
-    const tooltipTxtPdf = (item: RegistrationSummaryIF) => {
-      // Display messaging for client accounts when the submitting party doesn't match the current account
-      const isNotMhrSubmittingParty = !props.isPpr && item.submittingParty?.toUpperCase() !==
-        getAccountLabel.value?.toUpperCase()
-
-      // Sbc Staff can't rely on Submitting Party Match and cannot view all docs like Reg Staff
-      // Fall through to the 'download' messaging if user is SBC and this filing is recent.
-      const isRecentSbcFiling = isRoleStaffSbc.value && isWithinMinutes(item.createDateTime, 10)
-
-      if (isNotMhrSubmittingParty && !isRoleStaffReg.value && !isRecentSbcFiling) {
-        return 'Documents are only available to the Submitting Party of this filing. To view the details of this' +
-          ' registration you must conduct a search.'
-      }
-
-      const isVerificationStatement = !item.registeringName && props.isPpr
-      if (isVerificationStatement) {
-        return 'Verification Statements are only available to Secured Parties or the Registering Party of this ' +
-          'filing. To view the details of this registration you must conduct a search.'
-      }
-
-      // Display Legacy messaging if the filing was flagged as completed in the legacy system
-      if (isRoleStaffReg.value && item.legacy) {
-        return 'Document only available in the legacy system.'
-      }
-
-      return 'This document PDF is still being generated. Click the ' +
-        '<i class="v-icon notranslate mdi mdi-information-outline" style="font-size:18px; margin-bottom:4px;"></i>' +
-        ' icon to see if your PDF is ready to download. <br>' +
-        'Note: Large documents may take up to 20 minutes to generate.'
-    };
-
-
-    const downloadPDF = async (item: RegistrationSummaryIF): Promise<any> => {
-      localState.loadingPDF = item.path
-      const pdf = props.isPpr ? await registrationPDF(item.path) : await mhRegistrationPDF(item.path)
-      if (pdf.error) {
-        emit('error', pdf.error)
-      } else {
-        /* solution from https://github.com/axios/axios/issues/1392 */
-
-        // it is necessary to create a new blob object with mime-type explicitly set
-        // otherwise only Chrome works like it should
-        const blob = new Blob([pdf], { type: 'application/pdf' })
-
-        // IE doesn't allow using a blob object directly as link href
-        // instead it is necessary to use msSaveOrOpenBlob
-        if (window.navigator && (window.navigator as any).msSaveOrOpenBlob) {
-          (window.navigator as any).msSaveOrOpenBlob(blob, item.path)
-        } else {
-          // for other browsers, create a link pointing to the ObjectURL containing the blob
-          const url = window.URL.createObjectURL(blob)
-          const a = window.document.createElement('a')
-          window.document.body.appendChild(a)
-          a.setAttribute('style', 'display: none')
-          a.href = url
-          // Format (PPR): [Date (in YYYY-MM-DD format)] BCPPR [Two Letter Registration Type Code
-          // (only for Standard Registrations)] [Verification Statement Type] - [Registration Number]
-          // Example: 2022-01-03 BCPPR SA Registration Verification - 100559B
-
-          // Format (MHR): [Date (in YYYY-MM-DD format)] BCMHR [Registration || Transfer] - [Registration Number]
-          // Example: 2023-03-13 BCMHR Registration - 150378
-
-          const today = new Date()
-          const regType = props.isPpr ? '_BCPPR_' : isMhrTransfer(item) ? '_BCMHR_Transfer' : '_BCMHR_Registration'
-          const regClass = getRegistrationClass(item.registrationClass) || ''
-          if (regClass === 'Registration Verification') {
-            a.download = today.toISOString().slice(0, 10) + regType +
-              item.registrationType + '_' + regClass.replace(/ /g, '_') + '_' + item.registrationNumber
-          } else {
-            a.download = today.toISOString().slice(0, 10) + regType +
-              regClass.replace(/ /g, '_') + '_' + (item.registrationNumber || item.baseRegistrationNumber)
-          }
-          a.click()
-          window.URL.revokeObjectURL(url)
-          a.remove()
-        }
-      }
-      localState.loadingPDF = ''
-    }
-
-    const editDraft = (item: DraftResultIF): void => {
-      if (item?.type === DraftTypes.FINANCING_STATEMENT) {
-        emit('action', { action: TableActions.EDIT_NEW, docId: item.documentId })
-      } else if (item?.type === DraftTypes.AMENDMENT_STATEMENT) {
-        emit('action', {
-          action: TableActions.EDIT_AMEND,
-          docId: item.documentId,
-          regNum: item.baseRegistrationNumber
-        })
-      }
-    }
-
-    const isEnabledMhr = (item: MhRegistrationSummaryIF) => {
-      return [MhApiStatusTypes.ACTIVE, MhApiStatusTypes.FROZEN, MhApiStatusTypes.EXEMPT, MhApiStatusTypes.CANCELLED]
-          .includes(item.statusType as MhApiStatusTypes) &&
-        localState.enableOpenEdit && (item.registrationDescription === APIMhrDescriptionTypes.REGISTER_NEW_UNIT ||
-          item.registrationDescription === APIMhrDescriptionTypes.CONVERTED)
-    }
-
-    const openMhr = (item: MhRegistrationSummaryIF): void => {
-      let action: TableActions
-
-      switch (item.registrationType) {
-        case APIMhrTypes.REGISTRY_STAFF_ADMIN:
-          action = item.registrationDescription === APIMhrDescriptionTypes.RE_REGISTER_NEW_UNIT
-            ? TableActions.OPEN_DRAFT_RE_REGISTRATION : TableActions.OPEN_DRAFT_CORRECTION
-          break
-        case APIMhrTypes.MANUFACTURED_HOME_REGISTRATION:
-          action = item.draftNumber ? TableActions.EDIT_NEW_MHR : TableActions.OPEN_MHR
-          break
-        default:
-          action = TableActions.OPEN_MHR
-          break
-      }
-
-      emit('action', {
-        action: action,
-        mhrInfo: item
-      })
-    }
-
-    const openExemption = (docType: UnitNoteDocTypes, item: MhRegistrationSummaryIF): void => {
-      emit('action', {
-        action: docType,
-        mhrInfo: item
-      })
-    }
-
-    const openMhrHistory = (item) => {
-      emit('action', {
-        action: TableActions.OPEN_MHR_HISTORY,
-        mhrInfo: item
-      })
-    }
-
-    const isMhrTransfer = (item: any): boolean => {
-      const formattedTransferTypes = [
-        UITransferTypes.SALE_OR_GIFT,
-        UITransferTypes.SURVIVING_JOINT_TENANT,
-        UITransferTypes.TO_ADMIN_NO_WILL,
-        UITransferTypes.TO_EXECUTOR_PROBATE_WILL,
-        UITransferTypes.TO_EXECUTOR_UNDER_25K_WILL
-      ].map(type => stripChars(type).toUpperCase())
-
-      return [MhApiStatusTypes.ACTIVE, MhApiStatusTypes.FROZEN].includes(item.statusType) &&
-        formattedTransferTypes.includes(stripChars(item.registrationDescription))
-    }
-
-    const removeMhrDraft = (item: MhRegistrationSummaryIF): void => {
-      emit('action', { action: TableActions.DELETE, regNum: item.draftNumber })
-    }
-
-    const getRegistrationClass = (regClass: string): string => {
-      return UIRegistrationClassTypes[regClass]
-    }
-
-    const freezeScrolling = (isMenuOpen: boolean) => {
-      emit('freezeScroll', isMenuOpen)
-    }
-
-    const handleAction = (item, action: TableActions): void => {
-      const registrationNumber = props.isPpr
-        ? item.baseRegistrationNumber
-        : item.mhrNumber
-
-      emit('action', { action, regNum: registrationNumber })
-    }
-
-    const inSelectedHeaders = (search: string) => {
-      return localState.headers.find(header => {
-        return header.value === search
-      })
-    }
-
-    const isActive = (item: RegistrationSummaryIF): boolean => {
-      return item.statusType === APIStatusTypes.ACTIVE
-    }
-
-    const hasFrozenParentReg = (item: MhRegistrationSummaryIF): boolean => {
-      const parentReg = item.mhrNumber && getMhRegTableBaseRegs.value?.find(reg => reg.mhrNumber === item.mhrNumber)
-      return parentReg?.statusType === MhApiStatusTypes.FROZEN
-    }
-
-    // locked state for MHR based on API response (eg. TAXN Unit Note is blocking QS)
-    const hasLockedState = (item: MhRegistrationSummaryIF): boolean => {
-      const parentReg: MhRegistrationSummaryIF =
-        item.mhrNumber && getMhRegTableBaseRegs.value?.find(reg => reg.mhrNumber === item.mhrNumber)
-      // For QS status will be frozen, but for Staff it will be Active, so no locked state would be shown
-      return (isRoleQualifiedSupplier.value && parentReg?.statusType === MhApiStatusTypes.FROZEN) &&
-        (QSLockedStateUnitNoteTypes.includes(parentReg?.frozenDocumentType) ||
-          parentReg?.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT)
-    }
-
-    const isDischarged = (item: RegistrationSummaryIF): boolean => {
-      return item.statusType === APIStatusTypes.DISCHARGED
-    }
-
-    const isRenewalDisabled = (item: RegistrationSummaryIF): boolean => {
-      return (item.expireDays === -99)
-    }
-
-    const isRepairersLienAmendDisabled = (item: RegistrationSummaryIF): boolean => {
-      // return if the repairers lien transition is enabled
-      if (getFeatureFlag('cla-enabled')) return false
-
-      const changes = item?.changes as RegistrationSummaryIF[]
-      // if there are amendments, get the vehicle count from the first array element
-      if (changes) {
-        const lastChange = changes[0]
-        return (lastChange.vehicleCount === 1)
-      }
-      return (item.vehicleCount === 1)
-    }
-
-    const isDraft = (item: any): boolean => {
-      // RegistrationSummaryIF | DraftResultIF | MhrDraftApiIF
-      return props.isPpr
-        ? item.type !== undefined
-        : (item.statusType === MhApiStatusTypes.DRAFT || item.statusType === undefined || !item.mhrNumber)
-    }
-
-    /**
-     * Checks if the given document ID is elegibile, returns true if the document ID is eligible
-     * Rules:
-     * - Document ID to link out to record if one exists, otherwise show NA.
-     * - Ignore 8 digit long IDs that start with '1', '8', '9', or 'REG'.
-     */
-    const isElegibleDocId = (docId: string): boolean => {
-      return docId && !(docId.length === 8 && /^[189]|REG/.test(docId));
-    }
-
-    const isExpired = (item: RegistrationSummaryIF): boolean => {
-      return item.statusType === APIStatusTypes.EXPIRED
-    }
-
-    const isRepairersLien = (item: RegistrationSummaryIF): boolean => {
-      return item.registrationType === APIRegistrationTypes.REPAIRERS_LIEN
-    }
-
-    const isRepairersLienAndTransitioning = (item: RegistrationSummaryIF): boolean => {
-      return isRepairersLien(item) && getFeatureFlag('cla-enabled')
-    }
-
-    const isExemptOrCancelled = (statusType: MhApiStatusTypes): boolean =>
-      [MhApiStatusTypes.EXEMPT, MhApiStatusTypes.CANCELLED].includes(statusType)
-
-    const refresh = async (item: RegistrationSummaryIF): Promise<void> => {
-      // could be base reg or child reg
-      if (item.registeringName) {
-        // will always return base reg
-        const resp = await getRegistrationSummary(item.registrationNumber, true)
-        if (resp.error) {
-          // log error, but otherwise ignore it
-          console.error('Refreshing registration failed: ', resp.error)
-        } else {
-          if (item.registrationNumber === resp.registrationNumber) item.path = resp.path
-          else {
-            // find child in changes and set path to that
-            const changes = resp?.changes as RegistrationSummaryIF[]
-            const child = changes.find(reg => reg.registrationNumber === item.registrationNumber)
-            if (!child) {
-              // log error, but otherwise ignore it
-              console.error(
-                `Could not find registration ${item.registrationNumber} within base reg changes: `,
-                resp.changes
-              )
-            } else {
-              item.path = child.path
-            }
-          }
-        }
-        // Mhr Handling
-      } else if (
-        (item.submittingParty?.toUpperCase() === getAccountLabel.value?.toUpperCase()) || isRoleStaffReg.value ||
-        isRoleStaffSbc.value && isWithinMinutes(item.createDateTime, 10)
-    ) {
-        const resp = await getMHRegistrationSummary(item.baseRegistrationNumber, true)
-        if (resp.error) {
-          // log error, but otherwise ignore it
-          console.error('Refreshing registration failed: ', resp.error)
-        } else {
-          if (item.documentRegistrationNumber === resp.documentRegistrationNumber) item.path = resp.path
-          else {
-            // find child in changes and set path to that
-            const changes = resp?.changes as RegistrationSummaryIF[]
-            const child = changes.find(reg => reg.documentRegistrationNumber === item.documentRegistrationNumber)
-            if (!child) {
-              // log error, but otherwise ignore it
-              console.error(
-                `Could not find registration ${item.documentRegistrationNumber} within base reg changes: `,
-                resp.changes
-              )
-            } else {
-              item.path = child.path
-            }
-          }
-        }
-      }
-    }
-
-    const showExpireDays = (item: RegistrationSummaryIF): string => {
-      if (localState.isChild && props.isPpr) return ''
-      if (isExpired(item) || isDischarged(item)) return '—'
-
-      const days = item.expireDays
-      // -9999 indicates the notice of caution has been cancelled
-      if ([null, undefined, -9999, 9999].includes(days)) {
-        return 'N/A'
-      }
-      if (days === -99) {
-        return 'Infinite'
-      }
-      if (days <= 0) {
-        return 'Expired'
-      } else {
-        if (days > 364) {
-          const today = new Date()
-          const expireDate = new Date()
-          // expireDate.setDate(expireDate.getDate() + days)
-          const dateExpiry = moment.utc(new Date(
-            Date.UTC(
-              expireDate.getUTCFullYear(),
-              expireDate.getUTCMonth(),
-              expireDate.getUTCDate()
-            )
-          )).add(days, 'days')
-          const dateToday = moment.utc(new Date(
-            Date.UTC(
-              today.getUTCFullYear(),
-              today.getUTCMonth(),
-              today.getUTCDate()
-            )
-          ))
-
-          // year difference
-          const years = dateExpiry.diff(dateToday, 'years')
-          if (years > 0) {
-            dateExpiry.subtract(years, 'year')
-          }
-          // day difference
-          const daysDiff = dateExpiry.diff(dateToday, 'days')
-          let yearText = ' years '
-          if (years === 1) {
-            yearText = ' year '
-          }
-
-          return years.toString() + yearText + daysDiff.toString() + ' days'
-        }
-        if (days <= 2) {
-          return `<span class="error-text">${days} ${days === 1 ? 'day' : 'days' }</span>`
-        }
-        return days.toString() + ' days'
-      }
-    }
-
-    const toggleExpand = (val: any) => {
-      emit('toggleExpand', val)
-    }
-
-    const hasLien = (item: any): boolean => {
-      // Future state might require type handling
-      return !!item.lienRegistrationType
-    }
-
-    // Hide cancelled document decs for Notice Of Redemption for child item in MHR table
-    const showCancelledDocumentDescription = (mhrTableChildItem): boolean => {
-      // Notice of Redemption is cancelled only by Notice of Tax Sale, so check for type to hide the desc
-      return mhrTableChildItem.cancelledDocumentType !== UnitNoteDocTypes.NOTICE_OF_TAX_SALE
-    }
-
-    watch(() => props.setItem, () => {
-    }, { deep: true, immediate: true })
-
-    return {
-      isTransitionedCommercialLien,
-      openMhrHistory,
-      hasRequiredTransfer,
-      multipleWordsToTitleCase,
-      freezeScrolling,
-      APIMhrDescriptionTypes,
-      getFormattedDate,
-      getRegistrationType,
-      getStatusDescription,
-      getRegisteringName,
-      showExpireDays,
-      deleteDraft,
-      editDraft,
-      handleAction,
-      refresh,
-      registrationNumber,
-      registeringParty,
-      securedParties,
-      isActive,
-      isDischarged,
-      isDraft,
-      isElegibleDocId,
-      isExpired,
-      isRepairersLien,
-      isRepairersLienAndTransitioning,
-      isExemptOrCancelled,
-      isRenewalDisabled,
-      isRepairersLienAmendDisabled,
-      isRoleStaffReg,
-      isRoleQualifiedSupplier,
-      isExemptionEnabled,
-      hasChildResExemption,
-      hasRenewal,
-      downloadPDF,
-      inSelectedHeaders,
-      TableActions,
-      toggleExpand,
-      tooltipTxtPdf,
-      openMhr,
-      openExemption,
-      isEnabledMhr,
-      removeMhrDraft,
-      isMhrTransfer,
-      hasLien,
-      showCancelledDocumentDescription,
-      isTransAffi,
-      hasFrozenParentReg,
-      hasLockedState,
-      MhApiFrozenDocumentTypes,
-      UnitNoteDocTypes,
-      HomeLocationTypes,
-      isNonResExemptionEnabled,
-      MhApiStatusTypes,
-      documentRecordUrl,
-      hasDrsEnabled,
-      ...toRefs(localState)
-    }
-  }
-})
-</script>
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';

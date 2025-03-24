@@ -1,230 +1,3 @@
-<template>
-  <div
-    id="registrations-wrapper"
-    class="mt-4"
-  >
-    <!-- Registration Dialogs -->
-    <BaseDialog
-      id="manufacturerRegSuccessDialog"
-      :set-display="manufacturerRegSuccessDialogDisplay"
-      :set-options="manufacturerRegSuccessDialogOptions"
-      show-dismiss-dialog-checkbox
-      @proceed="manufacturerRegSuccessDialogDisplay = false"
-    />
-    <BaseDialog
-      id="myRegAddDialog"
-      :set-display="myRegAddDialogDisplay"
-      :set-options="myRegAddDialog"
-      @proceed="myRegAddDialogProceed"
-    />
-    <BaseDialog
-      id="myRegCannotBeAddedDialog"
-      :set-display="myRegCannotBeAddedDialogDisplay"
-      :set-options="myRegCannotBeAddedDialog"
-      @proceed="myRegCannotBeAddedDialogDisplay = false"
-    />
-    <BaseDialog
-      id="myRegDeleteDialog"
-      :set-display="myRegDeleteDialogDisplay"
-      :set-options="myRegDeleteDialog"
-      @proceed="myRegDeleteDialogProceed"
-    />
-    <RegistrationConfirmation
-      attach=""
-      :options="myRegActionDialog"
-      :display="myRegActionDialogDisplay"
-      :registration-number="myRegActionRegNum"
-      @proceed="myRegActionDialogHandler"
-    />
-    <BaseDialog
-      id="staleDraftDialog"
-      :set-display="staleDraftDialogDisplay"
-      :set-options="staleDraftDialogOptions(`MHR Number ${mhrWithDraftId}`)"
-      @proceed="staleDraftHandler"
-    />
-    <BaseDialog
-      id="manufacturedHomeDelivered"
-      set-confirm-action-label="I confirm the manufactured home has been delivered"
-      :set-display="manufacturedHomeDeliveredDialogDisplay"
-      :set-options="manufacturedHomeDeliveredDialogOptions(exemptionTypeDesc)"
-      @proceed="mhDeliveredHandler"
-    />
-
-    <!-- Registrations Upper Section -->
-    <v-row
-      class="pt-10 px-0"
-      no-gutters
-      align="center"
-    >
-      <v-col
-        cols="4"
-        class="reg-bar-col"
-      >
-        <RegistrationBar
-          class="soft-corners-bottom"
-          :is-mhr="isMhr"
-          :is-tab-view="isTabView"
-          @selected-registration-type="startNewRegistration($event)"
-        />
-      </v-col>
-      <v-col cols="5">
-        <p class="fs-14 float-right pr-7 mb-0">
-          <v-tooltip
-            class="pa-2"
-            content-class="top-tooltip"
-            location="top"
-            transition="fade-transition"
-          >
-            <template #activator="{ props }">
-              <v-icon
-                color="primary"
-                v-bind="props"
-                class="mt-n1"
-                tabindex="0"
-              >
-                mdi-information-outline
-              </v-icon>
-            </template>
-            <div>
-              {{ tooltipTxtRegSrch }}
-            </div>
-          </v-tooltip>
-          <span class="pl-1">Retrieve an existing registration to add to your table:</span>
-        </p>
-      </v-col>
-      <v-col
-        cols="3"
-        class="reg-add-col mt-4"
-      >
-        <v-text-field
-          id="my-reg-add"
-          v-model="myRegAdd"
-          class="reg-input rounded-all float-right"
-          :class="{'column-selection': !isTabView}"
-          append-inner-icon="mdi-magnify"
-          variant="filled"
-          color="primary"
-          :error-messages="myRegAddInvalid ? `Registration numbers contain ${ isMhr ? '6' : '7' } digits` : ''"
-          :label="`${registrationLabel} Registration Number`"
-          style="width:342px"
-          density="compact"
-          @keypress.enter="findRegistration(myRegAdd)"
-          @click:append-inner="findRegistration(myRegAdd)"
-        />
-      </v-col>
-    </v-row>
-
-    <!-- Registrations Table Section -->
-    <v-row
-      no-gutters
-      class="my-10"
-    >
-      <v-col>
-        <v-row
-          id="registration-header"
-          class="review-header px-6 py-2 rounded-top"
-          align="center"
-          no-gutters
-        >
-          <v-col
-            cols="auto"
-            class="py-1 d-flex"
-          >
-            <h2 class="fs-16 lh-24 mr-1">
-              {{ registrationLabel }} Registrations
-            </h2>
-            <span>({{ isPpr ? getRegTableTotalRowCount : myRegistrations.length }})</span>
-          </v-col>
-          <v-col>
-            <v-row
-              justify="end"
-              no-gutters
-            >
-              <v-col
-                class="py-1"
-                cols="3"
-              >
-                <v-select
-                  id="column-selection"
-                  v-model="myRegHeadersSelected"
-                  :items="myRegHeadersSelectable"
-                  hide-details
-                  item-title="text"
-                  multiple
-                  return-object
-                  density="compact"
-                  placeholder="Columns to Show"
-                >
-                  <template #selection="{ index }">
-                    <span
-                      v-if="index === 0"
-                      class="fs-14"
-                    >
-                      Columns to Show
-                    </span>
-                  </template>
-                  <template #item="{ props, item }">
-                    <v-list-item
-                      v-bind="props"
-                      class="column-selection-item"
-                    >
-                      <template #prepend>
-                        <v-checkbox
-                          class="py-0"
-                          hide-details
-                          density="compact"
-                          :model-value="isActiveHeader(item.value)"
-                        />
-                      </template>
-                    </v-list-item>
-                  </template>
-                </v-select>
-              </v-col>
-            </v-row>
-          </v-col>
-        </v-row>
-        <v-row
-          no-gutters
-          class="bg-white"
-        >
-          <v-col
-            v-if="!appLoadingData"
-            cols="12"
-          >
-            <RegistrationTable
-              :class="{'table-border': isTabView}"
-              :is-ppr="isPpr"
-              :is-mhr="isMhr"
-              :set-headers="myRegHeaders"
-              :set-loading="myRegDataLoading || myRegDataAdding"
-              :set-more-pages="hasMorePages"
-              :set-new-reg-item="getRegTableNewItem"
-              :set-registration-history="myRegistrations"
-              :set-search="myRegFilter"
-              :set-sort="isPpr ? getRegTableSortOptions : getRegTableMhSortOptions"
-              @action="myRegActionHandler($event)"
-              @error="emitError($event)"
-              @sort="myRegSort($event)"
-              @get-next="myRegGetNext"
-            />
-          </v-col>
-          <v-col
-            v-else
-            class="pa-10"
-            cols="12"
-          >
-            <v-progress-linear
-              color="primary"
-              :indeterminate="true"
-              rounded
-              height="6"
-            />
-          </v-col>
-        </v-row>
-      </v-col>
-    </v-row>
-  </div>
-</template>
 <script lang="ts">
 // Components
 import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } from 'vue'
@@ -1319,6 +1092,234 @@ export default defineComponent({
   }
 })
 </script>
+
+<template>
+  <div
+    id="registrations-wrapper"
+    class="mt-4"
+  >
+    <!-- Registration Dialogs -->
+    <BaseDialog
+      id="manufacturerRegSuccessDialog"
+      :set-display="manufacturerRegSuccessDialogDisplay"
+      :set-options="manufacturerRegSuccessDialogOptions"
+      show-dismiss-dialog-checkbox
+      @proceed="manufacturerRegSuccessDialogDisplay = false"
+    />
+    <BaseDialog
+      id="myRegAddDialog"
+      :set-display="myRegAddDialogDisplay"
+      :set-options="myRegAddDialog"
+      @proceed="myRegAddDialogProceed"
+    />
+    <BaseDialog
+      id="myRegCannotBeAddedDialog"
+      :set-display="myRegCannotBeAddedDialogDisplay"
+      :set-options="myRegCannotBeAddedDialog"
+      @proceed="myRegCannotBeAddedDialogDisplay = false"
+    />
+    <BaseDialog
+      id="myRegDeleteDialog"
+      :set-display="myRegDeleteDialogDisplay"
+      :set-options="myRegDeleteDialog"
+      @proceed="myRegDeleteDialogProceed"
+    />
+    <RegistrationConfirmation
+      attach=""
+      :options="myRegActionDialog"
+      :display="myRegActionDialogDisplay"
+      :registration-number="myRegActionRegNum"
+      @proceed="myRegActionDialogHandler"
+    />
+    <BaseDialog
+      id="staleDraftDialog"
+      :set-display="staleDraftDialogDisplay"
+      :set-options="staleDraftDialogOptions(`MHR Number ${mhrWithDraftId}`)"
+      @proceed="staleDraftHandler"
+    />
+    <BaseDialog
+      id="manufacturedHomeDelivered"
+      set-confirm-action-label="I confirm the manufactured home has been delivered"
+      :set-display="manufacturedHomeDeliveredDialogDisplay"
+      :set-options="manufacturedHomeDeliveredDialogOptions(exemptionTypeDesc)"
+      @proceed="mhDeliveredHandler"
+    />
+
+    <!-- Registrations Upper Section -->
+    <v-row
+      class="pt-10 px-0"
+      no-gutters
+      align="center"
+    >
+      <v-col
+        cols="4"
+        class="reg-bar-col"
+      >
+        <RegistrationBar
+          class="soft-corners-bottom"
+          :is-mhr="isMhr"
+          :is-tab-view="isTabView"
+          @selected-registration-type="startNewRegistration($event)"
+        />
+      </v-col>
+      <v-col cols="5">
+        <p class="fs-14 float-right pr-7 mb-0">
+          <v-tooltip
+            class="pa-2"
+            content-class="top-tooltip"
+            location="top"
+            transition="fade-transition"
+          >
+            <template #activator="{ props }">
+              <v-icon
+                color="primary"
+                v-bind="props"
+                class="mt-n1"
+                tabindex="0"
+              >
+                mdi-information-outline
+              </v-icon>
+            </template>
+            <div>
+              {{ tooltipTxtRegSrch }}
+            </div>
+          </v-tooltip>
+          <span class="pl-1">Retrieve an existing registration to add to your table:</span>
+        </p>
+      </v-col>
+      <v-col
+        cols="3"
+        class="reg-add-col mt-4"
+      >
+        <v-text-field
+          id="my-reg-add"
+          v-model="myRegAdd"
+          class="reg-input rounded-all float-right"
+          :class="{'column-selection': !isTabView}"
+          append-inner-icon="mdi-magnify"
+          variant="filled"
+          color="primary"
+          :error-messages="myRegAddInvalid ? `Registration numbers contain ${ isMhr ? '6' : '7' } digits` : ''"
+          :label="`${registrationLabel} Registration Number`"
+          style="width:342px"
+          density="compact"
+          @keypress.enter="findRegistration(myRegAdd)"
+          @click:append-inner="findRegistration(myRegAdd)"
+        />
+      </v-col>
+    </v-row>
+
+    <!-- Registrations Table Section -->
+    <v-row
+      no-gutters
+      class="my-10"
+    >
+      <v-col>
+        <v-row
+          id="registration-header"
+          class="review-header px-6 py-2 rounded-top"
+          align="center"
+          no-gutters
+        >
+          <v-col
+            cols="auto"
+            class="py-1 d-flex"
+          >
+            <h2 class="fs-16 lh-24 mr-1">
+              {{ registrationLabel }} Registrations
+            </h2>
+            <span>({{ isPpr ? getRegTableTotalRowCount : myRegistrations.length }})</span>
+          </v-col>
+          <v-col>
+            <v-row
+              justify="end"
+              no-gutters
+            >
+              <v-col
+                class="py-1"
+                cols="3"
+              >
+                <v-select
+                  id="column-selection"
+                  v-model="myRegHeadersSelected"
+                  :items="myRegHeadersSelectable"
+                  hide-details
+                  item-title="text"
+                  multiple
+                  return-object
+                  density="compact"
+                  placeholder="Columns to Show"
+                >
+                  <template #selection="{ index }">
+                    <span
+                      v-if="index === 0"
+                      class="fs-14"
+                    >
+                      Columns to Show
+                    </span>
+                  </template>
+                  <template #item="{ props, item }">
+                    <v-list-item
+                      v-bind="props"
+                      class="column-selection-item"
+                    >
+                      <template #prepend>
+                        <v-checkbox
+                          class="py-0"
+                          hide-details
+                          density="compact"
+                          :model-value="isActiveHeader(item.value)"
+                        />
+                      </template>
+                    </v-list-item>
+                  </template>
+                </v-select>
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
+        <v-row
+          no-gutters
+          class="bg-white"
+        >
+          <v-col
+            v-if="!appLoadingData"
+            cols="12"
+          >
+            <RegistrationTable
+              :class="{'table-border': isTabView}"
+              :is-ppr="isPpr"
+              :is-mhr="isMhr"
+              :set-headers="myRegHeaders"
+              :set-loading="myRegDataLoading || myRegDataAdding"
+              :set-more-pages="hasMorePages"
+              :set-new-reg-item="getRegTableNewItem"
+              :set-registration-history="myRegistrations"
+              :set-search="myRegFilter"
+              :set-sort="isPpr ? getRegTableSortOptions : getRegTableMhSortOptions"
+              @action="myRegActionHandler($event)"
+              @error="emitError($event)"
+              @sort="myRegSort($event)"
+              @get-next="myRegGetNext"
+            />
+          </v-col>
+          <v-col
+            v-else
+            class="pa-10"
+            cols="12"
+          >
+            <v-progress-linear
+              color="primary"
+              :indeterminate="true"
+              rounded
+              height="6"
+            />
+          </v-col>
+        </v-row>
+      </v-col>
+    </v-row>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';

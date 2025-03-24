@@ -1,5 +1,5 @@
 import { APISearchTypes } from '@/enums'
-import { BaseHeaderIF, TableHeadersIF } from '@/interfaces'
+import type { BaseHeaderIF, TableHeadersIF } from '@/interfaces'
 
 export const searchTableHeaders: TableHeadersIF = {
   [APISearchTypes.SERIAL_NUMBER]: [
@@ -375,6 +375,13 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
     display: true
   },
   {
+    class: 'column-md',
+    sortable: false,
+    text: 'Verification Statement',
+    value: 'vs',
+    display: true
+  },
+  {
     class: 'column-mdl',
     sortable: true,
     text: 'Date (Pacific Time)',
@@ -425,13 +432,6 @@ export const registrationTableHeaders: Array<BaseHeaderIF> = [
     display: true
   },
   {
-    class: 'column-md',
-    sortable: false,
-    text: 'Verification Statement',
-    value: 'vs',
-    display: true
-  },
-  {
     class: 'registration-action',
     sortable: false,
     text: 'Actions',
@@ -453,6 +453,13 @@ export const mhRegistrationTableHeaders: Array<BaseHeaderIF> = [
     sortable: true,
     text: 'Registration Type',
     value: 'registrationDescription',
+    display: true
+  },
+  {
+    class: 'column-sm',
+    sortable: false,
+    text: 'Documents',
+    value: 'vs',
     display: true
   },
   {
@@ -509,13 +516,6 @@ export const mhRegistrationTableHeaders: Array<BaseHeaderIF> = [
     sortable: false,
     text: 'Days to Expiry (Pacific Time)',
     value: 'expireDays',
-    display: true
-  },
-  {
-    class: 'column-sm',
-    sortable: false,
-    text: 'Documents',
-    value: 'vs',
     display: true
   },
   {
