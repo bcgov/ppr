@@ -1,0 +1,13 @@
+declare module "#build/app-component.mjs";
+declare module "#build/nitro.client.mjs";
+declare module "#build/plugins.client.mjs";
+declare module "#build/css.mjs";
+declare module "#build/fetch.mjs";
+declare module "#build/error-component.mjs";
+declare module "#build/layouts.mjs";
+declare module "#build/middleware.mjs";
+declare module "#build/nuxt.config.mjs";
+declare module "#build/paths.mjs";
+declare module "#build/root-component.mjs";
+declare module "#build/plugins.server.mjs";
+declare module "#build/test-component-wrapper.mjs";
