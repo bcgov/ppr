@@ -1,6 +1,6 @@
 import { nextTick } from 'vue'
 import { useStore } from '@/store/store'
-import { DraftResultIF, MhrDraftIF, MhRegistrationSummaryIF, RegistrationSummaryIF } from '@/interfaces'
+import type { DraftResultIF, MhrDraftIF, MhRegistrationSummaryIF, RegistrationSummaryIF } from '@/interfaces'
 import {
   mockedDraft1,
   mockedDraftAmend,
@@ -77,7 +77,7 @@ describe('TableRow tests', () => {
 
   it('updates shown row cells when given new one headers', async () => {
     expect(wrapper.vm.$props.setHeaders).toEqual(registrationTableHeaders)
-    expect(wrapper.findAll('td').length).toEqual(registrationTableHeaders.length)
+    expect(wrapper.findAll('td').length).toEqual(registrationTableHeaders.length + 1)
     const newHeaders = [
       registrationTableHeaders[1],
       registrationTableHeaders[3],
@@ -101,7 +101,7 @@ describe('TableRow tests', () => {
     expect(wrapper.vm.$props.setHeaders).toEqual(newHeaders)
     await flushPromises()
     const rowCells = wrapper.findAll('td')
-    expect(rowCells.length).toBe(newHeaders.length)
+    expect(rowCells.length).toBe(newHeaders.length + 1)
   })
 
   it('displays properly in the row for all types of items', async () => {
@@ -168,7 +168,7 @@ describe('TableRow tests', () => {
         if (!isChild) {
           // parent registration
           rowData = wrapper.findAll(tableRowBaseReg + ' td')
-          expect(rowData.length).toBe(11)
+          expect(rowData.length).toBe(12)
           // reg num
           if (baseReg.changes) {
             expect(rowData.at(0).find(btnExpArr).exists()).toBe(true)
@@ -177,84 +177,82 @@ describe('TableRow tests', () => {
           }
           // base reg num
           expect(rowData.at(0).text()).not.toContain('Base Registration:')
-          expect(rowData.at(0).text()).toContain(baseReg.baseRegistrationNumber)
+          expect(rowData.at(1).text()).toContain(baseReg.baseRegistrationNumber)
           // reg type
-          expect(rowData.at(1).text()).toContain('- Base Registration')
+          expect(rowData.at(2).text()).toContain('- Base Registration')
           if (baseReg.changes) {
-            expect(rowData.at(1).find(btnExpTxt).exists()).toBe(true)
-            expect(rowData.at(1).find(btnExpTxt).text()).toContain('View')
+            expect(rowData.at(0).find(btnExpTxt).exists()).toBe(true)
+            expect(rowData.at(0).find(btnExpTxt).text()).toContain('View')
           } else {
             expect(rowData.at(1).find(btnExpTxt).exists()).toBe(false)
           }
           // status type
-          expect(rowData.at(3).text()).toContain(wrapper.vm.getStatusDescription(baseReg.statusType, false, true))
+          expect(rowData.at(5).text()).toContain(wrapper.vm.getStatusDescription(baseReg.statusType, false, true))
           // expire days
           if ([APIStatusTypes.DISCHARGED, APIStatusTypes.EXPIRED].includes(baseReg.statusType as APIStatusTypes)) {
-            expect(rowData.at(8).text()).toContain('—')
+            expect(rowData.at(10).text()).toContain('—')
           } else {
-            expect(rowData.at(8).text()).toContain(wrapper.vm.showExpireDays(baseReg))
+            expect(rowData.at(10).text()).toContain(wrapper.vm.showExpireDays(baseReg))
           }
           // action btn
           if (![APIStatusTypes.DISCHARGED, APIStatusTypes.EXPIRED].includes(baseReg.statusType as APIStatusTypes)) {
-            expect(rowData.at(10).text()).toContain('Amend')
+            expect(rowData.at(11).text()).toContain('Amend')
           } else {
-            expect(rowData.at(10).text()).toContain('Remove From Table')
+            expect(rowData.at(11).text()).toContain('Remove From Table')
           }
         } else {
           // child registration
           rowData = wrapper.findAll(tableRow + ' td')
-          expect(rowData.length).toBe(11)
+          expect(rowData.length).toBe(12)
           // regNum
-          expect(rowData.at(0).text()).toContain(baseReg.registrationNumber)
-          expect(rowData.at(0).text()).toContain(`Base Registration: ${baseReg.baseRegistrationNumber}`)
+          expect(rowData.at(1).text()).toContain(baseReg.registrationNumber)
+          expect(rowData.at(1).text()).toContain(`Base Registration: ${baseReg.baseRegistrationNumber}`)
           // reg type
-          expect(rowData.at(1).text()).not.toContain('- Base Registration')
-          expect(rowData.at(1).find(btnExpTxt).exists()).toBe(false)
+          expect(rowData.at(2).text()).not.toContain('- Base Registration')
+          expect(rowData.at(2).find(btnExpTxt).exists()).toBe(false)
           // status type
-          expect(rowData.at(3).text()).toEqual('')
+          expect(rowData.at(5).text()).toEqual('')
           // expiry days
-          expect(rowData.at(8).text()).toEqual('')
+          expect(rowData.at(10).text()).toEqual('')
           // action btn is not there
-          expect(rowData.at(10).text()).toContain('')
+          expect(rowData.at(11).text()).toContain('')
         }
         // reg type
-        expect(rowData.at(1).text()).toContain(wrapper.vm.getRegistrationType(baseReg.registrationType))
+        expect(rowData.at(2).text()).toContain(wrapper.vm.getRegistrationType(baseReg.registrationType))
         // submitted date
-        expect(rowData.at(2).text()).toContain(wrapper.vm.getFormattedDate(baseReg.createDateTime))
+        expect(rowData.at(4).text()).toContain(wrapper.vm.getFormattedDate(baseReg.createDateTime))
         // registering name
-        expect(rowData.at(4).text()).toContain(baseReg.registeringName)
+        expect(rowData.at(6).text()).toContain(baseReg.registeringName)
         // registering party
-        expect(rowData.at(5).text()).toContain(baseReg.registeringParty)
+        expect(rowData.at(7).text()).toContain(baseReg.registeringParty)
         // secured party
-        expect(rowData.at(6).text()).toContain(baseReg.securedParties)
+        expect(rowData.at(8).text()).toContain(baseReg.securedParties)
         // pdf
-        if (baseReg.path) expect(rowData.at(9).text()).toContain('PDF')
-        else expect(rowData.at(9).find('.mdi-information-outline').exists()).toBe(true)
+        if (baseReg.path) expect(rowData.at(3).text()).toContain('PDF')
+        else expect(rowData.at(3).find('.mdi-information-outline').exists()).toBe(true)
       } else {
         // draft registration
         let rowData
         if (!isChild) rowData = wrapper.findAll(tableRowDraft + ' td')
         else rowData = wrapper.findAll(tableRow + ' td')
-        expect(rowData.length).toBe(11)
+        expect(rowData.length).toBe(12)
         // reg num
-        if (isChild) expect(rowData.at(0).text()).toBe(`Pending Base Registration: ${baseReg.baseRegistrationNumber}`)
-        else expect(rowData.at(0).text()).toBe('Pending')
+        if (isChild) expect(rowData.at(1).text()).toBe(`Pending Base Registration: ${baseReg.baseRegistrationNumber}`)
+        else expect(rowData.at(1).text()).toBe('Pending')
         // submitted date
-        expect(rowData.at(2).text()).toBe('Not Registered')
+        expect(rowData.at(4).text()).toBe('Not Registered')
         // status type
-        expect(rowData.at(3).text()).toContain(wrapper.vm.getStatusDescription(baseReg.statusType, isChild, true))
+        expect(rowData.at(5).text()).toContain(wrapper.vm.getStatusDescription(baseReg.statusType, isChild, true))
         // expire days
         if (isChild) expect(rowData.at(8).text()).toEqual('')
-        else expect(rowData.at(8).text()).toBe('N/A')
-        // pdf
-        expect(rowData.at(9).text()).toEqual('')
+        else expect(rowData.at(10).text()).toBe('N/A')
         // action btn
-        expect(rowData.at(10).text()).toContain('Edit')
+        expect(rowData.at(11).text()).toContain('Edit')
       }
       // check things that apply to all items
       const rowData = wrapper.findAll(tableRow + ' td')
       // folio
-      expect(rowData.at(7).text()).toContain(baseReg.clientReferenceId)
+      expect(rowData.at(9).text()).toContain(baseReg.clientReferenceId)
     }
   })
 
@@ -364,7 +362,7 @@ describe('TableRow tests', () => {
     await nextTick()
 
     // Query the document body for the menu content
-    let menuContent2 = document.querySelector('.v-overlay__content')
+    const menuContent2 = document.querySelector('.v-overlay__content')
     expect(menuContent2).toBeTruthy()
 
     // it renders the delete action in drop down
@@ -558,31 +556,31 @@ describe('Mhr TableRow tests', () => {
           } else {
             // child registration
             rowData = await wrapper.findAll(tableRow + ' td')
-            expect(rowData.length).toBe(11)
+            expect(rowData.length).toBe(12)
 
             // regNum
-            expect(rowData.at(0).text()).toContain(`${baseReg.baseRegistrationNumber}`)
+            expect(rowData.at(1).text()).toContain(`${baseReg.baseRegistrationNumber}`)
             // reg type
             expect(rowData.at(1).find(btnExpTxt).exists()).toBe(false)
             // status type
-            expect(rowData.at(3).text()).toEqual('') // child status should be empty
+            expect(rowData.at(5).text()).toEqual('') // child status should be empty
             // expiry days
-            expect(rowData.at(8).text()).toEqual('1 year 135 days')
+            expect(rowData.at(10).text()).toEqual('1 year 135 days')
             // action btn is not there
-            expect(rowData.at(10).text()).toContain('')
+            expect(rowData.at(11).text()).toContain('')
           }
           // reg type
           expect(rowData.at(1).text()).toContain(wrapper.vm.getRegistrationType(baseReg.registrationType))
           // submitted date
-          expect(rowData.at(2).text()).toContain(wrapper.vm.getFormattedDate(baseReg.createDateTime))
+          expect(rowData.at(4).text()).toContain(wrapper.vm.getFormattedDate(baseReg.createDateTime))
           // pdf
-          if (baseReg.path) expect(rowData.at(9).text()).toContain('PDF')
-          else expect(rowData.at(9).find('.mdi-information-outline').exists()).toBe(true)
+          if (baseReg.path) expect(rowData.at(3).text()).toContain('PDF')
+          else expect(rowData.at(3).find('.mdi-information-outline').exists()).toBe(true)
         }
         // check things that apply to all items
         const rowData = wrapper.findAll(tableRow + ' td')
         // folio
-        expect(rowData.at(7).text()).toContain(baseReg.clientReferenceId)
+        expect(rowData.at(9).text()).toContain(baseReg.clientReferenceId)
     })
   }
 
@@ -611,10 +609,10 @@ describe('Mhr TableRow tests', () => {
       expect(wrapper.vm.item).toEqual(baseReg)
 
       const rowData = wrapper.findAll(tableRowBaseReg + ' td')
-      expect(rowData.length).toBe(11)
+      expect(rowData.length).toBe(12)
       // base reg num
-      expect(rowData.at(0).text()).toContain(baseReg.baseRegistrationNumber)
-      const alertIcon = rowData.at(0).find(getTestId('alert-icon'))
+      expect(rowData.at(1).text()).toContain(baseReg.baseRegistrationNumber)
+      const alertIcon = rowData.at(1).find(getTestId('alert-icon'))
       expect(alertIcon.exists()).toBeTruthy()
     }
   })
@@ -629,9 +627,9 @@ describe('Mhr TableRow tests', () => {
     await nextTick()
 
     const rowData = await wrapper.findAll(tableRowBaseReg + ' td')
-    const lockedIcon = rowData.at(0).find(getTestId('LOCKED-badge'))
+    const lockedIcon = rowData.at(1).find(getTestId('LOCKED-badge'))
     expect(lockedIcon.exists()).toBeTruthy()
-    expect(rowData.at(0).text()).toContain('LOCKED')
+    expect(rowData.at(1).text()).toContain('LOCKED')
   })
 
   it('displays the correct status for all mhStatusTypes', async () => {
@@ -662,20 +660,20 @@ describe('Mhr TableRow tests', () => {
       const rowData = wrapper.findAll(tableRow + ' td')
       switch (reg.statusType) {
         case MhApiStatusTypes.ACTIVE:
-          expect(rowData.at(3).text()).toContain(MhUIStatusTypes.ACTIVE)
+          expect(rowData.at(5).text()).toContain(MhUIStatusTypes.ACTIVE)
           break
         case MhApiStatusTypes.DRAFT:
-          expect(rowData.at(3).text()).toContain(MhUIStatusTypes.DRAFT)
+          expect(rowData.at(5).text()).toContain(MhUIStatusTypes.DRAFT)
           expect(rowData.at(rowData.length - 1).text()).toContain('Edit')
           break
         case MhApiStatusTypes.EXEMPT:
-          expect(rowData.at(3).text()).toContain(MhUIStatusTypes.EXEMPT)
+          expect(rowData.at(5).text()).toContain(MhUIStatusTypes.EXEMPT)
           break
         case MhApiStatusTypes.FROZEN:
-          expect(rowData.at(3).text()).toContain(MhUIStatusTypes.ACTIVE)
+          expect(rowData.at(5).text()).toContain(MhUIStatusTypes.ACTIVE)
           break
         case MhApiStatusTypes.CANCELLED:
-          expect(rowData.at(3).text()).toContain(MhUIStatusTypes.CANCELLED)
+          expect(rowData.at(5).text()).toContain(MhUIStatusTypes.CANCELLED)
           break
         default:
           fail('No/Unknown MhStatusType')
@@ -748,7 +746,7 @@ describe('Mhr TableRow tests', () => {
 
     const rowData = wrapper.findAll(tableRow + ' td')
 
-    expect(rowData.at(3).text()).toContain(MhUIStatusTypes.EXEMPT) // Status column data
+    expect(rowData.at(5).text()).toContain(MhUIStatusTypes.EXEMPT) // Status column data
     expect(rowData.at(rowData.length - 1).text()).toContain('Open')
 
     wrapper.find('.actions__more-actions__btn').trigger('click')
@@ -818,7 +816,7 @@ describe('Mhr TableRow tests', () => {
     const rowData = wrapper.findAll(tableRow + ' td')
 
     // reg type
-    expect(rowData.at(1).text()).toContain('Cancel Note')
-    expect(rowData.at(1).text()).toContain('Notice of Caution')
+    expect(rowData.at(2).text()).toContain('Cancel Note')
+    expect(rowData.at(2).text()).toContain('Notice of Caution')
   })
 })

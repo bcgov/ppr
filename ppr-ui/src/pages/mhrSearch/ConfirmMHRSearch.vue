@@ -46,7 +46,7 @@
                 Selection Summary
               </label>
             </header>
-            <SearchedResultMhr
+            <SearchedResultsMhr
               class="px-1"
               :is-review-mode="true"
             />
@@ -136,7 +136,6 @@ import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { notCompleteSearchDialog } from '@/resources/dialogOptions'
 import { getFeatureFlag } from '@/utils'
 import { submitSelectedMhr } from '@/utils/mhr-api-helper'
-import { SearchedResultsMhr } from '@/components/tables/mhr'
 import { uniqBy } from 'lodash'
 
 import type { DialogOptionsIF , StaffPaymentIF } from '@/interfaces'
@@ -149,7 +148,6 @@ export default defineComponent({
   components: {
     FolioNumberSummary,
     StickyContainer,
-    SearchedResultsMhr,
     StaffPayment
   },
   props: {

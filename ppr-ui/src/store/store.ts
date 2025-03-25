@@ -172,6 +172,12 @@ export const useStore = defineStore('assetsStore', () => {
   const getUserProductSubscriptionsCodes = computed<ProductCode[]>((): ProductCode[] => {
     return state.value.userProductSubscriptionsCodes
   })
+  /** Returns true if CLA is enabled the current registration type is Commercial Lien and it was Converted **/
+  const isConvertedCl = computed((): boolean => {
+    return getFeatureFlag('cla-enabled') &&
+      getRegistrationType.value?.registrationTypeAPI === APIRegistrationTypes.COMMERCIAL_LIEN &&
+      state.value.registration?.transitioned
+  })
   /** Returns true if CLA is enabled the current registration type is RepairersLien **/
   const isRlTransition = computed((): boolean => {
     return getFeatureFlag('cla-enabled') &&
@@ -1210,6 +1216,10 @@ export const useStore = defineStore('assetsStore', () => {
     setUnsavedChanges(true)
   }
 
+  function setClTransitioned (isTransitioned: boolean) {
+    state.value.registration.transitioned = isTransitioned
+  }
+
   function setShowStepErrors (show: boolean) {
     state.value.registration.showStepErrors = show
   }
@@ -1610,6 +1620,7 @@ export const useStore = defineStore('assetsStore', () => {
     getSearchDebtorName,
 
     // Registration getters
+    isConvertedCl,
     isRlTransition,
     rlTransitionDate,
     getCertifyInformation,
@@ -1820,6 +1831,7 @@ export const useStore = defineStore('assetsStore', () => {
     setAddCollateralStepValidity,
     setLengthTrustStepValidity,
     setFolioOrReferenceNumber,
+    setClTransitioned,
     setShowStepErrors,
     setRegTableData,
     setRegTableBaseRegs,

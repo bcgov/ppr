@@ -55,7 +55,7 @@
           </span>
           |
           <span
-            class="px-4"
+            class="px-4 contents-display"
             :class="{ 'error-text': hasUndefinedInterest && !isRemovedHomeOwnerGroup(group) }"
           >
             Interest: {{ isRemovedHomeOwnerGroup(group) ? 'N/A' : getOwnershipInterest() }}
@@ -129,6 +129,7 @@
       <div
         v-if="showEditActions && isMhrCorrection && isAddedHomeOwnerGroup(group) &&
           !isRemovedHomeOwnerGroup(group) && !isChangedOwnerGroup(group)"
+        class="contents-display"
       >
         <v-btn
           variant="plain"
@@ -583,6 +584,10 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+
+.contents-display {
+  display: contents;
+}
 
 :deep(.group-header-summary) {
   display: flex;

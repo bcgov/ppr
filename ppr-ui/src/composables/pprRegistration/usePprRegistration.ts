@@ -34,6 +34,7 @@ export const usePprRegistration = () => {
     setOriginalAddSecuredPartiesAndDebtors,
     setRegistrationFlowType,
     setFolioOrReferenceNumber,
+    setClTransitioned,
     setCertifyInformation
   } = useStore()
   const { getRegistrationType, getUserSettings } = storeToRefs(useStore())
@@ -46,6 +47,7 @@ export const usePprRegistration = () => {
     setRegistrationNumber(statement.baseRegistrationNumber)
     setRegistrationFlowType(flowType)
     setFolioOrReferenceNumber('')
+    setClTransitioned(!!statement.transitioned)
     const registrationType = AllRegistrationTypes.find((reg) =>
       reg.registrationTypeAPI === statement.type)
 
@@ -133,7 +135,7 @@ export const usePprRegistration = () => {
         lienAmount: statement.lienAmount || null
       } as LengthTrustIF
     }
-    
+
     setLengthTrust(lengthTrust)
 
     if (flowType !== RegistrationFlowType.DISCHARGE) {

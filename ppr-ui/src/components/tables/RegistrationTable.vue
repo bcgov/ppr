@@ -1,384 +1,3 @@
-<template>
-  <v-card
-    ref="tableHeaderRef"
-    flat
-    class="pa-0 noGutters"
-  >
-    <!-- Ranged Date Picker for DateTime Filtering -->
-    <RangeDatePicker
-      v-if="showDatePicker"
-      id="ranged-date-picker"
-      ref="datePicker"
-      :default-start-date="getPstDateObj(submittedStartDate)"
-      :default-end-date="getPstDateObj(submittedEndDate)"
-      :default-max-date="new Date()"
-      @submit="updateDateRange($event)"
-    />
-
-    <v-table
-      id="registration-table"
-      ref="regTable"
-      :class="{
-        'freeze-scroll': freezeTableScroll,
-        'full-width': headers.length <= 1,
-        'registration-table': true,
-        'min-table-height': showDatePicker
-      }"
-      fixed-header
-    >
-      <template #default>
-        <thead v-if="setHeaders.length > 1">
-          <tr>
-            <th
-              v-for="(header, index) in setHeaders"
-              :key="index"
-              :ref="header.value + 'Ref'"
-              :class="header.class"
-              class="text-left py-2"
-              :style="overrideWidth ? getHeaderStyle(overrideWidth, header.value) : ''"
-            >
-              <v-row
-                class="reg-header-row"
-                no-gutters
-                @click="toggleOrderBy(header.value, header.sortable)"
-              >
-                <v-col
-                  :class="{ 'pl-7': header.value === 'actions' }"
-                >
-                  {{ header.text }}
-                  <!-- Date Sort Icon/Button -->
-                  <SortingIcon
-                    v-if="header.value === orderBy && header.sortable"
-                    :sort-asc="sortAsc"
-                    @sort-event="dateSortHandler(setRegistrationHistory, 'createDateTime', $event)"
-                  />
-                </v-col>
-              </v-row>
-              <v-row
-                class="reg-filter-row py-2"
-                no-gutters
-              >
-                <v-col>
-                  <v-text-field
-                    v-if="header.value === 'registrationNumber' || header.value === 'mhrNumber'"
-                    v-model="registrationNumber"
-                    variant="filled"
-                    color="primary"
-                    single-line
-                    :hide-details="true"
-                    type="text"
-                    label="Number"
-                    density="compact"
-                    aria-hidden="true"
-                  />
-                  <template v-if="header.value === 'registrationType'">
-                    <RegistrationBarTypeAheadList
-                      v-if="hasRPPR"
-                      id="reg-type-select"
-                      class="reg-type-ahead-input"
-                      :default-label="'Registration Type'"
-                      :default-dense="true"
-                      :default-clearable="true"
-                      :default-clear="shouldClearType"
-                      @selected="selectRegistration($event)"
-                    />
-                    <v-select
-                      v-else
-                      id="txt-type"
-                      v-model="registrationType"
-                      :items="registrationTypes"
-                      single-line
-                      item-title="registrationTypeUI"
-                      item-value="registrationTypeAPI"
-                      class="table-registration-types registration-type-select"
-                      variant="filled"
-                      color="primary"
-                      clearable
-                      hide-details
-                      density="compact"
-                      label="Registration Type"
-                      aria-hidden="true"
-                    >
-                      <template #default="item">
-                        <span class="list-item py-3">
-                          {{ item.registrationTypeUI }}
-                        </span>
-                      </template>
-                    </v-select>
-                  </template>
-                  <div v-if="header.value === 'registrationDescription'">
-                    <v-select
-                      id="txt-type"
-                      v-model="registrationType"
-                      :items="mhrRegistrationTypes"
-                      :menu-props="isMiscTransfersEnabled ? { maxHeight: 440, width: 500 } : {}"
-                      single-line
-                      item-title="registrationTypeUI"
-                      item-value="registrationTypeAPI"
-                      class="table-registration-types registration-type-select"
-                      variant="filled"
-                      color="primary"
-                      clearable
-                      hide-details
-                      density="compact"
-                      label="Registration Type"
-                      aria-hideen="true"
-                      @update:menu="isMiscTransfersEnabled ? hideAllGroups() : ''"
-                    >
-                      <template
-                        v-if="isMiscTransfersEnabled"
-                        #item="{ props, item }"
-                      >
-                        <template v-if="item.raw.class === 'registration-list-header'">
-                          <v-divider
-                            v-if="item.raw.group !== 1"
-                            class="mx-4"
-                          />
-                          <v-list-item
-                            v-if="item.raw.class === 'registration-list-header'"
-                            class="registration-list-item font-weight-bold fs-14 py-3"
-                          >
-                            <v-row
-                              :id="`transfer-type-group-${item.raw.group}`"
-                              no-gutters
-                              @click="toggleGroup(item.raw.group)"
-                            >
-                              <v-col>
-                                {{ item.raw.text }}
-                              </v-col>
-                              <v-col
-                                cols="auto"
-                              >
-                                <v-btn
-                                  variant="plain"
-                                  size="18"
-                                  color="primary"
-                                  class="mt-n2"
-                                  :append-icon="displayGroup[item.raw.group] ? 'mdi-chevron-up' : 'mdi-chevron-down'"
-                                />
-                              </v-col>
-                            </v-row>
-                          </v-list-item>
-                        </template>
-                        <v-list-item
-                          v-else
-                          :id="`transfer-type-item-${index}`"
-                          :title="item.raw.registrationTypeUI"
-                          class="copy-normal gray7 fs-14 py-3 pl-8"
-                          v-bind="props"
-                        />
-                      </template>
-                      <template
-                        v-else
-                        #default="item"
-                      >
-                        <span class="list-item py-3">
-                          {{ item.registrationTypeUI }}
-                        </span>
-                      </template>
-                    </v-select>
-                  </div>
-                  <v-text-field
-                    v-if="header.value === 'createDateTime'"
-                    id="reg-date-text-field"
-                    v-model="dateTxt"
-                    class="reg-textfield date-filter"
-                    append-inner-icon="mdi-calendar"
-                    density="compact"
-                    clearable
-                    variant="filled"
-                    color="primary"
-                    hide-details
-                    label="Date"
-                    single-line
-                    persistent-clear
-                    :clear-icon="'mdi-close'"
-                    aria-hidden="true"
-                    @click="showDatePicker = true"
-                  />
-                  <v-text-field
-                    v-if="!isPpr && header.value === 'documentId'"
-                    v-model="documentId"
-                    variant="filled"
-                    color="primary"
-                    single-line
-                    hide-details="true"
-                    type="text"
-                    label="Document ID"
-                    density="compact"
-                    aria-hidden="true"
-                  />
-                  <v-select
-                    v-if="isPpr && header.value === 'statusType'"
-                    v-model="status"
-                    :items="statusTypes"
-                    hide-details
-                    single-line
-                    variant="filled"
-                    color="primary"
-                    item-class="list-item"
-                    label="Status"
-                    clearable
-                    density="compact"
-                    aria-hidden="true"
-                  />
-                  <v-select
-                    v-else-if="header.value === 'statusType'"
-                    v-model="status"
-                    :items="mhStatusTypes"
-                    hide-details
-                    single-line
-                    variant="filled"
-                    color="primary"
-                    item-class="list-item"
-                    label="Status"
-                    clearable
-                    density="compact"
-                    aria-hidden="true"
-                  />
-                  <v-text-field
-                    v-if="header.value === 'registeringName'"
-                    v-model="registeredBy"
-                    variant="filled"
-                    color="primary"
-                    single-line
-                    hide-details="true"
-                    type="text"
-                    label="Registered By"
-                    density="compact"
-                    aria-hidden="true"
-                  />
-                  <v-text-field
-                    v-if="!isPpr && header.value === 'registeringParty'"
-                    v-model="registeringParty"
-                    variant="filled"
-                    color="primary"
-                    single-line
-                    hide-details="true"
-                    type="text"
-                    label="Submitting Party"
-                    density="compact"
-                  />
-                  <v-text-field
-                    v-if="header.value === 'clientReferenceId'"
-                    v-model="folioNumber"
-                    variant="filled"
-                    color="primary"
-                    single-line
-                    hide-details="true"
-                    type="text"
-                    label=""
-                    density="compact"
-                    aria-hidden="true"
-                  />
-                  <v-btn
-                    v-if="header.value === 'actions' && headers.length > 1 && tableFiltersActive"
-                    class="clear-filters-btn registration-action ma-0 px-0 pl-6 pt-4"
-                    color="primary"
-                    :ripple="false"
-                    variant="plain"
-                    @click="clearFilters()"
-                  >
-                    Clear Filters
-                    <v-icon class="pl-1 pt-1">
-                      mdi-close
-                    </v-icon>
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </th>
-          </tr>
-        </thead>
-        <thead v-else>
-          <tr>
-            <th>
-              <p class="pa-10 ma-0">
-                No columns selected to show. Please select columns to see registration information.
-              </p>
-            </th>
-          </tr>
-        </thead>
-
-        <tr v-if="loadingData">
-          <td
-            class="text-center"
-            :colspan="setHeaders.length"
-          >
-            <v-progress-linear
-              indeterminate
-              color="primary"
-            />
-          </td>
-        </tr>
-        <tbody v-if="setRegistrationHistory.length">
-          <template
-            v-for="(item, index) in setRegistrationHistory"
-            :key="`row-item:${index}`"
-          >
-            <!-- Parent Registration items -->
-            <TableRow
-              :ref="setRowRef(item)"
-              class="registration-data-table"
-              :set-add-reg-effect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(item))"
-              :set-disable-action-shadow="overrideWidth"
-              :set-headers="headers"
-              :set-is-expanded="item.expand || isNewRegParentItem(item)"
-              :set-item="item"
-              :is-ppr="isPpr"
-              @action="emitRowAction($event)"
-              @error="emitError($event)"
-              @freeze-scroll="freezeTableScroll = $event"
-              @toggle-expand="item.expand = !item.expand"
-            />
-
-            <!-- Children items -->
-            <template v-if="item.expand">
-              <TableRow
-                v-for="childItem in item.changes"
-                :key="`change-${childItem.documentId || childItem.registrationNumber}`"
-                :ref="setRowRef(childItem)"
-                class="registration-data-table"
-                :is-ppr="isPpr"
-                :set-add-reg-effect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(childItem))"
-                :set-disable-action-shadow="overrideWidth"
-                :set-child="true"
-                :set-headers="setHeaders"
-                :set-item="childItem"
-                @action="emitRowAction($event)"
-                @freeze-scroll="freezeTableScroll = $event"
-              />
-            </template>
-          </template>
-          <!-- Simulated Pagination -->
-          <template v-if="setMorePages">
-            <tr>
-              <td :colspan="setHeaders.length">
-                <TableObserver @intersect="getNext()" />
-                <v-progress-linear
-                  v-if="loadingNewPages"
-                  indeterminate
-                  color="primary"
-                />
-              </td>
-            </tr>
-          </template>
-        </tbody>
-        <!-- No Data Message -->
-        <tbody v-else>
-          <tr>
-            <td
-              class="text-center"
-              :colspan="setHeaders.length"
-            >
-              {{ tableFiltersActive ? 'No registrations found.' : 'No registrations to show.' }}
-            </td>
-          </tr>
-        </tbody>
-      </template>
-    </v-table>
-  </v-card>
-</template>
-
 <script lang="ts">
 import {
   computed,
@@ -390,7 +9,6 @@ import {
   watch
 } from 'vue'
 import { useStore } from '@/store/store'
-import RegistrationBarTypeAheadList from '@/components/registration/RegistrationBarTypeAheadList.vue'
 import { SortingIcon, TableRow } from './common'
 import type {
   RegistrationSummaryIF,
@@ -408,28 +26,24 @@ import {
   AccountProductCodes,
   AccountProductRoles,
   TableActions,
-  mapMhrDescriptionToCodes, APIRegistrationTypes
+  mapMhrDescriptionToCodes,
+  APIRegistrationTypes
 } from '@/enums'
-import { useRegistration } from '@/composables/useRegistration'
 import {
   MHRegistrationTypes,
   RegistrationTypesStandard,
   StatusTypes,
   MhStatusTypes,
-  MHRegistrationTypesOrg, RegistrationTypes
+  MHRegistrationTypesOrg
 } from '@/resources'
 import { storeToRefs } from 'pinia'
-import { useTableFeatures, useTransferOwners } from '@/composables'
-import { RangeDatePicker } from '@/components/common'
 import { dateToYyyyMmDd, yyyyMmDdToPacificDate, localTodayDate, getFeatureFlag } from '@/utils'
 import TableObserver from '@/components/tables/common/TableObserver.vue'
 
 export default defineComponent({
   components: {
     TableObserver,
-    RangeDatePicker,
     SortingIcon,
-    RegistrationBarTypeAheadList,
     TableRow
   },
   props: {
@@ -537,7 +151,6 @@ export default defineComponent({
       clearFilters
     } = useRegistration(props.setSort)
     const { sortDates } = useTableFeatures()
-
     const { isMiscTransfersEnabled } = useTransferOwners()
 
     const localState = reactive({
@@ -917,6 +530,405 @@ export default defineComponent({
   }
 })
 </script>
+
+<template>
+  <v-card
+    ref="tableHeaderRef"
+    flat
+    class="pa-0 noGutters"
+  >
+    <!-- Ranged Date Picker for DateTime Filtering -->
+    <RangeDatePicker
+      v-if="showDatePicker"
+      id="ranged-date-picker"
+      ref="datePicker"
+      :default-start-date="getPstDateObj(submittedStartDate)"
+      :default-end-date="getPstDateObj(submittedEndDate)"
+      :default-max-date="new Date()"
+      @submit="updateDateRange($event)"
+    />
+
+    <v-table
+      id="registration-table"
+      ref="regTable"
+      :class="{
+        'freeze-scroll': freezeTableScroll,
+        'full-width': headers.length <= 1,
+        'registration-table': true,
+        'min-table-height': showDatePicker
+      }"
+      fixed-header
+    >
+      <template #default>
+        <thead v-if="setHeaders.length > 1">
+          <tr>
+            <th>
+              <span class="fs-13 font-weight-medium">SORT BY:</span>
+            </th>
+            <th
+              v-for="(header, index) in setHeaders"
+              :key="index"
+              :ref="header.value + 'Ref'"
+              :class="header.class"
+              class="text-left py-2"
+              :style="overrideWidth ? getHeaderStyle(overrideWidth, header.value) : ''"
+            >
+              <v-row
+                class="reg-header-row"
+                no-gutters
+                @click="toggleOrderBy(header.value, header.sortable)"
+              >
+                <v-col
+                  :class="{ 'pl-7': header.value === 'actions' }"
+                >
+                  {{ header.text }}
+                  <!-- Date Sort Icon/Button -->
+                  <SortingIcon
+                    v-if="header.value === orderBy && header.sortable"
+                    :sort-asc="sortAsc"
+                    @sort-event="dateSortHandler(setRegistrationHistory, 'createDateTime', $event)"
+                  />
+                </v-col>
+              </v-row>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <span class="fs-13 font-weight-medium">FILTER BY:</span>
+            </th>
+            <th
+              v-for="(header, index) in setHeaders"
+              :key="index"
+              :ref="header.value + 'Ref'"
+              :class="header.class"
+              class="text-left py-2"
+              :style="overrideWidth ? getHeaderStyle(overrideWidth, header.value) : ''"
+            >
+              <v-row
+                class="reg-filter-row py-2"
+                no-gutters
+              >
+                <v-col>
+                  <v-text-field
+                    v-if="header.value === 'registrationNumber' || header.value === 'mhrNumber'"
+                    v-model="registrationNumber"
+                    variant="filled"
+                    color="primary"
+                    single-line
+                    :hide-details="true"
+                    type="text"
+                    label="Number"
+                    density="compact"
+                    aria-hidden="true"
+                  />
+                  <template v-if="header.value === 'registrationType'">
+                    <RegistrationBarTypeAheadList
+                      v-if="hasRPPR"
+                      id="reg-type-select"
+                      class="reg-type-ahead-input"
+                      :default-label="'Registration Type'"
+                      :default-dense="true"
+                      :default-clearable="true"
+                      :default-clear="shouldClearType"
+                      @selected="selectRegistration($event)"
+                    />
+                    <v-select
+                      v-else
+                      id="txt-type"
+                      v-model="registrationType"
+                      :items="registrationTypes"
+                      single-line
+                      item-title="registrationTypeUI"
+                      item-value="registrationTypeAPI"
+                      class="table-registration-types registration-type-select"
+                      variant="filled"
+                      color="primary"
+                      clearable
+                      hide-details
+                      density="compact"
+                      label="Registration Type"
+                      aria-hidden="true"
+                    >
+                      <template #default="item">
+                          <span class="list-item py-3">
+                            {{ item.registrationTypeUI }}
+                          </span>
+                      </template>
+                    </v-select>
+                  </template>
+
+                  <div v-if="header.value === 'registrationDescription'">
+                    <v-select
+                      id="txt-type"
+                      v-model="registrationType"
+                      :items="mhrRegistrationTypes"
+                      :menu-props="isMiscTransfersEnabled ? { maxHeight: 440, width: 500 } : {}"
+                      single-line
+                      item-title="registrationTypeUI"
+                      item-value="registrationTypeAPI"
+                      class="table-registration-types registration-type-select"
+                      variant="filled"
+                      color="primary"
+                      clearable
+                      hide-details
+                      density="compact"
+                      label="Registration Type"
+                      aria-hideen="true"
+                      @update:menu="isMiscTransfersEnabled ? hideAllGroups() : ''"
+                    >
+                      <template
+                        v-if="isMiscTransfersEnabled"
+                        #item="{ props, item }"
+                      >
+                        <template v-if="item.raw.class === 'registration-list-header'">
+                          <v-divider
+                            v-if="item.raw.group !== 1"
+                            class="mx-4"
+                          />
+                          <v-list-item
+                            v-if="item.raw.class === 'registration-list-header'"
+                            class="registration-list-item font-weight-bold fs-14 py-3"
+                          >
+                            <v-row
+                              :id="`transfer-type-group-${item.raw.group}`"
+                              no-gutters
+                              @click="toggleGroup(item.raw.group)"
+                            >
+                              <v-col>
+                                {{ item.raw.text }}
+                              </v-col>
+                              <v-col
+                                cols="auto"
+                              >
+                                <v-btn
+                                  variant="plain"
+                                  size="18"
+                                  color="primary"
+                                  class="mt-n2"
+                                  :append-icon="displayGroup[item.raw.group] ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+                                />
+                              </v-col>
+                            </v-row>
+                          </v-list-item>
+                        </template>
+                        <v-list-item
+                          v-else
+                          :id="`transfer-type-item-${index}`"
+                          :title="item.raw.registrationTypeUI"
+                          class="copy-normal gray7 fs-14 py-3 pl-8"
+                          v-bind="props"
+                        />
+                      </template>
+                      <template
+                        v-else
+                        #default="item"
+                      >
+                          <span class="list-item py-3">
+                            {{ item.registrationTypeUI }}
+                          </span>
+                      </template>
+                    </v-select>
+                  </div>
+                  <v-text-field
+                    v-if="header.value === 'createDateTime'"
+                    id="reg-date-text-field"
+                    v-model="dateTxt"
+                    class="reg-textfield date-filter"
+                    append-inner-icon="mdi-calendar"
+                    density="compact"
+                    clearable
+                    variant="filled"
+                    color="primary"
+                    hide-details
+                    label="Date"
+                    single-line
+                    persistent-clear
+                    :clear-icon="'mdi-close'"
+                    aria-hidden="true"
+                    @click="showDatePicker = true"
+                  />
+                  <v-text-field
+                    v-if="!isPpr && header.value === 'documentId'"
+                    v-model="documentId"
+                    variant="filled"
+                    color="primary"
+                    single-line
+                    hide-details="true"
+                    type="text"
+                    label="Document ID"
+                    density="compact"
+                    aria-hidden="true"
+                  />
+                  <v-select
+                    v-if="isPpr && header.value === 'statusType'"
+                    v-model="status"
+                    :items="statusTypes"
+                    hide-details
+                    single-line
+                    variant="filled"
+                    color="primary"
+                    item-class="list-item"
+                    label="Status"
+                    clearable
+                    density="compact"
+                    aria-hidden="true"
+                  />
+                  <v-select
+                    v-else-if="header.value === 'statusType'"
+                    v-model="status"
+                    :items="mhStatusTypes"
+                    hide-details
+                    single-line
+                    variant="filled"
+                    color="primary"
+                    item-class="list-item"
+                    label="Status"
+                    clearable
+                    density="compact"
+                    aria-hidden="true"
+                  />
+                  <v-text-field
+                    v-if="header.value === 'registeringName'"
+                    v-model="registeredBy"
+                    variant="filled"
+                    color="primary"
+                    single-line
+                    hide-details="true"
+                    type="text"
+                    label="Registered By"
+                    density="compact"
+                    aria-hidden="true"
+                  />
+                  <v-text-field
+                    v-if="!isPpr && header.value === 'registeringParty'"
+                    v-model="registeringParty"
+                    variant="filled"
+                    color="primary"
+                    single-line
+                    hide-details="true"
+                    type="text"
+                    label="Submitting Party"
+                    density="compact"
+                  />
+                  <v-text-field
+                    v-if="header.value === 'clientReferenceId'"
+                    v-model="folioNumber"
+                    variant="filled"
+                    color="primary"
+                    single-line
+                    hide-details="true"
+                    type="text"
+                    label=""
+                    density="compact"
+                    aria-hidden="true"
+                  />
+                  <v-btn
+                    v-if="header.value === 'actions' && headers.length > 1 && tableFiltersActive"
+                    class="clear-filters-btn registration-action ma-0 px-0 pl-6 pt-4"
+                    color="primary"
+                    :ripple="false"
+                    variant="plain"
+                    @click="clearFilters()"
+                  >
+                    Clear Filters
+                    <v-icon class="pl-1 pt-1">
+                      mdi-close
+                    </v-icon>
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </th>
+          </tr>
+        </thead>
+        <thead v-else>
+          <tr>
+            <th>
+              <p class="pa-10 ma-0">
+                No columns selected to show. Please select columns to see registration information.
+              </p>
+            </th>
+          </tr>
+        </thead>
+
+        <tr v-if="loadingData">
+          <td
+            class="text-center"
+            :colspan="setHeaders.length"
+          >
+            <v-progress-linear
+              indeterminate
+              color="primary"
+            />
+          </td>
+        </tr>
+        <tbody v-if="setRegistrationHistory.length">
+        <template
+          v-for="(item, index) in setRegistrationHistory"
+          :key="`row-item:${index}`"
+        >
+          <!-- Parent Registration items -->
+          <TableRow
+            :ref="setRowRef(item)"
+            class="registration-data-table"
+            :set-add-reg-effect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(item))"
+            :set-disable-action-shadow="overrideWidth"
+            :set-headers="headers"
+            :set-is-expanded="item.expand || isNewRegParentItem(item)"
+            :set-item="item"
+            :is-ppr="isPpr"
+            @action="emitRowAction($event)"
+            @error="emitError($event)"
+            @freeze-scroll="freezeTableScroll = $event"
+            @toggle-expand="item.expand = !item.expand"
+          />
+
+          <!-- Children items -->
+          <template v-if="item.expand">
+            <TableRow
+              v-for="childItem in item.changes"
+              :key="`change-${childItem.documentId || childItem.registrationNumber}`"
+              :ref="setRowRef(childItem)"
+              class="registration-data-table"
+              :is-ppr="isPpr"
+              :set-add-reg-effect="['newRegItem', 'newAndFirstItem'].includes(setRowRef(childItem))"
+              :set-disable-action-shadow="overrideWidth"
+              :set-child="true"
+              :set-headers="setHeaders"
+              :set-item="childItem"
+              @action="emitRowAction($event)"
+              @freeze-scroll="freezeTableScroll = $event"
+            />
+          </template>
+        </template>
+        <!-- Simulated Pagination -->
+        <template v-if="setMorePages">
+          <tr>
+            <td :colspan="setHeaders.length">
+              <TableObserver @intersect="getNext()" />
+              <v-progress-linear
+                v-if="loadingNewPages"
+                indeterminate
+                color="primary"
+              />
+            </td>
+          </tr>
+        </template>
+        </tbody>
+        <!-- No Data Message -->
+        <tbody v-else>
+        <tr>
+          <td
+            class="text-center"
+            :colspan="setHeaders.length"
+          >
+            {{ tableFiltersActive ? 'No registrations found.' : 'No registrations to show.' }}
+          </td>
+        </tr>
+        </tbody>
+      </template>
+    </v-table>
+  </v-card>
+</template>
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';

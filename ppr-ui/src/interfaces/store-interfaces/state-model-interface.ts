@@ -1,5 +1,5 @@
-import { ProductCode, RegistrationFlowType } from '@/enums'
-import {
+import type { ProductCode, RegistrationFlowType } from '@/enums'
+import type {
   AddPartiesIF,
   AddCollateralIF,
   CourtOrderIF,
@@ -36,7 +36,7 @@ import {
   AddEditSaNoticeIF,
   MhrRegistrationHomeOwnerGroupIF
 } from '@/interfaces'
-import { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
+import type { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 
 // State model example
 export interface StateModelIF {
@@ -71,6 +71,7 @@ export interface StateModelIF {
     registrationType: RegistrationTypeIF | null
     registrationTypeOtherDesc: string
     showStepErrors: boolean
+    transitioned?: boolean
     securitiesActNotices?: Array<AddEditSaNoticeIF>
   }
   registrationTable: RegTableDataI

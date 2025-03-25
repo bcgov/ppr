@@ -27,7 +27,7 @@ describe('Confirm MHRSearch view', () => {
 
   it('renders Confirm Registration View with child components', () => {
     expect(wrapper.findComponent(ConfirmMHRSearch).exists()).toBe(true)
-    expect(wrapper.findComponent(SearchedResultsMhr).exists()).toBe(false)
+    expect(wrapper.findComponent(SearchedResultsMhr).exists()).toBe(true)
     expect(wrapper.vm.$route.name).toBe(RouteNames.MHRSEARCH_CONFIRM)
     expect(wrapper.vm.appReady).toBe(true)
     expect(wrapper.vm.dataLoaded).toBe(true)
