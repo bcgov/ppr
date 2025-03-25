@@ -79,7 +79,7 @@
     >
       <v-col>
         <p>{{ isRlTransition ? 'Commercial Lien' : registrationType }}</p>
-        <p v-if="isRlTransition"><i>(Continued from Repairers Lien {{ getRegistrationNumber }})</i></p>
+        <p v-if="isRlTransition || isConvertedCl"><i>(Converted from Repairers Lien {{ getRegistrationNumber }})</i></p>
       </v-col>
       <v-col
         class="ml-16 tombstone-info"
@@ -223,6 +223,7 @@ export default defineComponent({
   },
   setup (props) {
     const {
+      isConvertedCl,
       isRlTransition,
       getRegistrationCreationDate,
       getRegistrationExpiryDate,
@@ -297,6 +298,7 @@ export default defineComponent({
     return {
       RouteNames,
       isRouteName,
+      isConvertedCl,
       isCancelledMhr,
       isMhrCorrection,
       isRlTransition,

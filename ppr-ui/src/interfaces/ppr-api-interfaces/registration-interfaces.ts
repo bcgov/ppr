@@ -1,5 +1,5 @@
-import { APIAmendmentTypes, APIMhrTypes, APIRegistrationTypes, DraftTypes, MhApiStatusTypes } from '@/enums'
-import {
+import type { APIAmendmentTypes, APIMhrTypes, APIRegistrationTypes, DraftTypes, MhApiStatusTypes } from '@/enums'
+import type {
   AddEditSaNoticeIF,
   CourtOrderIF,
   DebtorNameIF,
@@ -40,6 +40,7 @@ export interface FinancingStatementIF {
   payment?: PaymentIF // Included in a successful response.
   otherTypeDescription?: string // Included if type is Other
   error?: ErrorIF
+  transitioned?: boolean // Included if the CL registration was transitioned from a repairers lien.
   authorizationReceived?: boolean // Always true for the UI: API requirement.
 }
 
