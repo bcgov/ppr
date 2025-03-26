@@ -62,7 +62,7 @@
 
           <!-- Historical Repairers Lien Information -->
           <v-card
-            v-if="isRlTransition"
+            v-if="displayHistoricalLienInfo"
             flat
             class="mt-1 bg-white pa-6 rounded"
           >
@@ -218,7 +218,8 @@ export default defineComponent({
       getRegistrationType,
       getConfirmDebtorName,
       getRegistrationNumber,
-      getRegistrationFlowType
+      getRegistrationFlowType,
+      displayHistoricalLienInfo
     } = storeToRefs(useStore())
 
     const localState = reactive({
@@ -397,6 +398,7 @@ export default defineComponent({
       isRlTransition,
       confirmRenewal,
       handleDialogResp,
+      displayHistoricalLienInfo,
       ...toRefs(localState)
     }
   }

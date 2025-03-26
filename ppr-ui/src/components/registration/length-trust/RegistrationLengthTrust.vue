@@ -21,7 +21,7 @@
           <strong>
             Renewal Length
             <span v-if="showTrustIndenture"> and Trust Indenture</span>
-            <span v-if="isRlTransition"> and Historical Information</span>
+            <span v-if="displayHistoricalLienInfo"> and Historical Information</span>
           </strong>
         </label>
       </v-col>
@@ -222,7 +222,8 @@ export default defineComponent({
       isRlTransition,
       getLengthTrust,
       getRegistrationType,
-      getRegistrationExpiryDate
+      displayHistoricalLienInfo,
+      getRegistrationExpiryDate,
     } = storeToRefs(useStore())
     const { isSecurityActNotice } = usePprRegistration()
     const registrationType = getRegistrationType.value?.registrationTypeAPI
@@ -412,6 +413,7 @@ export default defineComponent({
       registrationType,
       modal,
       isSecurityActNotice,
+      displayHistoricalLienInfo,
       ...toRefs(localState)
     }
   }
