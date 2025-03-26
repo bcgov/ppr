@@ -183,6 +183,10 @@ export const useStore = defineStore('assetsStore', () => {
     return getFeatureFlag('cla-enabled') &&
       getRegistrationType.value?.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN
   })
+  /** Returns true if CLA is enabled the current registration type is RepairersLien or it was a Converted CL **/
+  const displayHistoricalLienInfo = computed((): boolean => {
+    return isRlTransition.value || isConvertedCl.value
+  })
   /** Returns the Repairers Lien transition date. **/
   const rlTransitionDate = computed((): string => {
     return 'June 30th, 2025' // DATE-TBD: To be set when known
@@ -1622,6 +1626,7 @@ export const useStore = defineStore('assetsStore', () => {
     // Registration getters
     isConvertedCl,
     isRlTransition,
+    displayHistoricalLienInfo,
     rlTransitionDate,
     getCertifyInformation,
     getCourtOrderInformation,

@@ -10,7 +10,7 @@
       <h3 class="fs-16 lh-24 ml-3 pr-2">
         Current Expiry Date and Time
         <span v-if="showTrustIndenture"> and Trust Indenture</span>
-        <span v-if="isRlTransition"> and Historical Information</span>
+        <span v-if="displayHistoricalLienInfo"> and Historical Information</span>
       </h3>
     </header>
     <v-card
@@ -153,7 +153,7 @@
 
     <!-- Historical Repairers Lien Information -->
     <v-card
-      v-if="isRlTransition"
+      v-if="displayHistoricalLienInfo"
       flat
       class="mt-1 bg-white pa-6 rounded"
     >
@@ -212,7 +212,7 @@ export default defineComponent({
     const { setLengthTrust } = useStore()
     const {
       // Getters
-      isRlTransition,
+      displayHistoricalLienInfo,
       getLengthTrust,
       getOriginalLengthTrust,
       getRegistrationType,
@@ -313,10 +313,10 @@ export default defineComponent({
       APIRegistrationTypes,
       resetEdit,
       initEdit,
-      isRlTransition,
       registrationType,
       undoTrustIndenture,
       modal,
+      displayHistoricalLienInfo,
       ...toRefs(localState)
     }
   },

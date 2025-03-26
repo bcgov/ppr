@@ -205,7 +205,7 @@ export default defineComponent({
           // Example: 2023-03-13 BCMHR Registration - 150378
 
           const today = new Date()
-          const regType = props.isPpr ? '_BCPPR_' : isMhrTransfer(item) ? '_BCMHR_Transfer' : '_BCMHR_Registration'
+          const regType = props.isPpr ? '_BCPPR_' : mapMhrRegType(item)
           const regClass = getRegistrationClass(item.registrationClass) || ''
           if (regClass === 'Registration Verification') {
             a.download = today.toISOString().slice(0, 10) + regType +
@@ -288,6 +288,10 @@ export default defineComponent({
 
       return [MhApiStatusTypes.ACTIVE, MhApiStatusTypes.FROZEN].includes(item.statusType) &&
         formattedTransferTypes.includes(stripChars(item.registrationDescription))
+    }
+
+    const mapMhrRegType = (reg): string => {
+      return '_BCMHR_' + reg.registrationDescription.replace(/ /g, '_').toLowerCase()
     }
 
     const removeMhrDraft = (item: MhRegistrationSummaryIF): void => {
