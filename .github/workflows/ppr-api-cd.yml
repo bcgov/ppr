@@ -17,9 +17,9 @@ on:
         options:
         - dev
         - test
+        - uat
         - sandbox
         - prod
-        - uat
 
 jobs:
   ppr-api-cd:
