@@ -17,6 +17,7 @@ on:
         options:
         - dev
         - test
+        - uat
         - sandbox
         - prod
 

@@ -46,6 +46,20 @@ serialPipeline:
       app-env: "test"
       cloudsql-instances: "eogruh-test:northamerica-northeast1:ppr-test-cloudsql"
       service-account: "sa-api@eogruh-test.iam.gserviceaccount.com"
+ - targetId: eogruh-uat
+   profiles: [uat]
+   strategy:
+    standard:
+      verify: false
+   deployParameters:
+   - values:
+      deploy-env: "uat"
+      deploy-project-id: "eogruh-test"
+      service-name: "ppr-api-uat"
+      container-name: "ppr-api-uat"
+      app-env: "uat"
+      cloudsql-instances: "eogruh-test:northamerica-northeast1:ppr-test-cloudsql"
+      service-account: "sa-api@eogruh-test.iam.gserviceaccount.com"
  - targetId: eogruh-sandbox
    profiles: [sandbox]
    strategy:
