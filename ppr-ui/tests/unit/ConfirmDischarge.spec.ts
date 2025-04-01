@@ -34,6 +34,13 @@ vi.mock('@/utils/registration-helper', () => ({
     Promise.resolve({ ...mockedDischargeResponse }))
 }))
 
+vi.mock('@/utils/auth-helper', () => ({
+  getRegisteringPartyFromAuth: vi.fn(() =>
+    Promise.resolve({})),
+  getStaffRegisteringParty: vi.fn(() =>
+    Promise.resolve({}))
+}))
+
 describe('ConfirmDischarge registration view', () => {
   let wrapper
   const regNum = '123456B'
@@ -66,7 +73,7 @@ describe('ConfirmDischarge registration view', () => {
     expect(wrapper.vm.appReady).toBe(true)
     const state = store.getStateModel
     // check registering party
-    expect(state.registration.parties.registeringParty).toBe(null)
+    expect(state.registration.parties.registeringParty).toStrictEqual({})
     expect(wrapper.findComponent(RegisteringPartyChange).exists()).toBe(true)
     // check confirm discharge section
     expect(wrapper.findComponent(DischargeConfirmSummary).exists()).toBe(true)
