@@ -40,8 +40,9 @@
           <CautionBox
             v-if="isRlTransition"
             class="mt-7"
-            :set-msg="`After the Commercial Liens Act takes effect on ${ rlTransitionDate }, any amendments,
-            renewals, or discharges of Repairers Lien (RL) registrations will be registered as Commercial Lien (CL).`"
+            :set-msg="`The Commercial Liens Act (CLA) took effect on ${ rlTransitionDate }. The repairers lien is
+             continued under the CLA and any amendments, renewals, or discharges will be registered as Commercial Lien
+             (CL).`"
             :set-important-word="'Important'"
           />
           <caution-box
