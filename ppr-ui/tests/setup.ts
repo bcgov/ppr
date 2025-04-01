@@ -92,18 +92,6 @@ beforeAll(() => {
     constructor() {}
   }
 
-  // Mock & Stub the global ResizeObserver
-  // vi.stubGlobal('ResizeObserver', vi.fn(() => ({
-  //   observe: vi.fn(),
-  //   unobserve: vi.fn(),
-  //   disconnect: vi.fn()
-  // })))
-  // // Mock & Stub the global IntersectionObserver
-  // vi.stubGlobal('IntersectionObserver', vi.fn(() => ({
-  //   observe: vi.fn(),
-  //   disconnect: vi.fn()
-  // })))
-
   // Mock Sentry
   vi.mock('@sentry/browser', () => ({
     captureException: vi.fn()

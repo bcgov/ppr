@@ -24,7 +24,7 @@ import { RegisteringPartyChange } from '@/components/parties/party'
 import { usePprRegistration } from '@/composables'
 import { useStore } from '@/store/store'
 import { createComponent } from './utils'
-import { vi } from 'vitest'
+import { afterAll, vi } from 'vitest'
 
 const store = useStore()
 const { initPprUpdateFilling } = usePprRegistration()
@@ -40,6 +40,13 @@ vi.mock('@/utils/registration-helper', () => ({
 vi.mock('@/utils/registration-helper', () => ({
   saveAmendmentStatement: vi.fn(() =>
     Promise.resolve({ ...mockedAmendmentResponse }))
+}))
+
+vi.mock('@/utils/auth-helper', () => ({
+  getRegisteringPartyFromAuth: vi.fn(() =>
+    Promise.resolve({})),
+  getStaffRegisteringParty: vi.fn(() =>
+    Promise.resolve({}))
 }))
 
 describe('Confirm Amendment registration component', () => {
@@ -97,7 +104,7 @@ describe('Confirm Amendment registration component', () => {
     expect(wrapper.findComponent(GenColSummary).exists()).toBe(true)
 
     // check registering party
-    expect(state.registration.parties.registeringParty).toBe(null)
+    expect(state.registration.parties.registeringParty).toStrictEqual({})
     expect(wrapper.findComponent(RegisteringPartyChange).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationLengthTrustAmendment).exists()).toBe(true)
     expect(wrapper.findComponent(AmendmentDescription).exists()).toBe(true)
