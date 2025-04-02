@@ -31,6 +31,12 @@ vi.mock('@/utils/registration-helper', () => ({
   saveRenewal: vi.fn(() =>
     Promise.resolve({ ...mockedRenewalResponse }))
 }))
+vi.mock('@/utils/auth-helper', () => ({
+  getRegisteringPartyFromAuth: vi.fn(() =>
+    Promise.resolve({})),
+  getStaffRegisteringParty: vi.fn(() =>
+    Promise.resolve({}))
+}))
 
 describe('Confirm Renewal new registration component', () => {
   let wrapper
