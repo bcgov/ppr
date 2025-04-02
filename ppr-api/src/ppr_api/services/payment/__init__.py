@@ -15,6 +15,8 @@
 
 from enum import Enum
 
+from ppr_api.utils.base import BaseEnum
+
 
 class TransactionTypes(Enum):
     """Derive payment request filing type from transaction type."""
@@ -38,3 +40,35 @@ class TransactionTypes(Enum):
     SEARCH_STAFF_NO_FEE = "SEARCH_STAFF_NO_FEE"
     SEARCH_STAFF_CERTIFIED = "SEARCH_STAFF_CERTIFIED"
     SEARCH_STAFF_CERTIFIED_NO_FEE = "SEARCH_STAFF_CERTIFIED_NO_FEE"
+
+
+class PaymentMethods(BaseEnum):
+    """Render an Enum of the pay api payment methods."""
+
+    CASH = "CASH"
+    CC = "CC"
+    CHEQUE = "CHEQUE"
+    DIRECT_PAY = "DIRECT_PAY"
+    DRAWDOWN = "DRAWDOWN"
+    EFT = "EFT"
+    EJV = "EJV"
+    INTERNAL = "INTERNAL"
+    ONLINE_BANKING = "ONLINE_BANKING"
+    PAD = "PAD"
+    WIRE = "WIRE"
+
+
+class StatusCodes(BaseEnum):
+    """Render an Enum of the pay api invoice response status codes."""
+
+    APPROVED = "APPROVED"
+    CANCELLED = "CANCELLED"
+    COMPLETED = "COMPLETED"
+    CREATED = "CREATED"
+    CREDITED = "CREDITED"
+    DELETED = "DELETED"
+    OVERDUE = "OVERDUE"
+    PAID = "PAID"
+    REFUND_REQUESTED = "REFUND_REQUESTED"
+    REFUNDED = "REFUNDED"
+    SETTLEMENT_SCHED = "SETTLEMENT_SCHED"

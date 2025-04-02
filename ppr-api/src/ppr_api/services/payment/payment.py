@@ -30,7 +30,7 @@ class Payment:
         self.api_key = api_key
         self.details = details
 
-    def create_payment(  # pylint: disable=too-many-positional-arguments,too-many-arguments
+    def create_payment(  # pylint: disable=too-many-arguments
         self, transaction_type, quantity, transaction_id=None, client_reference_id=None, processing_fee=None
     ):
         """Submit a payment request for the account_id-jwt pair.
@@ -53,6 +53,8 @@ class Payment:
             logger.debug(api_response)
             return api_response
 
+        except SBCPaymentException as sbc_err:
+            raise sbc_err
         except ApiRequestError as api_err:
             raise SBCPaymentException(api_err, json_data=api_err.json_data) from api_err
         except Exception as err:  # noqa: B902; wrapping exception
@@ -88,6 +90,8 @@ class Payment:
             logger.debug(api_response)
             return api_response
 
+        except SBCPaymentException as sbc_err:
+            raise sbc_err
         except Exception as err:  # noqa: B902; wrapping exception
             raise SBCPaymentException(err) from err
 
@@ -108,5 +112,7 @@ class Payment:
             logger.debug(api_response)
             return api_response
 
+        except SBCPaymentException as sbc_err:
+            raise sbc_err
         except Exception as err:  # noqa: B902; wrapping exception
             raise SBCPaymentException(err) from err
