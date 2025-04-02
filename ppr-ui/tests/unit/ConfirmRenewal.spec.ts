@@ -66,7 +66,7 @@ describe('Confirm Renewal new registration component', () => {
     expect(wrapper.findComponent(ConfirmRenewal).exists()).toBe(true)
     expect(wrapper.findComponent(FolioNumberSummary).exists()).toBe(true)
     // check registering party
-    expect(state.registration.parties.registeringParty).toBe(null)
+    expect(state.registration.parties.registeringParty).toStrictEqual({})
     expect(wrapper.findComponent(RegisteringPartyChange).exists()).toBe(true)
     expect(wrapper.findComponent(RegistrationLengthTrustSummary).exists()).toBe(true)
     // check fee summary + buttons

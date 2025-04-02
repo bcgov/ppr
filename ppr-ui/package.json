@@ -86,7 +86,7 @@
     "jsdom": "^22.1.0",
     "maska": "^2.1.10",
     "nuxt-lodash": "^2.5.3",
-    "sass": "~1.32.13",
+    "sass": "1.62.1",
     "sass-loader": "^16.0.4",
     "sinon": "^17.0.1",
     "style-loader": "^4.0.0",
