@@ -923,7 +923,7 @@ export default defineComponent({
       hasTransactionInProgress: false,
       reviewModeHeader: computed((): string =>
         isCancelChangeLocationActive.value ? 'Location of Home' :
-          (isChangeLocationActive.value || isExtendChangeLocationActive) ? 'Location Change' :
+          (isChangeLocationActive.value || isExtendChangeLocationActive.value) ? 'Location Change' :
         'Ownership Transfer or Change'
       ),
       isChangeOwnershipBtnDisabled: computed((): boolean => {

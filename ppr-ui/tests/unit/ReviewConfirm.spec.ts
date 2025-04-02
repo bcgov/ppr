@@ -21,6 +21,7 @@ import type { LengthTrustIF } from '@/interfaces'
 import { RegistrationTypes } from '@/resources'
 import { useStore } from '@/store/store'
 import { nextTick } from 'vue'
+import { vi } from 'vitest'
 
 const store = useStore()
 
@@ -34,6 +35,12 @@ describe('Review Confirm new registration component', () => {
   beforeEach(async () => {
     await store.setRegistrationType(null)
     await store.setRegistrationFlowType(null)
+    vi.mock('@/utils/auth-helper', () => ({
+      getRegisteringPartyFromAuth: vi.fn(() =>
+        Promise.resolve({})),
+      getStaffRegisteringParty: vi.fn(() =>
+        Promise.resolve({}))
+    }))
   })
 
   it('redirects to dashboard when store is not set', async () => {

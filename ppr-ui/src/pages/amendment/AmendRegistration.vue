@@ -285,8 +285,8 @@ export default defineComponent({
       submitting: false,
       cautionTxt: computed((): string => {
         return isRlTransition.value
-          ? `After the Commercial Liens Act takes effect on ${ rlTransitionDate.value }, any amendments, renewals, or
-          discharges of Repairers Lien (RL) registrations will be registered as Commercial Lien (CL).`
+          ? `The Commercial Liens Act (CLA) took effect on ${ rlTransitionDate.value }. The repairers lien is continued
+           under the CLA and any amendments, renewals, or discharges will be registered as Commercial Lien (CL).`
           : 'The Registry will provide the verification statement to all Secured Parties named in this ' +
           'registration.'
       }),
