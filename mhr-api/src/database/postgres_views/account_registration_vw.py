@@ -38,7 +38,8 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
            AND p.party_type = 'SP') AS secured_party,
        r.client_reference_id,
        (SELECT CASE WHEN r.user_id IS NULL THEN ''
-                    ELSE (SELECT u.firstname || ' ' || u.lastname
+                    ELSE (SELECT CASE WHEN u.lastname = '' or u.lastname IS NULL THEN u.firstname
+                                 ELSE u.firstname || ' ' || u.lastname END
                             FROM users u
                            WHERE u.username = r.user_id FETCH FIRST 1 ROWS ONLY) END) AS registering_name,
        r.account_id AS orig_account_id,
@@ -97,7 +98,8 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
            AND p.party_type = 'SP') AS secured_party,
        r.client_reference_id,
        (SELECT CASE WHEN r.user_id IS NULL THEN ''
-                    ELSE (SELECT u.firstname || ' ' || u.lastname
+                    ELSE (SELECT CASE WHEN u.lastname = '' or u.lastname IS NULL THEN u.firstname
+                                 ELSE u.firstname || ' ' || u.lastname END
                             FROM users u
                            WHERE u.username = r.user_id FETCH FIRST 1 ROWS ONLY) END) AS registering_name,
        r.account_id AS orig_account_id,
