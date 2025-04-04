@@ -1,5 +1,5 @@
 import { nextTick } from 'vue'
-import { GenColEdit, GenColSummary, GeneralCollateral, GenColAmend } from '@/components/collateral'
+import { GenColEdit, GenColSummary, GeneralCollateral, GenColAmend } from '@/components/collateral/general'
 import { RegistrationFlowType } from '@/enums'
 import { useStore } from '@/store/store'
 import { createComponent } from './utils'

@@ -5,12 +5,12 @@ import { AddCollateral } from '@/pages'
 import { mockedSelectSecurityAgreement } from './test-data'
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import { Collateral } from '@/components/collateral'
+import Collateral from '@/components/collateral/Collateral.vue'
 import flushPromises from 'flush-promises'
 import type { LengthTrustIF } from '@/interfaces'
 import { RegistrationTypes } from '@/resources'
 import { nextTick } from 'vue'
-import { expect, it } from 'vitest'
+import { expect, it, test } from 'vitest'
 import { axe } from 'vitest-axe'
 
 const store = useStore()
@@ -51,7 +51,7 @@ describe('Add Collateral new registration component', () => {
     const results = await axe(wrapper.html())
     // Use the custom vitest-axe matcher to check for violations
     expect(results).toHaveNoViolations()
-  })
+})
 
   it('renders Add Collateral View with child components when store is set', async () => {
     expect(wrapper.vm.$route.name).toBe(RouteNames.ADD_COLLATERAL)

@@ -1,23 +1,24 @@
 import { reactive, toRefs } from 'vue'
 import { MhrAPIToUIStatusTypesMap, PprAPIToUIStatusTypesMap } from '@/resources'
+import type {
+  APIStatusTypes} from '@/enums';
 import {
   APIAmendmentTypes,
   APIRegistrationTypes,
-  APIStatusTypes,
   MhApiStatusTypes,
   MhUIStatusTypes,
   UIAmendmentTypes,
   UIRegistrationTypes,
   UIStatusTypes
 } from '@/enums'
-import { RegistrationSortIF, RegistrationSummaryIF } from '@/interfaces'
+import type { RegistrationSortIF, RegistrationSummaryIF } from '@/interfaces'
 
 export const useRegistration = (setSort: RegistrationSortIF) => {
   const localState = reactive({
     dateTxt: (setSort?.startDate && setSort.endDate) ? 'Custom' : '',
     registrationNumber: setSort?.regNum || '',
-    registrationType: setSort?.regType || '',
-    status: setSort?.status || '',
+    registrationType: setSort?.regType || null,
+    status: setSort?.status || null,
     registeredBy: setSort?.regBy || '',
     documentId: setSort?.documentId || '',
     registeringParty: setSort?.regParty || '',

@@ -1,5 +1,5 @@
 import { nextTick } from 'vue'
-import { GenColAmend } from '@/components/collateral'
+import { GenColAmend } from '@/components/collateral/general'
 import { RegistrationFlowType } from '@/enums'
 import { createComponent, getLastEvent } from './utils'
 import flushPromises from 'flush-promises'

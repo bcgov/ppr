@@ -1,6 +1,6 @@
 import { nextTick } from 'vue'
 import { RenewRegistration } from '@/pages'
-import { Collateral } from '@/components/collateral'
+import Collateral from '@/components/collateral/Collateral.vue'
 import { RegistrationLengthTrust } from '@/components/registration'
 import { StickyContainer } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'
