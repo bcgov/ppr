@@ -159,7 +159,6 @@ import { useRoute } from 'vue-router'
 import { useStore } from '@/store/store'
 import { StickyContainer, CourtOrder } from '@/components/common'
 import { RegistrationLengthTrust, RegistrationRepairersLien } from '@/components/registration'
-import { Collateral } from '@/components/collateral'
 import {
   DebtorSummary,
   RegisteringPartySummary,
@@ -190,7 +189,6 @@ export default defineComponent({
   components: {
     RegistrationLengthTrust,
     RegistrationRepairersLien,
-    Collateral,
     DebtorSummary,
     RegisteringPartySummary,
     SecuredPartySummary,

@@ -291,9 +291,8 @@ import type {
 } from '@/interfaces'
 import type { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { useAuth, useNavigation } from '@/composables'
-import { GenColSummary } from '@/components/collateral'
+import { GenColSummary } from '@/components/collateral/general'
 import { AmendmentDescription } from '@/components/registration'
-
 
 export default defineComponent({
   name: 'ConfirmAmendment',

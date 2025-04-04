@@ -1,7 +1,7 @@
 // Libraries
 import { nextTick } from 'vue'
 import { mockedGeneralCollateral2 } from './test-data'
-import { GenColSummary } from '@/components/collateral'
+import { GenColSummary } from '@/components/collateral/general'
 import { RegistrationFlowType } from '@/enums'
 import { pacificDate } from '@/utils'
 import { useStore } from '@/store/store'
