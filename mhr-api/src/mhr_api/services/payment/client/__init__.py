@@ -18,11 +18,13 @@
 import copy
 import json
 from functools import wraps
+from http import HTTPStatus
 
 import requests
 from flask import current_app
 
-from mhr_api.services.payment import TransactionTypes
+from mhr_api.services.payment import PaymentMethods, StatusCodes, TransactionTypes
+from mhr_api.services.payment.exceptions import SBCPaymentException
 from mhr_api.utils.base import BaseEnum
 from mhr_api.utils.logging import logger
 
@@ -78,10 +80,11 @@ PATH_REFUND = "payment-requests/{invoice_id}/refunds"
 PATH_INVOICE = "payment-requests/{invoice_id}"
 PATH_RECEIPT = "payment-requests/{invoice_id}/receipts"
 
-STATUS_COMPLETED = "COMPLETED"
-STATUS_CREATED = "CREATED"
-STATUS_PAID = "PAID"
-STATUS_APPROVED = "APPROVED"
+VALID_RESPONSE_STATUS = [StatusCodes.PAID.value, StatusCodes.APPROVED.value]
+VALID_RESPONSE_STATUS_INTERNAL = [StatusCodes.PAID.value, StatusCodes.APPROVED.value, StatusCodes.COMPLETED.value]
+VALID_RESPONSE_STATUS_CC = [StatusCodes.PAID.value, StatusCodes.CREATED.value]
+INVALID_STATUS_JSON = {"status_code": HTTPStatus.PAYMENT_REQUIRED}
+INVALID_STATUS_MSG = "Payment request failed: payment method {pay_method} returned invalid status {invoice_status}."
 
 
 class ApiClientException(Exception):
@@ -188,8 +191,28 @@ class BaseClient:
             if not response.ok:
                 raise ApiRequestError(response, str(response.status_code) + ": " + response.text)
 
-            return json.loads(response.text)
-
+            response_json = json.loads(response.text)
+            pay_method: str = response_json.get("paymentMethod", "")
+            invoice_status: str = response_json.get("statusCode", "")
+            if method != HttpVerbs.POST or (
+                pay_method == PaymentMethods.INTERNAL.value and invoice_status == StatusCodes.COMPLETED.value
+            ):
+                return response_json
+            if pay_method != PaymentMethods.CC.value and invoice_status not in VALID_RESPONSE_STATUS:
+                logger.error(f"Invalid response payload status code {invoice_status} for payment method {pay_method}")
+                msg: str = INVALID_STATUS_MSG.format(pay_method=pay_method, invoice_status=invoice_status)
+                error_json = INVALID_STATUS_JSON
+                error_json["type"] = pay_method
+                error_json["detail"] = msg
+                raise SBCPaymentException(msg, error_json)
+            if pay_method == PaymentMethods.CC.value and invoice_status not in VALID_RESPONSE_STATUS_CC:
+                logger.error(f"Invalid response payload status code {invoice_status} for CC payment")
+                msg: str = INVALID_STATUS_MSG.format(pay_method=pay_method, invoice_status=invoice_status)
+                error_json = INVALID_STATUS_JSON
+                error_json["type"] = pay_method
+                error_json["detail"] = msg
+                raise SBCPaymentException(msg, error_json)
+            return response_json
         except ApiRequestError as err:
             logger.error("call_api error: " + err.message)
             raise err

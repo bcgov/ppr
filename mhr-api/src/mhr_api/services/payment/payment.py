@@ -52,6 +52,8 @@ class Payment:
             logger.debug(api_response)
             return api_response
 
+        except SBCPaymentException as sbc_err:
+            raise sbc_err
         except ApiRequestError as api_err:
             raise SBCPaymentException(api_err, json_data=api_err.json_data) from api_err
         except Exception as err:  # noqa: B902; wrapping exception
@@ -95,6 +97,8 @@ class Payment:
             logger.debug(api_response)
             return api_response
 
+        except SBCPaymentException as sbc_err:
+            raise sbc_err
         except ApiRequestError as api_err:
             raise SBCPaymentException(api_err, json_data=api_err.json_data) from api_err
         except Exception as err:  # noqa: B902; wrapping exception
@@ -117,6 +121,8 @@ class Payment:
             logger.debug(api_response)
             return api_response
 
+        except SBCPaymentException as sbc_err:
+            raise sbc_err
         except Exception as err:  # noqa: B902; wrapping exception
             raise SBCPaymentException(err) from err
 
@@ -135,5 +141,7 @@ class Payment:
             logger.debug(api_response)
             return api_response
 
+        except SBCPaymentException as sbc_err:
+            raise sbc_err
         except Exception as err:  # noqa: B902; wrapping exception
             raise SBCPaymentException(err) from err
