@@ -18,9 +18,66 @@ Test-Suite to ensure that the Party Model is working as expected.
 """
 import copy
 
+import pytest
 from registry_schemas.example_data.ppr import FINANCING_STATEMENT
 
 from ppr_api.models import Party
+
+
+BUSINESS_1 = {
+    'businessName': 'business inc',
+    'emailAddress': 'asmith@gmail.com',
+    'address': {
+        'street': 'street',
+        'streetAdditional': 'additional',
+        'city': 'city',
+        'region': 'BC',
+        'country': 'CA',
+        'postalCode': 'V8S2J4'
+    }
+}
+INDIVIDUAL_1 = {
+    'personName': {
+        'first': 'first',
+        'last': 'last',
+        'middle': 'middle'
+    },
+    'emailAddress': 'asmith@gmail.com',
+    'birthDate': '1990-06-15',
+    'address': {
+        'street': 'street',
+        'streetAdditional': 'additional',
+        'city': 'city',
+        'region': 'BC',
+        'country': 'CA',
+        'postalCode': 'V8S2J4'
+    }
+}
+# testdata pattern is ({party_type},{email_value},{is_bus},{has_email})
+TEST_EMAIL_DATA = [
+    (Party.PartyTypes.REGISTERING_PARTY.value, "test1@gmail.com", False, True),
+    (Party.PartyTypes.REGISTERING_PARTY.value, "test1@gmail.com", True, True),
+    (Party.PartyTypes.SECURED_PARTY.value, "test1@gmail.com", False, True),
+    (Party.PartyTypes.SECURED_PARTY.value, "test1@gmail.com", True, True),
+    (Party.PartyTypes.DEBTOR_COMPANY.value, "test1@gmail.com", True, False),
+    (Party.PartyTypes.DEBTOR_COMPANY.value, "test1@gmail.com", False, False),
+]
+
+
+@pytest.mark.parametrize('party_type,email_value,is_bus,has_email', TEST_EMAIL_DATA)
+def test_party(session, party_type, email_value, is_bus, has_email):
+    """Assert that party email addresses are saved/masked correctly."""
+    party_json = copy.deepcopy(BUSINESS_1) if is_bus else copy.deepcopy(INDIVIDUAL_1)
+    party_json["emailAddress"] = email_value
+    party: Party = Party.create_from_json(party_json, party_type, 1)
+    if has_email:
+        assert party.email_id == email_value
+        p_json = party.json
+        assert p_json.get("emailAddress") == email_value
+    else:
+        assert not party.email_id
+        p_json = party.json
+        assert not p_json.get("emailAddress")
 
 
 def test_find_by_id(session):
@@ -241,7 +298,7 @@ def test_save_business(session):
         }
     }
 
-    party_bus = Party.create_from_json(party_bus_json, Party.PartyTypes.DEBTOR_COMPANY.value, 1234)
+    party_bus: Party = Party.create_from_json(party_bus_json, Party.PartyTypes.DEBTOR_COMPANY.value, 1234)
     party_bus.registration_id = 200000000
     party_bus.financing_id = 200000000
     party_bus.save()
@@ -250,6 +307,7 @@ def test_save_business(session):
     assert party_bus.bus_name_base
     assert party_bus.bus_name_key_char1 == 'B'
     assert party_bus.previous_party_id == party_bus_json.get('amendPartyId')
+    assert not party_bus.email_id
 
 
 def test_save_individual(session):
@@ -273,7 +331,7 @@ def test_save_individual(session):
         }
     }
 
-    party = Party.create_from_json(party_ind_json, Party.PartyTypes.DEBTOR_INDIVIDUAL.value, 1234)
+    party: Party = Party.create_from_json(party_ind_json, Party.PartyTypes.DEBTOR_INDIVIDUAL.value, 1234)
     party.registration_id = 200000000
     party.financing_id = 200000000
     party.save()
@@ -288,4 +346,4 @@ def test_save_individual(session):
     assert party.first_name_char2 == 'E'
     assert party.first_name_key_char1 == 'P'
     assert party.previous_party_id == party_ind_json.get('amendPartyId')
- 
+    assert not party.email_id
