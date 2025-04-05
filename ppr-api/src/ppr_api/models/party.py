@@ -151,7 +151,10 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
                 cp_address = self.address.json
                 party["address"] = cp_address
 
-            if self.email_id:
+            if self.email_id and self.party_type not in (
+                Party.PartyTypes.DEBTOR_COMPANY.value,
+                Party.PartyTypes.DEBTOR_INDIVIDUAL.value,
+            ):
                 party["emailAddress"] = self.email_id
 
             if self.birth_date:
@@ -242,7 +245,10 @@ class Party(db.Model):  # pylint: disable=too-many-instance-attributes
                 if json_data["personName"].get("middle"):
                     party.middle_initial = json_data["personName"]["middle"].strip().upper()
 
-            if json_data.get("emailAddress"):
+            if json_data.get("emailAddress") and party_type not in (
+                Party.PartyTypes.DEBTOR_COMPANY.value,
+                Party.PartyTypes.DEBTOR_INDIVIDUAL.value,
+            ):
                 party.email_id = json_data["emailAddress"]
 
             party.address = Address.create_from_json(json_data["address"])
