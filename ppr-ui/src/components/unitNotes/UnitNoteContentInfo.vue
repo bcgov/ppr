@@ -3,7 +3,7 @@
   <div>
     <v-row
       v-if="note.effectiveDateTime && hasEffectiveDateInPanel(note) && !isExemptionNoteType"
-      noGutters
+      no-gutters
       class="mt-6"
       data-test-id="effective-date-info"
     >
@@ -21,7 +21,7 @@
 
     <v-row
       v-if="isNoticeOfCautionOrRelatedDocType(note)"
-      noGutters
+      no-gutters
       class="my-3"
     >
       <v-col cols="3">
@@ -48,7 +48,7 @@
 
     <v-row
       v-if="note.cancelledDateTime"
-      noGutters
+      no-gutters
       class="my-3"
     >
       <v-col cols="3">
@@ -66,7 +66,7 @@
     <!-- Non Residential Exemption Details -->
     <template v-if="note.nonResidentialReason">
       <v-row
-        noGutters
+        no-gutters
         class="mt-6"
         data-test-id="declaration-details"
       >
@@ -84,7 +84,7 @@
       </v-row>
 
       <v-row
-        noGutters
+        no-gutters
         class="mt-3"
         data-test-id="declaration-date"
       >
@@ -102,7 +102,7 @@
     </template>
 
     <v-row
-      noGutters
+      no-gutters
       class="mt-3"
       :class="{ 'mb-6': !isExemptionNoteType }"
       data-test-id="remarks-info"
@@ -140,7 +140,7 @@
     <!-- Person Giving Notice or Collector Table -->
     <v-row
       v-if="!isExemptionNoteType"
-      noGutters
+      no-gutters
       class="mt-7"
       data-test-id="person-giving-notice-info"
     >
@@ -163,12 +163,12 @@
     </v-row>
     <v-row
       v-if="note.givingNoticeParty"
-      noGutters
+      no-gutters
     >
       <v-col cols="12">
         <v-table
           id="persons-giving-notice-table"
-          fixedHeader
+          fixed-header
           density="comfortable"
         >
           <template #default>
@@ -222,7 +222,7 @@
 
 <script lang="ts">
 import { defineComponent, computed, reactive, toRefs } from 'vue'
-import { UnitNotePanelIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
+import type { UnitNotePanelIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 import {
   UnitNotesInfo,
   personGivingNoticeTableHeaders,
@@ -231,7 +231,7 @@ import {
   hasNoPersonGivingNoticeText
 } from '@/resources'
 import { pacificDate, shortPacificDate, toTitleCase } from '@/utils'
-import { PartyIF } from '@/interfaces'
+import type { PartyIF } from '@/interfaces'
 import { BaseAddress } from '@/composables/address'
 import { useMhrUnitNote, useMhrUnitNotePanel } from '@/composables'
 import { UnitNoteDocTypes } from '@/enums'

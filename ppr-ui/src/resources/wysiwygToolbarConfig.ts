@@ -1,4 +1,4 @@
-import { WysiwygToolsIF } from '@/interfaces'
+import type { WysiwygToolsIF } from '@/interfaces'
 
 export const wysiwygToolkitConfig: Array<WysiwygToolsIF> = [
   {

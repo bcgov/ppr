@@ -1,5 +1,5 @@
-import { MhrSubTypes } from '@/enums'
-import { AccountInfoIF, UserAccessAuthorizationIF, PartyIF, AddressIF } from '@/interfaces'
+import type { MhrSubTypes } from '@/enums'
+import type { AccountInfoIF, UserAccessAuthorizationIF, PartyIF, AddressIF } from '@/interfaces'
 
 export interface UserAccessIF {
   mrhSubProduct: MhrSubTypes

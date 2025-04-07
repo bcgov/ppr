@@ -1,10 +1,10 @@
 <template>
   <v-container class="party-summary px-0">
     <BasePartySummary
-      :setHeaders="registeringPartyHeaders"
-      :setItems="registeringParty"
-      :setOptions="registeringPartyOptions"
-      @triggerNoDataAction="goToParties()"
+      :set-headers="registeringPartyHeaders"
+      :set-items="registeringParty"
+      :set-options="registeringPartyOptions"
+      @trigger-no-data-action="goToParties()"
     />
   </v-container>
 </template>
@@ -20,7 +20,7 @@ import {
 import { useStore } from '@/store/store'
 import { useRouter } from 'vue-router'
 import { BasePartySummary } from '@/components/parties/summaries'
-import { AddPartiesIF, PartyIF, PartySummaryOptionsI } from '@/interfaces'
+import type { AddPartiesIF, PartyIF, PartySummaryOptionsI } from '@/interfaces'
 import { registeringTableHeaders } from '@/resources'
 import { RegistrationFlowType } from '@/enums'
 import { useRegisteringParty } from '@/composables/useRegisteringParty'

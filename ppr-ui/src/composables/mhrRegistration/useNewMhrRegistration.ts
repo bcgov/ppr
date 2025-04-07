@@ -289,7 +289,7 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
     parsedOwnerGroups.forEach((ownerGroup: MhrRegistrationHomeOwnerGroupIF) => {
       ownerGroup.owners = Object.values(ownerGroup.owners)
 
-      // @ts-ignore
+      // @ts-expect-error: Type mismatch due to module resolution issue
       ownerGroup.groupId = parseInt(ownerGroup.groupId)
 
       ownerGroup.type = Object.keys(HomeTenancyTypes).find(key => HomeTenancyTypes[key] as string === ownerGroup.type)

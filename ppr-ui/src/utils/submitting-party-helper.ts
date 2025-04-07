@@ -1,4 +1,4 @@
-import { AccountInfoIF, PartyIF, SubmittingPartyIF } from '@/interfaces'
+import type { AccountInfoIF, PartyIF, SubmittingPartyIF } from '@/interfaces'
 
 export const parseAccountToSubmittingParty = (accountInfo: AccountInfoIF): SubmittingPartyIF => {
   return {

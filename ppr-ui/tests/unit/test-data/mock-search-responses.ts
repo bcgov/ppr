@@ -1,5 +1,5 @@
 import { APIMHRSearchTypes, APISearchTypes, UIMHRSearchTypes, UISearchTypes } from '@/enums'
-import { ManufacturedHomeSearchResponseIF, SearchResponseIF } from '@/interfaces'
+import type { ManufacturedHomeSearchResponseIF, SearchResponseIF } from '@/interfaces'
 import { mockedSearchResults, mockedMHRSearchResults } from '.'
 
 type mockedSearchResponse = {

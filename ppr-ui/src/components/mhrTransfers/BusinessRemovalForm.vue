@@ -4,7 +4,7 @@
     ref="businessRemovalFormRef"
     class="pt-4"
   >
-    <v-row noGutters>
+    <v-row no-gutters>
       <v-col cols="3">
         <div
           class="generic-label pr-2"
@@ -28,7 +28,7 @@
       </v-col>
     </v-row>
     <v-row
-      noGutters
+      no-gutters
       class="mt-4"
     >
       <v-col cols="3">
@@ -47,12 +47,12 @@
           id="date-of-dissolution"
           ref="dateOfDissolutionRef"
           title="Date of Dissolution or Cancellation"
-          :errorMsg="validate && !state?.dateOfDissolution ? 'Date of Dissolution or Cancellation' : ''"
-          :initialValue="state?.dateOfDissolution"
-          :maxDate="state?.todayDate"
-          @emitDate="state.dateOfDissolution = $event"
-          @emitCancel="state.dateOfDissolution = null"
-          @emitClear="state.dateOfDissolution = null"
+          :error-msg="validate && !state?.dateOfDissolution ? 'Date of Dissolution or Cancellation' : ''"
+          :initial-value="state?.dateOfDissolution"
+          :max-date="state?.todayDate"
+          @emit-date="state.dateOfDissolution = $event"
+          @emit-cancel="state.dateOfDissolution = null"
+          @emit-clear="state.dateOfDissolution = null"
         />
       </v-col>
     </v-row>
@@ -62,7 +62,7 @@
 import { InputFieldDatePicker } from '@/components/common'
 import { computed, reactive, ref, watch } from 'vue'
 import { useHomeOwners, useInputRules } from '@/composables'
-import { FormIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
+import type { FormIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { localTodayDate } from '@/utils'
 import { useStore } from '@/store/store'
 

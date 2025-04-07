@@ -8,7 +8,7 @@
 <template>
   <SimpleHelpToggle
     class="mb-7"
-    toggleButtonTitle="Need Help? Contact Us"
+    toggle-button-title="Need Help? Contact Us"
   >
     <template #content>
       <h3 class="text-center mb-2">
@@ -16,8 +16,8 @@
       </h3>
       <div class="ml-7">
         <DialogContent
-          :setBaseText="helpText"
-          :setHasContactInfo="true"
+          :set-base-text="helpText"
+          :set-has-contact-info="true"
         />
         <div class="mt-3">
           <h4>Hours of Operation:</h4>

@@ -1,4 +1,4 @@
-import { SubProductConfigIF } from '@/interfaces'
+import type { SubProductConfigIF } from '@/interfaces'
 import { SubProductSelector } from '@/components/common'
 import { nextTick } from 'vue'
 import { createComponent } from './utils'

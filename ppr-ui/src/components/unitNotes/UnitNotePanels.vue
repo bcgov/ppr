@@ -10,7 +10,7 @@
       class="review-header rounded-top"
     >
       <v-row
-        noGutters
+        no-gutters
         align="center"
       >
         <v-col
@@ -76,7 +76,7 @@
 
     <!-- Unit notes expansion panels -->
     <v-row
-      noGutters
+      no-gutters
       justify="center"
       class="unit-note-panel-row"
     >
@@ -90,8 +90,8 @@
           :key="index"
           :disabled="disabled"
           :note="item"
-          :additionalNotes="item.additionalUnitNotes"
-          :isActive="activePanels.includes(index)"
+          :additional-notes="item.additionalUnitNotes"
+          :is-active="activePanels.includes(index)"
         />
       </v-expansion-panels>
       <v-col
@@ -108,7 +108,8 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
-import { RouteNames, UnitNoteDocTypes } from '@/enums'
+import type { UnitNoteDocTypes } from '@/enums';
+import { RouteNames } from '@/enums'
 import { useStore } from '@/store/store'
 import {
   UnitNotesInfo,
@@ -117,7 +118,7 @@ import {
   ResidentialExemptionQSDropDown
 }
   from '@/resources'
-import { UnitNoteIF } from '@/interfaces/unit-note-interfaces'
+import type { UnitNoteIF } from '@/interfaces/unit-note-interfaces'
 import UnitNotePanel from './UnitNotePanel.vue'
 import { useMhrInformation, useMhrUnitNotePanel, useNavigation } from '@/composables'
 

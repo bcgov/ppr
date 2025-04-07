@@ -2,7 +2,7 @@
   <v-container class="pa-0">
     <v-row
       v-if="setBaseText"
-      noGutters
+      no-gutters
     >
       <v-col cols="auto">
         <p
@@ -14,7 +14,7 @@
     <v-row
       v-if="setExtraText.length > 0"
       class="pt-5"
-      noGutters
+      no-gutters
     >
       <v-col cols="auto">
         <p
@@ -28,7 +28,7 @@
     <v-row
       v-if="setHasContactInfo"
       class="pt-5"
-      noGutters
+      no-gutters
     >
       <v-col>
         <ErrorContact />

@@ -9,7 +9,7 @@
       id="mh-home-sections-table"
       class="home-sections-table"
       :class="{ 'mhr-correction': isMhrCorrection || isMhrReRegistration }"
-      fixedHeader
+      fixed-header
     >
       <template #default>
         <!-- Table Headers -->
@@ -41,8 +41,8 @@
                 :colspan="headers.length"
               >
                 <AddEditHomeSections
-                  :editHomeSection="item"
-                  :isNewHomeSection="false"
+                  :edit-home-section="item"
+                  :is-new-home-section="false"
                   :validate="validate"
                   @close="activeIndex = -1"
                   @remove="remove(item)"
@@ -185,7 +185,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
-import { BaseHeaderIF, HomeSectionIF } from '@/interfaces'
+import type { BaseHeaderIF, HomeSectionIF } from '@/interfaces'
 import { homeSectionsTableHeaders, homeSectionsReviewTableHeaders } from '@/resources/tableHeaders'
 import AddEditHomeSections from '@/components/mhrRegistration/YourHome/AddEditHomeSections.vue'
 import { useMhrCorrections } from '@/composables'

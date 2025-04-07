@@ -1,4 +1,4 @@
-import { IndividualNameIF } from '@/interfaces'
+import type { IndividualNameIF } from '@/interfaces'
 
 // Debtor business or individual name interface.
 export interface DebtorNameIF {

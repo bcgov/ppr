@@ -8,7 +8,7 @@ import {
   SupportingDocumentsOptions
 } from '@/enums'
 import { useStore } from '@/store/store'
-import {
+import type {
   MhrHomeOwnerGroupIF,
   MhrRegistrationFractionalOwnershipIF,
   MhrRegistrationHomeOwnerGroupIF,
@@ -260,12 +260,9 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.TRANS_RECEIVERSHIP:
       case ApiTransferTypes.TRANS_SEVER_GRANT:
       case ApiTransferTypes.TRANS_WRIT_SEIZURE:
-
-      // Transfers Due to Death
       case ApiTransferTypes.TO_EXECUTOR_PROBATE_WILL:
       case ApiTransferTypes.TO_EXECUTOR_UNDER_25K_WILL:
       case ApiTransferTypes.TO_ADMIN_NO_WILL:
-
       case ApiTransferTypes.ABAN:
       case ApiTransferTypes.BANK:
       case ApiTransferTypes.COU:
@@ -354,11 +351,13 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       case ApiTransferTypes.SURVIVING_JOINT_TENANT:
         // Check for joint tenancy (at least two owners who are not executors, trustees or admins)
         // Disable If the owners group contains 1 or more businesses for Lawyers and Notaries
-        const groupContainsBusinessOwners = getCurrentGroupById(owner.groupId)?.owners.some(
-          owner => owner.partyType === HomeOwnerPartyTypes.OWNER_BUS
-        )
-        return owner.type === ApiHomeTenancyTypes.JOINT &&
-          !(isRoleQualifiedSupplierLawyersNotaries.value && groupContainsBusinessOwners)
+        {
+          const groupContainsBusinessOwners = getCurrentGroupById(owner.groupId)?.owners.some(
+            owner => owner.partyType === HomeOwnerPartyTypes.OWNER_BUS
+          )
+          return owner.type === ApiHomeTenancyTypes.JOINT &&
+            !(isRoleQualifiedSupplierLawyersNotaries.value && groupContainsBusinessOwners)
+        }
       default:
         return false
     }

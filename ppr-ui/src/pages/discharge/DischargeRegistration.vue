@@ -150,7 +150,6 @@ import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
 import { RegistrationLengthTrustSummary, SecuritiesActNoticesPanels } from '@/components/registration'
-import { Collateral } from '@/components/collateral'
 import { DebtorSummary, RegisteringPartySummary, SecuredPartySummary } from '@/components/parties/summaries'
 import { notCompleteDialog } from '@/resources/dialogOptions'
 import { getFeatureFlag, pacificDate } from '@/utils'
@@ -173,7 +172,6 @@ export default defineComponent({
   components: {
     CautionBox,
     RegistrationLengthTrustSummary,
-    Collateral,
     DebtorSummary,
     RegisteringPartySummary,
     SecuredPartySummary,

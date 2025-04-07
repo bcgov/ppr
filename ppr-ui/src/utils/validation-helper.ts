@@ -1,5 +1,5 @@
 import { APISearchTypes, APIMHRMapSearchTypes } from '@/enums'
-import {
+import type {
   IndividualNameIF,
   SearchTypeIF,
   SearchValidationIF

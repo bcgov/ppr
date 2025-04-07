@@ -1,5 +1,5 @@
 import { APIVehicleTypes, MatchTypes, UIMHRSearchTypes, UISearchTypes } from '@/enums'
-import { ManufacturedHomeSearchResultIF, SearchResultIF } from '@/interfaces'
+import type { ManufacturedHomeSearchResultIF, SearchResultIF } from '@/interfaces'
 
 type mockSearchResults = {
   [UISearchTypes.SERIAL_NUMBER]?: Array<SearchResultIF>

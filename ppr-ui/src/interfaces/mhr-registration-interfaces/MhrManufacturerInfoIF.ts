@@ -1,4 +1,4 @@
-import { MhrRegistrationHomeLocationIF, MhrRegistrationHomeOwnerGroupIF, SubmittingPartyIF } from '@/interfaces'
+import type { MhrRegistrationHomeLocationIF, MhrRegistrationHomeOwnerGroupIF, SubmittingPartyIF } from '@/interfaces'
 
 export interface MhrManufacturerInfoIF {
   authorizationName?: string

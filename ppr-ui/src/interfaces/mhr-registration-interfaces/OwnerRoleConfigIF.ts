@@ -1,4 +1,4 @@
-import { HomeOwnerPartyTypes } from '@/enums'
+import type { HomeOwnerPartyTypes } from '@/enums'
 
 export interface OwnerRoleConfigIF {
   id: string

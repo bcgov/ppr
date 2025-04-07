@@ -1,4 +1,4 @@
-import { BaseDataUnionIF } from "./base-data-union-interface";
+import type { BaseDataUnionIF } from "./base-data-union-interface";
 
 export interface UpdatedBadgeIF {
   action?: string,

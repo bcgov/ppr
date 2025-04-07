@@ -1,10 +1,10 @@
 <template>
   <v-container class="pa-0 party-summary flat">
     <BasePartySummary
-      :setHeaders="securedPartyHeaders"
-      :setItems="securedParties"
-      :setOptions="securedPartyOptions"
-      @triggerNoDataAction="goToParties()"
+      :set-headers="securedPartyHeaders"
+      :set-items="securedParties"
+      :set-options="securedPartyOptions"
+      @trigger-no-data-action="goToParties()"
     />
   </v-container>
 </template>
@@ -18,7 +18,7 @@ import {
 } from 'vue'
 import { useStore } from '@/store/store'
 import { BasePartySummary } from '@/components/parties/summaries'
-import { AddPartiesIF, PartySummaryOptionsI } from '@/interfaces'
+import type { AddPartiesIF, PartySummaryOptionsI } from '@/interfaces'
 import { useRouter } from 'vue-router'
 import { partyTableHeaders } from '@/resources'
 import { RegistrationFlowType } from '@/enums'

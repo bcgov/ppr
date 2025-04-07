@@ -7,7 +7,7 @@ import {
   mockedMarriageMH
 } from './test-data'
 import { APIVehicleTypes } from '@/enums'
-import { EditCollateral } from '@/components/collateral'
+import { EditCollateral } from '@/components/collateral/vehicle'
 import { useStore } from '@/store/store'
 import { createComponent } from './utils'
 

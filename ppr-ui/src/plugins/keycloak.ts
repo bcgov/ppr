@@ -25,5 +25,5 @@ async function syncSession () {
 export default defineNuxtPlugin(async nuxtApp => {
   await fetchConfig()
   await syncSession()
-  console.log('Keycloak initialized')
+  console.info('Keycloak initialized')
 })

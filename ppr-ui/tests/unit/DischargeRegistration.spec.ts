@@ -1,7 +1,7 @@
 import { nextTick } from 'vue'
 import flushPromises from 'flush-promises'
 import { DischargeRegistration } from '@/pages'
-import { Collateral } from '@/components/collateral'
+import Collateral from '@/components/collateral/Collateral.vue'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
 import { CautionBox, StickyContainer } from '@/components/common'
 import { BaseDialog } from '@/components/dialogs'

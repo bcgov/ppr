@@ -1,4 +1,4 @@
-import { APIVehicleTypes, UIVehicleTypes } from '@/enums'
+import type { APIVehicleTypes, UIVehicleTypes } from '@/enums'
 
 // Vehicle type interface
 export interface VehicleTypeIF {

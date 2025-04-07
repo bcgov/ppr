@@ -7,7 +7,7 @@
     <v-menu
       v-model="displayPicker"
       persistent
-      :closeOnContentClick="false"
+      :close-on-content-click="false"
       transition="scale-transition"
       location="bottom right"
     >
@@ -17,18 +17,18 @@
           ref="dateTextField"
           v-bind="props"
           v-model="dateText"
-          appendInnerIcon="mdi-calendar"
+          append-inner-icon="mdi-calendar"
           :class="{'date-text-field-pointer': (isActive || disablePicker)}"
           :clearable="clearable"
-          :clearIcon="'mdi-close'"
-          :errorMessages="errorMsg"
+          :clear-icon="'mdi-close'"
+          :error-messages="errorMsg"
           :error="!!errorMsg"
           :label="title"
           :rules="inputRules"
           :disabled="isActive || disablePicker"
           :hint="hint"
-          :persistentHint="persistentHint"
-          persistentClear
+          :persistent-hint="persistentHint"
+          persistent-clear
           readonly
           variant="filled"
           color="primary"
@@ -42,9 +42,9 @@
       >
         <BaseDatePicker
           id="date-picker-calendar"
-          :defaultSelectedDate="defaultDate"
-          :setMinDate="minDate ? new Date(minDate) : null"
-          :setMaxDate="maxDate ? new Date(maxDate) : null"
+          :default-selected-date="defaultDate"
+          :set-min-date="minDate ? new Date(minDate) : null"
+          :set-max-date="maxDate ? new Date(maxDate) : null"
           @selected-date="dateHandler"
         />
 
@@ -75,7 +75,7 @@
 import { defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { convertDate, dateToYyyyMmDd, yyyyMmDdToDate } from '@/utils'
-import { FormIF } from '@/interfaces'
+import type { FormIF } from '@/interfaces'
 import BaseDatePicker from '@/components/common/BaseDatePicker.vue'
 
 export default defineComponent({

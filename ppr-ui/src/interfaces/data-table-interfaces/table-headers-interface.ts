@@ -1,4 +1,4 @@
-import { APISearchTypes } from '@/enums'
+import type { APISearchTypes } from '@/enums'
 
 export interface BaseHeaderIF {
     name?: string

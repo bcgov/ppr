@@ -8,7 +8,7 @@
       ref="deathCertificateForm"
       v-model="isFormValid"
     >
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col cols="3">
           <div
             class="generic-label"
@@ -35,7 +35,7 @@
         </v-col>
       </v-row>
       <v-row
-        noGutters
+        no-gutters
         class="mt-4"
       >
         <v-col cols="3">
@@ -54,14 +54,14 @@
             id="death-date-time"
             ref="deathDateTimeRef"
             title="Date of Death"
-            :errorMsg="validate && !deathDateTime ? 'Enter date of death' : ''"
-            :initialValue="deathDateTime"
-            :maxDate="localTodayDate(new Date(), true)"
-            :disablePicker="isDisabled"
+            :error-msg="validate && !deathDateTime ? 'Enter date of death' : ''"
+            :initial-value="deathDateTime"
+            :max-date="localTodayDate(new Date(), true)"
+            :disable-picker="isDisabled"
             data-test-id="death-date-time"
-            @emitDate="deathDateTime = $event"
-            @emitCancel="deathDateTime = null"
-            @emitClear="deathDateTime = null"
+            @emit-date="deathDateTime = $event"
+            @emit-cancel="deathDateTime = null"
+            @emit-clear="deathDateTime = null"
           />
         </v-col>
       </v-row>
@@ -80,7 +80,7 @@
             class="has-certificate-checkbox"
             :error="validate && !hasDeathCertificate"
             data-test-id="has-certificate-checkbox"
-            hideDetails
+            hide-details
             :disabled="isDisabled"
           />
         </v-col>
@@ -93,7 +93,7 @@
 import { useInputRules, useHomeOwners } from '@/composables'
 import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
-import { FormIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
+import type { FormIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { InputFieldDatePicker } from '@/components/common'
 import { localTodayDate } from '@/utils'
 

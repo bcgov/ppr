@@ -6,7 +6,7 @@
     class="mt-8 px-8 pt-8 pb-2"
   >
     <v-row
-      noGutters
+      no-gutters
       class="py-2"
     >
       <v-col
@@ -23,8 +23,8 @@
           v-if="updatedBadge"
           :action="updatedBadge.action"
           :baseline="updatedBadge.baseline"
-          :currentState="updatedBadge.currentState"
-          :isCaseSensitive="!isMhrCorrection"
+          :current-state="updatedBadge.currentState"
+          :is-case-sensitive="!isMhrCorrection"
         />
       </v-col>
       <v-col
@@ -45,10 +45,10 @@
                 autocomplete="new-password"
                 variant="filled"
                 class="address-country"
-                hideNoData
+                hide-no-data
                 :disabled="hasOnlyStreetEditable"
-                itemTitle="name"
-                itemValue="code"
+                item-title="name"
+                item-value="code"
                 :items="getCountries(true)"
                 :label="countryLabel"
                 :rules="[...schemaLocal.country]"
@@ -70,7 +70,7 @@
               variant="filled"
               color="primary"
               label="Street Address (Number and Name)"
-              persistentHint
+              persistent-hint
               data-test-id="civic-address-street"
               :rules="[...schema.street]"
               @keypress.once="isAddressLookupEnabled && enableAddressComplete()"
@@ -101,10 +101,10 @@
                   autocomplete="off"
                   variant="filled"
                   color="primary"
-                  persistentHint
+                  persistent-hint
                   :items="provinceOptions"
-                  itemTitle="name"
-                  itemValue="value"
+                  item-title="name"
+                  item-value="value"
                   :disabled="hasOnlyStreetEditable"
                   :rules="[...schema.region]"
                 >
@@ -129,7 +129,7 @@
         <CautionBox
           v-if="isMovingIntoProvince || isMovingOutOfProvince"
           class="mt-4 mb-6"
-          :setMsg="correctionCautionMsg"
+          :set-msg="correctionCautionMsg"
         />
       </v-col>
     </v-row>
@@ -143,8 +143,8 @@ import {
   useAddressComplete,
   useCountriesProvinces
 } from '@/composables/address/factories'
-import { AddressIF, FormIF, UpdatedBadgeIF } from '@/interfaces'
-import { SchemaIF } from '@/composables/address/interfaces'
+import type { AddressIF, FormIF, UpdatedBadgeIF } from '@/interfaces'
+import type { SchemaIF } from '@/composables/address/interfaces'
 import { UpdatedBadge } from '@/components/common'
 import { useMhrCorrections } from '@/composables'
 import CautionBox from '@/components/common/CautionBox.vue'

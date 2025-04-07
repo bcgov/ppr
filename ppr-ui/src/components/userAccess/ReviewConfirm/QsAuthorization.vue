@@ -1,7 +1,7 @@
 <template>
   <FormCard
     label="Confirm Authorization"
-    :showErrors="showErrors"
+    :show-errors="showErrors"
     :class="{'border-error-left': showErrors}"
   >
     <template #formSlot>
@@ -22,7 +22,7 @@
           id="authorization-checkbox"
           v-model="authorization.isAuthorizationConfirmed"
           class="mt-1"
-          hideDetails
+          hide-details
         >
           <template #label>
             <span
@@ -54,7 +54,7 @@ import { FormCard } from '@/components/common'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { useInputRules } from '@/composables'
-import { UserAccessAuthorizationIF } from '@/interfaces'
+import type { UserAccessAuthorizationIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'QsAuthorization',

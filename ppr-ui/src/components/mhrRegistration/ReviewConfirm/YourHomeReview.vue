@@ -35,7 +35,7 @@
         <!-- Manufacturer Make Model -->
         <section class="py-6">
           <v-row
-            noGutters
+            no-gutters
             class="px-8 key-value-pair"
           >
             <v-col cols="3">
@@ -45,7 +45,7 @@
                 class="mb-1"
                 :action="correctionState.action"
                 :baseline="correctionState.manufacturer.baseline"
-                :currentState="correctionState.manufacturer.currentState"
+                :current-state="correctionState.manufacturer.currentState"
               />
             </v-col>
             <v-col cols="9">
@@ -53,7 +53,7 @@
             </v-col>
           </v-row>
           <v-row
-            noGutters
+            no-gutters
             class="pt-3 px-8 key-value-pair"
           >
             <v-col cols="3">
@@ -63,7 +63,7 @@
                 class="mb-1"
                 :action="correctionState.action"
                 :baseline="correctionState.manufacturerYear.baseline"
-                :currentState="correctionState.manufacturerYear.currentState"
+                :current-state="correctionState.manufacturerYear.currentState"
               />
             </v-col>
             <v-col cols="9">
@@ -79,7 +79,7 @@
             </v-col>
           </v-row>
           <v-row
-            noGutters
+            no-gutters
             class="pt-3 px-8 key-value-pair"
           >
             <v-col cols="3">
@@ -89,7 +89,7 @@
                 class="mb-1"
                 :action="correctionState.action"
                 :baseline="correctionState.make.baseline"
-                :currentState="correctionState.make.currentState"
+                :current-state="correctionState.make.currentState"
               />
             </v-col>
             <v-col cols="9">
@@ -97,7 +97,7 @@
             </v-col>
           </v-row>
           <v-row
-            noGutters
+            no-gutters
             class="pt-3 px-8 key-value-pair"
           >
             <v-col cols="3">
@@ -107,7 +107,7 @@
                 class="mb-1"
                 :action="correctionState.action"
                 :baseline="correctionState.model.baseline"
-                :currentState="correctionState.model.currentState"
+                :current-state="correctionState.model.currentState"
               />
             </v-col>
             <v-col cols="9">
@@ -121,7 +121,7 @@
         <!-- Has no home certification is checked -->
         <template v-if="getMhrRegistrationHomeDescription.hasNoCertification">
           <v-row
-            noGutters
+            no-gutters
             class="py-6 px-8 key-value-pair"
           >
             <v-col
@@ -133,7 +133,7 @@
                 v-if="showUpdatedBadge"
                 :action="correctionState.action"
                 :baseline="correctionState.homeCertification.baseline"
-                :currentState="correctionState.homeCertification.currentState"
+                :current-state="correctionState.homeCertification.currentState"
               />
             </v-col>
             <v-col
@@ -148,7 +148,7 @@
         <!-- CSA Review -->
         <template v-else-if="isCSA">
           <v-row
-            noGutters
+            no-gutters
             class="py-6 px-8 key-value-pair"
           >
             <v-col
@@ -175,7 +175,7 @@
                 v-if="showUpdatedBadge"
                 :action="correctionState.action"
                 :baseline="correctionState.homeCertification.baseline"
-                :currentState="correctionState.homeCertification.currentState"
+                :current-state="correctionState.homeCertification.currentState"
               />
             </v-col>
             <v-col
@@ -191,7 +191,7 @@
         <!-- Engineer Review -->
         <template v-else-if="isEngineerInspection">
           <v-row
-            noGutters
+            no-gutters
             class="py-6 px-8 key-value-pair"
           >
             <v-col
@@ -218,7 +218,7 @@
                 v-if="showUpdatedBadge"
                 :action="correctionState.action"
                 :baseline="correctionState.homeCertification.baseline"
-                :currentState="correctionState.homeCertification.currentState"
+                :current-state="correctionState.homeCertification.currentState"
               />
             </v-col>
             <v-col
@@ -234,7 +234,7 @@
         <!-- No option selected -->
         <template v-else>
           <v-row
-            noGutters
+            no-gutters
             class="py-6 px-8 key-value-pair"
           >
             <v-col cols="3">
@@ -258,7 +258,7 @@
           </h4>
           <HomeSections
             class="mt-n4 px-8 py-0"
-            :isReviewMode="true"
+            :is-review-mode="true"
           />
         </section>
 
@@ -267,7 +267,7 @@
 
           <!-- Rebuilt Status Review -->
           <v-row
-            noGutters
+            no-gutters
             class="py-6 px-8 key-value-pair"
           >
             <v-col cols="3">
@@ -276,7 +276,7 @@
                 v-if="showUpdatedBadge"
                 :action="correctionState.action"
                 :baseline="correctionState.rebuilt.baseline"
-                :currentState="correctionState.rebuilt.currentState"
+                :current-state="correctionState.rebuilt.currentState"
               />
             </v-col>
             <v-col cols="9">
@@ -288,7 +288,7 @@
 
           <!-- Other Information Review -->
           <v-row
-            noGutters
+            no-gutters
             class="py-6 px-8 key-value-pair"
           >
             <v-col cols="3">
@@ -297,7 +297,7 @@
                 v-if="showUpdatedBadge"
                 :action="correctionState.action"
                 :baseline="correctionState.otherRemarks.baseline"
-                :currentState="correctionState.otherRemarks.currentState"
+                :current-state="correctionState.otherRemarks.currentState"
               />
             </v-col>
             <v-col cols="9">

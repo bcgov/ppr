@@ -1,5 +1,5 @@
 import { nextTick } from 'vue'
-import { GenColEdit } from '@/components/collateral'
+import { GenColEdit } from '@/components/collateral/general'
 import { RegistrationFlowType } from '@/enums'
 import { mockedOtherCarbon } from './test-data'
 import { useStore } from '@/store/store'

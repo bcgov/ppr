@@ -1,4 +1,4 @@
-import { DebtorNameIF } from '@/interfaces'
+import type { DebtorNameIF } from '@/interfaces'
 
 export const mockedDebtorNames: Array<DebtorNameIF> = [
   {

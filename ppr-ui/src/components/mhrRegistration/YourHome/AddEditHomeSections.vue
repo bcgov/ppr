@@ -10,7 +10,7 @@
       ref="addEditHomeSectionsForm"
       v-model="addEditValid"
     >
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col
           cols="12"
           sm="3"
@@ -37,12 +37,12 @@
             class="pt-4"
             label="Serial Number"
             :rules="serialNumberRules"
-            persistentHint
+            persistent-hint
           />
 
           <label class="generic-label">Length</label>
           <v-row
-            noGutters
+            no-gutters
             class="pt-4"
           >
             <v-col>
@@ -54,7 +54,7 @@
                 class="numberInput pr-2"
                 label="Feet"
                 :rules="lengthFeetRules"
-                persistentHint
+                persistent-hint
                 @keydown.space.prevent
               />
             </v-col>
@@ -67,7 +67,7 @@
                 class="numberInput pl-2"
                 label="Inches (Optional)"
                 :rules="isNumber('Inches', 2, 12)"
-                persistentHint
+                persistent-hint
                 @keydown.space.prevent
               />
             </v-col>
@@ -75,7 +75,7 @@
 
           <label class="generic-label">Width</label>
           <v-row
-            noGutters
+            no-gutters
             class="pt-4"
           >
             <v-col>
@@ -87,7 +87,7 @@
                 class="numberInput pr-2"
                 label="Feet"
                 :rules="widthFeetRules"
-                persistentHint
+                persistent-hint
                 @keydown.space.prevent
               />
             </v-col>
@@ -100,14 +100,14 @@
                 class="pl-2"
                 label="Inches (Optional)"
                 :rules="(isNumber('Inches', 2, 12))"
-                persistentHint
+                persistent-hint
                 @keydown.space.prevent
               />
             </v-col>
           </v-row>
 
           <!-- Action buttons -->
-          <v-row noGutters>
+          <v-row no-gutters>
             <v-col>
               <div class="form__row form__btns">
                 <v-btn
@@ -154,7 +154,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs, nextTick } from 'vue'
-import { FormIF, HomeSectionIF } from '@/interfaces'
+import type { FormIF, HomeSectionIF } from '@/interfaces'
 import { useInputRules } from '@/composables/useInputRules'
 
 export default defineComponent({

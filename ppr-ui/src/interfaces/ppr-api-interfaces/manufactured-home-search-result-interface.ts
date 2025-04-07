@@ -1,4 +1,4 @@
-import { IndividualNameIF } from '@/interfaces'
+import type { IndividualNameIF } from '@/interfaces'
 
 // Interface for a single search result matching the search criteria.
 export interface ManufacturedHomeSearchResultIF {

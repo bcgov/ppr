@@ -34,7 +34,7 @@
           <!-- Insert Review mode of component here -->
           <template v-if="!isMhrManufacturerRegistration">
             <v-row
-              noGutters
+              no-gutters
               class="px-6 py-6"
             >
               <v-col cols="3">
@@ -54,7 +54,7 @@
           </template>
 
           <v-row
-            noGutters
+            no-gutters
             class="px-6 pb-5 pt-6"
           >
             <v-col cols="3">
@@ -91,11 +91,11 @@
           <v-divider class="mx-4" />
 
           <v-row
-            noGutters
+            no-gutters
             class="px-6 py-7"
           >
             <v-col cols="3">
-              <v-row noGutters>
+              <v-row no-gutters>
                 <v-col
                   cols="1"
                   class="mr-2"
@@ -151,7 +151,7 @@
             <v-divider class="mx-4" />
 
             <v-row
-              noGutters
+              no-gutters
               class="px-6 py-7"
             >
               <v-col cols="3">
@@ -180,7 +180,7 @@ import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 import { toDisplayPhone, hasTruthyValue } from '@/utils'
 import { useMhrValidations } from '@/composables'
-import { AttnRefConfigIF } from '@/interfaces'
+import type { AttnRefConfigIF } from '@/interfaces'
 import { attentionConfig, folioOrRefConfig } from '@/resources/attnRefConfigs'
 import { storeToRefs } from 'pinia'
 

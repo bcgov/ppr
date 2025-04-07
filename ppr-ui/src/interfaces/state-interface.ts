@@ -1,4 +1,4 @@
-import { AccountModelIF, StateModelIF } from '@/interfaces'
+import type { AccountModelIF, StateModelIF } from '@/interfaces'
 
 // State model example
 export interface StateIF {

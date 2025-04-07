@@ -1,4 +1,4 @@
-import { ProductStatus } from '@/enums'
+import type { ProductStatus } from '@/enums'
 
 export interface UserAccessMessageIF {
   status: ProductStatus

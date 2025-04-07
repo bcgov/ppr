@@ -268,9 +268,10 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
-import { UIRegistrationTypes, UITransferTypes, UnitNoteDocTypes } from '@/enums'
+import type { UITransferTypes, UnitNoteDocTypes } from '@/enums';
+import { UIRegistrationTypes } from '@/enums'
 import { FeeSummaryTypes } from './enums'
-import { AdditionalSearchFeeIF, FeeSummaryI, RegistrationLengthI } from './interfaces'
+import type { AdditionalSearchFeeIF, FeeSummaryI, RegistrationLengthI } from './interfaces'
 import { getFeeHint, getFeeSummary } from './factories'
 import { storeToRefs } from 'pinia'
 import { UnitNotesInfo } from '@/resources/unitNotes'

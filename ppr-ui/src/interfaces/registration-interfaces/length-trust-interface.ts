@@ -1,4 +1,4 @@
-import { ActionTypes } from '@/enums'
+import type { ActionTypes } from '@/enums'
 
 // New registration life and trust indenture interface.
 export interface LengthTrustIF {

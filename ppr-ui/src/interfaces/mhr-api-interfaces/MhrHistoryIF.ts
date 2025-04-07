@@ -1,5 +1,5 @@
-import { AddressIF, MhrLocationInfoIF } from '@/interfaces'
-import { HomeOwnerPartyTypes } from '@/enums'
+import type { AddressIF, MhrLocationInfoIF } from '@/interfaces'
+import type { HomeOwnerPartyTypes } from '@/enums'
 
 export interface DescriptionIF {
   baseInformation?: {

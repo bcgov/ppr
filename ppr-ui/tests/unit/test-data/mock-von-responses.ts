@@ -1,4 +1,4 @@
-import { AutoCompleteResponseIF } from '@/interfaces'
+import type { AutoCompleteResponseIF } from '@/interfaces'
 import { mockedVonResults } from '.'
 
 export const mockedVonResponse: AutoCompleteResponseIF = {

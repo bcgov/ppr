@@ -105,7 +105,7 @@ export default defineComponent({
     })
 
     const hasPropData = (propertyName: string): boolean => {
-      return props.reviewProperties?.hasOwnProperty(propertyName)
+      return Object.prototype.hasOwnProperty.call(props.reviewProperties, propertyName)
     }
 
     return {

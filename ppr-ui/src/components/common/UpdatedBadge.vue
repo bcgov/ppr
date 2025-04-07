@@ -4,7 +4,7 @@
     id="updated-badge-component"
   >
     <v-chip
-      xSmall
+      x-small
       variant="flat"
       color="primary"
       :data-test-id="`${action}-badge`"
@@ -14,14 +14,15 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, PropType } from 'vue'
-import { BaseDataUnionIF } from '@/interfaces'
+import type { PropType } from 'vue';
+import { computed } from 'vue'
+import type { BaseDataUnionIF } from '@/interfaces'
 import { deepChangesComparison } from '@/utils'
 
 const props = withDefaults(defineProps<{
   action?: string,
-  baseline: PropType<BaseDataUnionIF>
-  currentState: PropType<BaseDataUnionIF>,
+  baseline?: PropType<BaseDataUnionIF>
+  currentState?: PropType<BaseDataUnionIF>,
   isCaseSensitive?: boolean
 }>(), {
   action: 'CORRECTED',

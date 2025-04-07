@@ -1,5 +1,5 @@
 import { computed, nextTick, reactive, toRefs } from 'vue'
-import { PartyIF, AddressIF } from '@/interfaces'
+import type { PartyIF, AddressIF } from '@/interfaces'
 import { useStore } from '@/store/store'
 import { PartyAddressSchema } from '@/schemas'
 import { ActionTypes, RegistrationFlowType, SecuredPartyTypes } from '@/enums'
@@ -178,14 +178,14 @@ export const useSecuredParty = (context?) => {
   }
 
   const addSecuredParty = (newParty: PartyIF, activeIndex: number = -1) => {
-    const parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
+    const parties = getAddSecuredPartiesAndDebtors.value  
     const newList: PartyIF[] = parties.securedParties
     if (activeIndex > -1) {
       newParty.action = ActionTypes.ADDED
       newList.splice(activeIndex, 1, newParty)
     } else {
       // Add
-      // eslint-disable-line
+       
       newParty.action = ActionTypes.ADDED
       newList.push(newParty)
     }

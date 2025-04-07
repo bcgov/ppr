@@ -1,4 +1,4 @@
-import { StaffPaymentOptions } from '@/enums'
+import type { StaffPaymentOptions } from '@/enums'
 
 export * from './account-interfaces'
 export * from './breadcrumb-interface'

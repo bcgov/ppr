@@ -12,7 +12,7 @@
       <strong>A
         <v-tooltip
           location="top"
-          contentClass="top-tooltip pa-5"
+          content-class="top-tooltip pa-5"
           transition="fade-transition"
         >
           <template #activator="{ props }">

@@ -80,7 +80,6 @@ import { APIRegistrationTypes, RegistrationFlowType, RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
-import { Collateral } from '@/components/collateral'
 import { getFeatureFlag } from '@/utils'
 import type { ErrorIF } from '@/interfaces'
 import type { RegistrationLengthI } from '@/composables/fees/interfaces'
@@ -91,7 +90,6 @@ export default defineComponent({
   name: 'AddCollateral',
   components: {
     ButtonFooter,
-    Collateral,
     Stepper,
     StickyContainer
   },

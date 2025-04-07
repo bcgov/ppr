@@ -5,7 +5,7 @@
       id="search-meta-info"
       class="px-6 pt-8"
     >
-      <v-row noGutters>
+      <v-row no-gutters>
         <p class="search-sub-title">
           {{ searchType }} - <b>"{{ searchValue }}"</b>
         </p>
@@ -44,9 +44,9 @@
           <v-row class="float-right">
             <FolioNumber
               class="mr-3 ml-0 mt-n2"
-              :defaultFolioNumber="folioNumber"
-              @folioNumber="updateFolioOrReference($event)"
-              @folioError="folioError = $event"
+              :default-folio-number="folioNumber"
+              @folio-number="updateFolioOrReference($event)"
+              @folio-error="folioError = $event"
             />
             <v-btn
               id="review-confirm-btn"
@@ -86,7 +86,7 @@
           :id="`mh-search-results-table`"
           class="results-table"
           :class="{ 'review-mode' : isReviewMode }"
-          fixedHeader
+          fixed-header
         >
           <template #default>
             <!-- Table Headers -->
@@ -102,7 +102,7 @@
                   <template v-if="index === 0 && !isReviewMode">
                     <v-tooltip
                       location="top"
-                      contentClass="top-tooltip"
+                      content-class="top-tooltip"
                       transition="fade-transition"
                     >
                       <template #activator="{ props }">
@@ -111,7 +111,7 @@
                             id="select-all-checkbox"
                             v-model="selectAll"
                             class="header-checkbox ma-0 pa-0"
-                            hideDetails
+                            hide-details
                             :label="headerSlotLabel"
                           />
                         </span>
@@ -131,7 +131,7 @@
                       class="header-checkbox ma-0 pa-0"
                       label="Include lien information for all selections"
                       :disabled="selectedMatchesLength === 0"
-                      hideDetails
+                      hide-details
                     />
                   </template>
 
@@ -175,7 +175,7 @@
                       v-model="item.selected"
                       :label="isReviewMode ? getOwnerName(item) + ' ' + getOwnerCount(item) : getOwnerName(item) "
                       :ripple="false"
-                      hideDetails
+                      hide-details
                       @click="onSelectionCheckboxClick(item)"
                     />
                   </td>
@@ -191,7 +191,7 @@
                     <td class="lien-col">
                       <v-tooltip
                         location="top"
-                        contentClass="top-tooltip"
+                        content-class="top-tooltip"
                         transition="fade-transition"
                       >
                         <template #activator="{ props }">
@@ -201,7 +201,7 @@
                               :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                               :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
                               :ripple="false"
-                              hideDetails
+                              hide-details
                             />
                           </span>
                         </template>
@@ -219,7 +219,7 @@
                         <td>
                           <v-tooltip
                             location="top"
-                            contentClass="top-tooltip"
+                            content-class="top-tooltip"
                             transition="fade-transition"
                           >
                             <template #activator="{ props }">
@@ -244,7 +244,7 @@
                         <td class="lien-col">
                           <v-tooltip
                             location="top"
-                            contentClass="top-tooltip"
+                            content-class="top-tooltip"
                             transition="fade-transition"
                           >
                             <template #activator="{ props }">
@@ -254,7 +254,7 @@
                                   :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                                   :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
                                   :ripple="false"
-                                  hideDetails
+                                  hide-details
                                 />
                               </span>
                             </template>
@@ -290,7 +290,7 @@
                       <td class="lien-col">
                         <v-tooltip
                           location="top"
-                          contentClass="top-tooltip"
+                          content-class="top-tooltip"
                           transition="fade-transition"
                         >
                           <template #activator="{ props }">
@@ -300,7 +300,7 @@
                                 :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                                 :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
                                 :ripple="false"
-                                hideDetails
+                                hide-details
                               />
                             </span>
                           </template>
@@ -320,7 +320,7 @@
                   <td v-if="hasMultipleSelections(item.mhrNumber) && isReviewMode">
                     <v-tooltip
                       location="top"
-                      contentClass="top-tooltip"
+                      content-class="top-tooltip"
                       transition="fade-transition"
                     >
                       <template #activator="{ props }">
@@ -341,7 +341,7 @@
                       v-model="item.selected"
                       :label="item.mhrNumber"
                       :ripple="false"
-                      hideDetails
+                      hide-details
                       @click="onSelectionCheckboxClick(item)"
                     />
                   </td>
@@ -357,7 +357,7 @@
                     <td class="lien-col">
                       <v-tooltip
                         location="top"
-                        contentClass="top-tooltip"
+                        content-class="top-tooltip"
                         transition="fade-transition"
                       >
                         <template #activator="{ props }">
@@ -367,7 +367,7 @@
                               :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                               :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
                               :ripple="false"
-                              hideDetails
+                              hide-details
                             />
                           </span>
                         </template>
@@ -389,7 +389,7 @@
                     <td class="lien-col">
                       <v-tooltip
                         location="top"
-                        contentClass="top-tooltip"
+                        content-class="top-tooltip"
                         transition="fade-transition"
                       >
                         <template #activator="{ props }">
@@ -399,7 +399,7 @@
                               :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                               :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
                               :ripple="false"
-                              hideDetails
+                              hide-details
                             />
                           </span>
                         </template>
@@ -422,7 +422,7 @@
                         ? `${item.serialNumber} (${item.activeCount})`
                         : `${item.serialNumber}`"
                       :ripple="false"
-                      hideDetails
+                      hide-details
                       @click="onSelectionCheckboxClick(item)"
                     />
                   </td>
@@ -438,7 +438,7 @@
                     <td class="lien-col">
                       <v-tooltip
                         location="top"
-                        contentClass="top-tooltip"
+                        content-class="top-tooltip"
                         transition="fade-transition"
                       >
                         <template #activator="{ props }">
@@ -448,7 +448,7 @@
                               :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                               :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
                               :ripple="false"
-                              hideDetails
+                              hide-details
                             />
                           </span>
                         </template>
@@ -473,7 +473,7 @@
                     <td class="lien-col">
                       <v-tooltip
                         location="top"
-                        contentClass="top-tooltip"
+                        content-class="top-tooltip"
                         transition="fade-transition"
                       >
                         <template #activator="{ props }">
@@ -483,7 +483,7 @@
                               :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                               :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
                               :ripple="false"
-                              hideDetails
+                              hide-details
                             />
                           </span>
                         </template>
@@ -533,7 +533,7 @@ import {
   mhSearchSerialNumberHeaders,
   mhSearchSerialNumberHeadersReview
 } from '@/resources'
-import { BaseHeaderIF, ManufacturedHomeSearchResultIF } from '@/interfaces'
+import type { BaseHeaderIF, ManufacturedHomeSearchResultIF } from '@/interfaces'
 import { FolioNumber } from '@/components/common'
 import { RouteNames, UIMHRSearchTypeMap, UIMHRSearchTypes, UIMHRSearchTypeValues } from '@/enums'
 import { cloneDeep, uniqBy, filter, sortBy, groupBy } from 'lodash'

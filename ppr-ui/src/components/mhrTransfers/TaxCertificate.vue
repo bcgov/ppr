@@ -2,21 +2,21 @@
   <FormCard
     label="Tax Certificate"
     class="mhr-tax-certificate mt-8"
-    :showErrors="validate && state.selectedFutureDate === ''"
+    :show-errors="validate && state.selectedFutureDate === ''"
   >
     <template #formSlot>
       <InputFieldDatePicker
         id="expiry-date-picker"
         ref="expiryDatePickerRef"
         title="Tax Certificate Expiry Date"
-        :initialValue="props.expiryDate"
-        :inputRules="state.dateRules"
-        :minDate="state.minDate"
-        :maxDate="state.maxDate"
-        :disablePicker="state.certificateWaived"
-        @emitDate="setDate($event)"
-        @emitCancel="state.selectedFutureDate = ''"
-        @emitClear="state.selectedFutureDate = ''"
+        :initial-value="props.expiryDate"
+        :input-rules="state.dateRules"
+        :min-date="state.minDate"
+        :max-date="state.maxDate"
+        :disable-picker="state.certificateWaived"
+        @emit-date="setDate($event)"
+        @emit-cancel="state.selectedFutureDate = ''"
+        @emit-clear="state.selectedFutureDate = ''"
       />
 
       <!-- Waive Certificate Checkbox -->
@@ -37,7 +37,7 @@ import { calendarDates } from "@/utils"
 import { reactive, computed, watch, ref, nextTick, onMounted } from 'vue'
 import { FormCard, InputFieldDatePicker } from "../common"
 import { useStore } from "@/store/store"
-import { FormIF } from "@/interfaces"
+import type { FormIF } from "@/interfaces"
 import { storeToRefs } from 'pinia'
 
 const props = defineProps<{

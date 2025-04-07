@@ -4,16 +4,16 @@
     width="50rem"
     persistent
     attach="#app"
-    contentClass="secured-party-dialog"
+    content-class="secured-party-dialog"
   >
     <v-card
       id="secured-party-dialog"
       class="pr-1 pt-7 mt-7"
       :class="!isDuplicate && !isReview ? 'pl-4 ' : 'pl-1'"
     >
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col cols="11">
-          <v-row noGutters>
+          <v-row no-gutters>
             <v-col class="text-md-center ml-8">
               <v-icon class="iconRed">
                 mdi-alert-circle-outline
@@ -22,7 +22,7 @@
           </v-row>
           <v-row
             v-if="!isDuplicate"
-            noGutters
+            no-gutters
             class="pt-5"
           >
             <v-col class="text-md-center ml-8">
@@ -33,7 +33,7 @@
           </v-row>
           <v-row
             v-else
-            noGutters
+            no-gutters
             class="pt-5"
           >
             <v-col class="text-md-center ml-8">
@@ -45,7 +45,7 @@
         </v-col>
         <v-col cols="1">
           <v-row
-            noGutters
+            no-gutters
             justify="end"
             style="margin-top: -10px; padding-right: 15px;"
           >
@@ -126,7 +126,7 @@
               <div>
                 <v-chip
                   v-if="!isDuplicate"
-                  xSmall
+                  x-small
                   variant="elevated"
                   color="primary"
                 >
@@ -249,7 +249,7 @@ import {
   toRefs,
   computed
 } from 'vue'
-import { SearchPartyIF, PartyIF } from '@/interfaces'
+import type { SearchPartyIF, PartyIF } from '@/interfaces'
 import { useSecuredParty } from '@/composables/parties'
 import {
   useCountriesProvinces

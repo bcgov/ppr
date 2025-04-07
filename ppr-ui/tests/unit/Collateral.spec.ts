@@ -10,7 +10,9 @@ import {
 } from './test-data'
 
 // Components
-import { Collateral, GeneralCollateral, VehicleCollateral } from '@/components/collateral'
+import Collateral from '@/components/collateral/Collateral.vue'
+import { GeneralCollateral } from '@/components/collateral/general'
+import { VehicleCollateral } from '@/components/collateral/vehicle'
 import { RegistrationFlowType } from '@/enums'
 import { createComponent } from './utils'
 import { nextTick } from 'vue'

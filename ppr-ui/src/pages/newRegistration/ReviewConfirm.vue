@@ -228,7 +228,6 @@ import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { Stepper, StickyContainer, CertifyInformation } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
-import { Collateral } from '@/components/collateral'
 import { Parties } from '@/components/parties'
 import FolioNumberSummary from '@/components/common/FolioNumberSummary.vue'
 import { getFeatureFlag, scrollToFirstVisibleErrorComponent } from '@/utils'
@@ -243,7 +242,6 @@ export default defineComponent({
   components: {
     SecuritiesActNoticesPanels,
     ButtonFooter,
-    Collateral,
     FolioNumberSummary,
     Parties,
     RegistrationLengthTrustSummary,

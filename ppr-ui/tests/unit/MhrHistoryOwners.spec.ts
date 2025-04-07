@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { createComponent } from './utils'
 import { MhrHistoryOwners } from '@/components/mhrHistory'
-import { OwnerIF } from '@/interfaces'
+import type { OwnerIF } from '@/interfaces'
 import { nextTick } from 'vue'
 import BaseAddress from '@/composables/address/BaseAddress.vue'
 

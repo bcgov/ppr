@@ -1,4 +1,4 @@
-import { DialogOptionsIF } from '@/interfaces'
+import type { DialogOptionsIF } from '@/interfaces'
 
 export const staffPaymentDialog: DialogOptionsIF = {
   acceptText: 'Submit Search',

@@ -33,7 +33,7 @@
       >
         <article class="border-btm py-5">
           <v-row
-            noGutters
+            no-gutters
             data-test-id="home-tenancy-type"
           >
             <v-col cols="3">
@@ -60,7 +60,7 @@
           </v-row>
           <v-row
             v-if="showGroups && ![HomeTenancyTypes.SOLE, HomeTenancyTypes.JOINT].includes(getHomeTenancyType())"
-            noGutters
+            no-gutters
             class="pt-2"
             data-test-id="total-ownership"
           >
@@ -74,10 +74,10 @@
         </article>
 
         <HomeOwnersTable
-          isReadonlyTable
-          :showChips="isMhrCorrection"
-          :isMhrTransfer="isMhrTransfer"
-          :homeOwnerGroups="hideRemovedOwners ? filteredHomeOwnersGroups : getHomeOwnerGroups"
+          is-readonly-table
+          :show-chips="isMhrCorrection"
+          :is-mhr-transfer="isMhrTransfer"
+          :home-owner-groups="hideRemovedOwners ? filteredHomeOwnersGroups : getHomeOwnerGroups"
           class="readonly-home-owners-table px-0 py-3"
         />
       </section>

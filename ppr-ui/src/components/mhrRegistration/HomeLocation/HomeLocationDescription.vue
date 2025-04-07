@@ -3,7 +3,7 @@
     ref="homeLocationDescriptionForm"
     v-model="isHomeLocationDescriptionValid"
   >
-    <v-row noGutters>
+    <v-row no-gutters>
       <!-- Auto Populated Legal Land Description -->
       <template v-if="legalDescription">
         <v-col
@@ -51,7 +51,7 @@
         v-if="showLocationInfo || isReserve"
         cols="12"
       >
-        <v-row noGutters>
+        <v-row no-gutters>
           <v-col
             cols="9"
             class="m-auto pb-0 py-2"
@@ -110,13 +110,13 @@
         </v-row>
 
         <HomeLocationInfo
-          :homeLocationInfo="locationDescription"
-          :isReserve="isReserve"
-          :isStrata="isStrata"
+          :home-location-info="locationDescription"
+          :is-reserve="isReserve"
+          :is-strata="isStrata"
           :validate="validate"
-          @updateLocationInfo="locationInfo = $event"
-          @updateLocationDescription="additionalDescription = $event"
-          @updateLocationInfoValid="isValidLocationInfo = $event"
+          @update-location-info="locationInfo = $event"
+          @update-location-description="additionalDescription = $event"
+          @update-location-info-valid="isValidLocationInfo = $event"
         />
       </v-col>
 
@@ -144,7 +144,7 @@ import { defineComponent, computed, reactive, toRefs, watch, onMounted } from 'v
 import { HomeLocationInfo } from '@/components/common'
 import { useStore } from '@/store/store'
 import { useInputRules, useNewMhrRegistration } from '@/composables'
-import { MhrLocationInfoIF, MhrRegistrationHomeLocationIF } from '@/interfaces'
+import type { MhrLocationInfoIF, MhrRegistrationHomeLocationIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'HomeLocationDescription',

@@ -1,4 +1,4 @@
-import { HomeSectionIF } from '@/interfaces'
+import type { HomeSectionIF } from '@/interfaces'
 
 export const mockedHomeSections: Array<HomeSectionIF> = [
   {

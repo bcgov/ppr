@@ -1,5 +1,5 @@
 import { MhrSubTypes } from '@/enums'
-import { RequirementsConfigIF } from '@/interfaces'
+import type { RequirementsConfigIF } from '@/interfaces'
 
 export const userAccessRequirements: Record<MhrSubTypes, RequirementsConfigIF[]> = {
   [MhrSubTypes.LAWYERS_NOTARIES]: [

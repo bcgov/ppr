@@ -1,4 +1,4 @@
-import { BaseHeaderIF } from '@/interfaces'
+import type { BaseHeaderIF } from '@/interfaces'
 
 export const homeDescriptionHeaders: Array<BaseHeaderIF> = [
   {

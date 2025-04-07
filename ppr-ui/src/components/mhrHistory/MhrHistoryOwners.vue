@@ -4,7 +4,7 @@
     class="pr-4"
   >
     <v-row
-      noGutters
+      no-gutters
       class="condensed-row pt-5"
     >
       <p>
@@ -37,7 +37,7 @@
     </v-row>
 
     <v-row
-      noGutters
+      no-gutters
       class="condensed-row py-3"
     >
       <v-col cols="3">
@@ -62,7 +62,7 @@
 
     <!-- Owner From/Until Details -->
     <v-row
-      noGutters
+      no-gutters
       class="py-6 condensed-row"
     >
       <v-col cols="3">
@@ -162,15 +162,15 @@
 </template>
 
 <script setup lang="ts">
-import { OwnerIF } from '@/interfaces'
+import type { OwnerIF } from '@/interfaces'
 import { BaseAddress } from '@/composables/address'
 import { multipleWordsToTitleCase, pacificDate } from '@/utils'
 import { HomeTenancyTypes } from '@/enums'
 
 /** Props **/
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 const props = withDefaults(defineProps<{
-  content: OwnerIF
+  content?: OwnerIF
 }>(), {
   content: null
 })

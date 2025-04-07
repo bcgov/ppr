@@ -10,7 +10,7 @@
     >
       <template v-if="isReserve">
         <v-row
-          noGutters
+          no-gutters
           class="pt-5"
         >
           <v-col
@@ -48,8 +48,8 @@
               label="Additional Description"
               hint="Example: PIN number"
               :error="isReserveLengthErr"
-              :errorMessages="isReserveLengthErr ? reserveLengthErrMsg : ''"
-              persistentHint
+              :error-messages="isReserveLengthErr ? reserveLengthErrMsg : ''"
+              persistent-hint
             />
           </v-col>
         </v-row>
@@ -57,7 +57,7 @@
       </template>
 
       <v-row
-        noGutters
+        no-gutters
         class="pt-4"
       >
         <v-col>
@@ -68,12 +68,12 @@
             color="primary"
             :label="isStrata ? 'Strata Lot' : 'Lot'"
             :rules="locationInputRules(10, 'Enter a lot number', 'lot')"
-            persistentHint
+            persistent-hint
           />
         </v-col>
       </v-row>
 
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col>
           <v-text-field
             id="land-district"
@@ -82,12 +82,12 @@
             color="primary"
             label="Land District"
             :rules="locationInputRules(20, 'Enter a land district', 'land-district')"
-            persistentHint
+            persistent-hint
           />
         </v-col>
       </v-row>
 
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col>
           <v-text-field
             id="plan"
@@ -96,12 +96,12 @@
             color="primary"
             :label="isStrata ? 'Strata Plan' : 'Plan'"
             :rules="locationInputRules(12, 'Enter a plan number', 'plan')"
-            persistentHint
+            persistent-hint
           />
         </v-col>
       </v-row>
 
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col
           cols="4"
           class="pr-2"
@@ -113,7 +113,7 @@
             color="primary"
             label="District Lot"
             :rules="locationInputRules(17, 'Enter a district lot', 'district-lot')"
-            persistentHint
+            persistent-hint
           />
         </v-col>
 
@@ -128,7 +128,7 @@
             color="primary"
             label="Part Of"
             :rules="maxLength(10)"
-            persistentHint
+            persistent-hint
           />
         </v-col>
 
@@ -143,12 +143,12 @@
             color="primary"
             label="Section"
             :rules="maxLength(10)"
-            persistentHint
+            persistent-hint
           />
         </v-col>
       </v-row>
 
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col
           cols="4"
           class="pr-2"
@@ -160,7 +160,7 @@
             color="primary"
             label="Township"
             :rules="maxLength(2)"
-            persistentHint
+            persistent-hint
           />
         </v-col>
 
@@ -175,7 +175,7 @@
             color="primary"
             label="Range"
             :rules="maxLength(2)"
-            persistentHint
+            persistent-hint
           />
         </v-col>
 
@@ -190,12 +190,12 @@
             color="primary"
             label="Meridian"
             :rules="maxLength(3)"
-            persistentHint
+            persistent-hint
           />
         </v-col>
       </v-row>
 
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col
           cols="6"
           class="pr-2"
@@ -207,7 +207,7 @@
             color="primary"
             label="Parcel"
             :rules="locationInputRules(10, 'Enter a parcel block')"
-            persistentHint
+            persistent-hint
           />
         </v-col>
 
@@ -222,12 +222,12 @@
             color="primary"
             label="Block"
             :rules="locationInputRules(10, 'Enter a block')"
-            persistentHint
+            persistent-hint
           />
         </v-col>
       </v-row>
 
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col cols="12">
           <v-textarea
             id="exceptionPlan"
@@ -236,7 +236,7 @@
             color="primary"
             label="Except Plan"
             :rules="maxLength(80)"
-            persistentHint
+            persistent-hint
           />
         </v-col>
       </v-row>
@@ -247,7 +247,7 @@
 <script lang="ts">
 
 import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue'
-import { FormIF, MhrLocationInfoIF, MhrRegistrationHomeLocationIF } from '@/interfaces'
+import type { FormIF, MhrLocationInfoIF, MhrRegistrationHomeLocationIF } from '@/interfaces'
 import { useInputRules } from '@/composables/useInputRules'
 
 export default defineComponent({

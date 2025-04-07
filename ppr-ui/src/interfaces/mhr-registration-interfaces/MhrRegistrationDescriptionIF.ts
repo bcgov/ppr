@@ -1,5 +1,5 @@
-import { HomeSectionIF } from '@/interfaces'
-import { HomeCertificationOptions } from '@/enums'
+import type { HomeSectionIF } from '@/interfaces'
+import type { HomeCertificationOptions } from '@/enums'
 
 export interface MhrRegistrationDescriptionIF {
   manufacturer: string,

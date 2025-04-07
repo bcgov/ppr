@@ -1,4 +1,4 @@
-import { ContactInfoIF, FeeSettingsIF, UserSettingsIF } from '.'
+import type { ContactInfoIF, FeeSettingsIF, UserSettingsIF } from '.'
 
 // User Info state model
 export interface UserInfoIF {

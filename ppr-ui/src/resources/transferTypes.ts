@@ -1,4 +1,4 @@
-import { TransferTypeSelectIF } from '@/interfaces'
+import type { TransferTypeSelectIF } from '@/interfaces'
 import { ApiTransferTypes, UITransferTypes } from '@/enums/transferTypes'
 import { BlankSearchTypes } from '@/enums'
 

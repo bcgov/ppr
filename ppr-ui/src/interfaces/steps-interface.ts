@@ -1,5 +1,5 @@
-import { RouteNames } from '@/enums'
-import { Component } from 'vue'
+import type { RouteNames } from '@/enums'
+import type { Component } from 'vue'
 
 export interface StepIF {
   id: string

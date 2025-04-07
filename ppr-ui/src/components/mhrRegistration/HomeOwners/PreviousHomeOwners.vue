@@ -6,8 +6,8 @@
     <v-divider class="my-15" />
 
     <CollapsibleCard
-      headerLabel="Previous Home Owners"
-      toggleLabel="Previous Owners"
+      header-label="Previous Home Owners"
+      toggle-label="Previous Owners"
     >
       <template #infoSlot>
         <p class="px-6 mb-6">
@@ -28,10 +28,10 @@
         <v-divider class="mx-6" />
 
         <HomeOwnersTable
-          :homeOwnerGroups="getMhrReRegistrationPreviousOwnerGroups"
-          isReadonlyTable
-          hideTableErrors
-          :forceShowGroups="getMhrReRegistrationPreviousTenancyType === HomeTenancyTypes.COMMON"
+          :home-owner-groups="getMhrReRegistrationPreviousOwnerGroups"
+          is-readonly-table
+          hide-table-errors
+          :force-show-groups="getMhrReRegistrationPreviousTenancyType === HomeTenancyTypes.COMMON"
           class="mx-6 mb-1"
         />
       </template>

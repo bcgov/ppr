@@ -6,7 +6,7 @@
     class="mt-8 pa-8"
   >
     <v-row
-      noGutters
+      no-gutters
       class="pt-1"
     >
       <v-col
@@ -23,8 +23,8 @@
           v-if="updatedBadge"
           :action="updatedBadge.action"
           :baseline="updatedBadge.baseline"
-          :currentState="updatedBadge.currentState"
-          :isCaseSensitive="!isMhrCorrection"
+          :current-state="updatedBadge.currentState"
+          :is-case-sensitive="!isMhrCorrection"
         />
       </v-col>
       <v-col
@@ -36,11 +36,11 @@
           id="location-type--radio-options"
           v-model="locationTypeOption"
           class="mt-0 pr-1"
-          :hideDetails="true"
+          :hide-details="true"
           :disabled="isVerifyingPid"
         >
           <!-- Dealers / Manufacturers Lot -->
-          <v-row noGutters>
+          <v-row no-gutters>
             <v-col>
               <v-radio
                 id="lot-option"
@@ -69,7 +69,7 @@
           </v-row>
 
           <!-- Manufactured Home Park -->
-          <v-row noGutters>
+          <v-row no-gutters>
             <v-col class="pt-3">
               <v-radio
                 id="home-park-option"
@@ -107,7 +107,7 @@
           </v-row>
 
           <!-- Other Land type -->
-          <v-row noGutters>
+          <v-row no-gutters>
             <v-col class="pt-3">
               <v-radio
                 id="other-option"
@@ -121,7 +121,7 @@
                   id="location-type--radio-options"
                   v-model="otherTypeOption"
                   class="mt-0 ml-10"
-                  hideDetails="true"
+                  hide-details="true"
                 >
                   <v-radio
                     id="reserve-option"
@@ -136,10 +136,10 @@
                       class="ml-8"
                     >
                       <HomeLocationDescription
-                        :locationDescription="locationTypeInfo"
-                        :isReserve="true"
+                        :location-description="locationTypeInfo"
+                        :is-reserve="true"
                         :validate="validate"
-                        :legalDescription="legalDescription"
+                        :legal-description="legalDescription"
                         @set-is-valid-location-info="isValidLocationInfo = $event"
                         @set-show-location-info="showLocationInfo = $event"
                         @set-location-info="locationInfo = $event"
@@ -163,7 +163,7 @@
                     >
                       <PidNumber
                         class="mb-4"
-                        :pidNumber="locationTypeInfo.pidNumber"
+                        :pid-number="locationTypeInfo.pidNumber"
                         :disable="showLocationInfo"
                         :required="otherTypeOption === HomeLocationTypes.OTHER_STRATA && validate"
                         @set-pid="handlePidInfo($event)"
@@ -171,10 +171,10 @@
                       />
 
                       <HomeLocationDescription
-                        :locationDescription="locationTypeInfo"
-                        :isStrata="true"
+                        :location-description="locationTypeInfo"
+                        :is-strata="true"
                         :validate="validate"
-                        :legalDescription="legalDescription"
+                        :legal-description="legalDescription"
                         @set-is-valid-location-info="isValidLocationInfo = $event"
                         @set-show-location-info="showLocationInfo = $event"
                         @set-location-info="locationInfo = $event"
@@ -198,7 +198,7 @@
                     >
                       <PidNumber
                         class="mb-4"
-                        :pidNumber="locationTypeInfo.pidNumber"
+                        :pid-number="locationTypeInfo.pidNumber"
                         :disable="showLocationInfo"
                         :required="otherTypeOption === HomeLocationTypes.OTHER_TYPE && validate"
                         @set-pid="handlePidInfo($event)"
@@ -206,9 +206,9 @@
                       />
 
                       <HomeLocationDescription
-                        :locationDescription="locationTypeInfo"
+                        :location-description="locationTypeInfo"
                         :validate="validate"
-                        :legalDescription="legalDescription"
+                        :legal-description="legalDescription"
                         @set-is-valid-location-info="isValidLocationInfo = $event"
                         @set-show-location-info="showLocationInfo = $event"
                         @set-location-info="locationInfo = $event"
@@ -233,8 +233,8 @@ import { HomeLocationTypes } from '@/enums'
 import { PidNumber, UpdatedBadge } from '@/components/common'
 import HomeLocationDescription from './HomeLocationDescription.vue'
 import { useInputRules, useMhrCorrections, useNewMhrRegistration } from '@/composables'
-import { FormIF, MhrLocationInfoIF, MhrRegistrationHomeLocationIF, UpdatedBadgeIF } from '@/interfaces'
-import { PidInfoIF } from '@/interfaces/ltsa-api-interfaces'
+import type { FormIF, MhrLocationInfoIF, MhrRegistrationHomeLocationIF, UpdatedBadgeIF } from '@/interfaces'
+import type { PidInfoIF } from '@/interfaces/ltsa-api-interfaces'
 
 export default defineComponent({
   name: 'HomeLocationType',

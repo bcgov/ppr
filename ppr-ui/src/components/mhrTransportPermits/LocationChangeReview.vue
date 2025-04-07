@@ -7,7 +7,7 @@
   >
     <v-row
       v-if="isRoleStaffReg"
-      noGutters
+      no-gutters
       class="my-4 px-8 key-value-pair"
     >
       <v-col cols="3">
@@ -22,7 +22,7 @@
     </v-row>
 
     <v-row
-      noGutters
+      no-gutters
       class="my-4 px-8 key-value-pair"
     >
       <v-col cols="3">
@@ -44,10 +44,10 @@
     <v-divider class="mx-8 mt-7 mb-n10" />
 
     <HomeLocationReview
-      hideDefaultHeader
-      isTransportPermitReview
-      :isCancelTransportPermitReview="isCancelChangeLocationActive"
-      :isExtendChangeLocationReview="isExtendChangeLocationActive"
+      hide-default-header
+      is-transport-permit-review
+      :is-cancel-transport-permit-review="isCancelChangeLocationActive"
+      :is-extend-change-location-review="isExtendChangeLocationActive"
     />
   </v-card>
 </template>

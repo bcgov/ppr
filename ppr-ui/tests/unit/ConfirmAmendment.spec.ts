@@ -24,7 +24,7 @@ import { RegisteringPartyChange } from '@/components/parties/party'
 import { usePprRegistration } from '@/composables'
 import { useStore } from '@/store/store'
 import { createComponent } from './utils'
-import { afterAll, vi } from 'vitest'
+import { vi } from 'vitest'
 
 const store = useStore()
 const { initPprUpdateFilling } = usePprRegistration()

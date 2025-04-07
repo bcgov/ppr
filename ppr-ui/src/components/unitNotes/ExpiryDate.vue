@@ -12,7 +12,7 @@
       :class="{ 'border-error-left': showBorderError }"
       flat
     >
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col
           cols="12"
           sm="3"
@@ -56,13 +56,13 @@
             ref="expiryDatePicker"
             title="Date"
             :class="{ 'ml-8' : !hideContinuedExpiryDate }"
-            :initialValue="selectedFutureDate"
-            :disablePicker="isContinuedDateSelected && !hideContinuedExpiryDate"
-            :inputRules="required('This field is required')"
-            :minDate="minDate"
-            @emitDate="selectedFutureDate = $event"
-            @emitCancel="selectedFutureDate = ''"
-            @emitClear="selectedFutureDate = ''"
+            :initial-value="selectedFutureDate"
+            :disable-picker="isContinuedDateSelected && !hideContinuedExpiryDate"
+            :input-rules="required('This field is required')"
+            :min-date="minDate"
+            @emit-date="selectedFutureDate = $event"
+            @emit-cancel="selectedFutureDate = ''"
+            @emit-clear="selectedFutureDate = ''"
           />
         </v-col>
       </v-row>
@@ -74,7 +74,7 @@
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { EffectiveDateTypes } from '@/enums/'
 import { createDateFromPacificTime, localTodayDate } from '@/utils'
-import { ContentIF, FormIF } from '@/interfaces'
+import type { ContentIF, FormIF } from '@/interfaces'
 import { useInputRules } from '@/composables'
 import InputFieldDatePicker from '@/components/common/InputFieldDatePicker.vue'
 

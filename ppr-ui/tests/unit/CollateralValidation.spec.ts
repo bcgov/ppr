@@ -3,7 +3,7 @@ import { useStore } from '@/store/store'
 import { createComponent } from './utils'
 import { mockedSelectSecurityAgreement } from './test-data'
 import flushPromises from 'flush-promises'
-import { EditCollateral } from '@/components/collateral'
+import { EditCollateral } from '@/components/collateral/vehicle'
 
 const store = useStore()
 

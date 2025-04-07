@@ -1,5 +1,5 @@
 import { reactive, toRefs } from 'vue'
-import { PartyIF } from '@/interfaces'
+import type { PartyIF } from '@/interfaces'
 import { useStore } from '@/store/store'
 import { Months } from '@/resources/months'
 import { PartyAddressSchema } from '@/schemas'
@@ -97,7 +97,7 @@ export const useDebtor = (props, context) => {
 
     if (!localState.currentIsBusiness) {
       const dateOfBirth = new Date()
-      // @ts-ignore - returned by toRef
+      // @ts-expect-error - returned by toRef
       dateOfBirth.setFullYear(
         parseInt(localState.year),
         localState.monthValue - 1,

@@ -1,4 +1,4 @@
-import { CancelUnitNoteIF, SubmittingPartyIF, UnitNoteIF } from '@/interfaces'
+import type { CancelUnitNoteIF, SubmittingPartyIF, UnitNoteIF } from '@/interfaces'
 
 export interface UnitNoteRegistrationIF {
   clientReferenceId: string

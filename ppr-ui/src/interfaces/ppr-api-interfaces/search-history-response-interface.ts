@@ -1,4 +1,4 @@
-import { ErrorIF, SearchResponseIF, ManufacturedHomeSearchResponseIF } from '@/interfaces'
+import type { ErrorIF, SearchResponseIF, ManufacturedHomeSearchResponseIF } from '@/interfaces'
 
 // Search Query response (search step 1) interface.
 export interface SearchHistoryResponseIF {

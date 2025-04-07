@@ -4,7 +4,7 @@
       v-for="(item, index) in contactInfo"
       :key="index"
       class="contact-item pt-1"
-      noGutters
+      no-gutters
     >
       <v-col
         class="contact-label"

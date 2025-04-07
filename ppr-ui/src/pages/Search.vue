@@ -124,6 +124,7 @@ import { useAuth, useNavigation } from '@/composables'
 import SearchedResultsPpr from '@/components/tables/ppr/SearchedResultsPpr.vue'
 
 export default defineComponent({
+  // eslint-disable-next-line vue/no-reserved-component-names
   name: 'Search',
   components: {
     SearchedResultsPpr

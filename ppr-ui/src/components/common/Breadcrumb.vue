@@ -2,11 +2,11 @@
   <div class="breadcrumb-row">
     <v-container class="view-container py-0">
       <v-row
-        noGutters
+        no-gutters
         class="py-2"
       >
         <v-col cols="auto">
-          <v-row noGutters>
+          <v-row no-gutters>
             <v-col cols="auto">
               <v-btn
                 id="breadcrumb-back-btn"
@@ -59,11 +59,11 @@
 </template>
 <script lang="ts">
 // external
-import { computed, defineComponent, reactive, toRefs } from 'vue' // eslint-disable-line
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 // local
-import { BreadcrumbIF } from '@/interfaces' // eslint-disable-line
+import type { BreadcrumbIF } from '@/interfaces'
 import {
   tombstoneBreadcrumbDashboard,
   tombstoneBreadcrumbDischarge,

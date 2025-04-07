@@ -5,7 +5,7 @@
   >
     <v-radio-group
       v-model="selectedProduct"
-      hideDetails
+      hide-details
       class="sub-product-radio-group pt-0 mt-0"
     >
       <div
@@ -19,7 +19,7 @@
         >
           <template #label="{props}">
             <v-row
-              noGutters
+              no-gutters
             >
               <v-col cols="12">
                 <label
@@ -63,8 +63,8 @@
 
 <script lang="ts">
 import { defineComponent, reactive, ref, toRefs, watch } from 'vue'
-import { SubProductConfigIF } from '@/interfaces'
-import { MhrSubTypes } from '@/enums'
+import type { SubProductConfigIF } from '@/interfaces'
+import type { MhrSubTypes } from '@/enums'
 
 export default defineComponent({
   name: 'SubProductSelector',

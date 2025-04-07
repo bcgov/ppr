@@ -1,4 +1,4 @@
-import { SearchPartyIF } from '@/interfaces'
+import type { SearchPartyIF } from '@/interfaces'
 
 export const mockedPartyCodeSearchResults: Array<SearchPartyIF> = [
   {

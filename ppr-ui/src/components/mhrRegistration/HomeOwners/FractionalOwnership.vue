@@ -28,7 +28,7 @@
         :data-test-id="`interest-type-field-group-${groupId}`"
       />
       <div class="owner-fractions">
-        <v-row noGutters>
+        <v-row no-gutters>
           <v-col class="pr-1">
             <v-text-field
               :id="`fraction-amount-group-${groupId}`"
@@ -88,7 +88,7 @@ export default defineComponent({
           interestDenominator: null
         }
       },
-      required: true
+      required: false
     },
     isMhrTransfer: { type: Boolean, default: false }
   },

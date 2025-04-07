@@ -14,7 +14,7 @@
         v-if="showUpdatedBadge"
         :action="correctionState.action"
         :baseline="correctionState.manufacturerYear.baseline"
-        :currentState="correctionState.manufacturerYear.currentState"
+        :current-state="correctionState.manufacturerYear.currentState"
       />
     </v-col>
     <v-col cols="4">
@@ -26,7 +26,7 @@
         color="primary"
         :rules="manufactureYearRules"
         label="Year of Manufacture"
-        persistentHint
+        persistent-hint
         hint="YYYY"
         data-test-id="manufacture-year"
       />
@@ -37,12 +37,12 @@
         v-model="circa"
         label="This Year of Manufacture is approximate"
         class="float-left"
-        hideDetails
+        hide-details
         data-test-id="circa-year-checkbox"
       />
       <v-tooltip
         location="top"
-        contentClass="top-tooltip"
+        content-class="top-tooltip"
         transition="fade-transition"
         data-test-id="circa-year-tooltip"
       >

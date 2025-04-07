@@ -26,15 +26,15 @@
         :data-test-id="`${sectionId}-card`"
       >
         <FormField
-          :sectionId="sectionId"
-          :initialValue="initialValue"
-          :inputTitle="config.inputTitle"
-          :inputLabel="config.inputLabel"
-          :inputColWidth="hasWiderInput ? 9 : undefined"
-          :labelColWidth="hasWiderInput ? 3 : undefined"
+          :section-id="sectionId"
+          :initial-value="initialValue"
+          :input-title="config.inputTitle"
+          :input-label="config.inputLabel"
+          :input-col-width="hasWiderInput ? 9 : undefined"
+          :label-col-width="hasWiderInput ? 3 : undefined"
           :rules="maxLength(40)"
-          :showErrors="setShowErrors"
-          @updateValue="$emit('setStoreProperty', $event)"
+          :show-errors="setShowErrors"
+          @update-value="$emit('setStoreProperty', $event)"
         />
       </v-card>
     </v-form>
@@ -48,7 +48,7 @@ import { defineComponent, toRefs, computed, reactive, ref, watch } from 'vue'
 import { useInputRules } from '@/composables'
 import { FormField } from '@/components/common'
 import { attentionConfigManufacturer, attentionConfig } from '@/resources/attnRefConfigs'
-import { AttnRefConfigIF } from '@/interfaces'
+import type { AttnRefConfigIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'Attention',

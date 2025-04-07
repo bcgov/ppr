@@ -5,7 +5,7 @@
     style="background-color: white;"
   >
     <v-row
-      noGutters
+      no-gutters
       style="padding: 40px 30px;"
     >
       <v-col
@@ -31,7 +31,7 @@
           v-model="checkbox1"
           class="ma-0"
           :class="showErrors && !checkbox1 ? 'check-box-error': 'copy-normal'"
-          hideDetails
+          hide-details
         >
           <template #label>
             <p class="ma-0">
@@ -44,7 +44,7 @@
           v-model="checkbox2"
           class="ma-0"
           :class="showErrors && !checkbox2 ? 'check-box-error': 'copy-normal'"
-          hideDetails
+          hide-details
         >
           <template #label>
             <p class="ma-0">
@@ -57,7 +57,7 @@
           v-model="checkbox3"
           class="ma-0"
           :class="showErrors && !checkbox3 ? 'check-box-error': 'copy-normal'"
-          hideDetails
+          hide-details
         >
           <template #label>
             <p class="ma-0">
@@ -78,7 +78,7 @@ import {
   toRefs,
   watch
 } from 'vue'
-import { UIRegistrationTypes } from '@/enums'
+import type { UIRegistrationTypes } from '@/enums'
 
 export default defineComponent({
   name: 'DischargeConfirmSummary',

@@ -18,7 +18,7 @@ import {
 import { DebtorSummary, RegisteringPartySummary, SecuredPartySummary } from '@/components/parties/summaries'
 import { SecuredParties } from '@/components/parties/party'
 import { Debtors } from '@/components/parties/debtor'
-import { Collateral } from '@/components/collateral'
+import Collateral from '@/components/collateral/Collateral.vue'
 import { StickyContainer } from '@/components/common'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import flushPromises from 'flush-promises'

@@ -1,4 +1,4 @@
-import { OrgLookupConfigIF } from '@/interfaces'
+import type { OrgLookupConfigIF } from '@/interfaces'
 import { MhrSubTypes } from '@/enums'
 
 export const UserAccessOrgLookupConfig: Record<MhrSubTypes, OrgLookupConfigIF> = {

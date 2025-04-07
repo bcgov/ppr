@@ -1,5 +1,5 @@
-import { MhrRegistrationHomeOwnerIF, MhrRegistrationFractionalOwnershipIF } from '@/interfaces'
-import { ActionTypes } from '@/enums'
+import type { MhrRegistrationHomeOwnerIF, MhrRegistrationFractionalOwnershipIF } from '@/interfaces'
+import type { ActionTypes } from '@/enums'
 
 export interface MhrRegistrationHomeOwnerGroupIF extends MhrRegistrationFractionalOwnershipIF {
   groupId: number,

@@ -385,7 +385,7 @@ export default defineComponent({
       if (pdf.error) {
         if (pdf.error.statusCode === 400 && pdf.error.category === ErrorCategories.REPORT_GENERATION) {
           // log to console if pdf report is still pending
-          console.log('PDF Report is not ready yet.')
+          console.info('PDF Report is not ready yet.')
         } else {
           // emit and show modal for a server error
           emit('error', pdf.error)

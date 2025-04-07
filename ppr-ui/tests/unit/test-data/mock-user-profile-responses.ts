@@ -1,5 +1,5 @@
 import { SettingOptions } from '@/enums'
-import { UserSettingsIF } from '@/interfaces'
+import type { UserSettingsIF } from '@/interfaces'
 import { mhRegistrationTableHeaders, registrationTableHeaders } from '@/resources'
 
 export const mockedDefaultUserSettingsResponse: UserSettingsIF = {

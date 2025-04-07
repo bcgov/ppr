@@ -1,5 +1,5 @@
 // Search type interface
-import { ApiTransferTypes, UITransferTypes } from '@/enums/transferTypes'
+import type { ApiTransferTypes, UITransferTypes } from '@/enums/transferTypes'
 
 export interface TransferTypeSelectIF {
   divider: boolean

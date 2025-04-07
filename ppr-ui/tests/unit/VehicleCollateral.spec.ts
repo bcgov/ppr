@@ -9,7 +9,7 @@ import {
   mockedVehicleCollateralAmendment2
 } from './test-data'
 import { createComponent } from './utils'
-import { EditCollateral, VehicleCollateral } from '@/components/collateral'
+import { EditCollateral, VehicleCollateral } from '@/components/collateral/vehicle'
 import { nextTick } from 'vue'
 import { RegistrationFlowType } from '@/enums'
 

@@ -1,5 +1,5 @@
 import { RegistrationFlowType, UnitNoteStatusTypes } from '@/enums'
-import { MhrTransportPermitIF, PartyIF, RegistrationTypeIF, StateModelIF } from '@/interfaces'
+import type { MhrTransportPermitIF, PartyIF, RegistrationTypeIF, StateModelIF } from '@/interfaces'
 
 export const stateModel: StateModelIF = {
   accountInformation: {

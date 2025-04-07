@@ -14,13 +14,13 @@ function isAuthenticated (): boolean {
 }
 
 /** Returns True if route is Signin, else False. */
-// eslint-disable-next-line
+ 
 function isSigninRoute (route: Route): boolean {
   return Boolean(route.name === 'signin')
 }
 
 /** Returns True if route is Signout, else False. */
-// eslint-disable-next-line
+ 
 function isSignoutRoute (route: Route): boolean {
   return Boolean(route.name === 'signout')
 }

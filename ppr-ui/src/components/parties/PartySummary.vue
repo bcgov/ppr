@@ -4,7 +4,7 @@
     class="pa-0 flat"
   >
     <v-row
-      noGutters
+      no-gutters
       class="summary-header pa-2 rounded-top"
     >
       <v-col
@@ -26,7 +26,7 @@
           <span v-if="shouldShowHint">
             <v-tooltip
               class="pa-2"
-              contentClass="top-tooltip"
+              content-class="top-tooltip"
               location="top"
               transition="fade-transition"
             >
@@ -45,7 +45,7 @@
         </v-col>
       </v-row>
       <v-row
-        noGutters
+        no-gutters
         class="pb-6 pt-4"
       >
         <v-col>
@@ -62,7 +62,7 @@
         </v-col>
       </v-row>
       <v-row
-        noGutters
+        no-gutters
         class="pb-6 pt-4"
       >
         <v-col>
@@ -78,7 +78,7 @@
         </v-col>
       </v-row>
       <v-row
-        noGutters
+        no-gutters
         class="pb-6 pt-4"
       >
         <v-col>
@@ -107,7 +107,7 @@ import {
   RegisteringPartySummary,
   SecuredPartySummary
 } from '@/components/parties/summaries'
-import { AddPartiesIF } from '@/interfaces'
+import type { AddPartiesIF } from '@/interfaces'
 import { useParty } from '@/composables/useParty'
 import { PartyAddressSchema } from '@/schemas'
 

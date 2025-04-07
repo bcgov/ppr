@@ -22,7 +22,7 @@ import {
   UnitNotesInfo,
   cancelledWithRedemptionNote
 } from '@/resources/unitNotes'
-import { CancelUnitNoteIF, UnitNoteIF, UnitNotePanelIF } from '@/interfaces'
+import type { CancelUnitNoteIF, UnitNoteIF, UnitNotePanelIF } from '@/interfaces'
 import { createComponent, getTestId } from './utils'
 import { useMhrUnitNote } from '@/composables'
 import { DOMWrapper } from '@vue/test-utils'

@@ -80,6 +80,7 @@ export const addDaysToDate = (dateString, daysToAdd) => {
  */
 export function convertDateToLongFormat (dateString: string): string {
   if (!dateString) return ''
+  // eslint-disable-next-line no-unsafe-optional-chaining
   const [year, month, day] = dateString?.split('-').map(Number);
   const date = new Date(year, month - 1, day);
   return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -189,7 +190,7 @@ export function dateToYyyyMmDd (date: Date): string {
     day: 'numeric', // 31
     year: 'numeric' // 2020
   })
-  
+
   return convertDateFormat(localDate)
 }
 

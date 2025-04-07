@@ -9,7 +9,7 @@
       flat
     >
       <v-row
-        noGutters
+        no-gutters
         class="summary-header pa-2"
       >
         <v-col
@@ -25,7 +25,7 @@
         </v-col>
       </v-row>
       <v-container style="padding: 40px 30px;">
-        <v-row noGutters>
+        <v-row no-gutters>
           <v-col
             cols="12"
             class="pb-8"
@@ -35,7 +35,7 @@
             be added to any time remaining on your current registration.
           </v-col>
         </v-row>
-        <v-row noGutters>
+        <v-row no-gutters>
           <v-col
             cols="3"
             class="generic-label"
@@ -47,7 +47,7 @@
           </v-col>
         </v-row>
         <v-row
-          noGutters
+          no-gutters
           class="py-6"
         >
           <v-col cols="3" />
@@ -58,7 +58,7 @@
             <v-divider class="ml-0" />
           </v-col>
         </v-row>
-        <v-row noGutters>
+        <v-row no-gutters>
           <v-col
             cols="3"
             class="generic-label"
@@ -73,7 +73,7 @@
           </v-col>
         </v-row>
         <v-row
-          noGutters
+          no-gutters
           class="pt-6"
         >
           <v-col cols="3" />
@@ -85,7 +85,7 @@
           </v-col>
         </v-row>
         <v-row
-          noGutters
+          no-gutters
           class="pt-6"
         >
           <v-col
@@ -99,7 +99,7 @@
           </v-col>
         </v-row>
         <v-row
-          noGutters
+          no-gutters
           class="pt-6"
         >
           <v-col
@@ -126,7 +126,7 @@
   >
     <v-row
       v-if="renewalView"
-      noGutters
+      no-gutters
       class="summary-header pa-2 mb-8 mt-n3 mr-n10 ml-n8"
     >
       <v-col
@@ -144,7 +144,7 @@
 
     <v-row
       v-if="renewalView"
-      noGutters
+      no-gutters
     >
       <v-col
         cols="12"
@@ -156,7 +156,7 @@
     </v-row>
     <div>
       <v-row
-        noGutters
+        no-gutters
         class="ps-6 pt-6 pb-3"
       >
         <v-col
@@ -170,7 +170,7 @@
         </v-col>
       </v-row>
       <v-row
-        noGutters
+        no-gutters
         class="ps-6 pt-6"
       >
         <v-col
@@ -184,17 +184,17 @@
             id="lien-amount"
             v-model="lienAmount"
             autocomplete="off"
-            :errorMessages="lienAmountMessage || ''"
+            :error-messages="lienAmountMessage || ''"
             variant="filled"
             color="primary"
             hint="Example: 10,500.50"
-            persistentHint
+            persistent-hint
             label="Amount in Canadian Dollars ($)"
           />
         </v-col>
       </v-row>
       <v-row
-        noGutters
+        no-gutters
         class="ps-6 pt-4"
       >
         <v-col
@@ -208,15 +208,15 @@
             ref="datePickerRef"
             :key="datePickerKey"
             title="Date"
-            nudgeRight="40"
+            nudge-right="40"
             hint="Must not be more than 21 days in the past"
-            :errorMsg="surrenderDateMessage || ''"
-            :initialValue="surrenderDate"
-            :minDate="minSurrenderDate.toString()"
-            :persistentHint="true"
-            @emitDate="surrenderDate = $event"
-            @emitCancel="surrenderDate = ''"
-            @emitClear="surrenderDate = ''"
+            :error-msg="surrenderDateMessage || ''"
+            :initial-value="surrenderDate"
+            :min-date="minSurrenderDate.toString()"
+            :persistent-hint="true"
+            @emit-date="surrenderDate = $event"
+            @emit-cancel="surrenderDate = ''"
+            @emit-clear="surrenderDate = ''"
           />
         </v-col>
       </v-row>
@@ -235,7 +235,7 @@ import {
 } from 'vue'
 import { useStore } from '@/store/store'
 import InputFieldDatePicker from '@/components/common/InputFieldDatePicker.vue'
-import { LengthTrustIF } from '@/interfaces'
+import type { LengthTrustIF } from '@/interfaces'
 import { convertDate, formatExpiryDate, localTodayDate } from '@/utils'
 import { APIRegistrationTypes } from '@/enums'
 import { storeToRefs } from 'pinia'

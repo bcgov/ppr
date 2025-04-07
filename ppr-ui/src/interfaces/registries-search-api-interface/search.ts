@@ -1,5 +1,5 @@
-import { ErrorI } from '.'
-import { BusinessStatuses, BusinessTypes, CorpTypeCd } from '@/enums'
+import type { ErrorI } from '.'
+import type { BusinessStatuses, BusinessTypes, CorpTypeCd } from '@/enums'
 
 // api responses
 export interface SearchResultI {

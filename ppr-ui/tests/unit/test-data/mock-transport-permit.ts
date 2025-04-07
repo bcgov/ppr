@@ -1,5 +1,5 @@
 import { HomeLocationTypes } from "@/enums";
-import { MhrRegistrationHomeLocationIF } from "@/interfaces";
+import type { MhrRegistrationHomeLocationIF } from "@/interfaces";
 
 export const mockTransportPermitNewLocation: MhrRegistrationHomeLocationIF = {
   address: {

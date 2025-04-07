@@ -5,7 +5,7 @@
     class="pa-0 noGutters"
     role="region"
   >
-    <v-row noGutters>
+    <v-row no-gutters>
       <v-col cols="auto">
         Include Debtors as <b>either</b> an Individual or a Business. If the debtor is
         operating a business and you want to register both the name of the
@@ -16,7 +16,7 @@
       </v-col>
     </v-row>
     <v-row
-      noGutters
+      no-gutters
       class="pb-4 pt-10"
     >
       <v-col>
@@ -44,7 +44,7 @@
         </v-btn>
       </v-col>
     </v-row>
-    <v-row noGutters>
+    <v-row no-gutters>
       <v-col>
         <div :class="{ 'invalid-section': invalidSection }">
           <v-expand-transition>
@@ -54,11 +54,11 @@
               class="add-debtor-container"
             >
               <EditDebtor
-                :activeIndex="activeIndex"
-                :isBusiness="currentIsBusiness"
-                :invalidSection="invalidSection"
-                :setShowErrorBar="showErrorBar"
-                @resetEvent="resetData"
+                :active-index="activeIndex"
+                :is-business="currentIsBusiness"
+                :invalid-section="invalidSection"
+                :set-show-error-bar="showErrorBar"
+                @reset-event="resetData"
               />
             </v-card>
           </v-expand-transition>
@@ -67,7 +67,7 @@
     </v-row>
 
     <v-row
-      noGutters
+      no-gutters
       class="pt-4"
     >
       <v-col>
@@ -110,11 +110,11 @@
                       class="edit-debtor-container"
                     >
                       <edit-debtor
-                        :activeIndex="activeIndex"
-                        :invalidSection="invalidSection"
-                        :setShowErrorBar="showErrorBar"
-                        @removeDebtor="removeDebtor"
-                        @resetEvent="resetData"
+                        :active-index="activeIndex"
+                        :invalid-section="invalidSection"
+                        :set-show-error-bar="showErrorBar"
+                        @remove-debtor="removeDebtor"
+                        @reset-event="resetData"
                       />
                     </v-card>
                   </td>
@@ -125,7 +125,7 @@
                     style="padding-left:30px"
                   >
                     <v-row
-                      noGutters
+                      no-gutters
                       :aria-label="`${isBusiness(item) ? 'Business' : 'Person'} ${getName(item)}`"
                     >
                       <v-col
@@ -152,7 +152,7 @@
                         <div v-if="item.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
                           <v-chip
                             v-if="item.action === ActionTypes.REMOVED"
-                            xSmall
+                            x-small
                             variant="elevated"
                             color="greyLighten"
                           >
@@ -160,7 +160,7 @@
                           </v-chip>
                           <v-chip
                             v-else
-                            xSmall
+                            x-small
                             variant="elevated"
                             color="#1669BB"
                           >
@@ -341,7 +341,7 @@ import {
   watch
 } from 'vue'
 import { useStore } from '@/store/store'
-import { AddPartiesIF } from '@/interfaces'
+import type { AddPartiesIF } from '@/interfaces'
 import EditDebtor from './EditDebtor.vue'
 import { useParty } from '@/composables/useParty'
 import { BaseAddress } from '@/composables/address'

@@ -143,8 +143,10 @@ export default defineComponent({
       }
 
       if (staffPaymentData.routingSlipNumber || staffPaymentData.bcolAccountNumber || staffPaymentData.datNumber) {
+        localState.validating = true
       } else {
         if (localState.paymentOption !== staffPaymentData.option) {
+          localState.validating = false
           localState.paymentOption = staffPaymentData.option
         }
       }

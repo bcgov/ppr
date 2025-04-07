@@ -23,15 +23,15 @@
         :data-test-id="`${sectionId}-card`"
       >
         <FormField
-          :sectionId="sectionId"
-          :initialValue="initialValue"
-          :inputTitle="folioOrRefConfig.inputTitle"
-          :inputLabel="folioOrRefConfig.inputLabel"
-          :inputColWidth="hasWiderInput ? 10 : undefined"
-          :labelColWidth="hasWiderInput ? 2 : undefined"
+          :section-id="sectionId"
+          :initial-value="initialValue"
+          :input-title="folioOrRefConfig.inputTitle"
+          :input-label="folioOrRefConfig.inputLabel"
+          :input-col-width="hasWiderInput ? 10 : undefined"
+          :label-col-width="hasWiderInput ? 2 : undefined"
           :rules="maxLength(30)"
-          :showErrors="setShowErrors"
-          @updateValue="$emit('setStoreProperty', $event)"
+          :show-errors="setShowErrors"
+          @update-value="$emit('setStoreProperty', $event)"
         />
       </v-card>
     </v-form>

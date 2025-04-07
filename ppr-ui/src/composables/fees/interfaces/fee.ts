@@ -1,4 +1,4 @@
-import { FeeCodes } from '../enums'
+import type { FeeCodes } from '../enums'
 
 // Fee information interface.
 export interface FeeI {

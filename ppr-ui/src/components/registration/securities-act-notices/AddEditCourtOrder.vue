@@ -12,7 +12,7 @@
         class="pb-6 px-0"
       >
         <v-row
-          noGutters
+          no-gutters
         >
           <v-col>
             <v-text-field
@@ -22,14 +22,14 @@
               color="primary"
               label="Court Name"
               hint="For example: Supreme Court of British Columbia"
-              persistentHint
+              persistent-hint
               aria-label="court-name-text-field"
               :rules="nameRules"
             />
           </v-col>
         </v-row>
         <v-row
-          noGutters
+          no-gutters
         >
           <v-col
             class="pt-4"
@@ -41,14 +41,14 @@
               color="primary"
               label="Court Registry"
               hint="The location (city) of the court. For example: Richmond"
-              persistentHint
+              persistent-hint
               aria-label="court-registry-text-field"
               :rules="registryRules"
             />
           </v-col>
         </v-row>
         <v-row
-          noGutters
+          no-gutters
         >
           <v-col
             class="pt-4"
@@ -59,14 +59,14 @@
               variant="filled"
               color="primary"
               label="Court File Number"
-              persistentHint
+              persistent-hint
               aria-label="court-file-number-text-field"
               :rules="fileNumberRules"
             />
           </v-col>
         </v-row>
         <v-row
-          noGutters
+          no-gutters
         >
           <v-col
             class="pt-4"
@@ -75,21 +75,21 @@
               id="court-date-text-field"
               ref="datePickerRef"
               class="court-date-text-input"
-              nudgeRight="40"
+              nudge-right="40"
               title="Date of Order"
-              :initialValue="courtOrderData?.orderDate.split('T')[0]"
-              :minDate="null"
-              :maxDate="localTodayDate(new Date(), true)"
-              :persistentHint="true"
-              :inputRules="required('This field is required')"
+              :initial-value="courtOrderData?.orderDate.split('T')[0]"
+              :min-date="null"
+              :max-date="localTodayDate(new Date(), true)"
+              :persistent-hint="true"
+              :input-rules="required('This field is required')"
               :hint="'Enter the date of the order filing'"
-              @emitDate="courtOrderData.orderDate = $event"
-              @emitCancel="courtOrderData.orderDate = ''"
+              @emit-date="courtOrderData.orderDate = $event"
+              @emit-cancel="courtOrderData.orderDate = ''"
             />
           </v-col>
         </v-row>
         <v-row
-          noGutters
+          no-gutters
         >
           <v-col
             class="pt-4"
@@ -102,7 +102,7 @@
               variant="filled"
               label="Effect of Order (Optional)"
               counter="512"
-              persistentCounter
+              persistent-counter
               aria-label="effect-of-order-text-area"
               :rules="effectOfOrderRules"
             >
@@ -116,7 +116,7 @@
 
       <!-- Actions -->
       <v-row
-        noGutters
+        no-gutters
         class="justify-end mt-5 mr-3"
       >
         <v-btn
@@ -140,9 +140,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, Ref, ref, watch } from 'vue'
+import type { Ref} from 'vue';
+import { computed, ref, watch } from 'vue'
 import { FormCard, InputFieldDatePicker } from '@/components/common'
-import { CourtOrderIF, FormIF } from '@/interfaces'
+import type { CourtOrderIF, FormIF } from '@/interfaces'
 import { useInputRules } from '@/composables'
 import { localTodayDate } from '@/utils'
 
@@ -200,7 +201,7 @@ const fileNumberRules = customRules(
   maxLength(20)
 )
 const effectOfOrderRules = computed(() => {
-  return !!courtOrderData.value.effectOfOrder
+  return courtOrderData.value.effectOfOrder
     ? customRules(
       minLength(5),
       maxLength(512)

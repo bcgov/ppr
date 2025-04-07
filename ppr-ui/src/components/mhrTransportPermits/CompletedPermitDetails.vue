@@ -6,7 +6,7 @@ import { addDaysToDate, pacificDate, shortPacificDate } from '@/utils/date-helpe
 import { useTransportPermits } from '@/composables'
 const { getMhrInformation } = storeToRefs(useStore())
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 const props = withDefaults(defineProps<{
   isCancelledLocation?: boolean,
   isVoidPermit?: boolean,
@@ -29,7 +29,7 @@ const { isExtendChangeLocationActive } = useTransportPermits()
       { 'void-transport-permit-details': isVoidPermit }
     ]"
   >
-    <v-row noGutters>
+    <v-row no-gutters>
       <v-col
         class="transport-details-header"
       >
@@ -40,7 +40,7 @@ const { isExtendChangeLocationActive } = useTransportPermits()
     </v-row>
 
     <v-row
-      noGutters
+      no-gutters
       class="pt-4 key-value-pair"
     >
       <v-col cols="3 tp-header">
@@ -52,7 +52,7 @@ const { isExtendChangeLocationActive } = useTransportPermits()
     </v-row>
 
     <v-row
-      noGutters
+      no-gutters
       class="pt-2 key-value-pair"
     >
       <v-col cols="3 tp-header">
@@ -64,7 +64,7 @@ const { isExtendChangeLocationActive } = useTransportPermits()
     </v-row>
 
     <v-row
-      noGutters
+      no-gutters
       class="pt-2 pb-1 key-value-pair"
     >
       <v-col cols="3 tp-header">

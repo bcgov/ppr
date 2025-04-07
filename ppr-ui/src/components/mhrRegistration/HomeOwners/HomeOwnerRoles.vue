@@ -1,7 +1,7 @@
 <template>
   <v-row
     id="home-owners-roles"
-    noGutters
+    no-gutters
   >
     <v-col cols="12">
       <label class="generic-label">
@@ -14,13 +14,13 @@
         v-model="selectedPartyType"
         class="mt-0 pr-2"
         inline
-        hideDetails="true"
+        hide-details="true"
       >
         <v-tooltip
           v-for="role in HomeOwnerRoles"
           :key="role.id"
           location="top"
-          contentClass="top-tooltip pa-5"
+          content-class="top-tooltip pa-5"
           transition="fade-transition"
         >
           <template #activator="{ props }">
@@ -49,7 +49,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, reactive, toRefs, watch } from 'vue'
+import type { PropType} from 'vue';
+import { defineComponent, reactive, toRefs, watch } from 'vue'
 import { HomeOwnerPartyTypes } from '@/enums'
 import { HomeOwnerRoles } from '@/resources'
 import { useTransferOwners } from '@/composables'

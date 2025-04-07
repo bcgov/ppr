@@ -1,4 +1,4 @@
-import { SchemaIF } from '@/composables/address/interfaces'
+import type { SchemaIF } from '@/composables/address/interfaces'
 
 export interface PartySchemaIF {
   firstName: { rules: Array<(v:string) => true | string>, optional: boolean }

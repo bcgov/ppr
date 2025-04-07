@@ -1,10 +1,10 @@
-import {
+import type {
   MhrRegistrationDescriptionIF,
   MhrRegistrationHomeOwnerGroupIF,
   MhrRegistrationHomeLocationIF,
   SubmittingPartyIF
 } from '@/interfaces'
-import { APIRegistrationTypes, MhApiStatusTypes } from '@/enums'
+import type { APIRegistrationTypes, MhApiStatusTypes } from '@/enums'
 export interface MhrRegistrationIF {
   draftNumber: string
   documentId?: string

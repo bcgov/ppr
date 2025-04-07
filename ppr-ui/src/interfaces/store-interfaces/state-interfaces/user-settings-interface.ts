@@ -1,5 +1,5 @@
-import { SettingOptions } from '@/enums'
-import { BaseHeaderIF, ErrorIF } from '@/interfaces'
+import type { SettingOptions } from '@/enums'
+import type { BaseHeaderIF, ErrorIF } from '@/interfaces'
 
 // user settings state model
 export interface UserSettingsIF {

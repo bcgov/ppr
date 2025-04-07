@@ -56,7 +56,7 @@ export const useDebtorValidation = () => {
   const validateEmail = (email: string) => {
     let isValid = true
     if (email) {
-      // eslint-disable-line
+       
       const VALID_FORMAT = new RegExp(
         /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
       )

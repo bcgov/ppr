@@ -6,7 +6,7 @@ import { beforeEach } from 'vitest'
 import { createComponent } from './utils'
 import { SaNoticeTypes } from '@/enums'
 import flushPromises from 'flush-promises'
-import { AddEditSaNoticeIF } from '@/interfaces'
+import type { AddEditSaNoticeIF } from '@/interfaces'
 
 const store = useStore()
 

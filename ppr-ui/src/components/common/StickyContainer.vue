@@ -3,27 +3,27 @@
     <FeeSummary
       v-if="showFeeSummary"
       class="overlap"
-      :setFeeOverride="feeOverride"
-      :setFeeType="setFeeType"
-      :setFeeSubtitle="setFeeSubtitle"
-      :setFeeQuantity="setFeeQuantity"
-      :setRegistrationLength="registrationLength"
-      :setRegistrationType="registrationType"
-      :setStaffReg="isStaffReg"
-      :setStaffSBC="isStaffSBC"
-      :additionalFees="setAdditionalFees"
-      :setStaffClientPayment="isStaffClientPayment"
-      :transferType="transferType"
+      :set-fee-override="feeOverride"
+      :set-fee-type="setFeeType"
+      :set-fee-subtitle="setFeeSubtitle"
+      :set-fee-quantity="setFeeQuantity"
+      :set-registration-length="registrationLength"
+      :set-registration-type="registrationType"
+      :set-staff-reg="isStaffReg"
+      :set-staff-s-b-c="isStaffSBC"
+      :additional-fees="setAdditionalFees"
+      :set-staff-client-payment="isStaffClientPayment"
+      :transfer-type="transferType"
     />
     <ButtonsStacked
       v-if="showButtons"
       class="pt-4 buttons-stacked overlap"
-      :setBackBtn="setBackBtn"
-      :setCancelBtn="cancelBtn"
-      :setSubmitBtn="setSubmitBtn"
-      :setSaveButton="saveBtn"
-      :setDisableSubmitBtn="disableSubmitBtn"
-      :setIsLoading="setIsLoading"
+      :set-back-btn="setBackBtn"
+      :set-cancel-btn="cancelBtn"
+      :set-submit-btn="setSubmitBtn"
+      :set-save-button="saveBtn"
+      :set-disable-submit-btn="disableSubmitBtn"
+      :set-is-loading="setIsLoading"
       @back="back()"
       @cancel="cancel()"
       @submit="submit()"
@@ -49,9 +49,9 @@ import {
 import { useStore } from '@/store/store'
 import { ButtonsStacked } from '@/components/common'
 import { FeeSummary } from '@/composables/fees'
-import { UIRegistrationTypes, UITransferTypes } from '@/enums'
-import { FeeSummaryTypes } from '@/composables/fees/enums'
-import {
+import type { UIRegistrationTypes, UITransferTypes } from '@/enums'
+import type { FeeSummaryTypes } from '@/composables/fees/enums'
+import type {
   AdditionalSearchFeeIF,
   FeeSummaryI,
   RegistrationLengthI

@@ -5,7 +5,7 @@
     elevation="6"
     flat
   >
-    <v-row noGutters>
+    <v-row no-gutters>
       <v-col>
         <b
           class="date-selection__heading"
@@ -17,9 +17,9 @@
           class="date-selection__picker mt-2"
           :default-selected-date="startDate"
           :error="startDate === null && datePickerErr"
-          :resetTrigger="resetTrigger"
-          :setMaxDate="endDate || defaultMaxDate"
-          @selectedDate="startDate = $event"
+          :reset-trigger="resetTrigger"
+          :set-max-date="endDate || defaultMaxDate"
+          @selected-date="startDate = $event"
         />
       </v-col>
       <v-col class="pl-4">
@@ -33,16 +33,16 @@
           class="date-selection__picker mt-2"
           :default-selected-date="endDate"
           :error="endDate === null && datePickerErr"
-          :resetTrigger="resetTrigger"
-          :setMinDate="startDate"
-          :setMaxDate="defaultMaxDate"
-          @selectedDate="endDate = $event"
+          :reset-trigger="resetTrigger"
+          :set-min-date="startDate"
+          :set-max-date="defaultMaxDate"
+          @selected-date="endDate = $event"
         />
       </v-col>
     </v-row>
     <v-row
       class="pt-2 pr-2"
-      noGutters
+      no-gutters
       justify="end"
     >
       <v-col cols="auto">
@@ -71,7 +71,8 @@
 
 <script setup lang="ts">
 // external
-import { Ref, ref, watch } from 'vue'
+import type { Ref} from 'vue';
+import { ref, watch } from 'vue'
 // internal
 import { BaseDatePicker } from '@/components/common'
 

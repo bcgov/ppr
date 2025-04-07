@@ -1,7 +1,7 @@
 import { useStore } from '@/store/store'
 import { nextTick } from 'vue'
 import { CertifyInformation } from '@/components/common'
-import { CertifyIF } from '@/interfaces'
+import type { CertifyIF } from '@/interfaces'
 import { mockedAmendmentCertified, mockedAmendmentCertifiedInvalid, mockedRegisteringParty1 } from './test-data'
 import { createComponent } from './utils'
 

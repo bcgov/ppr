@@ -1,4 +1,4 @@
-import { AccountInfoIF, AddressIF } from '@/interfaces'
+import type { AccountInfoIF, AddressIF } from '@/interfaces'
 import { mockedAddress } from './mock-mhr-registration'
 
 export const mockedAccountInfo: AccountInfoIF = {

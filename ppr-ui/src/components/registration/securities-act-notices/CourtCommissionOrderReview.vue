@@ -3,7 +3,7 @@
     id="court-commission-order-review"
     class="pa-4"
     :class="{'removed-item': hasRemovedOrders || order.action === ActionTypes.REMOVED}"
-    noGuttters
+    no-guttters
   >
     <v-col
       cols="6"
@@ -95,14 +95,14 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { CourtOrderIF } from '@/interfaces'
+import type { CourtOrderIF } from '@/interfaces'
 import { yyyyMmDdToPacificDate } from '@/utils'
 import { InfoChip } from '@/components/common'
 import { ActionTypes } from '@/enums'
 
 /** Props **/
 const props = withDefaults(defineProps<{
-  order: CourtOrderIF,
+  order?: CourtOrderIF,
   isAmendment?: boolean,
   hasRemovedOrders?: boolean,
   hasAddedParentNotice?: boolean

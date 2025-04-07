@@ -1,4 +1,4 @@
-import { AutoCompleteResultIF } from '@/interfaces'
+import type { AutoCompleteResultIF } from '@/interfaces'
 
 // Auto complete Query response interface.
 export interface AutoCompleteResponseIF {

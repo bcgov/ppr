@@ -30,8 +30,8 @@
     </p>
 
     <UnitNoteReviewDetailsTable
-      :unitNote="getMhrUnitNote"
-      :unitNoteType="`${unitNoteType.header} ${getCancelledUnitNoteHeader()} `"
+      :unit-note="getMhrUnitNote"
+      :unit-note-type="`${unitNoteType.header} ${getCancelledUnitNoteHeader()} `"
     />
 
     <section
@@ -39,11 +39,11 @@
       class="mt-15"
     >
       <ContactInformation
-        :contactInfo="unitNoteSubmittingParty"
+        :contact-info="unitNoteSubmittingParty"
         :content="isRedemptionUnitNote ? submittingPartyRegistrationContent : submittingPartyChangeContent"
         :validate="validate"
-        @setStoreProperty="handleStoreUpdate('submittingParty', $event)"
-        @isValid="handleComponentValid(MhrCompVal.SUBMITTING_PARTY_VALID, $event)"
+        @set-store-property="handleStoreUpdate('submittingParty', $event)"
+        @is-valid="handleComponentValid(MhrCompVal.SUBMITTING_PARTY_VALID, $event)"
       />
     </section>
 
@@ -60,8 +60,8 @@
           dateSummaryLabel: `${unitNoteType.header} on this home effective: `
         }"
         :validate="validate"
-        @setStoreProperty="handleEffectiveDateUpdate($event)"
-        @isValid="handleComponentValid(MhrCompVal.EFFECTIVE_DATE_TIME_VALID, $event)"
+        @set-store-property="handleEffectiveDateUpdate($event)"
+        @is-valid="handleComponentValid(MhrCompVal.EFFECTIVE_DATE_TIME_VALID, $event)"
       />
     </section>
 
@@ -76,19 +76,19 @@
           sideLabel: 'Expiry Date'
         }"
         :validate="validate"
-        :hideContinuedExpiryDate="isUnitNoteTypeCAUE"
-        @setStoreProperty="handleExpiryDateUpdate($event)"
-        @isValid="handleComponentValid(MhrCompVal.EXPIRY_DATE_TIME_VALID, $event)"
+        :hide-continued-expiry-date="isUnitNoteTypeCAUE"
+        @set-store-property="handleExpiryDateUpdate($event)"
+        @is-valid="handleComponentValid(MhrCompVal.EXPIRY_DATE_TIME_VALID, $event)"
       />
     </section>
 
     <section class="mt-15">
       <Attention
-        sectionId="mhr-unit-note-attention"
+        section-id="mhr-unit-note-attention"
         :validate="validate"
-        :initialValue="initialAttention"
-        @isAttentionValid="handleComponentValid(MhrCompVal.ATTENTION_VALID, $event)"
-        @setStoreProperty="handleStoreUpdate('attentionReference', $event)"
+        :initial-value="initialAttention"
+        @is-attention-valid="handleComponentValid(MhrCompVal.ATTENTION_VALID, $event)"
+        @set-store-property="handleStoreUpdate('attentionReference', $event)"
       />
     </section>
 
@@ -104,8 +104,8 @@
             'to submit this registration. The following information must be completed and confirmed ' +
             'before submitting this registration.',
         }"
-        :setShowErrors="validate"
-        @certifyValid="handleComponentValid(MhrCompVal.AUTHORIZATION_VALID, $event)"
+        :set-show-errors="validate"
+        @certify-valid="handleComponentValid(MhrCompVal.AUTHORIZATION_VALID, $event)"
       />
     </section>
 
@@ -124,10 +124,10 @@
       >
         <StaffPayment
           id="staff-payment"
-          :displaySideLabel="true"
-          :displayPriorityCheckbox="true"
-          :staffPaymentData="staffPayment"
-          :invalidSection="validateStaffPayment"
+          :display-side-label="true"
+          :display-priority-checkbox="true"
+          :staff-payment-data="staffPayment"
+          :invalid-section="validateStaffPayment"
           :validate="validate"
           @update:staff-payment-data="onStaffPaymentDataUpdate($event)"
           @valid="handleComponentValid(MhrCompVal.STAFF_PAYMENT_VALID, $event)"
@@ -141,7 +141,7 @@
 import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { CancelUnitNoteIF, PartyIF, StaffPaymentIF } from '@/interfaces'
+import type { CancelUnitNoteIF, PartyIF, StaffPaymentIF } from '@/interfaces'
 import { UnitNotesInfo } from '@/resources/unitNotes'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { useMhrUnitNote, useMhrValidations } from '@/composables'

@@ -46,7 +46,7 @@
           <slot name="partyInfoLabelSlot" />
 
           <v-row
-            noGutters
+            no-gutters
             class="px-8 pt-6 pb-2"
           >
             <!-- Future: Handle person name -->
@@ -72,7 +72,7 @@
 
           <!-- Party Info Data -->
           <v-row
-            noGutters
+            no-gutters
             class="px-8 py-7 fs-14"
           >
             <v-col v-if="hasPropData('businessName')">
@@ -124,7 +124,7 @@
 import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { RouteNames } from '@/enums'
 import { BaseAddress } from '@/composables/address'
-import { PartyIF } from '@/interfaces'
+import type { PartyIF } from '@/interfaces'
 import { hasTruthyValue } from '@/utils'
 
 export default defineComponent({
@@ -166,7 +166,7 @@ export default defineComponent({
     })
 
     const hasPropData = (propertyName: string): boolean => {
-      return localState.partyModel?.hasOwnProperty(propertyName)
+      return Object.prototype.hasOwnProperty.call(localState.partyModel, propertyName)
     }
 
     return {

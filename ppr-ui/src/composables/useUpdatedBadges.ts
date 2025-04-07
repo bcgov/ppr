@@ -1,4 +1,5 @@
-import { ComputedRef, computed } from 'vue'
+import type { ComputedRef} from 'vue';
+import { computed } from 'vue'
 import { useMhrCorrections } from './mhrRegistration'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'

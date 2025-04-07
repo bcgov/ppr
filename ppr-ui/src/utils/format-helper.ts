@@ -140,7 +140,7 @@ export function removeEmptyProperties(obj: object): object {
   }
 
   for (const key in obj) {
-    if (obj.hasOwnProperty(key) && !isNotEmpty(obj[key])) {
+    if (Object.prototype.hasOwnProperty.call(obj, key) && !isNotEmpty(obj[key])) {
       delete obj[key]
     }
   }

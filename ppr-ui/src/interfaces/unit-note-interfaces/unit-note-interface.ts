@@ -1,6 +1,6 @@
-import { FeeSummaryDefaults } from '@/composables/fees/enums'
-import { UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
-import { PartyIF } from '@/interfaces'
+import type { FeeSummaryDefaults } from '@/composables/fees/enums'
+import type { UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
+import type { PartyIF } from '@/interfaces'
 
 export interface UnitNoteIF {
   documentType: UnitNoteDocTypes

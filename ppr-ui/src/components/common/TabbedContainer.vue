@@ -6,7 +6,7 @@
     <v-tabs
       v-model="tab"
       height="55"
-      alignTabs="center"
+      align-tabs="center"
       grow
     >
       <v-tab
@@ -47,7 +47,7 @@
 import { ref } from 'vue'
 
 /** Props **/
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 const props = withDefaults(defineProps<{
   tabConfig?: any
 }>(), {

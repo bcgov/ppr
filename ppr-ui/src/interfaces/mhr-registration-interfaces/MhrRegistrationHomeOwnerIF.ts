@@ -1,5 +1,5 @@
-import { AddressIF } from '@/composables/address/interfaces'
-import { ActionTypes, ApiHomeTenancyTypes, HomeOwnerPartyTypes, SupportingDocumentsOptions } from '@/enums'
+import type { AddressIF } from '@/composables/address/interfaces'
+import type { ActionTypes, ApiHomeTenancyTypes, HomeOwnerPartyTypes, SupportingDocumentsOptions } from '@/enums'
 
 export interface MhrRegistrationHomeOwnerIF {
   ownerId?: number // optional property used for editing a home owner

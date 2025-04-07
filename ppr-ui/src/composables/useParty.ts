@@ -1,5 +1,6 @@
-import { APIRegistrationTypes, ActionTypes } from '@/enums'
-import { PartyIF, AddPartiesIF } from '@/interfaces'
+import type { APIRegistrationTypes} from '@/enums';
+import { ActionTypes } from '@/enums'
+import type { PartyIF, AddPartiesIF } from '@/interfaces'
 import { SecuredPartyRestrictedList } from '@/resources'
 
 export const useParty = () => {

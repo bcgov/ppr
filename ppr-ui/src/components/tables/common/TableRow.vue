@@ -120,7 +120,7 @@ export default defineComponent({
 
     const documentRecordUrl = (documentId: string) => {
       const configDocumentUrl = sessionStorage.getItem('DOCUMENTS_URL')
-      return `${configDocumentUrl}/document-records/${documentId}`
+      return `${configDocumentUrl}/document-records/${documentId}?class=MHR`
     }
 
     const hasRequiredTransfer = (item: MhRegistrationSummaryIF) => {

@@ -1,4 +1,4 @@
-import { ContactInformationContentIF, PartyIF, SubmittingPartyIF } from '@/interfaces'
+import type { ContactInformationContentIF, PartyIF, SubmittingPartyIF } from '@/interfaces'
 
 /* eslint-disable max-len */
 export const submittingPartyRegistrationContent: ContactInformationContentIF = {

@@ -8,10 +8,10 @@
       v-if="searched"
       class="result-info px-5 pt-30px"
       align="center"
-      noGutters
+      no-gutters
     >
       <v-col cols="9">
-        <v-row noGutters>
+        <v-row no-gutters>
           <v-col
             class="divider pr-3 mr-3"
             cols="auto"
@@ -34,7 +34,7 @@
               <v-tooltip
                 v-if="selectedRegistrationsLength !== selectedLength"
                 class="pa-2"
-                contentClass="top-tooltip"
+                content-class="top-tooltip"
                 location="top"
                 transition="fade-transition"
               >
@@ -76,7 +76,7 @@
     <v-row
       v-if="results && results.length"
       class="pt-3"
-      noGutters
+      no-gutters
     >
       <v-col cols="12">
         <v-table
@@ -84,7 +84,7 @@
           id="search-results-table"
           class="results-table"
           :class="{'hide-scroll': results.length <= 1 }"
-          fixedHeader
+          fixed-header
         >
           <template #default>
             <!-- Table Headers -->
@@ -101,7 +101,7 @@
                       v-model="selectAll"
                       class="header-checkbox"
                       color="primary"
-                      hideDetails
+                      hide-details
                       label="Select All"
                       :indeterminate="(exactMatchResults.length && !selectAll) || false"
                     />
@@ -136,7 +136,7 @@
                   <!-- Exact Selection Checkboxes -->
                   <td class="checkbox-info">
                     <v-row
-                      noGutters
+                      no-gutters
                     >
                       <v-col
                         cols="3"
@@ -147,8 +147,8 @@
                           :readonly="true"
                           :ripple="false"
                           :disabled="true"
-                          hideDetails
-                          :modelValue="isSelected(item)"
+                          hide-details
+                          :model-value="isSelected(item)"
                         />
                       </v-col>
                       <span class="exact-match-checkbox-label mt-1">exact match added</span>
@@ -225,9 +225,9 @@
                   <!-- Exact Selection Checkboxes -->
                   <td class="checkbox-info">
                     <v-checkbox
-                      hideDetails
+                      hide-details
                       :ripple="false"
-                      :modelValue="isSelected(item)"
+                      :model-value="isSelected(item)"
                       @input="toggleSelected(item)"
                     >
                       <template #label>
@@ -290,7 +290,7 @@
       v-else
       id="search-no-results-info"
       class="text-center my-6"
-      noGutters
+      no-gutters
     >
       <v-col>
         <p class="no-results-title pt-10">
@@ -309,7 +309,7 @@
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { searchTableHeaders, VehicleTypes } from '@/resources'
-import { BaseHeaderIF, SearchResponseIF, SearchResultIF, TableHeadersIF } from '@/interfaces'
+import type { BaseHeaderIF, SearchResponseIF, SearchResultIF, TableHeadersIF } from '@/interfaces'
 import { APISearchTypes, MatchTypes } from '@/enums'
 import { convertDate } from '@/utils'
 import { storeToRefs } from 'pinia'

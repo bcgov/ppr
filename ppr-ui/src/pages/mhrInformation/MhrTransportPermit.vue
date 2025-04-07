@@ -486,9 +486,9 @@ import { confirmNewTransportPermit } from '@/resources/dialogOptions'
 import { pacificDate } from '@/utils'
 
 withDefaults(defineProps<{
-  disable: boolean,
-  validate: boolean,
-  disabledDueToLocation: boolean
+  disable?: boolean,
+  validate?: boolean,
+  disabledDueToLocation?: boolean
 }>(), {
   disable: false,
   validate: false,

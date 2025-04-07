@@ -56,14 +56,14 @@
                 id="transfer-date"
                 ref="transferDateRef"
                 title="Date"
-                :errorMsg="showFormError &&
+                :error-msg="showFormError &&
                   (!isTransferNonGiftBillOfSale && !transferDate) ? 'Enter bill of sale date of execution' : ''"
-                :initialValue="transferDate"
-                :maxDate="isRoleQualifiedSupplier ? localTodayDate(new Date(), true) : null"
+                :initial-value="transferDate"
+                :max-date="isRoleQualifiedSupplier ? localTodayDate(new Date(), true) : null"
                 data-test-id="transfer-date"
-                @emitDate="transferDate = $event"
-                @emitCancel="transferDate = null"
-                @emitClear="transferDate = null"
+                @emit-date="transferDate = $event"
+                @emit-cancel="transferDate = null"
+                @emit-clear="transferDate = null"
               />
             </v-col>
           </v-row>
@@ -83,7 +83,7 @@
             class="pl-3"
           >
             <p>
-              Will the manufactured home be located on land that the
+              Is the manufactured home located on land that the
               {{ isNewHomeOwner ? 'new' : '' }} homeowners own or on land that
               they have a registered lease of 3 years or more?
             </p>
@@ -159,7 +159,7 @@ import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { useInputRules, useTransferOwners } from '@/composables'
 import { InputFieldDatePicker } from '@/components/common'
-import { FormIF } from '@/interfaces'
+import type { FormIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
 import { localTodayDate } from '@/utils'
 

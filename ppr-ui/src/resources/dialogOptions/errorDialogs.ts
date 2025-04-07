@@ -1,4 +1,4 @@
-import { DialogOptionsIF } from '@/interfaces'
+import type { DialogOptionsIF } from '@/interfaces'
 
 export const authPprError: DialogOptionsIF = {
   acceptText: 'OK',

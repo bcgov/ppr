@@ -7,19 +7,19 @@
   >
     <v-card>
       <v-row
-        noGutters
+        no-gutters
         class="pl-10 pt-7"
       >
         <v-col cols="11">
-          <v-row noGutters>
-            <v-col alignSelf="start">
+          <v-row no-gutters>
+            <v-col align-self="start">
               <span class="dialog-title">
                 <b>Change Secured Party?</b>
               </span>
             </v-col>
           </v-row>
           <v-row
-            noGutters
+            no-gutters
             class="pt-5"
           >
             <span class="dialog-text">
@@ -30,7 +30,7 @@
           </v-row>
         </v-col>
         <v-col cols="1">
-          <v-row noGutters>
+          <v-row no-gutters>
             <v-btn
               color="primary"
               variant="plain"
@@ -43,7 +43,7 @@
         </v-col>
       </v-row>
       <v-row
-        noGutters
+        no-gutters
         justify="center"
         class="pt-5 pb-10"
       >

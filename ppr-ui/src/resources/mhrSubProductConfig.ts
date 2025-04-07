@@ -1,5 +1,5 @@
 import { MhrSubTypes, MhrActions } from '@/enums/mhrSubProductActions'
-import { SubProductConfigIF } from '@/interfaces'
+import type { SubProductConfigIF } from '@/interfaces'
 
 export const MhrSubProductConfig: Array<SubProductConfigIF> = [
   {

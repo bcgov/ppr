@@ -16,7 +16,7 @@
         :class="{ 'border-error-left': showBorderError }"
         flat
       >
-        <v-row noGutters>
+        <v-row no-gutters>
           <v-col cols="3">
             <label
               for="remarks-textarea"
@@ -44,7 +44,7 @@
               v-model="hasAdditionalRemarks"
               class="py-0 pr-0 ma-0"
               :label="content.checkboxLabel"
-              hideDetails
+              hide-details
               data-test-id="additional-remarks-checkbox"
             >
               <template #label>
@@ -64,7 +64,7 @@
 
 <script lang="ts">
 import { useInputRules } from '@/composables'
-import { ContentIF, FormIF } from '@/interfaces'
+import type { ContentIF, FormIF } from '@/interfaces'
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 
 export default defineComponent({

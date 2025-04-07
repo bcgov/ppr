@@ -1,4 +1,4 @@
-import { PartyIF } from '@/interfaces'
+import type { PartyIF } from '@/interfaces'
 
 export const useValidation = () => {
   const resetError = (fieldName, errors) => {

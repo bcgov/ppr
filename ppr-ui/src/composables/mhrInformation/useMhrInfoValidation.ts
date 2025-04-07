@@ -1,5 +1,5 @@
 import { useStore } from '@/store/store'
-import {
+import type {
   mhrInfoValidationStateIF,
   MhrRegistrationHomeOwnerIF
 } from '@/interfaces'
@@ -166,7 +166,7 @@ export const useMhrInfoValidation = (validationState: mhrInfoValidationStateIF) 
 
   /** Reset the validation state to default **/
   const resetValidationState = (): void => {
-    // eslint-disable-next-line no-return-assign
+     
     Object.keys(validationState).forEach(flag => validationState[flag] = false)
   }
 

@@ -1,6 +1,7 @@
-import { computed, ComputedRef } from 'vue'
+import type { ComputedRef } from 'vue';
+import { computed } from 'vue'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-import { AccountProductSubscriptionIF } from '@/interfaces'
+import type { AccountProductSubscriptionIF } from '@/interfaces'
 import { AccountProductCodes, AccountProductMemberships, AccountProductRoles, ProductStatus } from '@/enums'
 import { fetchAccountProducts, getProductSubscription } from '@/utils'
 import { useStore } from '@/store/store'

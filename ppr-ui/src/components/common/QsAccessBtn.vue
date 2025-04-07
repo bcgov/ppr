@@ -18,7 +18,7 @@
       <v-tooltip
         location="top"
         class="request-qs-tooltip"
-        contentClass="top-tooltip pa-4 mr-2"
+        content-class="top-tooltip pa-4 mr-2"
         transition="fade-transition"
         :disabled="!hasPendingQsAccess"
       >

@@ -1,9 +1,9 @@
 // external
 import { StatusCodes } from 'http-status-codes'
 // local
-import { FeeCodes } from '@/composables/fees/enums'
+import type { FeeCodes } from '@/composables/fees/enums'
 import { ErrorCategories } from '@/enums'
-import { GetFeesI } from '@/interfaces'
+import type { GetFeesI } from '@/interfaces'
 import { axios } from '@/utils/axios-pay'
 
 // get fees for account
