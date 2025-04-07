@@ -385,16 +385,18 @@ export default defineComponent({
           scrollToInvalid(MhrSectVal.LOCATION_VALID, 'mhr-home-location')
           break
         case RouteNames.MHR_REVIEW_CONFIRM:
-          const stepsValidation = getMhrSteps.value.map((step : StepIF) => step.valid)
-          stepsValidation.pop() // Removes review confirm step from stepsValidation
-          localState.isValidatingApp &&
-          scrollToInvalidReviewConfirm(stepsValidation)
-          // Only set reviewed if add/edit form was open when review reached
-          if (isGlobalEditingMode.value) {
-            setValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID, MhrCompVal.OWNERS_VALID, false)
+          {
+            const stepsValidation = getMhrSteps.value.map((step : StepIF) => step.valid)
+            stepsValidation.pop() // Removes review confirm step from stepsValidation
+            localState.isValidatingApp &&
+            scrollToInvalidReviewConfirm(stepsValidation)
+            // Only set reviewed if add/edit form was open when review reached
+            if (isGlobalEditingMode.value) {
+              setValidation(MhrSectVal.ADD_EDIT_OWNERS_VALID, MhrCompVal.OWNERS_VALID, false)
+            }
+            setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS, true)
+            break
           }
-          setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.VALIDATE_STEPS, true)
-          break
       }
     })
 

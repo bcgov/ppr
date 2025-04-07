@@ -4,7 +4,7 @@ import {
   RegistrationTypesStandard,
   RegistrationTypesMiscellaneousOT
 } from '@/resources'
-import {
+import type {
   AddPartiesIF,
   AddCollateralIF,
   AddressIF,

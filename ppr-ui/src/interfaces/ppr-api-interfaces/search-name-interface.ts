@@ -1,4 +1,4 @@
-import { IndividualNameIF } from '@/interfaces'
+import type { IndividualNameIF } from '@/interfaces'
 
 // Search result Debtor business or individual name interface.
 export interface SearchNameIF {

@@ -1,6 +1,6 @@
 import { FeeSummaryDefaults } from '@/composables/fees/enums'
 import { UnitNoteDocTypes } from '@/enums'
-import { UnitNoteInfoIF } from '@/interfaces'
+import type { UnitNoteInfoIF } from '@/interfaces'
 
 export const UnitNotesDropdown: Array<UnitNoteDocTypes> = [
   UnitNoteDocTypes.DECAL_REPLACEMENT,

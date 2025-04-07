@@ -7,7 +7,7 @@
     elevation="5"
   >
     <v-row
-      noGutters
+      no-gutters
       justify="center"
       class="pl-2 pa-0"
     >
@@ -30,12 +30,12 @@
                 !isExistingSecuredParty(result.code, isRegisteringParty) ?
                   'auto-complete-item' : 'auto-complete-added-item'
               ]"
-            :activeClass="isExistingSecuredParty(result.code, isRegisteringParty) ? 'added-color' : ''"
+            :active-class="isExistingSecuredParty(result.code, isRegisteringParty) ? 'added-color' : ''"
             @mouseover="mouseOver = true"
             @mouseleave="mouseOver = false"
           >
             <v-row
-              noGutters
+              no-gutters
               class="auto-complete-row"
               :class="!mouseOver && wasSelected(result)"
             >
@@ -115,7 +115,7 @@ import { defineComponent, reactive, toRefs, computed } from 'vue'
 import { useCountriesProvinces } from '@/composables/address/factories'
 import { useSecuredParty } from '@/composables/parties'
 import { ActionTypes } from '@/enums'
-import { SearchPartyIF, PartyIF } from '@/interfaces'
+import type { SearchPartyIF, PartyIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'PartyAutocomplete',

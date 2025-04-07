@@ -1,5 +1,5 @@
 import { FeeSummaryDefaults } from '../enums'
-import { FeeSummaryI } from '../interfaces'
+import type { FeeSummaryI } from '../interfaces'
 
 export const defaultFeeSummaries = {
   [FeeSummaryDefaults.AMEND]: {

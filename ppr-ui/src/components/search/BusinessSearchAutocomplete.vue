@@ -7,7 +7,7 @@
       elevation="5"
     >
       <v-row
-        noGutters
+        no-gutters
         justify="center"
         class="px-0"
       >
@@ -38,7 +38,7 @@
               >
                 <v-tooltip
                   location="right"
-                  contentClass="start-tooltip py-5"
+                  content-class="start-tooltip py-5"
                   :disabled="isPPR"
                 >
                   <template #activator="{ props }">
@@ -108,7 +108,7 @@
 
 <script lang="ts">
 import { defineComponent, reactive, toRefs, watch, computed } from 'vue'
-import { SearchResponseI } from '@/interfaces'
+import type { SearchResponseI } from '@/interfaces'
 import { useSearch } from '@/composables/useSearch'
 import { BusinessTypes } from '@/enums/business-types'
 import { debounce } from 'lodash'

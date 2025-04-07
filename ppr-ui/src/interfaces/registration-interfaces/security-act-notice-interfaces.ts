@@ -1,5 +1,5 @@
-import { ActionTypes, SaNoticeTypes } from '@/enums'
-import { CourtOrderIF } from '@/interfaces'
+import type { ActionTypes, SaNoticeTypes } from '@/enums'
+import type { CourtOrderIF } from '@/interfaces'
 
 export interface AddEditSaNoticeIF {
   noticeId?: number

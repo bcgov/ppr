@@ -3,7 +3,7 @@ import { useStore } from '@/store/store'
 import { axe } from 'vitest-axe'
 import { createComponent } from './utils'
 import { ProductCode, ProductStatus, ProductType } from '@/enums'
-import { UserProductSubscriptionIF } from '@/interfaces'
+import type { UserProductSubscriptionIF } from '@/interfaces'
 
 const store = useStore()
 

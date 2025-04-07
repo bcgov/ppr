@@ -1,4 +1,4 @@
-import { ProductCode, ProductStatus, ProductType } from '@/enums'
+import type { ProductCode, ProductStatus, ProductType } from '@/enums'
 
 export interface UserProductSubscriptionIF {
   premiumOnly: boolean

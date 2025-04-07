@@ -1,7 +1,7 @@
 <template>
   <div id="securities-act-notices">
     <v-row
-      noGutters
+      no-gutters
       class="pt-10"
     >
       <v-col
@@ -13,7 +13,7 @@
         </h3>
       </v-col>
     </v-row>
-    <v-row noGutters>
+    <v-row no-gutters>
       <v-col class="pt-2 pb-6 sub-header-info">
         <v-btn
           id=""
@@ -35,11 +35,11 @@
     <v-expand-transition>
       <v-row
         v-if="openAddNotice"
-        noGutters
+        no-gutters
       >
         <v-col class="pt-2 pb-6">
           <AddEditNotice
-            :isAmendment="isAmendment"
+            :is-amendment="isAmendment"
             @cancel="openAddNotice = false"
             @done="handleAddNotice"
           />
@@ -47,12 +47,12 @@
       </v-row>
     </v-expand-transition>
 
-    <v-row noGutters>
+    <v-row no-gutters>
       <v-col class="pt-2 pb-6">
         <SecuritiesActNoticesPanels
-          :isAmendment="isAmendment"
-          :isAddingNotice="openAddNotice"
-          @hasActivePanel="disableAddNotice = $event"
+          :is-amendment="isAmendment"
+          :is-adding-notice="openAddNotice"
+          @has-active-panel="disableAddNotice = $event"
         />
       </v-col>
     </v-row>
@@ -64,7 +64,7 @@ import { ref  } from 'vue'
 import { AddEditNotice } from '@/components/registration'
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
-import { AddEditSaNoticeIF } from '@/interfaces'
+import type { AddEditSaNoticeIF } from '@/interfaces'
 import SecuritiesActNoticesPanels from '@/components/registration/securities-act-notices/SecuritiesActNoticesPanels.vue'
 import { UIRegistrationTypes } from '@/enums'
 
@@ -73,7 +73,7 @@ const { setSecuritiesActNotices } = useStore()
 const { getSecuritiesActNotices } = storeToRefs(useStore())
 
 /** Props **/
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 const props = withDefaults(defineProps<{
   isAmendment?: boolean
 }>(), {

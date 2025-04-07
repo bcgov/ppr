@@ -7,7 +7,7 @@
   >
     <v-card>
       <v-row
-        noGutters
+        no-gutters
         class="px-7 pt-7"
       >
         <v-col cols="11">
@@ -22,7 +22,7 @@
             id="dialog-text-field"
             v-model="userInput"
             class="rounded-top pt-5"
-            :errorMessages="validationErrors"
+            :error-messages="validationErrors"
             variant="filled"
             color="primary"
             :label="options.label"
@@ -30,7 +30,7 @@
         </v-col>
         <v-col cols="1">
           <v-row
-            noGutters
+            no-gutters
             justify="end"
           >
             <v-btn
@@ -46,7 +46,7 @@
         </v-col>
       </v-row>
       <v-row
-        noGutters
+        no-gutters
         justify="center"
         class="pt-5 pb-7"
       >
@@ -87,8 +87,8 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
-// eslint-disable-next-line no-unused-vars
-import { DialogOptionsIF } from '@/interfaces'
+ 
+import type { DialogOptionsIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'RegistrationOtherDialog',

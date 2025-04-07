@@ -1,4 +1,4 @@
-/* eslint-disable */
+ 
 // import these and sort them only once globally
 // Static import for the country & province list
 import countryList from 'country-list/data.json'

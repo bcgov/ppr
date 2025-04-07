@@ -1,4 +1,4 @@
-import { HomeLocationTypes } from '@/enums'
+import type { HomeLocationTypes } from '@/enums'
 
 export interface MhrRegistrationHomeLocationIF extends MhrRegistrationHomeLocationWithoutAddressIF {
   address: {

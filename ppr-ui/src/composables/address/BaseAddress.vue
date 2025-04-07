@@ -40,7 +40,7 @@
         v-if="editing"
         ref="addressForm"
         name="address-form"
-        lazyValidation
+        lazy-validation
       >
         <div class="form__row">
           <v-autocomplete
@@ -49,9 +49,9 @@
             variant="filled"
             color="primary"
             class="address-country"
-            hideNoData
-            itemTitle="name"
-            itemValue="code"
+            hide-no-data
+            item-title="name"
+            item-value="code"
             :items="getCountries()"
             :label="countryLabel"
             :rules="[...schemaLocal.country]"
@@ -84,7 +84,7 @@
             color="primary"
             :hint="hideAddressHint ? '' : 'Street address, PO box, rural route, or general delivery address'"
             :label="streetLabel"
-            persistentHint
+            persistent-hint
             :rules="[...schemaLocal.street]"
             @keypress.once="enableAddressComplete()"
             @click="enableAddressComplete()"
@@ -94,7 +94,7 @@
           <v-textarea
             v-model="addressLocal.streetAdditional"
             autocomplete="new-password"
-            autoGrow
+            auto-grow
             variant="filled"
             color="primary"
             class="street-address-additional"
@@ -120,9 +120,9 @@
             variant="filled"
             color="primary"
             class="item address-region"
-            hideNoData
-            itemTitle="name"
-            itemValue="short"
+            hide-no-data
+            item-title="name"
+            item-value="short"
             :items="getCountryRegions(country)"
             :label="regionLabel"
             :rules="[...schemaLocal.region]"
@@ -159,7 +159,7 @@
         >
           <v-textarea
             v-model="addressLocal.deliveryInstructions"
-            autoGrow
+            auto-grow
             variant="filled"
             color="primary"
             class="delivery-instructions"
@@ -184,7 +184,7 @@ import {
   useBaseValidations,
   spaceRules
 } from '@/composables/address/factories'
-import { AddressIF, SchemaIF } from '@/composables/address/interfaces'
+import type { AddressIF, SchemaIF } from '@/composables/address/interfaces'
 
 export default defineComponent({
   name: 'BaseAddress',

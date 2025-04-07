@@ -1,5 +1,5 @@
 import { ButtonsStacked, StickyContainer } from '@/components/common'
-import { RegistrationLengthI } from '@/composables/fees/interfaces'
+import type { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { createComponent, getLastEvent } from './utils'
 import { FeeSummary } from '@/composables/fees'
 import { FeeSummaryTypes } from '@/composables/fees/enums'

@@ -2,7 +2,7 @@
   <div id="mhr-home-sections-shim">
     <v-row
       v-if="!isReviewMode"
-      noGutters
+      no-gutters
     >
       <v-btn
         variant="outlined"
@@ -25,7 +25,7 @@
     </v-row>
 
     <v-row
-      noGutters
+      no-gutters
       class="mt-6"
     >
       <p
@@ -46,7 +46,7 @@
     <v-expand-transition>
       <AddEditHomeSections
         v-if="showAddEditHomeSections"
-        :isNewHomeSection="isNewHomeSection"
+        :is-new-home-section="isNewHomeSection"
         :validate="validate"
         @close="showAddEditHomeSections = false"
         @submit="addHomeSection($event)"
@@ -57,10 +57,10 @@
     <HomeSectionsTable
       :class="{ 'border-error-left': validate }"
       :validate="validate"
-      :isAdding="showAddEditHomeSections"
-      :homeSections="getMhrHomeSections"
-      :isReviewMode="isReviewMode"
-      @isEditing="isEditingHomeSection = $event"
+      :is-adding="showAddEditHomeSections"
+      :home-sections="getMhrHomeSections"
+      :is-review-mode="isReviewMode"
+      @is-editing="isEditingHomeSection = $event"
       @edit="editHomeSection($event)"
       @remove="removeHomeSection($event)"
       @undo="undoHomeSection($event)"
@@ -72,7 +72,7 @@
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { HomeSectionIF } from '@/interfaces'
+import type { HomeSectionIF } from '@/interfaces'
 import AddEditHomeSections from '@/components/mhrRegistration/YourHome/AddEditHomeSections.vue'
 import HomeSectionsTable from '@/components/tables/mhr/HomeSectionsTable.vue'
 import { useMhrCorrections, useMhrValidations } from '@/composables'

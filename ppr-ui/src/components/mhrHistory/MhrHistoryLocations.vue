@@ -4,7 +4,7 @@
     class="pr-4"
   >
     <v-row
-      noGutters
+      no-gutters
       class="pt-4 pb-5"
     >
       <v-col cols="3">
@@ -63,7 +63,7 @@
            HomeLocationUiTypes.OTHER_TYPE].includes(content.locationType)"
       >
         <v-row
-          noGutters
+          no-gutters
           class="condensed-row other-land-content"
         >
           <template v-if="content.pidNumber">
@@ -173,7 +173,7 @@
 
     <!-- Civic Address -->
     <v-row
-      noGutters
+      no-gutters
       class="condensed-row py-5"
     >
       <v-col cols="3">
@@ -199,7 +199,7 @@
 
     <!-- Land Details -->
     <v-row
-      noGutters
+      no-gutters
       class="condensed-row py-5"
     >
       <v-col cols="12">
@@ -224,7 +224,7 @@
 
     <!-- To From Details -->
     <v-row
-      noGutters
+      no-gutters
       class="py-6 condensed-row"
     >
       <v-col cols="3">
@@ -324,14 +324,14 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
-import { LocationIF, RegistrationIF } from '@/interfaces'
+import type { LocationIF, RegistrationIF } from '@/interfaces'
 import { HomeLocationUiTypes } from '@/enums'
 import { useCountriesProvinces } from '@/composables/address/factories'
 import { multipleWordsToTitleCase, pacificDate } from '@/utils'
 
 /** Props **/
 const props = withDefaults(defineProps<{
-  content: LocationIF,
+  content?: LocationIF,
   registrations?: Array<RegistrationIF>
 }>(), {
   content: null,

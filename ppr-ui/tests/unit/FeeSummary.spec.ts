@@ -1,11 +1,11 @@
 import { nextTick } from 'vue'
 import { useStore } from '@/store/store'
 import { FeeSummary } from '@/composables/fees'
-import { RegistrationLengthI } from '@/composables/fees/interfaces'
+import type { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { UIRegistrationTypes } from '@/enums'
 import { createComponent } from './utils'
-import { StaffPaymentIF } from '@/interfaces'
+import type { StaffPaymentIF } from '@/interfaces'
 
 const store = useStore()
 

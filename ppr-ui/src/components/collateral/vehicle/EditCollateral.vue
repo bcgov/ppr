@@ -5,7 +5,7 @@
     :class="{ 'border-error-left': showErrorBar && activeIndex === -1 }"
   >
     <v-expand-transition>
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col cols="3">
           <label
             class="add-vehicle-header generic-label pl-2"
@@ -39,16 +39,16 @@
             ref="vehicleForm"
             class="vehicle-form"
           >
-            <v-row noGutters>
+            <v-row no-gutters>
               <v-col v-if="mustHaveManufacturedHomeCollateral()">
                 <v-text-field
                   id="txt-type"
                   variant="filled"
                   color="primary"
                   label="Vehicle Type"
-                  modelValue="Manufactured Home (MH)"
+                  model-value="Manufactured Home (MH)"
                   readonly
-                  persistentHint
+                  persistent-hint
                 />
               </v-col>
               <v-col v-else-if="excludesManufacturedHomeCollateral()">
@@ -57,11 +57,11 @@
                   v-model="currentVehicle.type"
                   class="vehicle-type-select"
                   :items="vehicleTypesNoMH"
-                  itemTitle="text"
+                  item-title="text"
                   variant="filled"
                   color="primary"
                   label="Vehicle Type"
-                  :errorMessages="
+                  :error-messages="
                     errors.type.message ? errors.type.message : ''
                   "
                   @update:model-value="resetSerialError()"
@@ -73,11 +73,11 @@
                   v-model="currentVehicle.type"
                   class="vehicle-type-select"
                   :items="vehicleTypes"
-                  itemTitle="text"
+                  item-title="text"
                   variant="filled"
                   color="primary"
                   label="Vehicle Type"
-                  :errorMessages="
+                  :error-messages="
                     errors.type.message ? errors.type.message : ''
                   "
                   @update:model-value="resetSerialError()"
@@ -86,7 +86,7 @@
             </v-row>
             <v-row
               v-if="currentVehicle.type === 'MH'"
-              noGutters
+              no-gutters
             >
               <v-col>
                 <v-text-field
@@ -96,17 +96,17 @@
                   variant="filled"
                   color="primary"
                   label="Manufactured Home Registration Number"
-                  :errorMessages="
+                  :error-messages="
                     errors.manufacturedHomeRegistrationNumber.message
                       ? errors.manufacturedHomeRegistrationNumber.message
                       : ''
                   "
-                  persistentHint
+                  persistent-hint
                   @keyup="onBlur('manufacturedHomeRegistrationNumber')"
                 />
               </v-col>
             </v-row>
-            <v-row noGutters>
+            <v-row no-gutters>
               <v-col>
                 <v-text-field
                   id="txt-serial"
@@ -116,17 +116,17 @@
                   color="primary"
                   :label="getSerialLabel"
                   :disabled="getSerialDisabled"
-                  :errorMessages="
+                  :error-messages="
                     errors.serialNumber.message
                       ? errors.serialNumber.message
                       : ''
                   "
-                  persistentHint
+                  persistent-hint
                   @keyup="onBlur('serialNumber')"
                 />
               </v-col>
             </v-row>
-            <v-row noGutters>
+            <v-row no-gutters>
               <v-col cols="4">
                 <v-text-field
                   id="txt-years"
@@ -135,15 +135,15 @@
                   color="primary"
                   label="Year (Optional)"
                   hint="YYYY"
-                  persistentHint
-                  :errorMessages="
+                  persistent-hint
+                  :error-messages="
                     errors.year.message ? errors.year.message : ''
                   "
                   @blur="onBlur('year')"
                 />
               </v-col>
             </v-row>
-            <v-row noGutters>
+            <v-row no-gutters>
               <v-col>
                 <v-text-field
                   id="txt-make"
@@ -151,15 +151,15 @@
                   variant="filled"
                   color="primary"
                   label="Make"
-                  persistentHint
-                  :errorMessages="
+                  persistent-hint
+                  :error-messages="
                     errors.make.message ? errors.make.message : ''
                   "
                   @keyup="onBlur('make')"
                 />
               </v-col>
             </v-row>
-            <v-row noGutters>
+            <v-row no-gutters>
               <v-col>
                 <v-text-field
                   id="txt-model"
@@ -167,8 +167,8 @@
                   variant="filled"
                   color="primary"
                   label="Model"
-                  persistentHint
-                  :errorMessages="
+                  persistent-hint
+                  :error-messages="
                     errors.model.message ? errors.model.message : ''
                   "
                   @keyup="onBlur('model')"

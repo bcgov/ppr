@@ -1,4 +1,4 @@
-import { PartyIF } from '@/interfaces'
+import type { PartyIF } from '@/interfaces'
 
 // New registration authorizing/certify check interface.
 export interface CertifyIF {

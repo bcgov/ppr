@@ -2,7 +2,7 @@
 import { axios } from '@/utils/axios-base'
 import { StatusCodes } from 'http-status-codes'
 import { ErrorCategories } from '@/enums'
-import { LtsaDetailsIF, TitleSummariesIF } from '@/interfaces/ltsa-api-interfaces'
+import type { LtsaDetailsIF, TitleSummariesIF } from '@/interfaces/ltsa-api-interfaces'
 
 // Submit an LTSA summary query request.
 // Testing PID #: 014597365

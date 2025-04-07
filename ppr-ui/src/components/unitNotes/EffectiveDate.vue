@@ -12,7 +12,7 @@
       :class="{ 'border-error-left': showBorderError }"
       flat
     >
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col
           cols="12"
           sm="3"
@@ -53,13 +53,13 @@
               id="effective-date-picker"
               ref="effectiveDatePicker"
               title="Date"
-              :initialValue="selectedPastDate"
-              :disablePicker="isImmediateDateSelected"
-              :inputRules="required('This field is required')"
-              :maxDate="maxDate"
-              @emitDate="selectedPastDate = $event"
-              @emitCancel="selectedPastDate = ''"
-              @emitClear="selectedPastDate = ''"
+              :initial-value="selectedPastDate"
+              :disable-picker="isImmediateDateSelected"
+              :input-rules="required('This field is required')"
+              :max-date="maxDate"
+              @emit-date="selectedPastDate = $event"
+              @emit-cancel="selectedPastDate = ''"
+              @emit-clear="selectedPastDate = ''"
             />
           </v-form>
 
@@ -83,7 +83,7 @@
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { EffectiveDateTypes } from '@/enums/'
 import { createDateFromPacificTime, localTodayDate, shortPacificDate } from '@/utils'
-import { ContentIF, FormIF } from '@/interfaces'
+import type { ContentIF, FormIF } from '@/interfaces'
 import { useInputRules } from '@/composables'
 import InputFieldDatePicker from '@/components/common/InputFieldDatePicker.vue'
 

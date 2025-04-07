@@ -1,5 +1,5 @@
 import { FeeCodes } from '../enums'
-import { FeeI } from '../interfaces'
+import type { FeeI } from '../interfaces'
 
 const SERVICE_FEE: number = 1.50
 

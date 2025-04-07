@@ -20,7 +20,7 @@
       >
         <!-- Notice Type Selector -->
         <v-row
-          noGutters
+          no-gutters
           class="justify-end"
         >
           <v-col>
@@ -29,7 +29,7 @@
               v-model="securitiesActNoticeType"
               class="mt-0 pr-1"
               inline
-              hideDetails="true"
+              hide-details="true"
               :disabled="isAmendment && isEditing && notice?.action !== ActionTypes.ADDED"
               :rules="required('')"
             >
@@ -52,18 +52,18 @@
             <InputFieldDatePicker
               class="mt-8 mr-3"
               :title="'Effective Date (Optional)'"
-              :initialValue="effectiveDateTime?.split('T')[0]"
-              :minDate="null"
-              :maxDate="localTodayDate(new Date(), true)"
-              @emitCancel="effectiveDateTime = ''"
-              @emitDate="effectiveDateTime = $event"
+              :initial-value="effectiveDateTime?.split('T')[0]"
+              :min-date="null"
+              :max-date="localTodayDate(new Date(), true)"
+              @emit-cancel="effectiveDateTime = ''"
+              @emit-date="effectiveDateTime = $event"
             />
           </v-col>
         </v-row>
 
         <!-- Actions -->
         <v-row
-          noGutters
+          no-gutters
           class="justify-end mt-5 mr-3"
         >
           <v-btn
@@ -90,7 +90,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { FormCard, InputFieldDatePicker } from '@/components/common'
-import { AddEditSaNoticeIF, FormIF } from '@/interfaces'
+import type { AddEditSaNoticeIF, FormIF } from '@/interfaces'
 import { ActionTypes, SaNoticeTypes } from '@/enums'
 import { useInputRules } from '@/composables'
 import { localTodayDate } from '@/utils'

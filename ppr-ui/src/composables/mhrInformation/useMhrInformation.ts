@@ -400,7 +400,7 @@ export const useMhrInformation = () => {
 
     // Set draft owner groups
     setShowGroups(draft.addOwnerGroups?.length > 1 || draft.deleteOwnerGroups?.length > 1)
-    setMhrTransferHomeOwnerGroups([...draft?.addOwnerGroups])
+    setMhrTransferHomeOwnerGroups([...draft.addOwnerGroups])
 
     // Set submitting party
     setMhrAccountSubmittingParty(draft.submittingParty)

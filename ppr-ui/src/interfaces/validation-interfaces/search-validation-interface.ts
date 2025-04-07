@@ -1,4 +1,4 @@
-import { ValidationInfoIF } from '.'
+import type { ValidationInfoIF } from '.'
 
 export interface SearchValidationIF {
     category?: ValidationInfoIF

@@ -1,5 +1,5 @@
 import { UISearchTypes, UIMHRSearchTypes } from '@/enums'
-import { SearchHistoryResponseIF, MHRSearchHistoryResponseIF } from '@/interfaces'
+import type { SearchHistoryResponseIF, MHRSearchHistoryResponseIF } from '@/interfaces'
 import { mockedSearchResponse, mockedMHRSearchResponse } from './mock-search-responses'
 
 export const mockedSearchHistory: SearchHistoryResponseIF = {

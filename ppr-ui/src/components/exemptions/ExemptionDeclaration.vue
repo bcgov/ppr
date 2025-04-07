@@ -12,7 +12,7 @@
       v-model="declarationOption"
       class="mt-5 pr-1"
       inline
-      hideDetails="true"
+      hide-details="true"
     >
       <v-radio
         id="destroyed-option"
@@ -48,7 +48,7 @@
         id="destroyed-reason"
         v-model="declarationReason"
         class="mt-n2 ml-n2"
-        hideDetails="true"
+        hide-details="true"
         :error="validate && !declarationReason"
       >
         <v-radio
@@ -87,7 +87,7 @@
         id="converted-reason"
         v-model="declarationReason"
         class="mt-n2 ml-n2"
-        hideDetails="true"
+        hide-details="true"
         :error="validate && !declarationReason"
       >
         <v-radio
@@ -121,22 +121,25 @@
         ref="declarationDateRef"
         class="mt-4"
         title="Date"
-        persistentHint
+        persistent-hint
         hint="Enter the date this manufactured home was no longer in use."
-        :errorMsg="(validate && !declarationDate) ? 'Enter the date this manufactured home was no longer in use.' : '' "
-        :inputRules="dateFieldRules"
-        :maxDate="localTodayDate(new Date(), true)"
-        @emitDate="declarationDate = $event"
-        @emitCancel="declarationDate = ''"
+        :error-msg="(validate && !declarationDate)
+          ? 'Enter the date this manufactured home was no longer in use.'
+          : '' "
+        :input-rules="dateFieldRules"
+        :max-date="localTodayDate(new Date(), true)"
+        @emit-date="declarationDate = $event"
+        @emit-cancel="declarationDate = ''"
       />
     </template>
   </div>
 </template>
 <script setup lang="ts">
-import { computed, nextTick, Ref, ref, watch } from 'vue'
+import type { Ref} from 'vue';
+import { computed, nextTick, ref, watch } from 'vue'
 import { InputFieldDatePicker } from '@/components/common'
 import { NonResConvertedReasons, NonResDestroyedReasons, NonResOptions } from '@/enums'
-import { FormIF } from '@/interfaces'
+import type { FormIF } from '@/interfaces'
 import { useInputRules } from '@/composables'
 import { localTodayDate } from '@/utils'
 

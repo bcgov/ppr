@@ -1,5 +1,5 @@
 import { ActionTypes, APIAmendmentTypes, APIVehicleTypes, DraftTypes, RegistrationFlowType } from '@/enums'
-import {
+import type {
   CourtOrderIF,
   CertifyIF,
   DebtorNameIF,

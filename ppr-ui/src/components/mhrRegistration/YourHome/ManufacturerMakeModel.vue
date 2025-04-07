@@ -21,7 +21,7 @@
               v-if="showUpdatedBadge"
               :action="correctionState.action"
               :baseline="correctionState.manufacturer.baseline"
-              :currentState="correctionState.manufacturer.currentState"
+              :current-state="correctionState.manufacturer.currentState"
             />
           </v-col>
           <v-col cols="9">
@@ -62,7 +62,7 @@
               v-if="showUpdatedBadge"
               :action="correctionState.action"
               :baseline="correctionState.make.baseline"
-              :currentState="correctionState.make.currentState"
+              :current-state="correctionState.make.currentState"
             />
           </v-col>
           <v-col cols="9">
@@ -90,7 +90,7 @@
               v-if="showUpdatedBadge"
               :action="correctionState.action"
               :baseline="correctionState.model.baseline"
-              :currentState="correctionState.model.currentState"
+              :current-state="correctionState.model.currentState"
             />
           </v-col>
           <v-col cols="9">
@@ -123,7 +123,7 @@ import {
 import { useStore } from '@/store/store'
 import { useInputRules, useMhrCorrections, useMhrValidations, useUpdatedBadges } from '@/composables/'
 import { storeToRefs } from 'pinia'
-import { FormIF } from '@/interfaces'
+import type { FormIF } from '@/interfaces'
 import ManufacturedYearInput from './ManufacturedYearInput.vue'
 import ManufacturedYearSelect from './ManufacturedYearSelect.vue'
 import { UpdatedBadge } from '@/components/common'

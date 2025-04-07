@@ -93,7 +93,12 @@ import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'v
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
 import { CivicAddressSchema } from '@/schemas/civic-address'
-import { HomeLocationType, HomeCivicAddress, HomeLandOwnership , HomeLocationReview } from '@/components/mhrRegistration'
+import {
+  HomeLocationType,
+  HomeCivicAddress,
+  HomeLandOwnership ,
+  HomeLocationReview
+} from '@/components/mhrRegistration'
 import { useMhrValidations } from '@/composables/mhrRegistration/useMhrValidations'
 import { useMhrCorrections, useTransportPermits } from '@/composables'
 import { CautionBox } from '@/components/common'

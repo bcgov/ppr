@@ -1,5 +1,5 @@
-import { AddressIF, IndividualNameIF } from '@/interfaces'
-import { ActionTypes } from '@/enums'
+import type { AddressIF, IndividualNameIF } from '@/interfaces'
+import type { ActionTypes } from '@/enums'
 
 // Party interface represents a single registering party secured party or debtor.
 export interface PartyIF {

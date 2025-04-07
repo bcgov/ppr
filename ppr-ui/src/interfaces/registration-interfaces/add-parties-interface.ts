@@ -1,4 +1,4 @@
-import { PartyIF } from '@/interfaces'
+import type { PartyIF } from '@/interfaces'
 
 // New registration add secured parties and debtors interface.
 export interface AddPartiesIF {

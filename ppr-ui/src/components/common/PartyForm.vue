@@ -8,7 +8,7 @@
     <!-- If the data model contains both name types, the selector will render -->
     <v-row
       v-if="requiresPartyTypeSelect"
-      noGutters
+      no-gutters
     >
       <v-col>
         <v-radio-group
@@ -16,7 +16,7 @@
           v-model="contactInfoType"
           class="mt-0 pr-1"
           inline
-          hideDetails="true"
+          hide-details="true"
         >
           <v-radio
             id="person-option"
@@ -46,7 +46,7 @@
         for="first-name"
       >Person's Legal Name</label>
 
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col>
           <v-text-field
             id="first-name"
@@ -87,7 +87,7 @@
         for="business-name"
       >Business Name</label>
 
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col>
           <v-text-field
             id="business-name"
@@ -113,13 +113,13 @@
       <OrgNameLookup
         id="business-name"
         class="mt-6"
-        :fieldLabel="orgLookupConfig.fieldLabel"
-        :fieldHint="orgLookupConfig.fieldHint"
-        :nilSearchText="orgLookupConfig.nilSearchText"
-        :baseValue="partyModel.businessName"
-        :orgNameRules="schema.businessName.rules"
-        :disableManualEntry="orgLookupConfig.disableManualBusLookup"
-        @updateOrgName="partyModel.businessName = $event"
+        :field-label="orgLookupConfig.fieldLabel"
+        :field-hint="orgLookupConfig.fieldHint"
+        :nil-search-text="orgLookupConfig.nilSearchText"
+        :base-value="partyModel.businessName"
+        :org-name-rules="schema.businessName.rules"
+        :disable-manual-entry="orgLookupConfig.disableManualBusLookup"
+        @update-org-name="partyModel.businessName = $event"
       />
     </article>
 
@@ -138,12 +138,12 @@
       <OrgNameLookup
         id="dba-name"
         class="mt-6"
-        :fieldLabel="orgLookupConfig.dbaFieldLabel"
-        :fieldHint="orgLookupConfig.dbaFieldHint"
-        :nilSearchText="orgLookupConfig.dbaNilSearchText"
-        :baseValue="partyModel.dbaName"
-        :orgNameRules="schema.dbaName.rules"
-        @updateOrgName="partyModel.dbaName = $event"
+        :field-label="orgLookupConfig.dbaFieldLabel"
+        :field-hint="orgLookupConfig.dbaFieldHint"
+        :nil-search-text="orgLookupConfig.dbaNilSearchText"
+        :base-value="partyModel.dbaName"
+        :org-name-rules="schema.dbaName.rules"
+        @update-org-name="partyModel.dbaName = $event"
       />
     </article>
 
@@ -177,7 +177,7 @@
       >Phone Number</label>
 
       <v-row
-        noGutters
+        no-gutters
         class="mt-5"
       >
         <v-col>
@@ -224,7 +224,7 @@
         id="party-form-address"
         ref="baseAddressRef"
         editing
-        hideAddressHint
+        hide-address-hint
         class="mt-5"
         :schema="schema.address.rules"
         :value="partyModel.address"
@@ -236,7 +236,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
-import { FormIF, OrgLookupConfigIF, PartyIF, PartySchemaIF } from '@/interfaces'
+import type { FormIF, OrgLookupConfigIF, PartyIF, PartySchemaIF } from '@/interfaces'
 import { BaseAddress } from '@/composables/address'
 import OrgNameLookup from '@/components/common/OrgNameLookup.vue'
 import { ContactTypes } from '@/enums'
@@ -283,7 +283,7 @@ export default defineComponent({
     })
 
     const hasPropData = (propertyName: string): boolean => {
-      return localState.partyModel?.hasOwnProperty(propertyName)
+      return Object.prototype.hasOwnProperty.call(localState.partyModel, propertyName)
     }
 
     /** Validation function exposed for parent use **/

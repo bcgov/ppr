@@ -5,7 +5,7 @@ import {
   BlankSearchTypes,
   APIMHRMapSearchTypes
 } from '@/enums'
-import { SearchTypeIF } from '@/interfaces'
+import type { SearchTypeIF } from '@/interfaces'
 
 export const SearchTypes: Array<SearchTypeIF> = [
   {

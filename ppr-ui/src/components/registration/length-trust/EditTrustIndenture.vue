@@ -6,7 +6,7 @@
     <div>
       <v-row
         class="pt-6"
-        noGutters
+        no-gutters
       >
         <v-col
           cols="3"
@@ -19,7 +19,7 @@
             id="trust-indenture-checkbox"
             v-model="trustIndenture"
             class="trust-checkbox pa-0 ma-0 mt-n4 ml-n3"
-            hideDetails
+            hide-details
             label=""
           />
         </v-col>
@@ -29,7 +29,7 @@
           </p>
         </v-col>
       </v-row>
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col cols="12">
           <div class="form__row form__btns pt-4 float-right">
             <v-btn
@@ -66,7 +66,7 @@ import {
   toRefs
 } from 'vue'
 import { useStore } from '@/store/store'
-import { LengthTrustIF } from '@/interfaces'
+import type { LengthTrustIF } from '@/interfaces'
 import { ActionTypes } from '@/enums'
 import { storeToRefs } from 'pinia'
 

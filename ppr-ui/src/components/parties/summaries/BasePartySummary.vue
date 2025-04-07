@@ -7,7 +7,7 @@
     <v-row
       v-if="options.header"
       class="summary-header rounded-top"
-      noGutters
+      no-gutters
     >
       <v-col
         cols="auto"
@@ -25,7 +25,7 @@
       </v-col>
     </v-row>
 
-    <v-row noGutters>
+    <v-row no-gutters>
       <v-col>
         <v-table class="party-summary-table party-data-table">
           <template #default>
@@ -54,7 +54,7 @@
                   class="list-item__title"
                 >
                   <v-row
-                    noGutters
+                    no-gutters
                     :aria-label="`${isBusiness(item) ? 'Business' : 'Person'} ${getName(item)}`"
                   >
                     <v-col cols="auto">
@@ -77,7 +77,7 @@
                       <div v-if="item?.action && registrationFlowType === RegistrationFlowType.AMENDMENT">
                         <v-chip
                           v-if="item?.action === ActionTypes.REMOVED"
-                          xSmall
+                          x-small
                           variant="elevated"
                           color="greyLighten"
                         >
@@ -85,7 +85,7 @@
                         </v-chip>
                         <v-chip
                           v-else
-                          xSmall
+                          x-small
                           variant="elevated"
                           color="primary"
                         >
@@ -146,7 +146,7 @@ import { useStore } from '@/store/store'
 import { BaseAddress } from '@/composables/address'
 import { DefaultSchema } from '@/composables/address/resources'
 import { useParty } from '@/composables/useParty'
-import { BaseHeaderIF, PartyIF, PartySummaryOptionsI } from '@/interfaces'
+import type { BaseHeaderIF, PartyIF, PartySummaryOptionsI } from '@/interfaces'
 import { RegistrationFlowType, ActionTypes, APIRegistrationTypes } from '@/enums'
 import { storeToRefs } from 'pinia'
 

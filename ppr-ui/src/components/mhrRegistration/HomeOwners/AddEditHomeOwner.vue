@@ -18,15 +18,15 @@
         <CautionBox
           v-if="isRoleQualifiedSupplier"
           class="mb-9"
-          :setMsg="'Transfers to a trustee or a trust of any kind, cannot be completed online and must be registered ' +
-            'by BC Registries staff.'"
+          :set-msg="'Transfers to a trustee or a trust of any kind, cannot be completed online and must be ' +
+            'registered by BC Registries staff.'"
         />
 
         <!-- Owner Roles Component-->
         <HomeOwnerRoles
-          :partyType="owner.partyType"
-          :disableRoles="isCurrentOwner(owner)"
-          @update:partyType="owner.partyType = $event"
+          :party-type="owner.partyType"
+          :disable-roles="isCurrentOwner(owner)"
+          @update:party-type="owner.partyType = $event"
         />
 
         <v-form
@@ -41,7 +41,7 @@
             <v-tooltip
               v-if="disableNameFields && isCurrentOwner(owner)"
               location="top"
-              contentClass="top-tooltip pa-5"
+              content-class="top-tooltip pa-5"
               transition="fade-transition"
               data-test-id="suffix-tooltip"
             >
@@ -132,7 +132,7 @@
                   or incorporation number of the business, or you can type the full legal name of other types of
                   <v-tooltip
                     location="top"
-                    contentClass="top-tooltip pa-5"
+                    content-class="top-tooltip pa-5"
                     transition="fade-transition"
                     data-test-id="organization-tooltip"
                   >
@@ -153,8 +153,8 @@
 
                 <SimpleHelpToggle
                   class="pt-1"
-                  toggleButtonTitle="Help with Business and Organization Owners"
-                  :defaultHideText="false"
+                  toggle-button-title="Help with Business and Organization Owners"
+                  :default-hide-text="false"
                 >
                   <template #content>
                     <h3 class="text-center mb-2">
@@ -233,11 +233,11 @@
                     : 'Find or enter the Full Legal Name of the Business or Organization'"
                   variant="filled"
                   color="primary"
-                  persistentHint
-                  persistentClear
+                  persistent-hint
+                  persistent-clear
                   :rules="orgNameRules"
                   :clearable="showClear"
-                  :clearIcon="'mdi-close'"
+                  :clear-icon="'mdi-close'"
                   :disabled="disableNameFields && isCurrentOwner(owner)"
                   :readonly="disableNameFields && isCurrentOwner(owner)"
                   @click:clear="showClear = false"
@@ -256,10 +256,10 @@
 
                 <BusinessSearchAutocomplete
                   v-click-outside="setCloseAutoComplete"
-                  :searchValue="autoCompleteSearchValue"
-                  :setAutoCompleteIsActive="autoCompleteIsActive"
-                  :showDropdown="$refs.orgNameSearchField && $refs.orgNameSearchField.isFocused"
-                  @searchValue="setSearchValue"
+                  :search-value="autoCompleteSearchValue"
+                  :set-auto-complete-is-active="autoCompleteIsActive"
+                  :show-dropdown="$refs.orgNameSearchField && $refs.orgNameSearchField.isFocused"
+                  @search-value="setSearchValue"
                   @searching="loadingSearchResults = $event"
                 />
               </v-col>
@@ -272,7 +272,7 @@
           <v-tooltip
             v-if="disableNameFields && isCurrentOwner(owner)"
             location="top"
-            contentClass="top-tooltip pa-5"
+            content-class="top-tooltip pa-5"
             transition="fade-transition"
             data-test-id="suffix-tooltip"
           >
@@ -291,7 +291,7 @@
             <v-col class="col">
               <v-tooltip
                 location="right"
-                contentClass="right-tooltip pa-5"
+                content-class="right-tooltip pa-5"
                 transition="fade-transition"
                 :disabled="!additionalNameTooltip"
               >
@@ -304,7 +304,7 @@
                     :label="nameConfig.label"
                     data-test-id="suffix"
                     :hint="(disableNameFields && isCurrentOwner(owner)) ? '' : nameConfig.hint"
-                    persistentHint
+                    persistent-hint
                     :rules="additionalNameRules"
                     :disabled="disableNameFields && isCurrentOwner(owner)"
                     :readonly="disableNameFields && isCurrentOwner(owner)"
@@ -354,9 +354,9 @@
             :value="owner.address"
             :editing="true"
             :schema="{ ...addressSchema }"
-            :triggerErrors="triggerAddressErrors"
+            :trigger-errors="triggerAddressErrors"
             class="mt-6"
-            hideAddressHint
+            hide-address-hint
             @valid="isAddressFormValid = $event"
             @update-address="owner.address = $event"
           />
@@ -368,11 +368,11 @@
           >
             <hr class="mt-3 mb-10">
             <HomeOwnerGroups
-              :groupId="isDefinedGroup ? ownersGroupId : null"
-              :isAddingHomeOwner="isAddingHomeOwner"
-              :fractionalData="groupFractionalData"
-              :isMhrTransfer="isMhrTransfer"
-              @setOwnerGroupId="ownerGroupId = $event"
+              :group-id="isDefinedGroup ? ownersGroupId : null"
+              :is-adding-home-owner="isAddingHomeOwner"
+              :fractional-data="groupFractionalData"
+              :is-mhr-transfer="isMhrTransfer"
+              @set-owner-group-id="ownerGroupId = $event"
             />
           </template>
           <template v-else>
@@ -383,7 +383,7 @@
           </template>
         </v-form>
         <v-row
-          noGutters
+          no-gutters
           class="pt-5"
         >
           <v-col>
@@ -438,7 +438,7 @@ import { formatAddress } from '@/composables/address/factories'
 import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 import { focusOnFirstError, fromDisplayPhone } from '@/utils'
-import {
+import type {
   AdditionalNameConfigIF,
   FormIF,
   MhrRegistrationFractionalOwnershipIF,

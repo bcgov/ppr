@@ -1,4 +1,4 @@
-import { ContentIF, RequirementsConfigIF } from '@/interfaces'
+import type { ContentIF, RequirementsConfigIF } from '@/interfaces'
 
 export const docIdContent: ContentIF = {
   title: 'Document ID',

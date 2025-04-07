@@ -74,7 +74,7 @@
         <ButtonFooter
           :nav-config="MhrExemptionFooterConfig"
           :current-step-name="$route.name"
-          :BaseDialog-options="notCompleteDialog"
+          :base-dialog-options="notCompleteDialog"
           @error="emitError($event)"
           @submit="submit()"
         />

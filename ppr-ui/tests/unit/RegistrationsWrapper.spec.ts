@@ -3,7 +3,7 @@ import { nextTick } from 'vue'
 import { RegistrationsWrapper } from '@/components/common'
 import { RegistrationTable } from '@/components/tables'
 import { AuthRoles, SettingOptions, TableActions } from '@/enums'
-import {
+import type {
   DraftResultIF,
   MhrDraftIF,
   MhRegistrationSummaryIF,

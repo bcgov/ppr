@@ -11,7 +11,7 @@
       {{ infoText }}
     </p>
     <v-row
-      noGutters
+      no-gutters
       class="mb-5 party-summary"
     >
       <v-col>
@@ -63,7 +63,7 @@
       </v-col>
     </v-row>
 
-    <v-row noGutters>
+    <v-row no-gutters>
       <v-col
         cols="12"
         class="pa-0"
@@ -75,7 +75,7 @@
           class="px-6"
         >
           <v-row
-            noGutters
+            no-gutters
           >
             <v-col
               cols="3"
@@ -88,7 +88,7 @@
               class="pt-2 ml-n1"
             >
               <v-row
-                noGutters
+                no-gutters
                 class="pa-0"
               >
                 <v-col
@@ -99,7 +99,7 @@
                     id="checkbox-certified"
                     v-model="certified"
                     class="py-0 pr-0 pl-2 ma-0"
-                    hideDetails
+                    hide-details
                   >
                     <template #label>
                       <div class="pt-6">
@@ -117,7 +117,7 @@
                 </v-col>
               </v-row>
               <v-row
-                noGutters
+                no-gutters
                 class="pt-3 pb-8"
               >
                 <v-col
@@ -148,7 +148,7 @@ import { useStore } from '@/store/store'
 import { convertDate, getRegisteringPartyFromAuth } from '@/utils'
 import { BaseAddress } from '@/composables/address'
 import { DefaultSchema } from '@/composables/address/resources'
-import { CertifyIF, ContentIF, PartyIF } from '@/interfaces'
+import type { CertifyIF, ContentIF, PartyIF } from '@/interfaces'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { storeToRefs } from 'pinia'
 import { authorizedTableHeaders } from '@/resources'

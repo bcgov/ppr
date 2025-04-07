@@ -1,5 +1,5 @@
 import { APIRegistrationTypes } from '@/enums'
-import { DischargeRegistrationIF, FinancingStatementIF, RenewRegistrationIF } from '@/interfaces'
+import type { DischargeRegistrationIF, FinancingStatementIF, RenewRegistrationIF } from '@/interfaces'
 import {
   mockedDebtors1,
   mockedGeneralCollateral2,

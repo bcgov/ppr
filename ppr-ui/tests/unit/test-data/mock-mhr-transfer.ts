@@ -1,5 +1,5 @@
 import { ApiHomeTenancyTypes, HomeOwnerPartyTypes } from '@/enums'
-import {
+import type {
   AddressIF,
   MhRegistrationSummaryIF,
   MhrRegistrationHomeOwnerGroupIF,

@@ -17,7 +17,7 @@
 
     <v-row
       v-if="content?.csaNumber"
-      noGutters
+      no-gutters
       class="py-3"
     >
       <v-col cols="3">
@@ -42,7 +42,7 @@
 
     <v-row
       v-else-if="content?.engineerName"
-      noGutters
+      no-gutters
       class="py-3"
     >
       <v-col cols="3">
@@ -67,7 +67,7 @@
 
     <v-row
       v-else
-      noGutters
+      no-gutters
       class="py-3"
     >
       <v-col cols="3">
@@ -86,8 +86,8 @@
         <h4>Home Sections</h4>
         <HomeSectionsTable
           class="mt-n3"
-          :homeSections="content?.sections"
-          :isReviewMode="true"
+          :home-sections="content?.sections"
+          :is-review-mode="true"
         />
       </v-col>
     </v-row>
@@ -117,7 +117,7 @@
     </v-row>
 
     <v-row
-      noGutters
+      no-gutters
       class="py-6 condensed-row"
     >
       <v-col cols="3">
@@ -162,13 +162,13 @@
 
 <script setup lang="ts">
 import { HomeSectionsTable } from '@/components/tables/mhr'
-import { DescriptionIF } from '@/interfaces'
+import type { DescriptionIF } from '@/interfaces'
 import { multipleWordsToTitleCase, pacificDate, shortPacificDate } from '@/utils'
 
 /** Props **/
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 const props = withDefaults(defineProps<{
-  content: DescriptionIF
+  content?: DescriptionIF
 }>(), {
   content: null
 })

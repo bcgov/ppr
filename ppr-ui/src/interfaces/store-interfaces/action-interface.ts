@@ -1,4 +1,4 @@
-import { ActionContext } from 'vuex'
+import type { ActionContext } from 'vuex'
 
 // Interface to define a Vuex Action
 export interface ActionIF {

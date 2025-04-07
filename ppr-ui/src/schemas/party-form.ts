@@ -1,6 +1,6 @@
 import { PartyAddressSchema } from '@/schemas/party-address'
 import { useInputRules } from '@/composables'
-import { PartySchemaIF } from '@/interfaces'
+import type { PartySchemaIF } from '@/interfaces'
 
 const {
   firstNameRules,

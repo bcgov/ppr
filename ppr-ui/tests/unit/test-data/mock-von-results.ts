@@ -1,4 +1,4 @@
-import { AutoCompleteResultIF } from '@/interfaces'
+import type { AutoCompleteResultIF } from '@/interfaces'
 
 export const mockedVonResults: Array<AutoCompleteResultIF> = [
   {

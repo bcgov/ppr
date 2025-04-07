@@ -5,16 +5,16 @@
       class="mt-10"
     >
       <DocumentId
-        :documentId="unitNoteDocumentId"
-        :sectionNumber="1"
+        :document-id="unitNoteDocumentId"
+        :section-number="1"
         :content="{
           title: 'Document ID',
           description: 'Enter the 8-digit Document ID number.',
           sideLabel: 'Document ID'
         }"
         :validate="validate"
-        @setStoreProperty="handleStoreUpdate('documentId', $event)"
-        @isValid="handleComponentValid(MhrCompVal.DOC_ID_VALID, $event)"
+        @set-store-property="handleStoreUpdate('documentId', $event)"
+        @is-valid="handleComponentValid(MhrCompVal.DOC_ID_VALID, $event)"
       />
     </section>
 
@@ -23,15 +23,15 @@
       class="mt-10"
     >
       <Remarks
-        :unitNoteRemarks="unitNoteRemarks"
-        :additionalRemarks="additionalRemarks"
-        :showAdditionalRemarksCheckbox="isNoticeOfTaxSale"
-        :sectionNumber="2"
+        :unit-note-remarks="unitNoteRemarks"
+        :additional-remarks="additionalRemarks"
+        :show-additional-remarks-checkbox="isNoticeOfTaxSale"
+        :section-number="2"
         :content="remarksContent"
-        :isRequired="isRemarksRequired"
+        :is-required="isRemarksRequired"
         :validate="validate"
-        @setStoreProperty="handleStoreUpdate($event.key, $event.value)"
-        @isValid="handleComponentValid(MhrCompVal.REMARKS_VALID, $event)"
+        @set-store-property="handleStoreUpdate($event.key, $event.value)"
+        @is-valid="handleComponentValid(MhrCompVal.REMARKS_VALID, $event)"
       />
     </section>
 
@@ -40,16 +40,16 @@
       class="mt-10"
     >
       <ContactInformation
-        :contactInfo="unitNoteGivingNoticeParty"
-        :sectionNumber="3"
+        :contact-info="unitNoteGivingNoticeParty"
+        :section-number="3"
         :content="contactInfoContent"
         :validate="validate"
-        :isHidden="hasNoPersonGivingNotice"
-        enableCombinedNameValidation
-        hidePartySearch
-        hideDeliveryAddress
-        @setStoreProperty="handleStoreUpdate('givingNoticeParty', $event)"
-        @isValid="handleComponentValid(MhrCompVal.PERSON_GIVING_NOTICE_VALID, $event)"
+        :is-hidden="hasNoPersonGivingNotice"
+        enable-combined-name-validation
+        hide-party-search
+        hide-delivery-address
+        @set-store-property="handleStoreUpdate('givingNoticeParty', $event)"
+        @is-valid="handleComponentValid(MhrCompVal.PERSON_GIVING_NOTICE_VALID, $event)"
       >
         <template
           v-if="isPersonGivingNoticeOptional()"
@@ -60,7 +60,7 @@
             v-model="hasNoPersonGivingNotice"
             class="no-person-giving-notice-checkbox mb-8"
             :label="hasNoPersonGivingNoticeText"
-            hideDetails
+            hide-details
             density="compact"
             :ripple="false"
           />
@@ -76,7 +76,7 @@ import { UnitNotesInfo } from '@/resources/unitNotes'
 import { UnitNoteDocTypes } from '@/enums'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { ContactInformationContentIF, UnitNoteIF } from '@/interfaces'
+import type { ContactInformationContentIF, UnitNoteIF } from '@/interfaces'
 import { useMhrUnitNote, useMhrValidations } from '@/composables'
 import { MhrCompVal, MhrSectVal } from '@/composables/mhrRegistration/enums'
 import { DocumentId, Remarks, ContactInformation } from '@/components/common'

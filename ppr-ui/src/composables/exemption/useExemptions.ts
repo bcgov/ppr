@@ -1,4 +1,5 @@
-import { computed, ComputedRef } from 'vue'
+import type { ComputedRef } from 'vue';
+import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
 import { useNavigation } from '@/composables'
@@ -10,7 +11,7 @@ import {
   parseAccountToSubmittingParty,
   removeEmptyProperties
 } from '@/utils'
-import { ExemptionIF, IndividualNameIF, MhRegistrationSummaryIF, PartyIF, UnitNoteIF } from '@/interfaces'
+import type { ExemptionIF, IndividualNameIF, MhRegistrationSummaryIF, PartyIF, UnitNoteIF } from '@/interfaces'
 import {
   APIMhrDescriptionTypes,
   MhApiStatusTypes,
@@ -160,27 +161,30 @@ export const useExemptions = () => {
     // Initialize role specific values
     switch (true) {
       case isRoleQualifiedSupplier.value:
-        const account = await getAccountInfoFromAuth(getCurrentUser.value)
-        setMhrExemptionValue({ key: 'submittingParty', value: parseAccountToSubmittingParty(account) })
+        {
+          const account = await getAccountInfoFromAuth(getCurrentUser.value)
+          setMhrExemptionValue({ key: 'submittingParty', value: parseAccountToSubmittingParty(account) })
 
-        // Reset Validations here for qs specific requirements
-        updateValidation('documentId', true)
-        updateValidation('declarationDetails', true)
-        updateValidation('submittingParty', true)
-        updateValidation('staffPayment', true)
-        break
+          // Reset Validations here for qs specific requirements
+          updateValidation('documentId', true)
+          updateValidation('declarationDetails', true)
+          updateValidation('submittingParty', true)
+          updateValidation('staffPayment', true)
+          break
+        }
       case isRoleStaffReg.value:
-        const validationState = getMhrExemptionValidation.value
-        // eslint-disable-next-line no-return-assign
-        Object.keys(validationState).forEach(flag => validationState[flag] = false)
+        {
+          const validationState = getMhrExemptionValidation.value
+          Object.keys(validationState).forEach(flag => validationState[flag] = false)
 
-        // Staff specific flags
-        updateValidation('declarationDetails', !isNonResExemption.value)
-        updateValidation('remarks', true)
-        updateValidation('attention', true)
-        updateValidation('folio', true)
-        updateValidation('staffPayment', isNonResExemption.value)
-        break
+          // Staff specific flags
+          updateValidation('declarationDetails', !isNonResExemption.value)
+          updateValidation('remarks', true)
+          updateValidation('attention', true)
+          updateValidation('folio', true)
+          updateValidation('staffPayment', isNonResExemption.value)
+          break
+        }
       default:
     }
   }

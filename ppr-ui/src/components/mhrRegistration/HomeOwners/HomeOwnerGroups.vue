@@ -22,8 +22,8 @@
       variant="filled"
       color="primary"
       :clearable="groupItems.length === 1"
-      :clearIcon="'mdi-close'"
-      persistentClear
+      :clear-icon="'mdi-close'"
+      persistent-clear
       data-test-id="owner-group-select"
       @update:model-value="setOwnerGroupId($event)"
       @click:clear="removeGroupDropdownValidation === true && groupDropdown.blur()"
@@ -57,10 +57,10 @@
       </v-row>
       <FractionalOwnership
         :key="ownerGroupId"
-        :groupId="ownerGroupId"
-        :fractionalData="fractionalData"
-        :isReadOnly="groupState?.isReadonly && isDefinedGroup"
-        :isMhrTransfer="isMhrTransfer"
+        :group-id="ownerGroupId"
+        :fractional-data="fractionalData"
+        :is-read-only="groupState?.isReadonly && isDefinedGroup"
+        :is-mhr-transfer="isMhrTransfer"
       />
     </div>
   </div>
@@ -72,7 +72,7 @@ import { useHomeOwners, useMhrCorrections } from '@/composables/mhrRegistration'
 import { useInputRules } from '@/composables'
 import FractionalOwnership from './FractionalOwnership.vue'
 import { find } from 'lodash'
-import { MhrRegistrationFractionalOwnershipIF } from '@/interfaces/mhr-registration-interfaces'
+import type { MhrRegistrationFractionalOwnershipIF } from '@/interfaces/mhr-registration-interfaces'
 
 
 // Interface for readonly and Edit button states for Owner Groups

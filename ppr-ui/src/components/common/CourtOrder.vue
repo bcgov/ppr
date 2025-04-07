@@ -12,7 +12,7 @@
       style="padding: 40px 30px;"
     >
       <v-row
-        noGutters
+        no-gutters
         class="pb-7"
       >
         <v-col
@@ -29,7 +29,7 @@
         </v-col>
       </v-row>
       <v-row
-        noGutters
+        no-gutters
         class="pb-7"
       >
         <v-col
@@ -46,7 +46,7 @@
         </v-col>
       </v-row>
       <v-row
-        noGutters
+        no-gutters
         class="pb-7"
       >
         <v-col
@@ -63,7 +63,7 @@
         </v-col>
       </v-row>
       <v-row
-        noGutters
+        no-gutters
         class="pb-7"
       >
         <v-col
@@ -79,7 +79,7 @@
           {{ computedDateFormatted }}
         </v-col>
       </v-row>
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col
           cols="3"
           class="generic-label"
@@ -97,7 +97,7 @@
   </v-container>
   <v-container v-else-if="isSummary">
     <v-row
-      noGutters
+      no-gutters
       class="py-2"
     >
       <v-col
@@ -110,7 +110,7 @@
       </v-col>
     </v-row>
     <v-row
-      noGutters
+      no-gutters
       style="padding: 15px 30px;"
     >
       <v-col class="generic-label">
@@ -124,7 +124,7 @@
       </v-col>
     </v-row>
     <v-row
-      noGutters
+      no-gutters
       style="padding: 15px 30px;"
     >
       <v-col class="generic-label">
@@ -138,7 +138,7 @@
       </v-col>
     </v-row>
     <v-row
-      noGutters
+      no-gutters
       style="padding: 15px 30px;"
     >
       <v-col class="generic-label">
@@ -152,7 +152,7 @@
       </v-col>
     </v-row>
     <v-row
-      noGutters
+      no-gutters
       style="padding: 15px 30px;"
     >
       <v-col class="generic-label">
@@ -166,7 +166,7 @@
       </v-col>
     </v-row>
     <v-row
-      noGutters
+      no-gutters
       style="padding: 15px 30px;"
     >
       <v-col class="generic-label">
@@ -192,7 +192,7 @@
       flat
     >
       <v-row
-        noGutters
+        no-gutters
         class="summary-header pa-2 mb-8"
       >
         <v-col
@@ -208,7 +208,7 @@
         </v-col>
       </v-row>
       <v-row
-        noGutters
+        no-gutters
         class="summary-text"
         style="padding: 0 30px;"
       >
@@ -227,7 +227,7 @@
         class="px-6"
       >
         <v-row
-          noGutters
+          no-gutters
         >
           <v-col
             cols="3"
@@ -246,15 +246,15 @@
               color="primary"
               label="Court Name"
               hint="For example: Supreme Court of British Columbia"
-              persistentHint
-              :errorMessages="
+              persistent-hint
+              :error-messages="
                 errors.courtName.message ? errors.courtName.message : courtNameMessage
               "
             />
           </v-col>
         </v-row>
         <v-row
-          noGutters
+          no-gutters
         >
           <v-col
             cols="3"
@@ -273,15 +273,15 @@
               color="primary"
               label="Court Registry"
               hint="The location (city) of the court. For example: Richmond"
-              persistentHint
-              :errorMessages="
+              persistent-hint
+              :error-messages="
                 errors.courtRegistry.message ? errors.courtRegistry.message : courtRegistryMessage
               "
             />
           </v-col>
         </v-row>
         <v-row
-          noGutters
+          no-gutters
         >
           <v-col
             cols="3"
@@ -299,15 +299,15 @@
               variant="filled"
               color="primary"
               label="Court File Number"
-              persistentHint
-              :errorMessages="
+              persistent-hint
+              :error-messages="
                 errors.fileNumber.message ? errors.fileNumber.message : fileNumberMessage
               "
             />
           </v-col>
         </v-row>
         <v-row
-          noGutters
+          no-gutters
         >
           <v-col
             cols="3"
@@ -324,20 +324,20 @@
               ref="datePickerRef"
               :key="datePickerKey"
               class="court-date-text-input"
-              nudgeRight="40"
+              nudge-right="40"
               title="Date of Order"
-              :errorMsg="errors.orderDate.message ? errors.orderDate.message : ''"
-              :initialValue="orderDate"
-              :minDate="minCourtDate"
-              :maxDate="maxCourtDate"
-              :persistentHint="true"
-              @emitDate="orderDate = $event"
-              @emitCancel="orderDate = ''"
+              :error-msg="errors.orderDate.message ? errors.orderDate.message : ''"
+              :initial-value="orderDate"
+              :min-date="minCourtDate"
+              :max-date="maxCourtDate"
+              :persistent-hint="true"
+              @emit-date="orderDate = $event"
+              @emit-cancel="orderDate = ''"
             />
           </v-col>
         </v-row>
         <v-row
-          noGutters
+          no-gutters
         >
           <v-col
             cols="3"
@@ -352,13 +352,13 @@
             <v-textarea
               id="effect-of-order"
               v-model.trim="effectOfOrder"
-              autoGrow
+              auto-grow
               counter="512"
               variant="filled"
               color="primary"
               label="Effect of Order"
               class="bg-white pt-2 text-input-field"
-              :errorMessages="
+              :error-messages="
                 errors.effectOfOrder.message ? errors.effectOfOrder.message : effectOfOrderMessage
               "
             />
@@ -375,7 +375,7 @@ import { useStore } from '@/store/store'
 import { isEqual } from 'lodash'
 import InputFieldDatePicker from '@/components/common/InputFieldDatePicker.vue'
 import { APIRegistrationTypes } from '@/enums'
-import { CourtOrderIF } from '@/interfaces'
+import type { CourtOrderIF } from '@/interfaces'
 import { convertDate, localTodayDate } from '@/utils'
 import { useCourtOrderValidation } from './composables'
 import { storeToRefs } from 'pinia'

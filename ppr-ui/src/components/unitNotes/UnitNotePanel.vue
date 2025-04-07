@@ -1,7 +1,7 @@
 <template>
   <v-expansion-panel class="unit-note-panel">
     <v-expansion-panel-title
-      disableIconRotate
+      disable-icon-rotate
       :disabled="disabled"
       class="mb-2"
     >
@@ -35,7 +35,7 @@
                 :disabled="disabled"
                 :ripple="false"
                 v-bind="props"
-                minWidth="10"
+                min-width="10"
                 width="45"
               >
                 <v-icon
@@ -105,7 +105,7 @@ import { RouteNames, UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
 import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { UnitNotesInfo } from '@/resources'
-import { UnitNoteIF, UnitNotePanelIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
+import type { UnitNoteIF, UnitNotePanelIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 import UnitNoteHeaderInfo from './UnitNoteHeaderInfo.vue'
 import UnitNoteContentInfo from './UnitNoteContentInfo.vue'
 import { useMhrUnitNote, useMhrUnitNotePanel } from '@/composables'

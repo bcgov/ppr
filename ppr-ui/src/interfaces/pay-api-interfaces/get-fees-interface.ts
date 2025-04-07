@@ -1,4 +1,4 @@
-import { ErrorIF } from '@/interfaces'
+import type { ErrorIF } from '@/interfaces'
 
 export interface GetFeesI {
   error?: ErrorIF

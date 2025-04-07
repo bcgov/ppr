@@ -1,5 +1,5 @@
 <template>
-  <v-row noGutters>
+  <v-row no-gutters>
     <v-col
       v-if="isRoleStaff"
       class="staff-header-img"
@@ -11,7 +11,7 @@
     >
       <div class="ma-0 pa-0">
         <v-row
-          noGutters
+          no-gutters
           class="justify-space-between align-baseline"
         >
           <h1 class="tombstone-header">
@@ -21,10 +21,10 @@
         <v-row
           id="tombstone-user-info"
           class="pt-1 tombstone-sub-header"
-          noGutters
+          no-gutters
         >
           <v-col cols="7">
-            <v-row noGutters>
+            <v-row no-gutters>
               <v-col
                 cols="auto"
                 class="pr-3"
@@ -44,19 +44,19 @@
             <!-- Qualified Suppler Access Btn -->
             <v-row
               v-if="isQsAccessEnabled"
-              noGutters
+              no-gutters
               justify="end"
               class="mt-n8 mb-2"
             >
               <QsAccessBtn />
             </v-row>
             <v-row
-              noGutters
+              no-gutters
               justify="end"
             >
               <v-tooltip
                 location="top"
-                contentClass="top-tooltip pa-5"
+                content-class="top-tooltip pa-5"
                 transition="fade-transition"
               >
                 <template #activator="{ props }">
@@ -70,7 +70,7 @@
                   >
                     <div>
                       <v-row
-                        noGutters
+                        no-gutters
                         class="align-center"
                       >
                         <v-icon

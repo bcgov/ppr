@@ -1,4 +1,4 @@
-import { ActionTypes } from '@/enums'
+import type { ActionTypes } from '@/enums'
 
 // Existing court order information may not be altered. All elements are required.
 export interface CourtOrderIF {

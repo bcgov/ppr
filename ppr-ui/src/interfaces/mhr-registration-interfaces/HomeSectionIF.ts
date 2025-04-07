@@ -1,5 +1,5 @@
 // New mhr registration Home Section interface.
-import { ActionTypes } from '@/enums'
+import type { ActionTypes } from '@/enums'
 
 export interface HomeSectionIF {
   id?: string, // optional property for editing specific sections

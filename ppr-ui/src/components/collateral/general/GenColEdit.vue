@@ -6,7 +6,7 @@
     flat
   >
     <v-row
-      noGutters
+      no-gutters
       class="py-6"
     >
       <v-col
@@ -19,9 +19,9 @@
         cols="9"
       >
         <WysiwygEditor
-          placeHolderText="Description of General Collateral"
-          :editorContent="newDesc"
-          @emitEditorContent="newDesc = $event"
+          place-holder-text="Description of General Collateral"
+          :editor-content="newDesc"
+          @emit-editor-content="newDesc = $event"
         />
 
         <p class="summary-text mt-8">
@@ -49,7 +49,7 @@ import {
 import { useStore } from '@/store/store'
 // local
 import { APIRegistrationTypes, RegistrationFlowType } from '@/enums'
-import { GeneralCollateralIF } from '@/interfaces'
+import type { GeneralCollateralIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
 
 import { WysiwygEditor } from '@/components/common'

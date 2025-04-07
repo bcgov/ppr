@@ -2,6 +2,7 @@
 import withNuxt from './.nuxt/eslint.config.mjs'
 
 export default withNuxt(
+  {ignores: ['**/*.spec/*', '**/tests/*']},
   {
     "rules": {
       "max-len": [
@@ -13,7 +14,15 @@ export default withNuxt(
       "vue/no-unused-vars": "warn",
       "vue/multi-word-component-names": "off",
       "vue/no-v-html": "off",
-      "@typescript-eslint/no-unused-vars": "warn",
-      "@typescript-eslint/no-explicit-any": "off"
+      "vue/no-template-shadow": "off",
+      "@typescript-eslint/no-dynamic-delete": "off",
+      "no-constant-binary-expression": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-expressions": "off",
+      "@typescript-eslint/no-duplicate-enum-values": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
+      "@typescript-eslint/no-invalid-void-type": "off",
+      "vue/no-side-effects-in-computed-properties": "off"
     }
   })

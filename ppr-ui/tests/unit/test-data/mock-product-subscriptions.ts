@@ -1,5 +1,5 @@
 import { ProductCode, ProductStatus } from '@/enums'
-import { UserProductSubscriptionIF } from '@/interfaces'
+import type { UserProductSubscriptionIF } from '@/interfaces'
 
 type mockedProductSubscriptions = {
   ['ALL']?: UserProductSubscriptionIF[],

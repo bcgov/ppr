@@ -1,4 +1,4 @@
-import { APIMhrDescriptionTypes, APIRegistrationTypes, UIMhrDescriptionTypes, UIRegistrationTypes } from '@/enums'
+import type { APIMhrDescriptionTypes, APIRegistrationTypes, UIMhrDescriptionTypes, UIRegistrationTypes } from '@/enums'
 
 // Search type interface
 export interface RegistrationTypeIF {

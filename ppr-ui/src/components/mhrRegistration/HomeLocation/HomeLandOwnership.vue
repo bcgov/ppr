@@ -21,8 +21,8 @@
             v-if="updatedBadge"
             :action="updatedBadge.action"
             :baseline="updatedBadge.baseline"
-            :currentState="updatedBadge.currentState"
-            isCaseSensitive
+            :current-state="updatedBadge.currentState"
+            is-case-sensitive
           />
         </v-col>
         <v-col
@@ -93,7 +93,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
-import { ContentIF, FormIF, UpdatedBadgeIF } from '@/interfaces'
+import type { ContentIF, FormIF, UpdatedBadgeIF } from '@/interfaces'
 import { UpdatedBadge } from '@/components/common'
 
 export default defineComponent({

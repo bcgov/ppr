@@ -9,7 +9,7 @@ import {
   HomeTenancyTypes,
   MhApiStatusTypes
 } from '@/enums'
-import {
+import type {
   AddressIF,
   MhrRegistrationFractionalOwnershipIF,
   MhrRegistrationHomeOwnerGroupIF,

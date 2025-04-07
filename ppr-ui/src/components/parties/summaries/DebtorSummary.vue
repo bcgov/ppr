@@ -1,10 +1,10 @@
 <template>
   <v-container class="pa-0 party-summary flat">
     <base-party-summary
-      :setHeaders="debtorHeaders"
-      :setItems="debtors"
-      :setOptions="debtorOptions"
-      @triggerNoDataAction="goToParties()"
+      :set-headers="debtorHeaders"
+      :set-items="debtors"
+      :set-options="debtorOptions"
+      @trigger-no-data-action="goToParties()"
     />
   </v-container>
 </template>
@@ -14,7 +14,7 @@ import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { useStore } from '@/store/store'
 import { useRouter } from 'vue-router'
 import { BasePartySummary } from '@/components/parties/summaries'
-import { AddPartiesIF, PartySummaryOptionsI } from '@/interfaces'
+import type { AddPartiesIF, PartySummaryOptionsI } from '@/interfaces'
 import { debtorTableHeaders } from '@/resources'
 import { storeToRefs } from 'pinia'
 

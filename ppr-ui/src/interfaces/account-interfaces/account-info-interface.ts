@@ -1,4 +1,4 @@
-import { AddressIF } from '../ppr-api-interfaces'
+import type { AddressIF } from '../ppr-api-interfaces'
 
 export interface AccountAdminInfoIF {
   firstName: string

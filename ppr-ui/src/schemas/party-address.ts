@@ -1,6 +1,6 @@
 import { ValidationRule } from '@/composables/address/enums'
 import { baseRules, spaceRules } from '@/composables/address/factories/validation-factory'
-import { SchemaIF } from '@/composables/address/interfaces'
+import type { SchemaIF } from '@/composables/address/interfaces'
 
 // The Party Address schema containing Vuelidate rules.
 // NB: This should match the subject JSON schema.

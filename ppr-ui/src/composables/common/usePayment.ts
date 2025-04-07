@@ -1,6 +1,6 @@
 import { reactive } from 'vue'
 import { StaffPaymentOptions } from '@/enums'
-import { StaffPaymentIF } from '@/interfaces'
+import type { StaffPaymentIF } from '@/interfaces'
 import { useStore } from '@/store/store'
 
 /**

@@ -4,13 +4,13 @@
       ref="orgNameSearchField"
       v-model="searchValue"
       variant="filled"
-      persistentHint
-      persistentClear
+      persistent-hint
+      persistent-clear
       :hint="fieldHint"
       :label="fieldLabel"
       :rules="orgNameRules"
       :clearable="showClear"
-      :clearIcon="'mdi-close'"
+      :clear-icon="'mdi-close'"
       @click:clear="showClear = false"
       @keydown="manualEntryHandler"
       @update:focused="manualEntryFocusHandler"
@@ -29,10 +29,10 @@
 
     <BusinessSearchAutocomplete
       v-click-outside="setCloseAutoComplete"
-      :nilSearchText="nilSearchText"
-      :searchValue="autoCompleteSearchValue"
-      :setAutoCompleteIsActive="autoCompleteIsActive"
-      @searchValue="setSearchValue"
+      :nil-search-text="nilSearchText"
+      :search-value="autoCompleteSearchValue"
+      :set-auto-complete-is-active="autoCompleteIsActive"
+      @search-value="setSearchValue"
       @searching="loadingSearchResults = $event"
     />
   </div>

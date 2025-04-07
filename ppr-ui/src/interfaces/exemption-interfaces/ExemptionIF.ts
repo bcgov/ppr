@@ -1,5 +1,5 @@
-import { PartyIF } from '@/interfaces'
-import { NonResConvertedReasons, NonResDestroyedReasons, NonResOptions, UnitNoteDocTypes } from '@/enums'
+import type { PartyIF } from '@/interfaces'
+import type { NonResConvertedReasons, NonResDestroyedReasons, NonResOptions, UnitNoteDocTypes } from '@/enums'
 
 export interface ExemptionIF {
   documentId: string

@@ -1,4 +1,4 @@
-import { AddressIF } from '@/interfaces'
+import type { AddressIF } from '@/interfaces'
 
 export interface MhrQsPayloadIF {
   authorizationName: string

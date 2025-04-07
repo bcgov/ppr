@@ -79,5 +79,5 @@ const validationSchema = {
     ]
   }
 }
-// @ts-ignore - there is a type mismatch in the structure above, but it still works
+// @ts-expect-error - there is a type mismatch in the structure above, but it still works
 export const formValidation = createFormValidation(validationSchema)

@@ -14,7 +14,7 @@
             {{ requirement.boldTextPreTooltip }}
             <v-tooltip
               location="top"
-              contentClass="top-tooltip"
+              content-class="top-tooltip"
               transition="fade-transition"
             >
               <template #activator="{ props }">
@@ -75,7 +75,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { RequirementsConfigIF } from '@/interfaces'
+import type { RequirementsConfigIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'ListRequirements',

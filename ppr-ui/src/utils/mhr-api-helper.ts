@@ -24,7 +24,7 @@ import { useSearch } from '@/composables/useSearch'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { addTimestampToDate } from '@/utils'
 import { trim } from 'lodash'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 import type { AxiosError } from 'axios'
 
 // Create default request base URL and headers.

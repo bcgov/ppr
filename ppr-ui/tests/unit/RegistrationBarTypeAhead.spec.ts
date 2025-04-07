@@ -1,7 +1,7 @@
 import { RegistrationBarTypeAheadList } from '@/components/registration'
 import { RegistrationOtherDialog } from '@/components/dialogs'
 import { RegistrationTypesMiscellaneousCC } from '@/resources'
-import { RegistrationTypeIF } from '@/interfaces'
+import type { RegistrationTypeIF } from '@/interfaces'
 import { UIRegistrationTypes } from '@/enums'
 import { createComponent, getLastEvent } from './utils'
 import flushPromises from 'flush-promises'

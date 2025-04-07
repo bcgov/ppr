@@ -1,5 +1,5 @@
 import { UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums'
-import { CancelUnitNoteIF, UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
+import type { CancelUnitNoteIF, UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 import { UnitNotesInfo } from '@/resources'
 
 export const mockedUnitNotes: Array<UnitNoteIF> = [

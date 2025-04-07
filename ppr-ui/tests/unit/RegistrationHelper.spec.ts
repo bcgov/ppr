@@ -12,7 +12,7 @@ import {
   setupStateModelFromAmendmentDraft,
   setupAmendmentStatementFromDraft
 } from '@/utils'
-import {
+import type {
   AmendmentStatementIF,
   DischargeRegistrationIF,
   DraftIF,

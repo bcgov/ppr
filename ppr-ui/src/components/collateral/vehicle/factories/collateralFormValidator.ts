@@ -68,5 +68,5 @@ const validationSchema = {
     ]
   }
 }
-// @ts-ignore
+// @ts-expect-error: Type mismatch due to module resolution issue
 export const formValidation = createFormValidation(validationSchema)

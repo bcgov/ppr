@@ -7,7 +7,7 @@
       { 'void-transport-permit-details': isVoidPermit }
     ]"
   >
-    <v-row noGutters>
+    <v-row no-gutters>
       <v-col
         class="transport-details-header"
       >
@@ -45,7 +45,7 @@
     </v-row>
 
     <v-row
-      noGutters
+      no-gutters
       class="pt-4 key-value-pair"
     >
       <v-col cols="3 tp-header">
@@ -57,7 +57,7 @@
     </v-row>
 
     <v-row
-      noGutters
+      no-gutters
       class="pt-2 key-value-pair"
     >
       <v-col cols="3 tp-header">
@@ -69,7 +69,7 @@
     </v-row>
 
     <v-row
-      noGutters
+      no-gutters
       class="pt-2 pb-1 key-value-pair"
     >
       <v-col cols="3 tp-header">
@@ -78,7 +78,7 @@
           v-if="isExtendChangeLocationActive"
           action="EXTENDED"
           :baseline="getMhrInformation.permitDateTime"
-          :currentState="addDaysToDate(convertDate(new Date(), false, false), 30)"
+          :current-state="addDaysToDate(convertDate(new Date(), false, false), 30)"
         />
       </v-col>
       <v-col cols="9 tp-label">
@@ -104,7 +104,7 @@ import { InfoChip, UpdatedBadge } from '@/components/common'
 import { useTransportPermits } from '@/composables'
 const { getMhrInformation } = storeToRefs(useStore())
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 const props = withDefaults(defineProps<{
   isCancelledLocation?: boolean,
   isCompletedLocation?: boolean,

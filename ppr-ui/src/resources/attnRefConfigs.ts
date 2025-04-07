@@ -1,4 +1,4 @@
-import { AttnRefConfigIF } from '@/interfaces'
+import type { AttnRefConfigIF } from '@/interfaces'
 
 export const folioOrRefConfig: AttnRefConfigIF = {
   title: 'Folio or Reference Number',

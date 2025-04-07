@@ -11,6 +11,7 @@ export default defineVitestConfig({
     globals: true,
     testTimeout: 100000,
     setupFiles: '../tests/setup.ts',
+    silent: true,
     onConsoleLog (log) {
       if (log.includes('warn')) return false // Filter out Vue warnings while preserving errors and logs.
     },

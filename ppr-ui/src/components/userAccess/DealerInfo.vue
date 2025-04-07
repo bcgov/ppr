@@ -24,7 +24,7 @@ const qsUserGuideUrl = 'https://www2.gov.bc.ca/assets/gov/employment-business-an
       <v-expansion-panel-title>
         <v-expand-transition>
           <v-row
-            noGutters
+            no-gutters
             class="fs-14"
           >
             <v-col
@@ -44,7 +44,7 @@ const qsUserGuideUrl = 'https://www2.gov.bc.ca/assets/gov/employment-business-an
 
       <!-- Panel Content-->
       <v-expansion-panel-text class="py-0 fs-14">
-        <v-row noGutters>
+        <v-row no-gutters>
           <v-col cols="12">
             <p>
               Your Qualified Supplier – Home Dealers' account now includes the following features, regardless of the
@@ -78,7 +78,7 @@ const qsUserGuideUrl = 'https://www2.gov.bc.ca/assets/gov/employment-business-an
         </v-row>
 
         <v-row
-          noGutters
+          no-gutters
         >
           <template v-if="getIsAccountAdministrator">
             <v-col cols="12">

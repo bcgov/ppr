@@ -1,4 +1,4 @@
-import { AccountProductCodes, AccountProductMemberships, AccountProductRoles } from '@/enums'
+import type { AccountProductCodes, AccountProductMemberships, AccountProductRoles } from '@/enums'
 
 export interface AccountProductSubscriptionIF {
   [AccountProductCodes.RPPR]?: {

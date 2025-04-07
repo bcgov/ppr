@@ -8,7 +8,7 @@
       <v-tooltip
         if="tooltipContent"
         location="top"
-        contentClass="top-tooltip pa-5"
+        content-class="top-tooltip pa-5"
         transition="fade-transition"
         data-test-id="submitting-party-tooltip"
       >
@@ -95,7 +95,7 @@ import { BaseAddress } from '@/composables/address'
 import { PartyAddressSchema } from '@/schemas'
 import { defineComponent } from 'vue'
 import { toDisplayPhone } from '@/utils'
-import { AccountInfoIF } from '@/interfaces'
+import type { AccountInfoIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'AccountInfo',

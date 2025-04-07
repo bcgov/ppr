@@ -110,7 +110,7 @@ export async function fetchConfig (): Promise<any> {
 
   const podNamespace = config.VUE_APP_POD_NAMESPACE
   sessionStorage.setItem('POD_NAMESPACE', podNamespace)
-  console.log('POD_NAMESPACE: ' + podNamespace)
+  console.info('POD_NAMESPACE: ' + podNamespace)
 
   const addressCompleteKey: string = config.VUE_APP_ADDRESS_COMPLETE_KEY
   if (addressCompleteKey) {

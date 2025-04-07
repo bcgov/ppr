@@ -105,7 +105,7 @@
                     <strong>Original or
                       <v-tooltip
                         location="top"
-                        contentClass="top-tooltip pa-5"
+                        content-class="top-tooltip pa-5"
                         transition="fade-transition"
                         data-test-id="organization-tooltip"
                       >
@@ -124,7 +124,7 @@
                     each joint tenant owner being removed due to death. I confirm that it was
                     <v-tooltip
                       location="top"
-                      contentClass="top-tooltip pa-5"
+                      content-class="top-tooltip pa-5"
                       transition="fade-transition"
                       data-test-id="organization-tooltip"
                     >
@@ -331,7 +331,7 @@
           </v-col>
         </v-row>
         <v-row
-          noGutters
+          no-gutters
           class="mt-3"
         >
           <v-col cols="3">
@@ -345,7 +345,7 @@
               id="checkbox-confirmed"
               v-model="confirmCompletion"
               class="pb-7 pt-5 px-4 my-0 confirm-checkbox"
-              hideDetails
+              hide-details
               data-test-id="confirm-completion-checkbox"
               :ripple="false"
             >

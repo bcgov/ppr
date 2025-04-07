@@ -1,6 +1,6 @@
 import { nextTick } from 'vue'
 import { useStore } from "@/store/store"
-import { DraftResultIF, MhRegistrationSummaryIF, RegistrationSummaryIF, RegTableNewItemI } from '@/interfaces'
+import type { DraftResultIF, MhRegistrationSummaryIF, RegistrationSummaryIF, RegTableNewItemI } from '@/interfaces'
 import {
   mockedDraft1,
   mockedDraft2, mockedDraftAmend,

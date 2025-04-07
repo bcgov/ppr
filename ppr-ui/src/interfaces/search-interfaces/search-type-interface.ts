@@ -1,11 +1,11 @@
-import {
+import type {
   APIMHRMapSearchTypes,
   APISearchTypes,
   BlankSearchTypes,
   UIMHRSearchTypes,
   UISearchTypes
 } from '@/enums'
-import { HintIF } from '.'
+import type { HintIF } from '.'
 
 // Search type interface
 export interface SearchTypeIF {

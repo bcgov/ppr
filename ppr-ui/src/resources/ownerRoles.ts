@@ -1,5 +1,5 @@
 import { HomeOwnerPartyTypes } from '@/enums'
-import { OwnerRoleConfigIF } from '@/interfaces'
+import type { OwnerRoleConfigIF } from '@/interfaces'
 
 export const HomeOwnerRoles: Array<OwnerRoleConfigIF> = [
   {

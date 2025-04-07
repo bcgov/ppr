@@ -1,7 +1,7 @@
 <template>
   <FormCard
     label="Confirm Requirements"
-    :showErrors="validateReview && !isRequirementsConfirmed"
+    :show-errors="validateReview && !isRequirementsConfirmed"
     :class="{'border-error-left': validateReview && !isRequirementsConfirmed}"
   >
     <template #formSlot>
@@ -13,7 +13,7 @@
         <v-checkbox
           v-model="isRequirementsConfirmed"
           class="confirmation-checkbox mt-7 ml-n4"
-          hideDetails
+          hide-details
           label="I confirm and agree to all of the above requirements."
         >
           <template #label>
@@ -34,7 +34,7 @@ import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import ListRequirements from './ListRequirements.vue'
 import { userAccessRequirements } from '@/resources'
-import { RequirementsConfigIF } from '@/interfaces'
+import type { RequirementsConfigIF } from '@/interfaces'
 
 export default defineComponent({
   name: 'ConfirmRequirements',

@@ -1,6 +1,6 @@
 // Components
 import { BaseAddress } from '@/composables/address'
-import { AddressIF } from '@/interfaces'
+import type { AddressIF } from '@/interfaces'
 import { createComponent, getLastEvent } from './utils'
 import { DefaultSchema } from '@/composables/address/resources'
 

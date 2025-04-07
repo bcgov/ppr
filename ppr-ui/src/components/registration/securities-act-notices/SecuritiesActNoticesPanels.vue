@@ -4,7 +4,7 @@
     flat
   >
     <v-row
-      noGutters
+      no-gutters
       justify="center"
       class="securities-act-notices-panel-row"
     >
@@ -18,16 +18,16 @@
           :key="index"
           :disabled="false"
           :notice="item"
-          :noticeIndex="index"
-          :isActivePanel="activePanels.includes(index)"
-          :disableActions="!!activePanels.length || isAddingNotice"
-          :closeOrders="activeOrderPanel !== index"
-          :isSummary="isSummary"
-          :isAmendment="isAmendment"
-          :isDischarge="isDischarge"
+          :notice-index="index"
+          :is-active-panel="activePanels.includes(index)"
+          :disable-actions="!!activePanels.length || isAddingNotice"
+          :close-orders="activeOrderPanel !== index"
+          :is-summary="isSummary"
+          :is-amendment="isAmendment"
+          :is-discharge="isDischarge"
           :class="{ 'px-2': isSummary }"
-          @togglePanel="togglePanel"
-          @activeOrderIndex="activeOrderPanel = $event"
+          @toggle-panel="togglePanel"
+          @active-order-index="activeOrderPanel = $event"
         />
       </v-expansion-panels>
       <v-col
@@ -47,7 +47,7 @@ import { storeToRefs } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { useStore } from '@/store/store'
 import NoticePanel from './NoticePanel.vue'
-import { AddEditSaNoticeIF } from '@/interfaces'
+import type { AddEditSaNoticeIF } from '@/interfaces'
 
 /** Composables **/
 const { getSecuritiesActNotices } = storeToRefs(useStore())
@@ -58,7 +58,7 @@ const emits = defineEmits<{
 }>()
 
 /** Props **/
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 const props = withDefaults(defineProps<{
   isAddingNotice?: boolean,
   isSummary?: boolean,

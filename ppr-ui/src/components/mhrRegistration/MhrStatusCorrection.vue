@@ -1,7 +1,7 @@
 <template>
   <div id="mhr-status-correction">
     <v-row
-      noGutters
+      no-gutters
       class="fs-16 align-center mr-1"
     >
       <v-col
@@ -9,7 +9,7 @@
         class="text-no-wrap mx-6 px-6"
       >
         <v-tooltip
-          contentClass="bottom-tooltip"
+          content-class="bottom-tooltip"
           location="bottom"
           transition="fade-transition"
         >
@@ -33,10 +33,10 @@
           id="mhr-status-correction-options"
           v-model="mhrStatus"
           inline
-          hideDetails="true"
+          hide-details="true"
         >
           <v-tooltip
-            contentClass="bottom-tooltip"
+            content-class="bottom-tooltip"
             location="bottom"
             transition="fade-transition"
           >
@@ -54,7 +54,7 @@
             {{ mhrStatusToolTip }}
           </v-tooltip>
           <v-tooltip
-            contentClass="bottom-tooltip"
+            content-class="bottom-tooltip"
             location="bottom"
             transition="fade-transition"
           >
@@ -80,7 +80,7 @@
       </v-col>
     </v-row>
     <v-row
-      noGutter
+      no-gutter
       class="mt-0"
     >
       <v-col cols="2" />
@@ -89,7 +89,7 @@
           class="ml-n2"
           :action="correctionState.action"
           :baseline="correctionState.status.baseline"
-          :currentState="correctionState.status.currentState"
+          :current-state="correctionState.status.currentState"
         />
       </v-col>
     </v-row>

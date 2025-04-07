@@ -13,7 +13,7 @@
       <div v-show="!isHidden">
         <PartySearch
           v-if="!hidePartySearch"
-          isMhrPartySearch
+          is-mhr-party-search
           class="mb-8"
           @select-item="handlePartySelect($event)"
         />
@@ -26,7 +26,7 @@
           class="pa-8 pr-6"
           :class="{ 'border-error-left': showBorderError }"
         >
-          <v-row noGutters>
+          <v-row no-gutters>
             <v-col
               cols="12"
               sm="3"
@@ -48,7 +48,7 @@
                 v-model="contactInfoType"
                 class="mt-0 pr-1"
                 inline
-                :hideDetails="true"
+                :hide-details="true"
               >
                 <v-radio
                   id="person-option"
@@ -71,7 +71,7 @@
               <CautionBox
                 v-if="contactInfoModel.hasUsedPartyLookup"
                 class="mb-9"
-                setMsg="If you make changes to the submitting party information below, the changes will
+                set-msg="If you make changes to the submitting party information below, the changes will
                   only be applicable to this registration. The party code information will not be updated."
               />
 
@@ -86,7 +86,7 @@
                     class="generic-label"
                     for="first-name"
                   >Person's Name</label>
-                  <v-row noGutters>
+                  <v-row no-gutters>
                     <v-col>
                       <v-text-field
                         id="first-name"
@@ -97,7 +97,7 @@
                         :class="{ 'long-error-message': enableCombinedNameValidation }"
                         label="First Name"
                         :error="hasLongCombinedName"
-                        :errorMessages="longCombinedNameErrorMsg"
+                        :error-messages="longCombinedNameErrorMsg"
                         :rules="isPersonOption ? firstNameRules : []"
                       />
                     </v-col>
@@ -110,7 +110,7 @@
                         class="pt-4 px-2"
                         label="Middle Name (Optional)"
                         :error="hasLongCombinedName"
-                        :hideDetails="hasLongCombinedName"
+                        :hide-details="hasLongCombinedName"
                         :rules="isPersonOption ? middleNameRules : []"
                       />
                     </v-col>
@@ -123,7 +123,7 @@
                         class="pt-4 px-2"
                         label="Last Name"
                         :error="hasLongCombinedName"
-                        :hideDetails="hasLongCombinedName"
+                        :hide-details="hasLongCombinedName"
                         :rules="isPersonOption ? lastNameRules : []"
                       />
                     </v-col>
@@ -136,7 +136,7 @@
                     class="generic-label"
                     for="business-name"
                   >Business Name</label>
-                  <v-row noGutters>
+                  <v-row no-gutters>
                     <v-col>
                       <v-text-field
                         id="business-name"
@@ -171,7 +171,7 @@
                   class="generic-label"
                   for="contact-info-phone"
                 >Phone Number</label>
-                <v-row noGutters>
+                <v-row no-gutters>
                   <v-col>
                     <v-text-field
                       id="contact-info-phone"
@@ -215,11 +215,11 @@
                     ref="contactAddress"
                     class="mt-2"
                     editing
-                    hideAddressHint
-                    :hideDeliveryAddress="hideDeliveryAddress"
+                    hide-address-hint
+                    :hide-delivery-address="hideDeliveryAddress"
                     :schema="PartyAddressSchema"
                     :value="contactInfoModel.address"
-                    :triggerErrors="validate"
+                    :trigger-errors="validate"
                     @valid="isAddressValid = $event"
                     @update-address="contactInfoModel.address = $event"
                   />
@@ -236,15 +236,14 @@
 <script lang="ts">
 import { useInputRules } from '@/composables'
 import { ContactTypes } from '@/enums'
-import { ContactInformationContentIF, FormIF, PartyIF, SubmittingPartyIF } from '@/interfaces'
+import type { ContactInformationContentIF, FormIF, PartyIF, SubmittingPartyIF } from '@/interfaces'
 import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
 import { PartyAddressSchema, OptionalPartyAddressSchema } from '@/schemas'
 import { BaseAddress } from '@/composables/address'
 import { PartySearch } from '../parties/party'
 import { CautionBox } from '@/components/common'
-import { emptyContactInfo } from '@/resources'
+import { emptyContactInfo, phoneMask  } from '@/resources'
 import { cloneDeep } from 'lodash'
-import { phoneMask } from '@/resources'
 
 export default defineComponent({
   name: 'ContactInformation',

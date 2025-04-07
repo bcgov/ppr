@@ -1,5 +1,5 @@
 import { ApiTransferTypes, HomeOwnerPartyTypes } from '@/enums'
-import { AdditionalNameConfigsIF } from '@/interfaces/mhr-registration-interfaces/AdditionalNameConfigIF'
+import type { AdditionalNameConfigsIF } from '@/interfaces/mhr-registration-interfaces/AdditionalNameConfigIF'
 
 export const AdditionalNameConfig: AdditionalNameConfigsIF = {
   [HomeOwnerPartyTypes.OWNER_IND]: {

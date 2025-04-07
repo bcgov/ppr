@@ -1,5 +1,5 @@
-import { APIRegistrationTypes, MhApiStatusTypes } from '@/enums'
-import {
+import type { APIRegistrationTypes, MhApiStatusTypes } from '@/enums'
+import type {
   MhrHomeOwnerGroupIF,
   MhrRegistrationDescriptionIF,
   MhrRegistrationHomeLocationIF,

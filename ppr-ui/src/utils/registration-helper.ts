@@ -343,7 +343,7 @@ export async function saveAmendmentStatementDraft (stateModel:StateModelIF): Pro
   }
 
   if (!draftResponse.error) {
-    console.log('saveAmendmentStatementDraft ' + apiCall + ' draft successful for documentId ' +
+    console.info('saveAmendmentStatementDraft ' + apiCall + ' draft successful for documentId ' +
                 draftResponse.amendmentStatement?.documentId)
   }
   return draftResponse
@@ -453,7 +453,7 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
   }
 
   if (!draftResponse.error) {
-    console.log('saveFinancingStatementDraft ' + apiCall + ' draft successful for documentId ' +
+    console.info('saveFinancingStatementDraft ' + apiCall + ' draft successful for documentId ' +
                 draftResponse.financingStatement?.documentId)
   }
   return draftResponse
@@ -563,7 +563,7 @@ export async function saveDischarge (stateModel:StateModelIF): Promise<Discharge
   }
   registration.registeringParty = cleanupParty(registration.registeringParty)
   // Now save the registration.
-  console.log('saveDischarge calling api for base registration number ' + registration.baseRegistrationNumber + '.')
+  console.info('saveDischarge calling api for base registration number ' + registration.baseRegistrationNumber + '.')
 
   let apiResponse
   if (getIsStaff(stateModel)) {
@@ -793,7 +793,7 @@ export async function saveRenewal (stateModel:StateModelIF): Promise<RenewRegist
   }
 
   // Now save the registration.
-  console.log('save renewal calling api for base registration number ' + registration.baseRegistrationNumber + '.')
+  console.info('save renewal calling api for base registration number ' + registration.baseRegistrationNumber + '.')
 
   let apiResponse
   if (getIsStaff(stateModel)) {

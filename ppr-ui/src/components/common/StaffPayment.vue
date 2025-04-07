@@ -1,6 +1,6 @@
 <template>
   <div id="staff-payment-container">
-    <v-row noGutters>
+    <v-row no-gutters>
       <v-col
         v-if="displaySideLabel"
         cols="12"
@@ -112,7 +112,7 @@
             v-model="staffPaymentData.isPriority"
             class="priority-checkbox mt-6 pt-0"
             label="Priority (add $100.00)"
-            hideDetails
+            hide-details
             :disabled="staffPaymentData.option === StaffPaymentOptions.NO_FEE"
           />
         </template>
@@ -126,8 +126,8 @@
 <script lang="ts">
 import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
 import { StaffPaymentOptions } from '@/enums'
-import { FormIF, StaffPaymentIF } from '@/interfaces'
-import { ValidationRule } from '@/shims-vue'
+import type { FormIF, StaffPaymentIF } from '@/interfaces'
+import type { ValidationRule } from '@/shims-vue'
 
 export default defineComponent({
   name: 'StaffPayment',

@@ -5,15 +5,15 @@
     v-model="selectedSearchType"
     class="search-bar-type-select"
     :class="{ 'wide-menu' : !isSingleSearchOption }"
-    :errorMessages="categoryMessage ? categoryMessage : ''"
+    :error-messages="categoryMessage ? categoryMessage : ''"
     variant="filled"
     color="primary"
     :items="optionsList"
-    itemTitle="searchTypeUI"
-    itemValue="searchTypeAPI"
+    item-title="searchTypeUI"
+    item-value="searchTypeAPI"
     :label="searchTypeLabel"
-    returnObject
-    :menuProps="isSingleSearchOption
+    return-object
+    :menu-props="isSingleSearchOption
       ? { bottom: true, offsetY: true }
       : { maxHeight: 400, offset: -55 }"
     @focus="updateSelections()"
@@ -33,7 +33,7 @@
           >
             <v-col
               class="py-0 pl-3"
-              alignSelf="center"
+              align-self="center"
             >
               <span class="search-list-header">
                 <v-icon
@@ -46,7 +46,7 @@
             <v-col
               cols="auto"
               class="py-0"
-              alignSelf="center"
+              align-self="center"
             >
               <v-icon color="primary">
                 {{ displayGroup[item.raw.group] ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
@@ -73,7 +73,7 @@ import { computed, defineComponent, reactive, ref, toRefs, nextTick } from 'vue'
 import { useStore } from '@/store/store'
 import { MHRSearchTypes, SearchTypes } from '@/resources'
 import { APISearchTypes, UISearchTypes } from '@/enums'
-import { SearchTypeIF } from '@/interfaces'
+import type { SearchTypeIF } from '@/interfaces'
 import { getFeatureFlag } from '@/utils'
 import { storeToRefs } from 'pinia'
 

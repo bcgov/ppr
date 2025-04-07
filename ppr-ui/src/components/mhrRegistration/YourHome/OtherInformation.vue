@@ -19,7 +19,7 @@
             v-if="showUpdatedBadge"
             :action="correctionState.action"
             :baseline="correctionState.otherRemarks.baseline"
-            :currentState="correctionState.otherRemarks.currentState"
+            :current-state="correctionState.otherRemarks.currentState"
           />
         </v-col>
         <v-col cols="9">
@@ -46,7 +46,7 @@ import { defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { useInputRules, useMhrCorrections, useMhrValidations, useUpdatedBadges } from '@/composables/'
 import { storeToRefs } from 'pinia'
-import { FormIF } from '@/interfaces'
+import type { FormIF } from '@/interfaces'
 import { UpdatedBadge } from '@/components/common'
 
 export default defineComponent({

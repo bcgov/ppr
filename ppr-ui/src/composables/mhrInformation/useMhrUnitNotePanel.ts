@@ -1,5 +1,5 @@
 import { UnitNoteDocTypes, UnitNoteStatusTypes } from '@/enums/unitNoteDocTypes'
-import { CancelUnitNoteIF, UnitNoteIF, UnitNotePanelIF } from '@/interfaces'
+import type { CancelUnitNoteIF, UnitNoteIF, UnitNotePanelIF } from '@/interfaces'
 import { CancellableUnitNoteTypes, NoticeOfCautionDropDown, NoticeOfTaxSaleDropDown } from '@/resources'
 
 /**

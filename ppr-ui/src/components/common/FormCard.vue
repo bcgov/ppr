@@ -5,7 +5,7 @@
     class="pa-8"
     :class="{ 'border-error-left': showErrors }"
   >
-    <v-row noGutters>
+    <v-row no-gutters>
       <v-col
         cols="3"
         class="pr-8"

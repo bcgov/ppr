@@ -384,9 +384,9 @@ const emits = defineEmits<{
 
 /** Props **/
 const props = withDefaults(defineProps<{
-  notice: AddEditSaNoticeIF,
-  noticeIndex: number,
-  isActivePanel: boolean,
+  notice?: AddEditSaNoticeIF,
+  noticeIndex?: number,
+  isActivePanel?: boolean,
   disableActions?: boolean,
   closeOrders?: boolean,
   isSummary?: boolean,

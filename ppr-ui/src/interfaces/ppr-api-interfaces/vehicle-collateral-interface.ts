@@ -1,4 +1,4 @@
-import { ActionTypes, APIVehicleTypes } from '@/enums'
+import type { ActionTypes, APIVehicleTypes } from '@/enums'
 
 // Vehicle collateral interface.
 export interface VehicleCollateralIF {

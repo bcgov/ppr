@@ -78,7 +78,7 @@
 import { ref } from 'vue'
 import { isObject } from 'lodash'
 import { shortPacificDate } from '@/utils'
-import { BaseHeaderIF } from '@/interfaces'
+import type { BaseHeaderIF } from '@/interfaces'
 
 /** Props **/
 const props = withDefaults(defineProps<{
@@ -132,7 +132,7 @@ const getItemValue = (item: object, valuePaths: Array<string> | string): string 
 
     // Format the value as a date if the path includes 'date'
     if (path.toLowerCase().includes('date')) {
-      return !!result ? shortPacificDate(result) : props.dateFallBackLabel
+      return result ? shortPacificDate(result) : props.dateFallBackLabel
     }
 
     return result

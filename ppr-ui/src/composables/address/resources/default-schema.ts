@@ -1,5 +1,5 @@
 import { ValidationRule } from '@/composables/address/enums'
-import { SchemaIF } from '@/composables/address/interfaces'
+import type { SchemaIF } from '@/composables/address/interfaces'
 import { baseRules, spaceRules } from '@/composables/address/factories/validation-factory'
 
 /* example of what to pass in for the schema */

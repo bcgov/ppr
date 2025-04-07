@@ -13,7 +13,7 @@ import {
 } from '@/resources/dialogOptions'
 import { createComponent, getLastEvent, getTestId } from './utils'
 import { BaseDialog } from '@/components/dialogs'
-import { DialogOptionsIF } from '@/interfaces'
+import type { DialogOptionsIF } from '@/interfaces'
 import flushPromises from 'flush-promises'
 import { DialogButtons, DialogContent } from '@/components/dialogs/common'
 import { nextTick } from 'vue'

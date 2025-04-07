@@ -1,4 +1,4 @@
-import { BreadcrumbIF } from '@/interfaces'
+import type { BreadcrumbIF } from '@/interfaces'
 import { RouteNames } from '@/enums'
 
 // breadcrumb data in tombstone

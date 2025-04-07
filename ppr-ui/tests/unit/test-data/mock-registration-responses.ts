@@ -8,7 +8,7 @@ import {
   MhApiStatusTypes,
   UnitNoteDocTypes
 } from '@/enums'
-import {
+import type {
   DraftResultIF, MhCancelRegistrationSummaryIF,
   MhrDraftIF, MhRegistrationSummaryIF, RegistrationSummaryIF
 } from '@/interfaces'

@@ -7,13 +7,13 @@
       ref="form"
       v-model="isValid"
     >
-      <v-row noGutters>
+      <v-row no-gutters>
         <v-col class="generic-label">
           <h2>1. Folio or Reference Number</h2>
         </v-col>
       </v-row>
       <v-row
-        noGutters
+        no-gutters
         class="pt-4"
       >
         <v-col>
@@ -30,7 +30,7 @@
         :class="showErrors && !isValid ? 'border-error-left': ''"
       >
         <v-row
-          noGutters
+          no-gutters
         >
           <v-col
             cols="3"
@@ -49,7 +49,7 @@
               variant="filled"
               color="primary"
               label="Folio or Reference Number (Optional)"
-              persistentHint
+              persistent-hint
               :rules="rules"
             />
           </v-col>
@@ -70,7 +70,7 @@ import {
 } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { FormIF } from '@/interfaces'
+import type { FormIF } from '@/interfaces'
 
 export default defineComponent({
   props: {

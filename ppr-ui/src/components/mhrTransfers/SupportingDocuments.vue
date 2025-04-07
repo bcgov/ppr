@@ -15,7 +15,7 @@
       class="supporting-docs-options"
       inline
       :disabled="isGlobalEditingMode"
-      :hideDetails="true"
+      :hide-details="true"
     >
       <v-radio
         id="supporting-doc-option-one"
@@ -59,7 +59,7 @@
 <script lang="ts">
 import { useHomeOwners, useTransferOwners } from '@/composables'
 import { SupportingDocumentsOptions } from '@/enums/transferTypes'
-import { MhrRegistrationHomeOwnerIF } from '@/interfaces'
+import type { MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { defineComponent, reactive, toRefs, watch, computed, onUpdated } from 'vue'
 import { useStore } from '@/store/store'
 import { transferSupportingDocuments } from '@/resources/'

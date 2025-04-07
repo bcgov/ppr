@@ -10,7 +10,7 @@
         v-model="isValidCommissionOrderForm"
         class="pb-6 px-0"
       >
-        <v-row noGutters>
+        <v-row no-gutters>
           <v-col>
             <v-text-field
               id="commission-order-number"
@@ -18,33 +18,33 @@
               variant="filled"
               color="primary"
               label="Commission Order Number"
-              persistentHint
+              persistent-hint
               :rules="fileNumberRules"
               aria-label="commission-order-number"
             />
           </v-col>
         </v-row>
-        <v-row noGutters>
+        <v-row no-gutters>
           <v-col class="pt-4">
             <InputFieldDatePicker
               id="court-date-text-field"
               ref="datePickerRef"
               class="court-date-text-input"
-              nudgeRight="40"
+              nudge-right="40"
               title="Date of Order"
-              :initialValue="commissionOrderData?.orderDate.split('T')[0]"
-              :minDate="null"
-              :maxDate="localTodayDate(new Date(), true)"
-              :persistentHint="true"
-              :inputRules="required('This field is required')"
+              :initial-value="commissionOrderData?.orderDate.split('T')[0]"
+              :min-date="null"
+              :max-date="localTodayDate(new Date(), true)"
+              :persistent-hint="true"
+              :input-rules="required('This field is required')"
               :hint="'Enter the date of the order filing'"
-              @emitDate="commissionOrderData.orderDate = $event"
-              @emitCancel="commissionOrderData.orderDate = ''"
+              @emit-date="commissionOrderData.orderDate = $event"
+              @emit-cancel="commissionOrderData.orderDate = ''"
             />
           </v-col>
         </v-row>
         <v-row
-          noGutters
+          no-gutters
         >
           <v-col
             class="pt-4"
@@ -57,7 +57,7 @@
               variant="filled"
               label="Effect of Order (Optional)"
               counter="512"
-              persistentCounter
+              persistent-counter
               :rules="effectOfOrderRules"
               aria-label="effect-of-order"
             >
@@ -71,7 +71,7 @@
 
       <!-- Actions -->
       <v-row
-        noGutters
+        no-gutters
         class="justify-end mt-5 mr-3"
       >
         <v-btn
@@ -95,12 +95,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, Ref, ref, watch } from 'vue'
-import { FormCard } from '@/components/common'
-import { CourtOrderIF, FormIF } from '@/interfaces'
+import type { Ref} from 'vue';
+import { computed, ref, watch } from 'vue'
+import { FormCard, InputFieldDatePicker  } from '@/components/common'
+import type { CourtOrderIF, FormIF } from '@/interfaces'
 import { useInputRules } from '@/composables'
 import { localTodayDate } from '@/utils'
-import { InputFieldDatePicker } from '@/components/common'
 
 /** Refs **/
 const commissionOrderFormRef: Ref<FormIF> = ref(null)
@@ -144,7 +144,7 @@ const fileNumberRules = customRules(
   maxLength(20)
 )
 const effectOfOrderRules = computed(() => {
-  return !!commissionOrderData.value.effectOfOrder
+  return commissionOrderData.value.effectOfOrder
     ? customRules(
       minLength(5),
       maxLength(512)

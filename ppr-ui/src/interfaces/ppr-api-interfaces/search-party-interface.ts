@@ -1,4 +1,4 @@
-import { AddressIF } from '@/interfaces'
+import type { AddressIF } from '@/interfaces'
 
 // Search Party interface represents a search result from a party code search
 export interface SearchPartyIF {

@@ -1,5 +1,5 @@
-import { LocationChangeTypes } from "@/enums"
-import { MhrRegistrationHomeLocationIF, SubmittingPartyIF } from "@/interfaces"
+import type { LocationChangeTypes } from "@/enums"
+import type { MhrRegistrationHomeLocationIF, SubmittingPartyIF } from "@/interfaces"
 
 export interface MhrTransportPermitIF {
   documentId?: string
