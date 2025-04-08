@@ -60,7 +60,7 @@
           >
             <template #activator="{ props }">
               <v-radio
-                id="business-option"
+                id="exempt-option"
                 :value="MhApiStatusTypes.EXEMPT"
               >
                 <template #label>
