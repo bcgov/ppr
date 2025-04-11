@@ -195,7 +195,14 @@ class BaseClient:
             pay_method: str = response_json.get("paymentMethod", "")
             invoice_status: str = response_json.get("statusCode", "")
             if method != HttpVerbs.POST or (
-                pay_method == PaymentMethods.INTERNAL.value and invoice_status == StatusCodes.COMPLETED.value
+                pay_method
+                in (
+                    PaymentMethods.INTERNAL.value,
+                    PaymentMethods.DRAWDOWN.value,
+                    PaymentMethods.PAD.value,
+                    PaymentMethods.EJV.value,
+                )
+                and invoice_status == StatusCodes.COMPLETED.value
             ):
                 return response_json
             if pay_method != PaymentMethods.CC.value and invoice_status not in VALID_RESPONSE_STATUS:
