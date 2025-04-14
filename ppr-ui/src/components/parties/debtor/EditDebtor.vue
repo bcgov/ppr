@@ -219,32 +219,6 @@
               class="pb-4"
             >
               <v-col>
-                <label class="generic-label">Email Address</label>
-              </v-col>
-            </v-row>
-            <v-row no-gutters>
-              <v-col>
-                <v-text-field
-                  id="txt-email-debtor"
-                  v-model="currentDebtor.emailAddress"
-                  variant="filled"
-                  color="primary"
-                  label="Email Address (Optional)"
-                  :error-messages="
-                    errors.emailAddress.message
-                      ? errors.emailAddress.message
-                      : ''
-                  "
-                  persistent-hint
-                  @blur="validateEmail(currentDebtor.emailAddress)"
-                />
-              </v-col>
-            </v-row>
-            <v-row
-              no-gutters
-              class="pb-4"
-            >
-              <v-col>
                 <label class="generic-label">Address</label>
               </v-col>
             </v-row>

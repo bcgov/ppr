@@ -177,7 +177,6 @@
                       :value="item.address"
                     />
                   </td>
-                  <td>{{ item.emailAddress }}</td>
                   <td>{{ getFormattedBirthdate(item) }}</td>
                   <!-- Action Btns -->
                   <td class="actions-width actions-cell pr-5">
