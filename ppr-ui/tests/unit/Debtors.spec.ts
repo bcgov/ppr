@@ -63,7 +63,7 @@ describe('Debtor store tests', () => {
 
     expect(item1.querySelectorAll('td')[0].textContent).toContain('TEST 1 INDIVIDUAL DEBTOR')
     expect(item1.querySelectorAll('td')[1].textContent).toContain('1234 Fort St.')
-    expect(item1.querySelectorAll('td')[3].textContent).toContain('June 15, 1990')
+    expect(item1.querySelectorAll('td')[2].textContent).toContain('June 15, 1990')
   })
 })
 
@@ -100,15 +100,15 @@ describe('Debtor amendment tests', () => {
     const item1 = wrapper.vm.$el.querySelectorAll('.debtor-row')[0]
     const item2 = wrapper.vm.$el.querySelectorAll('.debtor-row')[1]
     const item3 = wrapper.vm.$el.querySelectorAll('.debtor-row')[2]
-    expect(item1.querySelectorAll('td')[4].textContent).toContain('Undo')
+    expect(item1.querySelectorAll('td')[3].textContent).toContain('Undo')
     const dropDowns = await wrapper.findAll('.smaller-actions')
     // 2 drop downs
     expect(dropDowns.length).toBe(2)
     // click the drop down arrow
     dropDowns.at(0).trigger('click')
     await nextTick()
-    expect(item2.querySelectorAll('td')[4].textContent).toContain('Undo')
-    expect(item3.querySelectorAll('td')[4].textContent).toContain('Edit')
+    expect(item2.querySelectorAll('td')[3].textContent).toContain('Undo')
+    expect(item3.querySelectorAll('td')[3].textContent).toContain('Edit')
   })
 
   it('fires the open event', async () => {
