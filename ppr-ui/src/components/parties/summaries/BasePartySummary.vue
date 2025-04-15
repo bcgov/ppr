@@ -102,7 +102,7 @@
                     :value="item?.address"
                   />
                 </td>
-                <td>{{ item?.emailAddress }}</td>
+                <td v-if="!options.isDebtorSummary">{{ item?.emailAddress }}</td>
                 <td v-if="options.isDebtorSummary">
                   {{ getFormattedBirthdate(item) }}
                 </td>
