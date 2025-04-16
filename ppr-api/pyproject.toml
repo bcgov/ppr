@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ppr-api"
-version = "1.3.5"
+version = "1.3.6"
 description = ""
 authors = ["dlovett <doug@daxiom.com>"]
 license = "BSD 3"
