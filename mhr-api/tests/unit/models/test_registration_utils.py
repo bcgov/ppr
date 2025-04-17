@@ -449,7 +449,8 @@ def test_account_reg_filter_multiple(session, account_id, collapse, start_value,
                          TEST_QUERY_FILTER_DATA)
 def test_find_account_filter(session, account_id, collapse, filter_name, filter_value, mhr_numbers, expected_clause):
     """Assert that account registration query with an order by clause is as expected."""
-    params: AccountRegistrationParams = AccountRegistrationParams(account_id=account_id,
+    test_account = "ppr_staff" if filter_value == "'000903'" else account_id
+    params: AccountRegistrationParams = AccountRegistrationParams(account_id=test_account,
                                                                   collapse=collapse,
                                                                   sbc_staff=False)
     if filter_name == reg_utils.REG_TS_PARAM:
@@ -484,3 +485,7 @@ def test_find_account_filter(session, account_id, collapse, filter_name, filter_
         assert registration['path'] is not None
         assert registration['documentId'] is not None
         assert not registration.get('inUserList')
+        if test_account == "ppr_staff":
+            assert registration.get("accountId")
+        else:
+            assert not registration.get("accountId")

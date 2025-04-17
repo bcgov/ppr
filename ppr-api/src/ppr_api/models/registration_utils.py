@@ -18,7 +18,7 @@
 from sqlalchemy.sql import text
 
 from ppr_api.models import utils as model_utils
-from ppr_api.services.authz import is_all_staff_account
+from ppr_api.services.authz import is_all_staff_account, is_staff_account
 from ppr_api.utils.logging import logger
 
 from .db import db
@@ -463,7 +463,11 @@ def __build_account_reg_result(
         else:
             result["transitioned"] = False
     if "accountId" in result:
-        del result["accountId"]  # Only use this for report access checking.
+        if is_staff_account(params.account_id):
+            if result.get("accountId", "0") == "0":
+                result["accountId"] = "N/A"
+        else:
+            del result["accountId"]  # Only use this for report access checking.
     return result
 
 
