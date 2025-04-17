@@ -32,6 +32,7 @@ TEST_GET_DATA = [
     ('Missing account', [MHR_ROLE], HTTPStatus.BAD_REQUEST, False, '000928', True),
     ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, '000928', True),
     ('Valid request MHR', [MHR_ROLE], HTTPStatus.OK, True, '000928', True),
+    ('Valid staff request MHR', [MHR_ROLE], HTTPStatus.OK, True, '000928', True),
     ('Valid request Doc Reg parent', [MHR_ROLE], HTTPStatus.OK, True, '90499037', False),
     ('Valid request Doc Reg child', [MHR_ROLE], HTTPStatus.OK, True, '90499038', False),
     ('Invalid MHR number', [MHR_ROLE], HTTPStatus.NOT_FOUND, True, 'TESTXX', True),
@@ -59,7 +60,9 @@ def test_get_mhr_summary(session, client, jwt, desc, roles, status, has_account,
     """Assert that a get MH registration summary info by MHR number works as expected."""
     headers = None
     # setup
-    if has_account:
+    if has_account and desc == 'Valid staff request MHR':
+        headers = create_header_account(jwt, roles, 'test-user', 'ppr_staff')
+    elif has_account:
         headers = create_header_account(jwt, roles)
     else:
         headers = create_header(jwt, roles)
@@ -88,6 +91,10 @@ def test_get_mhr_summary(session, client, jwt, desc, roles, status, has_account,
         assert registration['path'] is not None
         assert registration['inUserList'] is not None
         assert registration.get('documentRegistrationNumber')
+        if desc == 'Valid staff request MHR':
+            assert registration.get("accountId")
+        else:
+            assert not registration.get("accountId")
 
 
 @pytest.mark.parametrize('desc,roles,status,has_account, mhr_number', TEST_POST_DATA)
@@ -96,7 +103,7 @@ def test_post_other_account_reg(session, client, jwt, desc, roles, status, has_a
     headers = None
     # setup
     if desc == 'Valid request extra':
-        headers = create_header_account(jwt, roles, 'test-user', 'PS99999')
+        headers = create_header_account(jwt, roles, 'test-user', 'ppr_staff')
     elif has_account:
         headers = create_header_account(jwt, roles)
     else:
@@ -121,6 +128,10 @@ def test_post_other_account_reg(session, client, jwt, desc, roles, status, has_a
         assert registration['path'] is not None
         assert not registration['inUserList']
         assert registration.get('documentRegistrationNumber')
+        if desc == 'Valid request extra':
+            assert registration.get("accountId")
+        else:
+            assert not registration.get("accountId")
 
 
 @pytest.mark.parametrize('desc,roles,status,has_account, mhr_number', TEST_DELETE_DATA)

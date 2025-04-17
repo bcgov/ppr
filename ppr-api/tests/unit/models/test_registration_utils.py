@@ -25,6 +25,7 @@ from flask import current_app
 from ppr_api.models import FinancingStatement, Registration, registration_utils as registration_utils, \
     utils as model_utils
 from ppr_api.models.registration_utils import AccountRegistrationParams
+from ppr_api.services.authz import is_staff_account
 
 
 SE_AMEND_REG = {
@@ -362,7 +363,8 @@ def test_account_query_params(session, reg_num, reg_type, client_ref, registerin
 @pytest.mark.parametrize('reg_num,reg_type,client_ref,registering,status,start_ts,end_ts', TEST_QUERY_BASE_DATA)
 def test_find_all_by_account_id_filter(session, reg_num, reg_type, client_ref, registering, status, start_ts, end_ts):
     """Assert that the account registration filter works is as expected."""
-    params: AccountRegistrationParams = AccountRegistrationParams(account_id='PS12345',
+    account_id: str = 'ppr_staff' if reg_type and reg_type == 'SA' else 'PS12345'
+    params: AccountRegistrationParams = AccountRegistrationParams(account_id=account_id,
                                                                   collapse=True,
                                                                   account_name='Unit Testing',
                                                                   sbc_staff=False)
@@ -389,13 +391,17 @@ def test_find_all_by_account_id_filter(session, reg_num, reg_type, client_ref, r
         assert statement['registeringParty']
         assert statement['securedParties']
         assert 'vehicleCount' in statement
+        if is_staff_account(account_id):
+            assert statement.get('accountId')
+        else:
+            assert 'accountId' not in statement
         # current_app.logger.info('base reg_num=' + statement.get('registrationNumber'))
         if statement['registrationNumber'] == ('TEST0016'):
             assert statement['registeringName'] == ''
             assert statement['clientReferenceId'] == ''
         elif statement['registrationNumber'] not in ('TEST0019', 'TEST0021'):
             assert statement['registeringName']
-            assert statement['clientReferenceId']
+            assert 'clientReferenceId' in statement
         if statement['registrationNumber'] in ('TEST0019', 'TEST0021'):
             assert not statement['path']
         elif not is_ci_testing():
@@ -420,6 +426,10 @@ def test_find_all_by_account_id_filter(session, reg_num, reg_type, client_ref, r
                 if not is_ci_testing():
                     assert 'path' in change
                 assert 'legacy' in change
+                if is_staff_account(account_id):
+                    assert change.get('accountId')
+                else:
+                    assert 'accountId' not in change
                 #if change['baseRegistrationNumber'] in ('TEST0019', 'TEST0021'):
                 #    assert not change['path']
                 #elif change.get('registrationNumber', '') in ('TEST00D4', 'TEST00R5', 'TEST0007'):
@@ -462,7 +472,7 @@ def test_find_all_by_account_id_api_filter(session, reg_num, client_ref, start_t
             assert statement['clientReferenceId'] == ''
         elif statement['registrationNumber'] not in ('TEST0019', 'TEST0021'):
             assert statement['registeringName']
-            assert statement['clientReferenceId']
+            assert 'clientReferenceId' in statement
         if statement['registrationNumber'] in ('TEST0019', 'TEST0021'):
             assert not statement['path']
         elif not is_ci_testing():

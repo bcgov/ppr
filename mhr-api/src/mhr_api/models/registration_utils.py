@@ -80,6 +80,7 @@ from mhr_api.services.authz import (
     MANUFACTURER_GROUP,
     QUALIFIED_USER_GROUP,
     STAFF_ROLE,
+    is_staff_account,
 )
 from mhr_api.utils.logging import logger
 
@@ -904,10 +905,15 @@ def __build_summary(row, account_id: str, staff: bool, add_in_user_list: bool = 
 
 def __get_report_path(account_id: str, staff: bool, summary: dict, row, timestamp) -> dict:
     """Derive the report download path if applicable."""
-    reg_account_id: str = str(row[15])
+    reg_account_id: str = str(row[15]) if row[15] else ""
     doc_storage_url: str = str(row[19]) if row[19] else ""
     rep_count: int = int(row[24])
     summary["legacy"] = rep_count <= 0
+    if is_staff_account(account_id):
+        if reg_account_id != "0":
+            summary["accountId"] = reg_account_id
+        else:
+            summary["accountId"] = "N/A"
     # To be consistent with PPR, allow registries staff to generate reports for legacy registrations
     # if rep_count > 0 and (staff or account_id == reg_account_id) and \
     if (staff or (rep_count > 0 and account_id == reg_account_id)) and (
