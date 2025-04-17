@@ -109,6 +109,7 @@
                 <td v-else>
                   {{ item?.code }}
                 </td>
+                <td v-if="options.isDebtorSummary" />
               </tr>
             </tbody>
             <tbody v-else-if="options.enableNoDataAction">
