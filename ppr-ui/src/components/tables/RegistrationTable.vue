@@ -831,7 +831,7 @@ export default defineComponent({
                     @click="clearFilters()"
                   >
                     Clear Filters
-                    <v-icon class="pl-1 pt-1">
+                    <v-icon size="18" class="pl-3 pt-1">
                       mdi-close
                     </v-icon>
                   </v-btn>
