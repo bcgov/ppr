@@ -824,14 +824,14 @@ export default defineComponent({
                   />
                   <v-btn
                     v-if="header.value === 'actions' && headers.length > 1 && tableFiltersActive"
-                    class="clear-filters-btn registration-action ma-0 px-0 pl-6 pt-4"
+                    class="registration-action ma-0"
                     color="primary"
                     :ripple="false"
-                    variant="plain"
+                    variant="outlined"
                     @click="clearFilters()"
                   >
                     Clear Filters
-                    <v-icon class="pl-1 pt-1">
+                    <v-icon size="18" class="pl-3 pt-1">
                       mdi-close
                     </v-icon>
                   </v-btn>
