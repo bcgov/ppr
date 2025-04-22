@@ -893,8 +893,8 @@ export default defineComponent({
       v-if="inSelectedHeaders('registeringName')"
       :class="isChild || item.expanded ? 'border-left': ''"
     >
-      <span v-if="item.registeringName">{{ getRegisteringName(item.registeringName) }}</span>
-      <span v-else>{{ item.username || 'N/A' }}</span>
+      <span v-if="item.registeringName">{{ item.accountId }}<br>{{ getRegisteringName(item.registeringName) }}</span>
+      <span v-else>{{ item.accountId }}<br>{{ item.username || 'N/A' }}</span>
     </td>
     <td
       v-if="inSelectedHeaders('registeringParty')"
