@@ -23,8 +23,10 @@ const aboutText = (aboutText1 && aboutText2)
 export default defineNuxtConfig({
   compatibilityDate: '2025-03-07',
   devtools: { enabled: true },
+  // Auto-import components from the components directory
+  // Expanded paths to reduce component renames where implemented ie <CollateralGeneralCollateral />
   components: [
-    '~/components', // Auto-import components from the components directory
+    '~/components',
     '~/components/collateral',
     '~/components/collateral/generalCollateral',
     '~/components/collateral/vehicle',
@@ -59,6 +61,10 @@ export default defineNuxtConfig({
     '~/components/tombstones',
     '~/components/unitNotes',
     '~/components/userAccess'
+  ],
+  extends: [
+    // ['github:bcgov/business-dashboard-ui#v0.0.1', { install: true }]
+    // ['github:bcgov/sbc-connect-common', { install: true }]
   ],
   app: {
     buildAssetsDir: '/src/',
@@ -97,7 +103,12 @@ export default defineNuxtConfig({
     icons: ['mdi']
   },
   ssr: false,
-  modules: ['@pinia/nuxt', '@nuxt/eslint', 'nuxt-lodash', '@nuxt/test-utils/module',
+  modules: [
+    '@pinia/nuxt',
+    'nuxt-lodash',
+    '@nuxt/test-utils/module',
+    '@nuxt/ui',
+    '@nuxtjs/tailwindcss',
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
         config.plugins.push(vuetify({ autoImport: true }))
