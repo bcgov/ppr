@@ -14,8 +14,8 @@
     "postinstall": "nuxt prepare",
     "test": "vitest run",
     "test:unit": "vitest run",
-    "lint": "eslint",
-    "lint:fix": "eslint --fix"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@bcrs-shared-components/input-field-date-picker": "^1.0.0",

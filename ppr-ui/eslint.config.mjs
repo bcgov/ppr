@@ -2,9 +2,11 @@
 import withNuxt from './.nuxt/eslint.config.mjs'
 
 export default withNuxt(
-  {ignores: ['**/*.spec/*', '**/tests/*']},
   {
-    "rules": {
+    ignores: ['**/*.spec/*', '**/tests/*']
+  },
+  {
+    rules: {
       "max-len": [
         "warn",
         { "code": 120, "ignoreRegExpLiterals": true, "ignoreTrailingComments": true }
