@@ -62,10 +62,7 @@ export default defineNuxtConfig({
     '~/components/unitNotes',
     '~/components/userAccess'
   ],
-  extends: [
-    // ['github:bcgov/business-dashboard-ui#v0.0.1', { install: true }]
-    // ['github:bcgov/sbc-connect-common', { install: true }]
-  ],
+  // extends: '@sbc-connect/nuxt-core-layer',
   app: {
     buildAssetsDir: '/src/',
     head: {
@@ -104,6 +101,7 @@ export default defineNuxtConfig({
   },
   ssr: false,
   modules: [
+    '@nuxt/eslint',
     '@pinia/nuxt',
     'nuxt-lodash',
     '@nuxt/test-utils/module',
