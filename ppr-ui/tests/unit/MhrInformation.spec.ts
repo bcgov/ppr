@@ -745,7 +745,7 @@ describe('Mhr Information', async () => {
 
     const confirmCompletionCard = wrapper.find(getTestId('confirm-completion-card'))
     expect(confirmCompletionCard.exists()).toBeTruthy()
-    expect(confirmCompletionCard.classes('border-error-left')).toBeFalsy()
+    expect(confirmCompletionCard.findAll('.border-error-left').length).toBe(0)
     expect(confirmCompletionCard.find(getTestId('confirm-completion-checkbox')).exists()).toBeTruthy()
     expect(confirmCompletionCard.find('.confirm-checkbox').text()).toContain(LEGAL_NAME)
 
