@@ -111,6 +111,7 @@ QUERY_ACCOUNT_FILTER_BY = {
     reg_utils.USER_NAME_PARAM: FILTER_USERNAME,
     reg_utils.START_TS_PARAM: FILTER_DATE,
 }
+DRAFT_PAY_PENDING_PREFIX = "P"  # Special draft number when payment pending.
 
 
 class MhrDraft(db.Model):
@@ -266,8 +267,9 @@ class MhrDraft(db.Model):
         stale_count: int = int(row[9])
         if not mhr_num or mhr_num == "None":
             mhr_num = ""
+        draft_number: str = str(row[0])
         draft_json = {
-            "draftNumber": str(row[0]),
+            "draftNumber": draft_number,
             "createDateTime": model_utils.format_ts(row[1]),
             "registrationType": str(str(row[2])),
             "registrationDescription": str(row[3]),
@@ -280,6 +282,8 @@ class MhrDraft(db.Model):
         }
         if draft_json.get("mhrNumber"):
             draft_json["outOfDate"] = stale_count > 0
+        if draft_number.startswith(DRAFT_PAY_PENDING_PREFIX):
+            draft_json["paymentPending"] = True
         return draft_json
 
     @classmethod
@@ -298,7 +302,7 @@ class MhrDraft(db.Model):
             message = model_utils.ERR_DRAFT_NOT_FOUND.format(code=code, draft_number=draft_number)
             raise BusinessException(error=message, status_code=HTTPStatus.NOT_FOUND)
 
-        if draft.registration and not allow_used:
+        if (draft.registration or draft_number.startswith(DRAFT_PAY_PENDING_PREFIX)) and not allow_used:
             code = ResourceErrorCodes.UNAUTHORIZED_ERR.value
             message = model_utils.ERR_DRAFT_USED.format(code=code, draft_number=draft_number)
             raise BusinessException(error=message, status_code=HTTPStatus.BAD_REQUEST)
@@ -309,9 +313,23 @@ class MhrDraft(db.Model):
         return draft
 
     @classmethod
+    def find_by_invoice_id(cls, invoice_id: str):
+        """Return a draft statement by payment invoice id (payment pending state)."""
+        draft = None
+        if invoice_id:
+            try:
+                draft = db.session.query(MhrDraft).filter(MhrDraft.user_id == invoice_id).one_or_none()
+            except Exception as db_exception:  # noqa: B902; return nicer error
+                logger.error("DB find_by_draft_number exception: " + str(db_exception))
+                raise DatabaseException(db_exception) from db_exception
+        return draft
+
+    @classmethod
     def delete(cls, draft_number: str = None):
         """Delete a draft statement by document ID."""
         draft = None
+        if draft_number and draft_number.startswith(DRAFT_PAY_PENDING_PREFIX):
+            return None  # Cannot delete a payment pending draft.
         if draft_number:
             draft = cls.find_by_draft_number(draft_number, False)
         if draft:

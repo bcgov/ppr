@@ -22,7 +22,12 @@ from registry_schemas.example_data.mhr import REGISTRATION, TRANSFER, EXEMPTION
 from mhr_api.utils import registration_validator as validator, manufacturer_validator as man_validator, validator_utils
 from mhr_api.utils import validator_owner_utils as val_owner_utils
 from mhr_api.models import MhrRegistration, MhrManufacturer, utils as model_utils
-from mhr_api.models.type_tables import MhrRegistrationTypes, MhrTenancyTypes, MhrDocumentTypes
+from mhr_api.models.type_tables import (
+    MhrRegistrationTypes,
+    MhrTenancyTypes,
+    MhrDocumentTypes,
+    MhrRegistrationStatusTypes
+)
 from mhr_api.models.utils import now_ts
 from mhr_api.services.authz import QUALIFIED_USER_GROUP
 from tests.unit.utils.test_registration_data import (
@@ -251,7 +256,8 @@ TEST_EXEMPTION_DATA = [
     ('Invalid FROZEN REST', False, False, None, validator_utils.STATE_FROZEN_NOTE, 'PS12345', '000915'),
     ('Invalid existing location staff', False, True, DOC_ID_VALID, validator.LOCATION_NOT_ALLOWED, 'PS12345',
      '000900'),
-    ('Invalid existing location QS', False, False, None, validator.LOCATION_NOT_ALLOWED, 'PS12345', '000900')
+    ('Invalid existing location QS', False, False, None, validator.LOCATION_NOT_ALLOWED, 'PS12345', '000900'),
+    ('Invalid frozen payment', False, False, DOC_ID_VALID, validator_utils.STATE_FROZEN_PAYMENT, 'PS12345', '000916')
 ]
 # test data pattern is ({description}, {valid}, {ts_offset}, {mhr_num}, {account}, {doc_type}, {message_content})
 TEST_EXEMPTION_DATA_DESTROYED = [
@@ -460,7 +466,8 @@ def test_validate_exemption(session, desc, valid, staff, doc_id, message_content
     valid_format, errors = schema_utils.validate(json_data, 'exemption', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account_id)
-
+    if desc == "Invalid frozen payment":
+        registration.status_type = MhrRegistrationStatusTypes.DRAFT
     error_msg = validator.validate_exemption(registration, json_data, staff)
     if errors:
         for err in errors:

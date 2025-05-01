@@ -37,6 +37,7 @@ from mhr_api.models.registration_utils import (
 )
 from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationStatusTypes, MhrRegistrationTypes
 from mhr_api.reports import get_pdf
+from mhr_api.resources import cc_payment_utils
 from mhr_api.resources import utils as resource_utils
 from mhr_api.services.authz import STAFF_ROLE, is_reg_staff_account
 from mhr_api.services.document_storage.storage_service import DocumentTypes, GoogleStorageService
@@ -89,6 +90,7 @@ EMAIL_DOWNLOAD_LOCATION = "\n\n[[{0}]]({1})"
 EVENT_KEY_BATCH_MAN_REG: int = 99000000
 EVENT_KEY_BATCH_LOCATION: int = 99000001
 EVENT_KEY_BATCH_REG: int = 99000002
+REQUEST_PARAM_CC_PAY: str = "ccPayment"
 
 
 def get_pay_details(reg_type: str, trans_id: str = None) -> dict:
@@ -109,6 +111,13 @@ def get_pay_details_doc(doc_type: str, trans_id: str = None) -> dict:
     return details
 
 
+def set_cc_payment(req: request, details: dict) -> dict:
+    """Set optional cc payment indicator in details from the known request parameter."""
+    cc_payment: bool = req.args.get(REQUEST_PARAM_CC_PAY) if request.args.get(REQUEST_PARAM_CC_PAY) else False
+    details["ccPayment"] = cc_payment
+    return details
+
+
 def pay(req: request, request_json: dict, account_id: str, trans_type: str, trans_id: str = None):
     """Set up and submit a pay-api request."""
     payment: Payment = None
@@ -121,6 +130,7 @@ def pay(req: request, request_json: dict, account_id: str, trans_type: str, tran
         details = get_pay_details_doc(request_json.get("documentType"), trans_id)
     elif request_json.get("registrationType") == MhrRegistrationTypes.PERMIT and request_json.get("amendment"):
         details = get_pay_details_doc(MhrDocumentTypes.AMEND_PERMIT, trans_id)
+    details = set_cc_payment(req, details)
     if not is_reg_staff_account(account_id):
         payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id, details=details)
         pay_ref = payment.create_payment(trans_type, 1, trans_id, client_ref, False)
@@ -140,6 +150,7 @@ def pay_staff(req: request, request_json: dict, trans_type: str, trans_id: str =
     if not doc_type:
         doc_type = request_json["note"].get("documentType")
     details: dict = get_pay_details_doc(doc_type, trans_id)
+    details = set_cc_payment(req, details)
     payment_info = build_staff_payment(req, trans_type, 1, trans_id)
     payment = Payment(jwt=jwt.get_token_auth_header(), account_id=None, details=details)
     pay_ref = payment.create_payment_staff(payment_info, client_ref)
@@ -160,6 +171,10 @@ def pay_and_save_registration(  # pylint: disable=too-many-arguments,too-many-po
     request_json["affirmByName"] = get_affirmby(token)
     request_json["registrationType"] = MhrRegistrationTypes.MHREG
     payment, pay_ref = pay(req, request_json, account_id, trans_type, trans_id)
+    if pay_ref.get("ccPayment"):
+        logger.info("Payment response CC method.")
+        request_json = setup_cc_draft(request_json, pay_ref, account_id, token.get("username", None), user_group)
+        return cc_payment_utils.save_new_cc_draft(request_json)
     invoice_id = pay_ref["invoiceId"]
     # Try to save the registration: failure throws an exception.
     try:
@@ -198,6 +213,10 @@ def pay_and_save_transfer(  # pylint: disable=too-many-arguments,too-many-positi
     if not request_json.get("registrationType"):
         request_json["registrationType"] = MhrRegistrationTypes.TRANS
     payment, pay_ref = pay(req, request_json, account_id, trans_type, trans_id)
+    if pay_ref.get("ccPayment"):
+        logger.info("Payment response CC method.")
+        request_json = setup_cc_draft(request_json, pay_ref, account_id, token.get("username", None), user_group)
+        return cc_payment_utils.save_change_cc_draft(current_reg, request_json)
     invoice_id = pay_ref["invoiceId"]
     # Try to save the registration: failure throws an exception.
     try:
@@ -242,6 +261,10 @@ def pay_and_save_exemption(  # pylint: disable=too-many-arguments,too-many-posit
     else:
         request_json["registrationType"] = MhrRegistrationTypes.EXEMPTION_RES
     payment, pay_ref = pay(req, request_json, account_id, trans_type, trans_id)
+    if pay_ref.get("ccPayment"):
+        logger.info("Payment response CC method.")
+        request_json = setup_cc_draft(request_json, pay_ref, account_id, token.get("username", None), user_group)
+        return cc_payment_utils.save_change_cc_draft(current_reg, request_json)
     invoice_id = pay_ref["invoiceId"]
     # Try to save the registration: failure throws an exception.
     try:
@@ -264,6 +287,15 @@ def pay_and_save_exemption(  # pylint: disable=too-many-arguments,too-many-posit
         raise DatabaseException(db_exception) from db_exception
 
 
+def setup_cc_draft(json_data: dict, pay_ref: dict, account_id: str, username: str, usergroup: str) -> dict:
+    """Set common draft properties from request information."""
+    json_data["payment"] = pay_ref
+    json_data["accountId"] = account_id
+    json_data["username"] = username if username else ""
+    json_data["usergroup"] = usergroup if usergroup else ""
+    return json_data
+
+
 def pay_and_save_permit(  # pylint: disable=too-many-arguments,too-many-positional-arguments
     req: request,
     current_reg: MhrRegistration,
@@ -281,6 +313,11 @@ def pay_and_save_permit(  # pylint: disable=too-many-arguments,too-many-position
     if not request_json.get("registrationType"):
         request_json["registrationType"] = MhrRegistrationTypes.PERMIT
     payment, pay_ref = pay(req, request_json, account_id, trans_type, trans_id)
+    if pay_ref.get("ccPayment"):
+        logger.info("Payment response CC method.")
+        request_json = setup_cc_draft(request_json, pay_ref, account_id, token.get("username", None), user_group)
+        return cc_payment_utils.save_change_cc_draft(current_reg, request_json)
+
     invoice_id = pay_ref["invoiceId"]
     # Try to save the registration: failure throws an exception.
     try:

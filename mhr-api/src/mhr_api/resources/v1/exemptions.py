@@ -106,6 +106,8 @@ def submit_exemption(  # pylint: disable=too-many-branches,too-many-locals
             tran_type = TransactionTypes.EXEMPTION_NON_RES
         group: str = get_group(j_token)
         registration = reg_utils.pay_and_save_exemption(req, current_reg, request_json, account_id, group, tran_type)
+        if registration.reg_json and registration.reg_json.get("paymentPending"):
+            return jsonify(registration.reg_json), HTTPStatus.ACCEPTED
         logger.debug(f"building exemption response json for {registration.mhr_number}")
         response_json = registration.json
         response_json["status"] = MhrRegistrationStatusTypes.EXEMPT

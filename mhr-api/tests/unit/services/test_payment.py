@@ -16,6 +16,7 @@
 
 Test-Suite to ensure that the client for the pay-api service is working as expected.
 """
+import copy
 import json
 import os
 from http import HTTPStatus
@@ -23,8 +24,13 @@ from http import HTTPStatus
 from flask import current_app
 import pytest
 
-from mhr_api.services.payment.client import SBCPaymentClient, ApiRequestError, TRANSACTION_TO_FILING_TYPE
-from mhr_api.services.payment import TransactionTypes
+from mhr_api.services.payment.client import (
+    ApiRequestError,
+    CC_REQUEST_PAYMENT_INFO,
+    SBCPaymentClient,
+    TRANSACTION_TO_FILING_TYPE
+)
+from mhr_api.services.payment import  PaymentMethods, StatusCodes, TransactionTypes
 from mhr_api.services.payment.payment import Payment
 from mhr_api.services.payment.exceptions import SBCPaymentException
 from mhr_api.services.authz import MHR_ROLE, STAFF_ROLE
@@ -41,7 +47,11 @@ PAY_DETAILS_REGISTRATION = {
     'label': 'Reg Number',
     'value': '100468B'
 }
-
+PAY_DETAILS_CC = {
+    'label': 'CC TEST',
+    'value': 'UNIT TESTING',
+    'ccPayment': True
+}
 SELECT_MHR_ONLY = [
     {'mhrNumber': '022911', 'status': 'EXEMPT', 'createDateTime': '1995-11-14T00:00:01+00:00',
      'homeLocation': 'FORT NELSON', 'includeLienInfo': False, 'serialNumber': '2427',
@@ -92,8 +102,46 @@ SELECT_BOTH = [
         'status': 'ACTIVE'
     }
 ]
-
-
+PAYMENT_REQUEST_TEMPLATE = {
+    "filingInfo": {
+        "filingIdentifier": "",
+        "folioNumber": "",
+        "filingTypes": [{"filingTypeCode": "", "priority": False, "futureEffective": False, "quantity": 1}],
+    },
+    "businessInfo": {"corpType": "MHR"},
+    "details": [{"label": "", "value": ""}],
+}
+# testdata pattern is ({valid}, {filing_type}, {pay_method}, {pay_status})
+TEST_PAY_METHOD_STATUS = [
+    (True, 'MSRCH', PaymentMethods.DRAWDOWN.value, StatusCodes.COMPLETED.value),
+    (True, 'CSRCH', PaymentMethods.EJV.value, StatusCodes.COMPLETED.value),
+    (True, 'MSRCS', PaymentMethods.PAD.value, StatusCodes.COMPLETED.value),
+    (True, 'CSRCS', PaymentMethods.INTERNAL.value, StatusCodes.COMPLETED.value),
+    (True, 'TRAPP', PaymentMethods.DRAWDOWN.value, StatusCodes.APPROVED.value),
+    (True, 'INREG', PaymentMethods.EJV.value, StatusCodes.APPROVED.value),
+    (True, 'NTTRF', PaymentMethods.PAD.value, StatusCodes.APPROVED.value),
+    (True, 'EXEMP', PaymentMethods.INTERNAL.value, StatusCodes.APPROVED.value),
+    (True, 'TRAPP', PaymentMethods.DRAWDOWN.value, StatusCodes.PAID.value),
+    (True, 'INREG', PaymentMethods.EJV.value, StatusCodes.PAID.value),
+    (True, 'NTTRF', PaymentMethods.PAD.value, StatusCodes.PAID.value),
+    (True, 'EXEMP', PaymentMethods.INTERNAL.value, StatusCodes.PAID.value),
+    (True, 'TRAPP', PaymentMethods.CC.value, StatusCodes.CREATED.value),
+    (True, 'INREG', PaymentMethods.CC.value, StatusCodes.CREATED.value),
+    (True, 'NTTRF', PaymentMethods.CC.value, StatusCodes.CREATED.value),
+    (True, 'EXEMP', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
+    (True, 'TRAPP', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
+    (True, 'INREG', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
+    (True, 'NTTRF', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
+    (True, 'EXEMP', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
+    (False, 'MSRCH', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
+    (False, 'CSRCH', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
+    (False, 'MSRCS', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
+    (False, 'CSRCS', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
+    (False, 'MSRCH', PaymentMethods.CC.value, StatusCodes.CREATED.value),
+    (False, 'CSRCH', PaymentMethods.CC.value, StatusCodes.CREATED.value),
+    (False, 'MSRCS', PaymentMethods.CC.value, StatusCodes.CREATED.value),
+    (False, 'CSRCS', PaymentMethods.CC.value, StatusCodes.CREATED.value),
+]
 # testdata pattern is ({filing_type}, {selection}, {staff})
 TEST_PAY_TYPE_FILING_TYPE_SEARCH = [
     ('MSRCH', SELECT_MHR_ONLY, False),
@@ -134,26 +182,30 @@ TEST_PAYMENT_MOCK = [
     ('Valid no detail', SELECT_MHR_ONLY, MOCK_URL_NO_KEY, None, False),
     ('Unauthorized', SELECT_MHR_ONLY, MOCK_URL, None, True)
 ]
-# testdata pattern is ({desc}, {type}, {trans_id}, {client_id}, {quantity})
+# testdata pattern is ({desc}, {type}, {trans_id}, {client_id}, {quantity}, cc)
 TEST_PAYMENT_DATA = [
-    ('MHR Registration', TransactionTypes.REGISTRATION, '1234', 'UT-00001', 1),
-    ('MHR Registration no client id', TransactionTypes.REGISTRATION, '1234', None, 1),
-    ('MHR Registration no trans id', TransactionTypes.REGISTRATION, None, 'UT-00001', 1),
-    ('MHR Transfer', TransactionTypes.TRANSFER, '1234', 'UT-00001', 1),
-    ('MHR Transport Permit', TransactionTypes.TRANSPORT_PERMIT, '1234', 'UT-00001', 1),
-    ('MHR Transport Permit Extension', TransactionTypes.TRANSPORT_PERMIT_EXT, '1234', 'UT-00001', 1),
-    ('MHR Decal Replacement', TransactionTypes.DECAL_REPLACE, '1234', 'UT-00001', 1),
-    ('MHR Unit Note 102', TransactionTypes.UNIT_NOTE_102, '1234', 'UT-00001', 1),
-    ('MHR Unit Note TAXN', TransactionTypes.UNIT_NOTE_TAXN, '1234', 'UT-00001', 1),
-    ('MHR Unit Note Other', TransactionTypes.UNIT_NOTE_OTHER, '1234', 'UT-00001', 1)
+    ('MHR Registration', TransactionTypes.REGISTRATION, '1234', 'UT-00001', 1, False),
+    ('MHR Registration no client id', TransactionTypes.REGISTRATION, '1234', None, 1, False),
+    ('MHR Registration no trans id', TransactionTypes.REGISTRATION, None, 'UT-00001', 1, False),
+    ('MHR Transfer', TransactionTypes.TRANSFER, '1234', 'UT-00001', 1, False),
+    ('MHR Transport Permit', TransactionTypes.TRANSPORT_PERMIT, '1234', 'UT-00001', 1, False),
+    ('MHR Transport Permit Extension', TransactionTypes.TRANSPORT_PERMIT_EXT, '1234', 'UT-00001', 1, False),
+    ('MHR Decal Replacement', TransactionTypes.DECAL_REPLACE, '1234', 'UT-00001', 1, False),
+    ('MHR Unit Note 102', TransactionTypes.UNIT_NOTE_102, '1234', 'UT-00001', 1, False),
+    ('MHR Unit Note TAXN', TransactionTypes.UNIT_NOTE_TAXN, '1234', 'UT-00001', 1, False),
+    ('MHR Unit Note Other', TransactionTypes.UNIT_NOTE_OTHER, '1234', 'UT-00001', 1, False),
+    ('MHR Registration CC', TransactionTypes.REGISTRATION, '1234', 'UT-00001', 1, True),
+    ('MHR Transfer CC', TransactionTypes.TRANSFER, '1234', 'UT-00001', 1, True),
+    ('MHR Transport Permit CC', TransactionTypes.TRANSPORT_PERMIT, '1234', 'UT-00001', 1, True)
 ]
-# testdata pattern is ({type}, {trans_id}, {client_id}, {routingSlip}, {bcolNum}, {datNum}, {waiveFees}, {priority})
+# testdata pattern is ({type}, {trans_id}, {client_id}, {routingSlip}, {bcolNum}, {datNum}, {waiveFees}, {priority}, {cc})
 TEST_PAYMENT_DATA_STAFF = [
-    (TransactionTypes.REGISTRATION, '1234', 'UT-00001', '12345', None, None, False, False),
-    (TransactionTypes.REGISTRATION, '1234', 'UT-00001', '12345', None, None, False, True),
-    (TransactionTypes.REGISTRATION, '1234', None, None, '62345', None, False, False),
-    (TransactionTypes.REGISTRATION, None, 'UT-00001', None, '62345', '72345', False, False),
-    (TransactionTypes.REGISTRATION, '1234', 'UT-00001', None, None, None, True, False)
+    (TransactionTypes.REGISTRATION, '1234', 'UT-00001', '12345', None, None, False, False, False),
+    (TransactionTypes.REGISTRATION, '1234', 'UT-00001', '12345', None, None, False, True, False),
+    (TransactionTypes.REGISTRATION, '1234', None, None, '62345', None, False, False, False),
+    (TransactionTypes.REGISTRATION, None, 'UT-00001', None, '62345', '72345', False, False, False),
+    (TransactionTypes.REGISTRATION, '1234', 'UT-00001', None, None, None, True, False, False),
+    (TransactionTypes.REGISTRATION, '1234', 'UT-00001', None, None, None, True, False, True),
 ]
 # testdata pattern is ({pay_trans_type}, {pay_filing_type})
 TEST_TRANS_TYPE_DATA = [
@@ -348,12 +400,15 @@ def test_payment_search_mock(session, client, jwt, desc, selection, pay_url, det
         assert pay_data['receipt']
 
 
-@pytest.mark.parametrize('desc,type,trans_id,client_id,quantity', TEST_PAYMENT_DATA)
-def test_create_payment_data(session, client, jwt, desc, type, trans_id, client_id, quantity):
+@pytest.mark.parametrize('desc,type,trans_id,client_id,quantity,cc', TEST_PAYMENT_DATA)
+def test_create_payment_data(session, client, jwt, desc, type, trans_id, client_id, quantity, cc):
     """Assert that the payment-request body setup is as expected for a non staff transactions."""
     # setup
-    # test
-    data = SBCPaymentClient.create_payment_data(type, quantity, trans_id, client_id)
+    token = helper_create_jwt(jwt, [MHR_ROLE])
+    details: dict = PAY_DETAILS_REGISTRATION if not cc else PAY_DETAILS_CC
+    pay_client = SBCPaymentClient(jwt=token, account_id='PS12345', details=details)
+    data = pay_client.create_payment_data(type, quantity, trans_id, client_id)
+    data = pay_client.update_payload_data(data)
     # check
     # current_app.logger.info(data)
     assert data
@@ -368,14 +423,19 @@ def test_create_payment_data(session, client, jwt, desc, type, trans_id, client_
     assert data['businessInfo']['corpType'] == 'MHR'
     assert len(data['filingInfo']['filingTypes']) == 1
     assert data['filingInfo']['filingTypes'][0]['quantity'] == 1
+    if cc:
+        assert data.get("paymentInfo") == CC_REQUEST_PAYMENT_INFO
+    else:
+        assert not data.get("paymentInfo")
 
 
-@pytest.mark.parametrize('desc,type,trans_id,client_id,quantity', TEST_PAYMENT_DATA)
-def test_client_registration_mock(session, client, jwt, desc, type, trans_id, client_id, quantity):
+@pytest.mark.parametrize('desc,type,trans_id,client_id,quantity,cc', TEST_PAYMENT_DATA)
+def test_client_registration_mock(session, client, jwt, desc, type, trans_id, client_id, quantity, cc):
     """Assert that a pay-api client works as expected with the mock service endpoint."""
     # setup
     token = helper_create_jwt(jwt, [MHR_ROLE])
-    pay_client = SBCPaymentClient(jwt=token, account_id='PS12345', details=PAY_DETAILS_REGISTRATION)
+    details: dict = PAY_DETAILS_REGISTRATION if not cc else PAY_DETAILS_CC
+    pay_client = SBCPaymentClient(jwt=token, account_id='PS12345', details=details)
     pay_client.api_url = MOCK_URL_NO_KEY
 
     # test
@@ -386,14 +446,23 @@ def test_client_registration_mock(session, client, jwt, desc, type, trans_id, cl
     assert pay_data
     assert pay_data['invoiceId']
     assert pay_data['receipt']
+    if cc:
+        assert pay_data.get("ccPayment")
+        assert "paymentActionRequired" in pay_data
+        assert "paymentPortalURL" in pay_data
+    else:
+        assert "ccPayment" not in pay_data
+        assert "paymentActionRequired" not in pay_data
+        assert "paymentPortalURL" not in pay_data
 
 
-@pytest.mark.parametrize('desc,type,trans_id,client_id,quantity', TEST_PAYMENT_DATA)
-def test_payment_registration_mock(session, client, jwt, desc, type, trans_id, client_id, quantity):
+@pytest.mark.parametrize('desc,type,trans_id,client_id,quantity,cc', TEST_PAYMENT_DATA)
+def test_payment_registration_mock(session, client, jwt, desc, type, trans_id, client_id, quantity, cc):
     """Assert that a pay-api works as expected with the mock service endpoint."""
     # setup
     token = helper_create_jwt(jwt, [MHR_ROLE])
-    payment = Payment(jwt=token, account_id='PS12345', details=PAY_DETAILS_REGISTRATION)
+    details: dict = PAY_DETAILS_REGISTRATION if not cc else PAY_DETAILS_CC
+    payment = Payment(jwt=token, account_id='PS12345', details=details)
     payment.api_url = MOCK_URL_NO_KEY
 
     # test
@@ -404,12 +473,20 @@ def test_payment_registration_mock(session, client, jwt, desc, type, trans_id, c
     assert pay_data
     assert pay_data['invoiceId']
     assert pay_data['receipt']
+    if cc:
+        assert pay_data.get("ccPayment")
+        assert "paymentActionRequired" in pay_data
+        assert "paymentPortalURL" in pay_data
+    else:
+        assert "ccPayment" not in pay_data
+        assert "paymentActionRequired" not in pay_data
+        assert "paymentPortalURL" not in pay_data
 
 
-@pytest.mark.parametrize('type,trans_id,client_id,routing_slip,bcol_num,dat_num,waive_fees,priority',
+@pytest.mark.parametrize('type,trans_id,client_id,routing_slip,bcol_num,dat_num,waive_fees,priority,cc',
                          TEST_PAYMENT_DATA_STAFF)
 def test_create_payment_data_staff(client, jwt, type, trans_id, client_id, routing_slip, bcol_num, dat_num,
-                                   waive_fees, priority):
+                                   waive_fees, priority, cc):
     """Assert that the staff payment payment-request body is as expected for a pay transaction type."""
     transaction_info = {
         'transactionType': type,
@@ -429,8 +506,13 @@ def test_create_payment_data_staff(client, jwt, type, trans_id, client_id, routi
     if trans_id:
         transaction_info['transactionId'] = trans_id
 
+    token = helper_create_jwt(jwt, [MHR_ROLE])
+    details: dict = PAY_DETAILS_REGISTRATION if not cc else PAY_DETAILS_CC
+    pay_client = SBCPaymentClient(jwt=token, account_id='PS12345', details=details)
+ 
     # test
-    data = SBCPaymentClient.create_payment_staff_data(transaction_info, client_id)
+    data = pay_client.create_payment_staff_data(transaction_info, client_id)
+    data = pay_client.update_payload_data(data)
     # check
     assert data
     if waive_fees:
@@ -461,16 +543,21 @@ def test_create_payment_data_staff(client, jwt, type, trans_id, client_id, routi
     else:
         assert 'folioNumber' not in data['filingInfo']
     assert data['businessInfo']['corpType'] == 'MHR'
+    if cc:
+        assert data.get("paymentInfo") == CC_REQUEST_PAYMENT_INFO
+    else:
+        assert not data.get("paymentInfo")
 
 
-@pytest.mark.parametrize('type,trans_id,client_id,routing_slip,bcol_num,dat_num,waive_fees,priority',
+@pytest.mark.parametrize('type,trans_id,client_id,routing_slip,bcol_num,dat_num,waive_fees,priority,cc',
                          TEST_PAYMENT_DATA_STAFF)
 def test_client_registration_staff_mock(session, client, jwt, type, trans_id, client_id, routing_slip, bcol_num,
-                                        dat_num, waive_fees, priority):
+                                        dat_num, waive_fees, priority, cc):
     """Assert that a staff pay-api client works as expected with the mock service endpoint."""
     # setup
     token = helper_create_jwt(jwt, [MHR_ROLE, STAFF_ROLE])
-    pay_client = SBCPaymentClient(jwt=token, account_id='PS12345', details=PAY_DETAILS_REGISTRATION)
+    details: dict = PAY_DETAILS_REGISTRATION if not cc else PAY_DETAILS_CC
+    pay_client = SBCPaymentClient(jwt=token, account_id='PS12345', details=details)
     pay_client.api_url = MOCK_URL_NO_KEY
     transaction_info = {
         'transactionType': type,
@@ -500,14 +587,15 @@ def test_client_registration_staff_mock(session, client, jwt, type, trans_id, cl
     assert pay_data['receipt']
 
 
-@pytest.mark.parametrize('type,trans_id,client_id,routing_slip,bcol_num,dat_num,waive_fees,priority',
+@pytest.mark.parametrize('type,trans_id,client_id,routing_slip,bcol_num,dat_num,waive_fees,priority,cc',
                          TEST_PAYMENT_DATA_STAFF)
 def test_pay_registration_staff_mock(session, client, jwt, type, trans_id, client_id, routing_slip, bcol_num,
-                                     dat_num, waive_fees, priority):
+                                     dat_num, waive_fees, priority, cc):
     """Assert that a staff pay-api works as expected with the mock service endpoint."""
     # setup
     token = helper_create_jwt(jwt, [MHR_ROLE, STAFF_ROLE])
-    payment = Payment(jwt=token, account_id='PS12345', details=PAY_DETAILS_REGISTRATION)
+    details: dict = PAY_DETAILS_REGISTRATION if not cc else PAY_DETAILS_CC
+    payment = Payment(jwt=token, account_id='PS12345', details=details)
     payment.api_url = MOCK_URL_NO_KEY
     transaction_info = {
         'transactionType': type,
@@ -535,6 +623,14 @@ def test_pay_registration_staff_mock(session, client, jwt, type, trans_id, clien
     assert pay_data
     assert pay_data['invoiceId']
     assert pay_data['receipt']
+    if cc:
+        assert pay_data.get("ccPayment")
+        assert "paymentActionRequired" in pay_data
+        assert "paymentPortalURL" in pay_data
+    else:
+        assert "ccPayment" not in pay_data
+        assert "paymentActionRequired" not in pay_data
+        assert "paymentPortalURL" not in pay_data
 
 
 def test_payment_apikey(session, client, jwt):
@@ -576,6 +672,17 @@ def test_transaction_filing_type(session, client, jwt, pay_trans_type, filing_ty
     """Assert that mapping document type to payment transaction and filing types works as expected."""
     trans_filing_type: str = TRANSACTION_TO_FILING_TYPE.get(pay_trans_type)
     assert trans_filing_type == filing_type
+
+
+@pytest.mark.parametrize('valid, filing_type, pay_method, pay_status', TEST_PAY_METHOD_STATUS)
+def test_verify_pay_status(session, client, jwt, valid, filing_type, pay_method, pay_status):
+    """Assert that checking the response status works as expected."""
+    token = helper_create_jwt(jwt, [MHR_ROLE])
+    pay_client = SBCPaymentClient(jwt=token, account_id='PS12345')
+    req_json = copy.deepcopy(PAYMENT_REQUEST_TEMPLATE)
+    req_json["filingInfo"]["filingTypes"][0]["filingTypeCode"] = filing_type
+    result = pay_client.valid_payment_status(pay_method, pay_status, req_json)
+    assert result == valid
 
 
 def is_ci_testing() -> bool:

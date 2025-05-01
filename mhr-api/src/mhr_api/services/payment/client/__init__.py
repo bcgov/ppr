@@ -31,6 +31,7 @@ from mhr_api.utils.logging import logger
 MSG_CLIENT_CREDENTIALS_REQ_FAILED = "Client credentials request failed"
 MSG_INVALID_HTTP_VERB = "Invalid HTTP verb"
 
+EXCLUDED_CC_FILING_TYPES = ["MSRCH", "CSRCH", "MSRCS", "CSRCS", "MHRCD"]
 # Mapping from PPR transaction to Pay API filing type
 TRANSACTION_TO_FILING_TYPE = {
     "SEARCH": "MSRCH",
@@ -71,7 +72,7 @@ PAYMENT_REQUEST_TEMPLATE = {
     "details": [{"label": "", "value": ""}],
 }
 PRIORITY_FILING_TYPE = {"filingTypeCode": "PRIMH", "priority": True, "futureEffective": False, "quantity": 1}
-
+CC_REQUEST_PAYMENT_INFO = {"methodOfPayment": "DIRECT_PAY"}
 
 PAYMENT_REFUND_TEMPLATE = {"reason": "Immediate transaction rollback."}
 
@@ -80,9 +81,9 @@ PATH_REFUND = "payment-requests/{invoice_id}/refunds"
 PATH_INVOICE = "payment-requests/{invoice_id}"
 PATH_RECEIPT = "payment-requests/{invoice_id}/receipts"
 
-VALID_RESPONSE_STATUS = [StatusCodes.PAID.value, StatusCodes.APPROVED.value]
-VALID_RESPONSE_STATUS_INTERNAL = [StatusCodes.PAID.value, StatusCodes.APPROVED.value, StatusCodes.COMPLETED.value]
-VALID_RESPONSE_STATUS_CC = [StatusCodes.PAID.value, StatusCodes.CREATED.value]
+VALID_PAYMENT_METHOD_CC = [PaymentMethods.CC.value, PaymentMethods.DIRECT_PAY.value]
+VALID_RESPONSE_STATUS = [StatusCodes.PAID.value, StatusCodes.APPROVED.value, StatusCodes.COMPLETED.value]
+VALID_RESPONSE_STATUS_CC = StatusCodes.CREATED
 INVALID_STATUS_JSON = {"status_code": HTTPStatus.PAYMENT_REQUIRED}
 INVALID_STATUS_MSG = "Payment request failed: payment method {pay_method} returned invalid status {invoice_status}."
 
@@ -148,12 +149,27 @@ class BaseClient:
         self.jwt = jwt
         self.account_id = account_id
         self.api_key = api_key
+        self.cc_payment = False
         if details and "label" in details and "value" in details:
             self.detail_label = details["label"]
             self.detail_value = details["value"]
         else:
             self.detail_label = None
             self.detail_value = None
+        if details and "ccPayment" in details:
+            self.cc_payment = details.get("ccPayment")
+
+    def valid_payment_status(self, pay_method: str, pay_status: str, data: dict) -> bool:
+        """Verify the response status and payment method pair."""
+        if pay_method not in VALID_PAYMENT_METHOD_CC and pay_status in VALID_RESPONSE_STATUS:
+            return True
+        if pay_method in VALID_PAYMENT_METHOD_CC and pay_status == VALID_RESPONSE_STATUS_CC:
+            filing_type = data["filingInfo"]["filingTypes"][0].get("filingTypeCode")
+            if filing_type not in EXCLUDED_CC_FILING_TYPES:
+                return True
+            logger.error(f"Filing type {filing_type} not allowed for credit card payments.")
+        logger.error(f"Invalid response payload status code {pay_status} for payment method {pay_method}")
+        return False
 
     def call_api(  # pylint: disable=too-many-positional-arguments,too-many-arguments
         self,
@@ -194,26 +210,8 @@ class BaseClient:
             response_json = json.loads(response.text)
             pay_method: str = response_json.get("paymentMethod", "")
             invoice_status: str = response_json.get("statusCode", "")
-            if method != HttpVerbs.POST or (
-                pay_method
-                in (
-                    PaymentMethods.INTERNAL.value,
-                    PaymentMethods.DRAWDOWN.value,
-                    PaymentMethods.PAD.value,
-                    PaymentMethods.EJV.value,
-                )
-                and invoice_status == StatusCodes.COMPLETED.value
-            ):
-                return response_json
-            if pay_method != PaymentMethods.CC.value and invoice_status not in VALID_RESPONSE_STATUS:
+            if method == HttpVerbs.POST and not self.valid_payment_status(pay_method, invoice_status, data):
                 logger.error(f"Invalid response payload status code {invoice_status} for payment method {pay_method}")
-                msg: str = INVALID_STATUS_MSG.format(pay_method=pay_method, invoice_status=invoice_status)
-                error_json = INVALID_STATUS_JSON
-                error_json["type"] = pay_method
-                error_json["detail"] = msg
-                raise SBCPaymentException(msg, error_json)
-            if pay_method == PaymentMethods.CC.value and invoice_status not in VALID_RESPONSE_STATUS_CC:
-                logger.error(f"Invalid response payload status code {invoice_status} for CC payment")
                 msg: str = INVALID_STATUS_MSG.format(pay_method=pay_method, invoice_status=invoice_status)
                 error_json = INVALID_STATUS_JSON
                 error_json["type"] = pay_method
@@ -390,6 +388,18 @@ class SBCPaymentClient(BaseClient):
 
         return data
 
+    def update_payload_data(self, data: dict) -> dict:
+        """Explicitly set payment request as CC payment if requested."""
+        if self.cc_payment:
+            logger.info("Setting pay api payload payment method as CC.")
+            data["paymentInfo"] = CC_REQUEST_PAYMENT_INFO
+        if self.detail_label and self.detail_value:
+            data["details"][0]["label"] = self.detail_label
+            data["details"][0]["value"] = self.detail_value
+        else:
+            del data["details"]
+        return data
+
     def create_payment(  # pylint: disable=too-many-positional-arguments,too-many-arguments
         self, transaction_type, quantity=1, mhr_id=None, client_reference_id=None, processing_fee=None
     ):
@@ -397,11 +407,7 @@ class SBCPaymentClient(BaseClient):
         data = SBCPaymentClient.create_payment_data(
             transaction_type, quantity, mhr_id, client_reference_id, processing_fee
         )
-        if self.detail_label and self.detail_value:
-            data["details"][0]["label"] = self.detail_label
-            data["details"][0]["value"] = self.detail_value
-        else:
-            del data["details"]
+        data = self.update_payload_data(data)
         logger.debug("create paymnent payload:")
         logger.debug(json.dumps(data))
         invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data)
@@ -411,11 +417,7 @@ class SBCPaymentClient(BaseClient):
     def create_payment_search(self, selections, mhr_id=None, client_reference_id=None, staff_gov=False):
         """Submit a non-staff payment search request for the MHR API transaction."""
         data = SBCPaymentClient.create_payment_search_data(selections, mhr_id, client_reference_id, staff_gov)
-        if self.detail_label and self.detail_value:
-            data["details"][0]["label"] = self.detail_label
-            data["details"][0]["value"] = self.detail_value
-        else:
-            del data["details"]
+        data = self.update_payload_data(data)
         logger.debug("create non-staff search paymnent payload:")
         logger.debug(json.dumps(data))
         invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data)
@@ -433,11 +435,7 @@ class SBCPaymentClient(BaseClient):
         data = SBCPaymentClient.create_payment_staff_search_data(
             selections, transaction_info, mhr_id, client_reference_id
         )
-        if self.detail_label and self.detail_value:
-            data["details"][0]["label"] = self.detail_label
-            data["details"][0]["value"] = self.detail_value
-        else:
-            del data["details"]
+        data = self.update_payload_data(data)
         logger.debug("staff search create payment payload for account: " + self.account_id)
         logger.debug(json.dumps(data))
         invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data, include_account=True)
@@ -447,11 +445,7 @@ class SBCPaymentClient(BaseClient):
         """Submit a staff registration payment request for the MHR API transaction."""
         logger.debug("Setting up staff registration data.")
         data = SBCPaymentClient.create_payment_staff_data(transaction_info, client_reference_id)
-        if self.detail_label and self.detail_value:
-            data["details"][0]["label"] = self.detail_label
-            data["details"][0]["value"] = self.detail_value
-        else:
-            del data["details"]
+        data = self.update_payload_data(data)
         logger.debug("staff registration create payment payload: ")
         logger.debug(json.dumps(data))
         invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data, include_account=True)
@@ -505,5 +499,9 @@ class SBCPaymentClient(BaseClient):
         receipt_path = receipt_path[receipt_path.find("/") : None] + PATH_RECEIPT.format(invoice_id=invoice_id)
         # Return the pay reference to include in the API response.
         pay_reference = {"invoiceId": invoice_id, "receipt": receipt_path}
-
+        if invoice_data.get("paymentMethod", "") in (PaymentMethods.CC.value, PaymentMethods.DIRECT_PAY.value):
+            pay_reference["ccPayment"] = True
+            pay_reference["paymentActionRequired"] = invoice_data.get("isPaymentActionRequired")
+            # Replace with env var {PAYMENT_PORTAL_URL}
+            pay_reference["paymentPortalURL"] = "{PAYMENT_PORTAL_URL}/{invoice_id}/{return_URL}"
         return pay_reference
