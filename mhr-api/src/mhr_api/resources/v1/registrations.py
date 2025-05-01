@@ -147,6 +147,8 @@ def post_registrations():  # pylint: disable=too-many-return-statements,too-many
         registration = reg_utils.pay_and_save_registration(
             request, request_json, account_id, group, TransactionTypes.REGISTRATION
         )
+        if registration.reg_json and registration.reg_json.get("paymentPending"):
+            return jsonify(registration.reg_json), HTTPStatus.ACCEPTED
         registration.report_view = True
         response_json = registration.new_registration_json
         response_json = cleanup_owner_groups(response_json)

@@ -150,6 +150,11 @@ TEST_QUERY_FILTER_DATA = [
     (reg_utils.REG_TYPE_PARAM, 'REG TYPE', None, None, mhr_draft.FILTER_REG_TYPE, None),
     (reg_utils.CLIENT_REF_PARAM, 'CLIENT', None, None, mhr_draft.FILTER_CLIENT_REF, None)
 ]
+# testdata pattern is ({account_id}, {mhr_numb}, {exists}, {reg_type}, {draft_data})
+TEST_INVOICE_DATA = [
+    ('PS12345', '125234', False, MhrRegistrationTypes.TRANS, DRAFT_TRANSFER),
+    ('PS12345', '125234', True, MhrRegistrationTypes.TRANS, DRAFT_TRANSFER)
+]
 
 
 @pytest.mark.parametrize('account_id, has_results, draft_num, mhr_num, reg_type', TEST_ACCOUNT_DRAFT_DATA)
@@ -208,6 +213,27 @@ def test_find_by_draft_number(session, account_id, status, draft_num, mhr_num, r
             MhrDraft.find_by_draft_number(draft_num, False)
         assert error
         assert error.value.status_code == status
+
+
+@pytest.mark.parametrize('account_id, mhr_num, exists, reg_type, draft_data', TEST_INVOICE_DATA)
+def test_find_by_invoice(session, account_id, mhr_num, exists, reg_type, draft_data):
+    """Assert that finding a draft by invoice id returns the expected result."""
+    invoice_id: str = "98888888"
+    json_data = copy.deepcopy(draft_data)
+    if mhr_num:
+        json_data['mhrNumber'] = mhr_num
+    draft_data = {
+        'type': reg_type,
+        'registration': json_data
+    }
+    if exists:
+        new_draft: MhrDraft = MhrDraft.create_from_json(draft_data, account_id, invoice_id)
+        new_draft.save()
+    test_draft: MhrDraft = MhrDraft.find_by_invoice_id(invoice_id)
+    if exists:
+        assert test_draft
+    else:
+        assert not test_draft
 
 
 @pytest.mark.parametrize('account_id, mhr_num, reg_type, draft_data', TEST_SAVE_DRAFT_DATA)

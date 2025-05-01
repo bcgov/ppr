@@ -37,7 +37,8 @@ from mhr_api.resources.registration_utils import (
     email_batch_location_data,
     notify_location_config,
     get_pay_details,
-    get_pay_details_doc
+    get_pay_details_doc,
+    setup_cc_draft
 )
 from mhr_api.services.authz import COLIN_ROLE, MHR_ROLE, STAFF_ROLE, BCOL_HELP_ROLE, ASSETS_HELP
 from mhr_api.services.authz import REGISTER_MH, TRANSFER_SALE_BENEFICIARY, MANUFACTURER_GROUP
@@ -127,6 +128,7 @@ MANUFACTURER_VALID = {
     'phoneNumber': '2507701066'
   }
 }
+CC_PAYREF = {"invoiceId": "88888888", "receipt": "receipt", "ccPayment": True, "ccURL": ""}
 MANUFACTURER_ROLES = [MHR_ROLE, TRANSFER_SALE_BENEFICIARY, REGISTER_MH]
 # testdata pattern is ({desc}, {roles}, {status}, {has_account}, {results_size})
 TEST_GET_ACCOUNT_DATA = [
@@ -260,6 +262,10 @@ TEST_GET_HISTORY = [
     ('Invalid MHR Number', [MHR_ROLE], HTTPStatus.NOT_FOUND, 'PS12345', 'TESTXXXX'),
     ('Invalid request Staff no account', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None, '000900'),
     ('Valid Request reg staff', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, 'PS12345', '000912')
+]
+# testdata pattern is ({pay_ref}, {account_id}, {username}, {usergroup})
+TEST_SETUP_CC_PAYMENT= [
+    (CC_PAYREF, "1234", "username", "ppr_staff")
 ]
 
 
@@ -699,3 +705,15 @@ def test_batch_location_notify_email_data(session, client, jwt):
     current_app.logger.debug(email_data)
     email_data = email_batch_location_data(config, 'junk-link')
     current_app.logger.debug(email_data)
+
+# testdata pattern is ({pay_ref}, {account_id}, {username}, {usergroup})
+@pytest.mark.parametrize('pay_ref, account_id, username, usergroup',TEST_SETUP_CC_PAYMENT)
+def test_cc_payment_setup(session, client, jwt, pay_ref, account_id, username, usergroup):
+    """Assert that setting up the pay api invoice information by doc type works as expected."""
+    reg_json = {}
+    reg_json = setup_cc_draft(reg_json, pay_ref, account_id, username, usergroup)
+    assert reg_json.get("payment")
+    assert reg_json["payment"] == pay_ref
+    assert reg_json.get("accountId") == account_id
+    assert reg_json.get("username") == username
+    assert reg_json.get("usergroup") == usergroup

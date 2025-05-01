@@ -35,6 +35,12 @@ TEST_DOC_REC = {
     "documentClass": "MHR",
     "author": "John Smith"
 }
+TEST_PAY_NOTIFICATION = {
+    "corpTypeCode": "MHR",
+    "id": "999999999",
+    "statusCode": "COMPLETED",
+    "filingIdentifier": ""
+}
 
 
 def test_publish_search_report(session):
@@ -60,6 +66,14 @@ def test_publish_document_rec(session):
     if not is_ci_testing() and current_app.config.get("DOC_CREATE_REC_TOPIC"):
         payload = TEST_DOC_REC
         GoogleQueueService().publish_create_doc_record(payload)
+
+
+def test_publish_pay_completion(session):
+    """Assert that enqueuing/publishing a new payment completion notification works as expected.."""
+    if not is_ci_testing() and current_app.config.get("GCP_PS_PROJECT_ID"):
+        project_id: str = current_app.config.get("GCP_PS_PROJECT_ID")
+        topic_name: str = f"projects/{project_id}/topics/assets-pay-notification"
+        GoogleQueueService().publish(topic_name, TEST_PAY_NOTIFICATION)
 
 
 def is_ci_testing() -> bool:

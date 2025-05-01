@@ -1,0 +1,132 @@
+# Copyright © 2019 Province of British Columbia
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Tests to assure the credit card payment helper functions.
+
+Test-Suite to ensure that the credit card payment helper functions are working as expected.
+"""
+import copy
+from http import HTTPStatus
+
+import pytest
+from flask import current_app
+from registry_schemas.example_data.mhr import REGISTRATION, EXEMPTION, PERMIT, TRANSFER
+
+from mhr_api.models import MhrDraft, MhrRegistration
+from mhr_api.models.mhr_draft import DRAFT_PAY_PENDING_PREFIX
+from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrRegistrationTypes
+from mhr_api.resources import cc_payment_utils
+from mhr_api.resources.registration_utils import setup_cc_draft
+
+
+CC_PAYREF = {
+     "invoiceId": "88888888",
+     "receipt": "receipt",
+     "ccPayment": True,
+     "paymentActionRequired": True,
+     "paymentPortalURL": "{PAYMENT_PORTAL_URL}/{invoice_id}/{return_URL}"
+}
+PUB_SUB_PAYLOAD = {
+    "corpTypeCode": "MHR",
+    "id": "999999999",
+    "statusCode": "COMPLETED",
+    "filingIdentifier": ""
+}
+# testdata pattern is ({desc}, {status}, {draft_json}, {mhr_num}, {reg_type}, {invoice_id})
+TEST_CALLBACK_DATA = [
+    ('Valid new reg', HTTPStatus.OK, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
+#    ('Valid exemption', HTTPStatus.OK, EXEMPTION, "000919", MhrRegistrationTypes.EXEMPTION_RES.value, "20000101"),
+#    ('Valid permit', HTTPStatus.OK, PERMIT, "000900", MhrRegistrationTypes.PERMIT.value, "20000102"),
+#    ('Valid transfer', HTTPStatus.OK, TRANSFER, "000919", MhrRegistrationTypes.TRANS.value, "20000103"),
+#    ('Invalid no key', HTTPStatus.UNAUTHORIZED, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
+#    ('Invalid missing payload', HTTPStatus.BAD_REQUEST, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
+#    ('Invalid missing status', HTTPStatus.BAD_REQUEST, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
+#    ('Invalid status', HTTPStatus.BAD_REQUEST, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
+#    ('Invalid used', HTTPStatus.OK, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
+]
+
+
+def setup_registration(draft_json: dict, reg_type: str, invoice_id: str) -> dict:
+    """Set up registration for cc processing."""
+    json_data = copy.deepcopy(draft_json)
+    json_data["registrationType"] = reg_type
+    if json_data.get("mhrNumber") and reg_type == MhrRegistrationTypes.MHREG.value:
+        del json_data["mhrNumber"]
+    elif reg_type == MhrRegistrationTypes.EXEMPTION_RES.value:
+        del json_data['documentId']
+        del json_data['documentRegistrationNumber']
+        del json_data['documentDescription']
+        del json_data['createDateTime']
+        json_data['nonResidential'] = False
+    elif reg_type == MhrRegistrationTypes.PERMIT.value:
+        del json_data['documentId']
+        del json_data['documentRegistrationNumber']
+        del json_data['documentDescription']
+        del json_data['createDateTime']
+        del json_data['payment']
+        del json_data['note']
+    elif reg_type == MhrRegistrationTypes.TRANS.value:
+        del json_data['documentId']
+        del json_data['documentDescription']
+        del json_data['createDateTime']
+        del json_data['payment']
+    pay_ref: dict = copy.deepcopy(CC_PAYREF)
+    if invoice_id:
+        pay_ref["invoiceId"] = invoice_id
+    json_data = setup_cc_draft(json_data, pay_ref, "PS12345", "username@idir", "ppr_staff")
+    return json_data
+
+
+@pytest.mark.parametrize('desc,status,draft_json,mhr_num,reg_type,invoice_id', TEST_CALLBACK_DATA)
+def test_pay_callback(session, client, jwt, desc, status, draft_json, mhr_num, reg_type, invoice_id):
+    """Assert that creating a new cc payment registration from a callback works as expected."""
+    if not current_app.config.get('SUBSCRIPTION_API_KEY'):
+        return
+    headers = None
+    if status != HTTPStatus.UNAUTHORIZED:
+        apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+        if apikey:
+            headers = {
+                'x-apikey': apikey
+            }
+    if status not in (HTTPStatus.UNAUTHORIZED, HTTPStatus.NOT_FOUND):
+        json_data = setup_registration(draft_json, reg_type, invoice_id)
+        new_reg: MhrRegistration = None
+        base_reg: MhrRegistration = None
+        if reg_type == MhrRegistrationTypes.MHREG.value:
+            new_reg = cc_payment_utils.save_new_cc_draft(json_data)
+        else:
+            json_data["mhrNumber"] = mhr_num
+            base_reg: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, "PS12345", True)
+            new_reg: MhrRegistration = cc_payment_utils.save_change_cc_draft(base_reg, json_data)
+
+    payload = copy.deepcopy(PUB_SUB_PAYLOAD) if desc != "Invalid missing payload" else {}
+    if payload:
+        payload["id"] = invoice_id
+    if desc == 'Invalid missing status':
+        del payload["statusCode"]
+    elif desc == 'Invalid status':
+        payload["statusCode"] = "CREATED"
+    rv = client.post('/api/v1/pay-callback/' + str(invoice_id),
+                     json=payload,
+                     headers=headers,
+                     content_type='application/json')
+    # check
+    assert rv.status_code == status
+    if desc == 'Invalid used':
+        rv = client.post('/api/v1/pay-callback/' + str(invoice_id),
+                        json=payload,
+                        headers=headers,
+                        content_type='application/json')
+        assert rv.status_code in (HTTPStatus.NOT_FOUND, HTTPStatus.BAD_REQUEST)

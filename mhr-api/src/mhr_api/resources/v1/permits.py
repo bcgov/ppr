@@ -85,9 +85,11 @@ def post_permits(mhr_number: str):  # pylint: disable=too-many-return-statements
         current_reg.current_view = True
         current_location = reg_utils.get_active_location(current_reg)
         existing_status: str = current_reg.status_type
-        registration = reg_utils.pay_and_save_permit(
+        registration: MhrRegistration = reg_utils.pay_and_save_permit(
             request, current_reg, request_json, account_id, group, get_transaction_type(request_json)
         )
+        if registration.reg_json and registration.reg_json.get("paymentPending"):
+            return jsonify(registration.reg_json), HTTPStatus.ACCEPTED
         logger.debug(f"building transport permit response json for {mhr_number}")
         response_json = registration.json
         # Return report if request header Accept MIME type is application/pdf.

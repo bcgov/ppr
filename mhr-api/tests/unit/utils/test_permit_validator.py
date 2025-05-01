@@ -354,7 +354,9 @@ TEST_PERMIT_DATA = [
      STAFF_ROLE),
     ('Invalid EXEMPT', False, False, DOC_ID_VALID, validator_utils.STATE_NOT_ALLOWED, '000912', 'PS12345', STAFF_ROLE),
     ('Invalid CANCELLED', False, False, None, validator_utils.STATE_NOT_ALLOWED, '000913', 'PS12345',
-     REQUEST_TRANSPORT_PERMIT)
+     REQUEST_TRANSPORT_PERMIT),
+    ('Invalid frozen payment', False, False, DOC_ID_VALID, validator_utils.STATE_FROZEN_PAYMENT, '000931',
+     'PS12345', STAFF_ROLE),
 ]
 # testdata pattern is ({description}, {valid}, {mhr_num}, {location}, {message content}, {group})
 TEST_PERMIT_DATA_EXTRA = [
@@ -485,6 +487,8 @@ def test_validate_permit(session, desc, valid, staff, doc_id, message_content, m
     valid_format, errors = schema_utils.validate(json_data, 'permit', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, account)
+    if desc == "Invalid frozen payment":
+        registration.status_type = MhrRegistrationStatusTypes.DRAFT
     error_msg = validator.validate_permit(registration, json_data, account, staff, group)
     if errors:
         for err in errors:

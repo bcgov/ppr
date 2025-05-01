@@ -36,6 +36,7 @@ HOME_DESCRIPTION_MIN_YEAR: int = 1900
 DOC_ID_REQUIRED = "Document ID is required for staff registrations. "
 DOC_ID_EXISTS = "Document ID must be unique: provided value already exists. "
 DOC_ID_INVALID_CHECKSUM = "Document ID is invalid: checksum failed. "
+STATE_FROZEN_PAYMENT = "Registration not allowed: a previous registration with a pending payment exists. "
 STATE_NOT_ALLOWED = "The MH registration is not in a state where changes are allowed. "
 STATE_FROZEN_AFFIDAVIT = "A transfer to a beneficiary is pending after an AFFIDAVIT transfer. "
 STATE_FROZEN_NOTE = "Registration not allowed: this manufactured home has an active TAXN, NCON, or REST unit note. "
@@ -177,6 +178,8 @@ def validate_registration_state(  # pylint: disable=too-many-branches,too-many-r
     error_msg = ""
     if not reg:
         return error_msg
+    if reg and reg.status_type == MhrRegistrationStatusTypes.DRAFT:
+        return STATE_FROZEN_PAYMENT
     if doc_type and doc_type == MhrDocumentTypes.EXRE:
         return validate_registration_state_reregister(reg)
     if reg_type and reg_type in (MhrRegistrationTypes.EXEMPTION_NON_RES, MhrRegistrationTypes.EXEMPTION_RES):

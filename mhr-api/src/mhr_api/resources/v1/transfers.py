@@ -93,6 +93,8 @@ def post_transfers(mhr_number: str):  # pylint: disable=too-many-return-statemen
         registration = reg_utils.pay_and_save_transfer(
             request, current_reg, request_json, account_id, group, TransactionTypes.TRANSFER
         )
+        if registration.reg_json and registration.reg_json.get("paymentPending"):
+            return jsonify(registration.reg_json), HTTPStatus.ACCEPTED
         logger.debug(f"building transfer response json for {mhr_number}")
         registration.change_registrations = current_reg.change_registrations
         response_json = registration.json
