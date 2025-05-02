@@ -162,8 +162,9 @@ export default defineComponent({
       bcolFormValid: false,
       isValid: computed((): boolean => {
         return localState.staffPaymentData.option !== StaffPaymentOptions.NONE &&
-            (localState.fasFormValid || localState.bcolFormValid ||
-            (localState.staffPaymentData.option === StaffPaymentOptions.NO_FEE))
+          (localState.staffPaymentData.option === StaffPaymentOptions.FAS && localState.fasFormValid) ||
+          (localState.staffPaymentData.option === StaffPaymentOptions.BCOL && localState.bcolFormValid) ||
+          (localState.staffPaymentData.option === StaffPaymentOptions.NO_FEE)
       }),
       /** Validation rules for Routing Slip Number. */
       routingSlipNumberRules: computed((): Array<ValidationRule> => {

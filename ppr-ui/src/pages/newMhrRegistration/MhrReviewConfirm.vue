@@ -132,7 +132,10 @@
         <v-card
           flat
           class="mt-6 pa-6"
-          :class="{ 'border-error-left': validateStaffPayment }"
+          :class="{
+            'border-error-left': isValidatingApp &&
+            !getValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.STAFF_PAYMENT_VALID)
+          }"
         >
           <StaffPayment
             id="staff-payment"
@@ -141,8 +144,8 @@
             :staff-payment-data="staffPayment"
             :invalid-section="validateStaffPayment"
             :validate="hasStaffPaymentValues || isValidatingApp"
-            @update:staff-payment-data="onStaffPaymentDataUpdate($event)"
-            @valid="staffPaymentValid = $event"
+            @update:staff-payment-data="onStaffPaymentDataUpdate"
+            @valid="setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.STAFF_PAYMENT_VALID, $event)"
           />
         </v-card>
       </section>
@@ -271,7 +274,6 @@ export default defineComponent({
              after registering this ${localState.correctionAmendmentLabel}.`
       }),
       paymentOption: StaffPaymentOptions.NONE,
-      staffPaymentValid: false,
       staffPayment: {
         option: StaffPaymentOptions.NONE,
         routingSlipNumber: '',
@@ -318,7 +320,6 @@ export default defineComponent({
             datNumber: '',
             folioNumber: ''
           }
-          localState.staffPaymentValid = false
           break
 
         case StaffPaymentOptions.BCOL:
@@ -330,7 +331,6 @@ export default defineComponent({
             isPriority: staffPaymentData.isPriority,
             routingSlipNumber: ''
           }
-          localState.staffPaymentValid = false
           break
 
         case StaffPaymentOptions.NO_FEE:
@@ -342,7 +342,6 @@ export default defineComponent({
             datNumber: '',
             folioNumber: ''
           }
-          localState.staffPaymentValid = true
           break
         case StaffPaymentOptions.NONE: // should never happen
           break
@@ -356,13 +355,6 @@ export default defineComponent({
       () => localState.authorizationValid,
       (val: boolean) => {
         setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.AUTHORIZATION_VALID, val)
-      }
-    )
-
-    watch(
-      () => localState.staffPaymentValid,
-      async (val: boolean) => {
-        await setValidation(MhrSectVal.REVIEW_CONFIRM_VALID, MhrCompVal.STAFF_PAYMENT_VALID, val)
       }
     )
 
@@ -401,6 +393,10 @@ export default defineComponent({
     })
 
     return {
+      getValidation,
+      setValidation,
+      MhrCompVal,
+      MhrSectVal,
       setShowGroups,
       isRoleStaffSbc,
       isMhrCorrection,

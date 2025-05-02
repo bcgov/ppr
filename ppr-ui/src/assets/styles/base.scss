@@ -317,7 +317,7 @@ a {
 #registration-table.v-table.v-table--fixed-header > .v-table__wrapper > table > thead > tr > th.registration-action,
 #registration-table.v-table > .v-table__wrapper > table > tbody > tr > td.actions-cell {
   border-left: 1px solid $gray3;
-  box-shadow: -2px 0 4px -1px $gray5;
+  box-shadow: inset 1px 0 2px 0 $gray5
 }
 
 .v-table.v-table--fixed-header > .v-table__wrapper > table > thead > tr > th.registration-action {
