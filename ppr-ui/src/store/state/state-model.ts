@@ -10,6 +10,7 @@ export const stateModel: StateModelIF = {
   },
   isAccountAdministrator: false,
   accountProductSubscriptions: null,
+  accountPaymentInformation: null,
   userProductSubscriptions: [],
   userProductSubscriptionsCodes: [],
   authorization: {

@@ -3,15 +3,16 @@ import { computed } from 'vue'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import type { AccountProductSubscriptionIF } from '@/interfaces'
 import { AccountProductCodes, AccountProductMemberships, AccountProductRoles, ProductStatus } from '@/enums'
-import { fetchAccountProducts, getProductSubscription } from '@/utils'
+import { fetchAccountProducts, getPaymentInformation, getProductSubscription } from '@/utils'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 
 export const useAuth = () => {
   const {
     setAccountProductSubscription,
+    setAccountPaymentInformation,
     setUserProductSubscriptions,
-    setUserProductSubscriptionsCodes
+    setUserProductSubscriptionsCodes,
   } = useStore()
   const {
     getAccountId,
@@ -57,9 +58,19 @@ export const useAuth = () => {
     setAccountProductSubscription(rpprSubscription)
   }
 
+  /** Fetches payment information from the payment API. */
+  const loadPaymentInfo = async (): Promise<void> => {
+    const response = await getPaymentInformation(getAccountId.value)
+    if (!response) {
+      throw new Error('Failed to fetch payment information')
+    }
+    setAccountPaymentInformation(response)
+  }
+
   return {
     isAuthenticated,
     initializeUserProducts,
-    loadAccountProductSubscriptions
+    loadAccountProductSubscriptions,
+    loadPaymentInfo
   }
 }

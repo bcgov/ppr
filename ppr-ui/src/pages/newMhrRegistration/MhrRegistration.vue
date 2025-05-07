@@ -209,6 +209,10 @@ export default defineComponent({
       setShowGroups
     } = useHomeOwners(false, isMhrCorrection.value)
 
+    // Payment Urls
+    const authWebPayUrl = `${useRuntimeConfig()?.public.VUE_APP_AUTH_WEB_URL}/makePayment`
+    const homeRedirectUrl = `${useRuntimeConfig()?.public.BASE_URL}`
+
     const localState = reactive({
       dataLoaded: false,
       submitting: false,
@@ -249,7 +253,7 @@ export default defineComponent({
 
     const emitError = (error: ErrorIF): void => {
       // Intercept and handle out of date error (stale draft)
-      if (error.category === ErrorCategories.DRAFT_OUT_OF_DATE) {
+      if (error?.category === ErrorCategories.DRAFT_OUT_OF_DATE) {
         localState.showOutOfDateDraftDialog = true
         return
       }
@@ -347,6 +351,20 @@ export default defineComponent({
           setRegTableNewItem(newRegItem)
           setUnsavedChanges(false)
           goToDash()
+        } else if (mhrSubmission?.paymentPending) {
+          if (mhrSubmission.payment?.paymentPortalURL) {
+            try {
+              // ToDo: populate via api url
+              window.location.href = `${authWebPayUrl}/${mhrSubmission.payment?.invoiceId}/${homeRedirectUrl}`
+              return
+            } catch (error) {
+              console.error('Error redirecting to payment:', error)
+              emitError({ error: 'Failed to redirect to payment page' })
+            }
+          } else {
+            console.error('Payment URL not found')
+            emitError({ error: 'Payment URL not found' })
+          }
         } else {
           emitError(mhrSubmission?.error)
         }

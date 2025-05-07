@@ -17,3 +17,15 @@ export interface AccountInfoIF {
   phoneNumber?: string
   phoneExtension?: string
 }
+
+export interface PaymentInfoIF {
+  accountId: string
+  accountName: string
+  billable: boolean
+  credit: number
+  id: number
+  padTosAcceptedBy: string
+  padTosAcceptedDate: string
+  paymentMethod: string
+  version: number
+}

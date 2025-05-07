@@ -38,4 +38,5 @@ export interface StaffPaymentIF {
   datNumber: string
   folioNumber: string
   isPriority: boolean
+  isCreditCard?: boolean
 }

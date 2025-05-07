@@ -822,6 +822,7 @@ export default defineComponent({
       getMhrTransportPermit,
       getMhrTransferAttentionReference,
       getMhrAccountSubmittingParty,
+      isCreditCardPreferredPayment,
       isRoleQualifiedSupplierHomeDealer,
       isRoleQualifiedSupplierLawyersNotaries
     } = storeToRefs(useStore())
@@ -892,6 +893,11 @@ export default defineComponent({
     // Refs
     const homeOwnersComponentRef = ref(null) as Component
     const transferDetailsComponent = ref(null) as Component
+
+    // Payment Urls
+    const authWebPayUrl = `${useRuntimeConfig()?.public.VUE_APP_AUTH_WEB_URL}/makePayment`
+    const homeRedirectUrl = `${useRuntimeConfig()?.public.BASE_URL}`
+
 
     const localState = reactive({
       dataLoaded: false,
@@ -1280,7 +1286,28 @@ export default defineComponent({
         // 3b - Submit Transport Permit
         if (isChangeLocationActive.value || isExtendChangeLocationActive.value) {
           const transportPermitFilingResp: any =
-            await buildAndSubmitTransportPermit(getMhrInformation.value.mhrNumber, localState.staffPayment)
+            await buildAndSubmitTransportPermit(
+              getMhrInformation.value.mhrNumber,
+              localState.staffPayment,
+              isCreditCardPreferredPayment.value
+            )
+
+          if(transportPermitFilingResp?.paymentPending) {
+            if (transportPermitFilingResp.payment?.paymentPortalURL) {
+              try {
+                // ToDo: populate via api url
+                window.location.href = `${authWebPayUrl}/${transportPermitFilingResp.payment?.invoiceId}/
+                ${homeRedirectUrl}`
+                return
+              } catch (error) {
+                console.error('Error redirecting to payment:', error)
+                emitError({ error: 'Failed to redirect to payment page' })
+              }
+            } else {
+              console.error('Payment URL not found')
+              emitError({ error: 'Payment URL not found' })
+            }
+          }
 
           if (!transportPermitFilingResp?.error) {
             // this will scroll & highlight a new row for Unit Note in Registration Table
@@ -1304,8 +1331,27 @@ export default defineComponent({
         // 3c - Submit Transfer filing
         const apiData: MhrTransferApiIF = await buildApiData()
 
-        const mhrTransferFiling =
-          await submitMhrTransfer(apiData, getMhrInformation.value.mhrNumber, localState.staffPayment)
+        const mhrTransferFiling = await submitMhrTransfer(
+            apiData,
+            getMhrInformation.value.mhrNumber,
+            localState.staffPayment
+          )
+
+        if(mhrTransferFiling?.paymentPending) {
+          if (mhrTransferFiling.payment?.paymentPortalURL) {
+            try {
+              // ToDo: populate via api url
+              window.location.href = `${authWebPayUrl}/${mhrTransferFiling.payment?.invoiceId}/${homeRedirectUrl}`
+              return
+            } catch (error) {
+              console.error('Error redirecting to payment:', error)
+              emitError({ error: 'Failed to redirect to payment page' })
+            }
+          } else {
+            console.error('Payment URL not found')
+            emitError({ error: 'Payment URL not found' })
+          }
+        }
 
         if (!mhrTransferFiling.error) {
           // Set new filing to Reg Table
