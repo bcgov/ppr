@@ -41,4 +41,5 @@ export enum StaffPaymentOptions {
   NO_FEE = 0,
   FAS = 1,
   BCOL = 2,
+  CREDIT_CARD = 3
 }

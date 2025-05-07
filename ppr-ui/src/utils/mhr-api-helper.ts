@@ -107,11 +107,11 @@ function mhrStaffPaymentParameters (staffPayment: StaffPaymentIF) {
         paymentParams = paymentParams + 'bcolAccountNumber=' + staffPayment.bcolAccountNumber
         paymentParams = paymentParams + '&datNumber=' + staffPayment.datNumber
         break
+      case StaffPaymentOptions.CREDIT_CARD:
+        paymentParams = paymentParams + 'ccPayment=true'
+        break
     }
     if (staffPayment.isPriority) {
-      paymentParams = paymentParams + '&priority=true'
-    }
-    if (staffPayment.isCreditCard) {
       paymentParams = paymentParams + '&priority=true'
     }
   }
