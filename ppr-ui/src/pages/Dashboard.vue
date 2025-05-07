@@ -25,6 +25,40 @@
     >
       <!-- Qualified Supplier application messages -->
       <CautionBox
+        v-if="getFeatureFlag('mhr-credit-card-enabled')"
+        class="mb-10 bg-white !border-white"
+        set-important-word="Note"
+        :set-msg="`Your current credit card method is “...” You can now pay using a credit card.
+        Click <a href=${accountPaymentUrl}>here</a> to change your current method of payment. `"
+      >
+        <template #prependSLot>
+          <v-icon
+            class="mr-2 pt-n1"
+            color="primary"
+          >
+            mdi-information-outline
+          </v-icon>
+        </template>
+
+        <template #appendSLot>
+          <v-row no-gutters>
+            <v-col>
+              <v-btn
+                variant="plain"
+                class="msg-hide-icon float-right"
+                :ripple="false"
+              >
+                <v-icon color="primary">
+                  mdi-close
+                </v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
+        </template>
+      </CautionBox>
+
+      <!-- Qualified Supplier application messages -->
+      <CautionBox
         v-if="!!qsMsgContent"
         class="mb-10"
         set-important-word="Note"
@@ -310,6 +344,10 @@ export default defineComponent({
           !getUserSettings.value[SettingOptions.MISCELLANEOUS_PREFERENCES]?.some(
           setting => setting.accountId === getAccountId.value && !!setting[SettingOptions.RL_MSG_HIDE]
         )
+      }),
+      accountPaymentUrl: computed((): string => {
+        return `${useRuntimeConfig().public?.VUE_APP_AUTH_WEB_URL}/account/${getAccountId.value}/settings/
+        product-settings`
       })
     })
 

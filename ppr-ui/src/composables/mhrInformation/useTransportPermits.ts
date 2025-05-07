@@ -221,8 +221,8 @@ export const useTransportPermits = () => {
     await nextTick()
   }
 
-  const buildAndSubmitTransportPermit = (mhrNumber: string, staffPayment: StaffPaymentIF, isCcPay: boolean) => {
-    return submitMhrTransportPermit(mhrNumber, buildPayload(), staffPayment, isCcPay)
+  const buildAndSubmitTransportPermit = (mhrNumber: string, staffPayment: StaffPaymentIF) => {
+    return submitMhrTransportPermit(mhrNumber, buildPayload(), staffPayment)
   }
 
   const buildPayload = (): MhrTransportPermitIF => {

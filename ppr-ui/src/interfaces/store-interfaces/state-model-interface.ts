@@ -34,7 +34,8 @@ import type {
   StaffPaymentIF,
   MhrTransportPermitIF,
   AddEditSaNoticeIF,
-  MhrRegistrationHomeOwnerGroupIF, PaymentInfoIF
+  MhrRegistrationHomeOwnerGroupIF,
+  PaymentInfoIF
 } from '@/interfaces'
 import type { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 

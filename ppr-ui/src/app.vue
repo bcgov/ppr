@@ -382,7 +382,6 @@ export default defineComponent({
     }
 
     const handleError = (error: ErrorIF): void => {
-      console.log(error)
       switch (error?.category) {
         case ErrorCategories.ACCOUNT_ACCESS:
           localState.errorOptions = authPprError

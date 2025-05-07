@@ -17,13 +17,15 @@ import type {
   StaffPaymentIF,
   AdminRegistrationIF,
   MhrHistoryRoIF,
-  MhrTransportPermitIF, MhrTransferApiIF, NewMhrRegistrationApiIF
+  MhrTransportPermitIF,
+  MhrTransferApiIF,
+  NewMhrRegistrationApiIF
 } from '@/interfaces'
 import type { APIMhrTypes, ApiTransferTypes} from '@/enums'
 import { ErrorCategories, ErrorCodes, ErrorRootCauses, StaffPaymentOptions } from '@/enums'
 import { useSearch } from '@/composables/useSearch'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-import { addTimestampToDate, getFeatureFlag } from '@/utils'
+import { addTimestampToDate } from '@/utils'
 import { trim } from 'lodash'
 import type { AxiosError } from 'axios'
 

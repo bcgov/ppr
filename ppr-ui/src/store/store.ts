@@ -55,7 +55,8 @@ import type {
   MhrTransportPermitIF,
   MhrRegistrationHomeLocationWithoutAddressIF,
   ExemptionNoteIF,
-  AddEditSaNoticeIF, PaymentInfoIF
+  AddEditSaNoticeIF,
+  PaymentInfoIF
 } from '@/interfaces'
 import type {
   LocationChangeTypes,
