@@ -29,7 +29,7 @@
         class="mb-10 bg-white !border-white"
         set-important-word="Note"
         :set-msg="`Your current credit card method is “...” You can now pay using a credit card.
-        Click <a href=${accountPaymentUrl}>here</a> to change your current method of payment. `"
+        Click <a class='px-0' href=${accountPaymentUrl}>here</a> to change your current method of payment. `"
       >
         <template #prependSLot>
           <v-icon
@@ -346,8 +346,8 @@ export default defineComponent({
         )
       }),
       accountPaymentUrl: computed((): string => {
-        return `${useRuntimeConfig().public?.VUE_APP_AUTH_WEB_URL}/account/${getAccountId.value}/settings/
-        product-settings`
+        return useRuntimeConfig().public?.VUE_APP_AUTH_WEB_URL + '/account/' + getAccountId.value +
+          '/settings/product-settings'
       })
     })
 
