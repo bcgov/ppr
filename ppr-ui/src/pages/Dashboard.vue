@@ -23,7 +23,7 @@
       v-if="appReady"
       class="container pa-0"
     >
-      <!-- Qualified Supplier application messages -->
+      <!-- Payment method messaging -->
       <CautionBox
         v-if="getFeatureFlag('mhr-credit-card-enabled')"
         class="mb-10 bg-white !border-white"
