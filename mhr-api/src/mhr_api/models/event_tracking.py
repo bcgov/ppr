@@ -33,6 +33,8 @@ class EventTracking(db.Model):  # pylint: disable=too-many-instance-attributes
         EMAIL_REPORT = "EMAIL_REPORT"
         REGISTRATION_REPORT = "REGISTRATION_REPORT"
         MHR_REGISTRATION_REPORT = "MHR_REG_REPORT"
+        MHR_PAYMENT = "MHR_PAYMENT"
+        PPR_PAYMENT = "PPR_PAYMENT"
 
     __tablename__ = "event_tracking"
 
