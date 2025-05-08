@@ -92,7 +92,9 @@ def post_financing_statements():
         if not valid_format or extra_validation_msg != "":
             return resource_utils.validation_error_response(errors, fs_utils.VAL_ERROR, extra_validation_msg)
         # Set up the financing statement registration, pay, and save the data.
-        statement = fs_utils.pay_and_save_financing(request, request_json, account_id)
+        statement: FinancingStatement = fs_utils.pay_and_save_financing(request, request_json, account_id)
+        if statement.registration[0].reg_json and statement.registration[0].reg_json.get("paymentPending"):
+            return jsonify(statement.registration[0].reg_json), HTTPStatus.ACCEPTED
         response_json = statement.json
         if resource_utils.is_pdf(request):
             # Return report if request header Accept MIME type is application/pdf.
@@ -210,9 +212,10 @@ def post_amendments(registration_num: str):
         # Verify delete party and collateral ID's
         resource_utils.validate_delete_ids(request_json, statement)
         # Set up the registration, pay, and save the data.
-        registration = fs_utils.pay_and_save(
-            request, request_json, model_utils.REG_CLASS_AMEND, statement, registration_num, account_id
-        )
+        change_props = get_change_reg_props(model_utils.REG_CLASS_AMEND, registration_num, account_id)
+        registration: Registration = fs_utils.pay_and_save(request, request_json, statement, change_props)
+        if registration.reg_json and registration.reg_json.get("paymentPending"):
+            return jsonify(registration.reg_json), HTTPStatus.ACCEPTED
         response_json = registration.verification_json("amendmentRegistrationNumber")
         # If get to here request was successful, enqueue verification statements for secured parties.
         resource_utils.queue_secured_party_verification(registration)
@@ -326,7 +329,7 @@ def get_changes(registration_num: str, change_registration_num: str):
 @bp.route("/<string:registration_num>/renewals", methods=["POST", "OPTIONS"])
 @cross_origin(origin="*")
 @jwt.requires_auth
-def post_renewals(registration_num: str):
+def post_renewals(registration_num: str):  # pylint: disable=too-many-branches;only 1 more
     """Renew a financing statement by registration number."""
     try:
         if registration_num is None:
@@ -360,9 +363,10 @@ def post_renewals(registration_num: str):
         if not statement.validate_debtor_name(request_json["debtorName"], is_staff_account(account_id)):
             return resource_utils.base_debtor_invalid_response()
         # Set up the registration, pay, and save the data.
-        registration = fs_utils.pay_and_save(
-            request, request_json, model_utils.REG_CLASS_RENEWAL, statement, registration_num, account_id
-        )
+        change_props = get_change_reg_props(model_utils.REG_CLASS_RENEWAL, registration_num, account_id)
+        registration: Registration = fs_utils.pay_and_save(request, request_json, statement, change_props)
+        if registration.reg_json and registration.reg_json.get("paymentPending"):
+            return jsonify(registration.reg_json), HTTPStatus.ACCEPTED
         response_json = registration.verification_json("renewalRegistrationNumber")
         if resource_utils.is_pdf(request):
             # Return report if request header Accept MIME type is application/pdf.
@@ -465,9 +469,8 @@ def post_discharges(registration_num: str):
             return resource_utils.base_debtor_invalid_response()
         # No fee for a discharge but create a payment transaction record.
         # Set up the registration, pay, and save the data.
-        registration = fs_utils.pay_and_save(
-            request, request_json, model_utils.REG_CLASS_DISCHARGE, statement, registration_num, account_id
-        )
+        change_props = get_change_reg_props(model_utils.REG_CLASS_DISCHARGE, registration_num, account_id)
+        registration = fs_utils.pay_and_save(request, request_json, statement, change_props)
         response_json = registration.verification_json("dischargeRegistrationNumber")
         # If get to here request was successful, enqueue verification statements for secured parties.
         resource_utils.queue_secured_party_verification(registration)
@@ -881,3 +884,18 @@ def add_account_reg_update(registration: dict, account_id: str, base_reg_num: st
     if "inUserList" in registration:
         del registration["inUserList"]
     return registration
+
+
+def get_change_reg_props(
+    registration_class: str,
+    registration_num: str,
+    account_id,
+) -> dict:
+    """Set up the new change registration properies."""
+    change_props = {
+        "registration_class": registration_class,
+        "registration_num": registration_num,
+        "account_id": account_id,
+    }
+    logger.info(f"New reg props class={registration_class} reg_num={registration_num} account_id={account_id}")
+    return change_props

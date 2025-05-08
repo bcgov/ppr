@@ -442,7 +442,8 @@ QUERY_ACCOUNT_DRAFTS_DATE_CLAUSE = """
 
 QUERY_ACCOUNT_DRAFTS_BASE = """
 SELECT document_number, create_ts, registration_type, registration_type_cl, registration_desc, base_reg_num, draft_type,
-       last_update_ts, client_reference_id, registering_party, secured_party, registering_name, account_id
+       last_update_ts, client_reference_id, registering_party, secured_party, registering_name, account_id,
+       (SELECT d.user_id FROM drafts d WHERE d.id = adv.id) AS user_id
   FROM account_draft_vw adv
  WHERE account_id = :query_account
    AND NOT EXISTS (SELECT r.draft_id FROM registrations r WHERE r.account_id = adv.account_id AND r.draft_id = adv.id)
@@ -465,7 +466,8 @@ SELECT COUNT(id) AS reg_count
 QUERY_ACCOUNT_BASE_REG_BASE = """
 SELECT registration_number, registration_ts, registration_type, registration_type_cl, account_id,
        registration_desc, base_reg_number, state, expire_days, last_update_ts, registering_party,
-       secured_party, client_reference_id, registering_name, orig_account_id, pending_count, vehicle_count
+       secured_party, client_reference_id, registering_name, orig_account_id, pending_count, vehicle_count,
+       (SELECT r.ver_bypassed FROM registrations r WHERE r.id = arv.registration_id) as locked_status
   FROM account_registration_vw arv
  WHERE arv.account_id = :query_account
    AND arv.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')

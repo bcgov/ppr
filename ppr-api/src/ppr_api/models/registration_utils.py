@@ -454,6 +454,10 @@ def __build_account_reg_result(
     result["legacy"] = result.get("accountId") == "0"
     if model_utils.is_financing(reg_class) and not api_filter:
         result["expand"] = False
+        if params.from_ui:
+            status: str = str(row[17])
+            if status and status == "L":
+                result["paymentPending"] = True
     result = set_path(params, result, reg_num, base_reg_num, int(row[15]))
     result = update_summary_optional(result, params.account_id, params.sbc_staff)
     if result["registrationType"] == RegistrationTypes.CL.value:

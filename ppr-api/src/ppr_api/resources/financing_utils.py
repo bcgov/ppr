@@ -24,6 +24,7 @@ from ppr_api.models import EventTracking, FinancingStatement, Party, Registratio
 from ppr_api.models import utils as model_utils
 from ppr_api.models.type_tables import RegistrationTypes
 from ppr_api.reports import ReportTypes, get_callback_pdf, get_pdf, get_report_api_payload
+from ppr_api.resources import cc_payment_utils
 from ppr_api.resources import utils as resource_utils
 from ppr_api.services.authz import is_reg_staff_account, is_sbc_office_account
 from ppr_api.services.payment import TransactionTypes
@@ -86,14 +87,14 @@ def save_rl_transition(registration_class: str, financing_statement: FinancingSt
         logger.error(f"RL amend/renewal of {base_reg.registration_num} changing reg type to CL failed: {db_exception}")
 
 
-def get_payment_transaction_type(registration_class: str, financing_statement: FinancingStatement, life: int) -> str:
+def get_payment_transaction_type(registration_class: str, registration: Registration, base_reg_type: str) -> str:
     """Derive the payment transction type from the request."""
     pay_trans_type: str = TransactionTypes.CHANGE.value
     if registration_class == model_utils.REG_CLASS_AMEND:
         pay_trans_type = TransactionTypes.AMENDMENT.value
-        if resource_utils.no_fee_amendment(financing_statement.registration[0].registration_type):
+        if resource_utils.no_fee_amendment(base_reg_type):
             pay_trans_type = TransactionTypes.AMENDMENT_NO_FEE.value
-    elif registration_class == model_utils.REG_CLASS_RENEWAL and life == model_utils.LIFE_INFINITE:
+    elif registration_class == model_utils.REG_CLASS_RENEWAL and registration.life == model_utils.LIFE_INFINITE:
         pay_trans_type = TransactionTypes.RENEWAL_INFINITE.value
     elif registration_class == model_utils.REG_CLASS_RENEWAL:
         pay_trans_type = TransactionTypes.RENEWAL_LIFE_YEAR.value
@@ -102,50 +103,103 @@ def get_payment_transaction_type(registration_class: str, financing_statement: F
     return pay_trans_type
 
 
-def pay_and_save(  # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-positional-arguments
-    req: request,
-    request_json,
-    registration_class,
-    financing_statement,
-    registration_num,
-    account_id,
-):
-    """Set up the registration, pay if there is an account id, and save the data."""
-    token: dict = g.jwt_oidc_token_info
-    registration: Registration = Registration.create_from_json(
-        request_json, registration_class, financing_statement, registration_num, account_id
-    )
-    registration.user_id = token.get("username", None)
-    pay_trans_type: str = get_payment_transaction_type(registration_class, financing_statement, registration.life)
-    fee_quantity = 1 if pay_trans_type != TransactionTypes.RENEWAL_LIFE_YEAR.value else registration.life
+def pay_financing(req: request, new_reg: Registration, account_id: str) -> dict:
+    """Submit a payment request for a new financing statement registration."""
+    pay_trans_type, fee_quantity = resource_utils.get_payment_type_financing(new_reg)
     pay_ref = None
     processing_fee = None
+    details: dict = resource_utils.get_payment_details_financing(new_reg, req)
+    is_no_fee = pay_trans_type == TransactionTypes.FINANCING_NO_FEE.value
+    if not is_reg_staff_account(account_id):
+        # if sbc staff and not 'no fee' then add processing fee
+        if not is_no_fee and is_sbc_office_account(jwt.get_token_auth_header(), account_id):
+            processing_fee = TransactionTypes.FINANCING_STAFF_PROCESS_FEE.value
+        payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id, details=details)
+        pay_ref = payment.create_payment(
+            pay_trans_type, fee_quantity, None, new_reg.client_reference_id, processing_fee
+        )
+    else:
+        # if not 'no fee' then add processing fee
+        if not is_no_fee:
+            processing_fee = TransactionTypes.FINANCING_STAFF_PROCESS_FEE.value
+        payment_info = resource_utils.build_staff_registration_payment(req, pay_trans_type, fee_quantity)
+        payment = Payment(jwt=jwt.get_token_auth_header(), account_id=None, details=details)
+        pay_ref = payment.create_payment_staff_registration(payment_info, new_reg.client_reference_id, processing_fee)
+    return pay_ref
+
+
+def pay_registration(
+    req: request, financing_statement: FinancingStatement, change_props: dict, new_reg: Registration
+) -> dict:
+    """Submit a payment request for a new registration."""
+    registration_class = change_props.get("registration_class")
+    account_id = change_props.get("account_id")
+    pay_trans_type: str = get_payment_transaction_type(
+        registration_class, new_reg, financing_statement.registration[0].registration_type
+    )
+    fee_quantity = 1 if pay_trans_type != TransactionTypes.RENEWAL_LIFE_YEAR.value else new_reg.life
+    pay_ref = None
+    processing_fee = None
+    details: dict = resource_utils.get_payment_details(new_reg, req)
     if not is_reg_staff_account(account_id):
         # if sbc staff and not 'no fee' then add processing fee
         if pay_trans_type != TransactionTypes.DISCHARGE.value and is_sbc_office_account(
             jwt.get_token_auth_header(), account_id
         ):
             processing_fee = TransactionTypes.CHANGE_STAFF_PROCESS_FEE.value
-        pay_account_id: str = account_id
-        payment = Payment(
-            jwt=jwt.get_token_auth_header(),
-            account_id=pay_account_id,
-            details=resource_utils.get_payment_details(registration),
-        )
+        payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id, details=details)
         pay_ref = payment.create_payment(
-            pay_trans_type, fee_quantity, None, registration.client_reference_id, processing_fee
+            pay_trans_type, fee_quantity, None, new_reg.client_reference_id, processing_fee
         )
     else:
         # if not discharge add process fee
         if pay_trans_type != TransactionTypes.DISCHARGE.value:
             processing_fee = TransactionTypes.CHANGE_STAFF_PROCESS_FEE.value
         payment_info = resource_utils.build_staff_registration_payment(req, pay_trans_type, fee_quantity)
-        payment = Payment(
-            jwt=jwt.get_token_auth_header(), account_id=None, details=resource_utils.get_payment_details(registration)
-        )
-        pay_ref = payment.create_payment_staff_registration(
-            payment_info, registration.client_reference_id, processing_fee
-        )
+        payment = Payment(jwt=jwt.get_token_auth_header(), account_id=None, details=details)
+        pay_ref = payment.create_payment_staff_registration(payment_info, new_reg.client_reference_id, processing_fee)
+    return pay_ref
+
+
+def cancel_payment(db_exception, invoice_id: str, account_id: str, reg_class: str):
+    """Rollback payment when a registration save fails (database related exception)."""
+    logger.error(SAVE_ERROR_MESSAGE.format(account_id, reg_class, str(db_exception)))
+    if account_id and invoice_id is not None:
+        logger.info(PAY_REFUND_MESSAGE.format(account_id, reg_class, invoice_id))
+        try:
+            payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id)
+            payment.cancel_payment(invoice_id)
+        except SBCPaymentException as cancel_exception:
+            logger.error(PAY_REFUND_ERROR.format(account_id, reg_class, invoice_id, str(cancel_exception)))
+    raise DatabaseException(db_exception) from db_exception
+
+
+def setup_cc_draft(json_data: dict, pay_ref: dict, account_id: str, username: str) -> dict:
+    """Set common draft properties from request information."""
+    json_data["payment"] = pay_ref
+    json_data["accountId"] = account_id
+    json_data["username"] = username if username else ""
+    return json_data
+
+
+def pay_and_save(req: request, request_json: dict, financing_statement: FinancingStatement, change_props: dict):
+    """Set up the registration, pay if there is an account id, and save the data."""
+    token: dict = g.jwt_oidc_token_info
+    registration_class = change_props.get("registration_class")
+    account_id = change_props.get("account_id")
+    registration: Registration = resource_utils.create_new_pay_registration(
+        request_json, account_id, registration_class
+    )
+    registration.base_registration_num = change_props.get("registration_num")
+    pay_ref: dict = pay_registration(req, financing_statement, change_props, registration)
+    if pay_ref.get("ccPayment"):
+        logger.info("Payment response CC method.")
+        request_json = setup_cc_draft(request_json, pay_ref, account_id, token.get("username", None))
+        return cc_payment_utils.save_change_cc_draft(financing_statement.registration[0], request_json, registration)
+    registration: Registration = Registration.create_from_json(
+        request_json, registration_class, financing_statement, change_props.get("registration_num"), account_id
+    )
+    registration.user_id = token.get("username", None)
     invoice_id = pay_ref["invoiceId"]
     registration.pay_invoice_id = int(invoice_id)
     registration.pay_path = pay_ref["receipt"]
@@ -156,56 +210,23 @@ def pay_and_save(  # pylint: disable=too-many-arguments,too-many-locals,too-many
         # just pass it along
         raise bus_exception
     except Exception as db_exception:  # noqa: B902; handle all db related errors.
-        logger.error(SAVE_ERROR_MESSAGE.format(account_id, registration_class, str(db_exception)))
-        if account_id and invoice_id is not None:
-            logger.info(PAY_REFUND_MESSAGE.format(account_id, registration_class, invoice_id))
-            try:
-                payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id)
-                payment.cancel_payment(invoice_id)
-            except SBCPaymentException as cancel_exception:
-                logger.error(PAY_REFUND_ERROR.format(account_id, registration_class, invoice_id, str(cancel_exception)))
-        raise DatabaseException(db_exception) from db_exception
+        cancel_payment(db_exception, invoice_id, account_id, registration_class)
     save_rl_transition(registration_class, financing_statement, registration.id)
     return registration
 
 
-def pay_and_save_financing(req: request, request_json, account_id):  # pylint: disable=too-many-locals
+def pay_and_save_financing(req: request, request_json, account_id):
     """Set up the financing statement, pay if there is an account id, and save the data."""
     # Charge a fee.
     token: dict = g.jwt_oidc_token_info
+    registration: Registration = resource_utils.create_new_pay_registration(request_json, account_id)
+    pay_ref = pay_financing(req, registration, account_id)
+    if pay_ref.get("ccPayment"):
+        logger.info("Payment response CC method.")
+        request_json = setup_cc_draft(request_json, pay_ref, account_id, token.get("username", None))
+        return cc_payment_utils.save_new_cc_draft(request_json, registration)
     statement = FinancingStatement.create_from_json(request_json, account_id, token.get("username", None))
-    invoice_id = None
     registration = statement.registration[0]
-    pay_trans_type, fee_quantity = resource_utils.get_payment_type_financing(registration)
-    pay_ref = None
-    processing_fee = None
-    is_no_fee = pay_trans_type == TransactionTypes.FINANCING_NO_FEE.value
-    if not is_reg_staff_account(account_id):
-        # if sbc staff and not 'no fee' then add processing fee
-        if not is_no_fee and is_sbc_office_account(jwt.get_token_auth_header(), account_id):
-            processing_fee = TransactionTypes.FINANCING_STAFF_PROCESS_FEE.value
-        pay_account_id: str = account_id
-        payment = Payment(
-            jwt=jwt.get_token_auth_header(),
-            account_id=pay_account_id,
-            details=resource_utils.get_payment_details_financing(registration),
-        )
-        pay_ref = payment.create_payment(
-            pay_trans_type, fee_quantity, None, registration.client_reference_id, processing_fee
-        )
-    else:
-        # if not 'no fee' then add processing fee
-        if not is_no_fee:
-            processing_fee = TransactionTypes.FINANCING_STAFF_PROCESS_FEE.value
-        payment_info = resource_utils.build_staff_registration_payment(req, pay_trans_type, fee_quantity)
-        payment = Payment(
-            jwt=jwt.get_token_auth_header(),
-            account_id=None,
-            details=resource_utils.get_payment_details_financing(registration),
-        )
-        pay_ref = payment.create_payment_staff_registration(
-            payment_info, registration.client_reference_id, processing_fee
-        )
     invoice_id = pay_ref["invoiceId"]
     registration.pay_invoice_id = int(invoice_id)
     registration.pay_path = pay_ref["receipt"]
@@ -213,14 +234,7 @@ def pay_and_save_financing(req: request, request_json, account_id):  # pylint: d
     try:
         statement.save()
     except Exception as db_exception:  # noqa: B902; handle all db related errors.
-        logger.error(SAVE_ERROR_MESSAGE.format(account_id, "financing", str(db_exception)))
-        if account_id and invoice_id is not None:
-            logger.info(PAY_REFUND_MESSAGE.format(account_id, "financing", invoice_id))
-            try:
-                payment.cancel_payment(invoice_id)
-            except SBCPaymentException as cancel_exception:
-                logger.error(PAY_REFUND_ERROR.format(account_id, "financing", invoice_id, str(cancel_exception)))
-        raise DatabaseException(db_exception) from db_exception
+        cancel_payment(db_exception, invoice_id, account_id, registration.registration_type_cl)
     return statement
 
 

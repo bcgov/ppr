@@ -86,6 +86,7 @@ END_TS_PARAM = "endDateTime"
 STATUS_PARAM = "statusType"
 CLIENT_REF_PARAM = "clientReferenceId"
 REGISTER_NAME_PARAM = "registeringName"
+REQUEST_PARAM_CC_PAY: str = "ccPayment"
 
 
 class CallbackExceptionCodes(BaseEnum):
@@ -444,7 +445,7 @@ def build_staff_registration_payment(req: request, pay_trans_type: str, fee_quan
     return payment_info
 
 
-def get_payment_details(registration):
+def get_payment_details(registration: Registration, req=None):
     """Extract the payment details value from the registration request."""
     label = " Registration:"
     value = registration.base_registration_num
@@ -469,7 +470,7 @@ def get_payment_details(registration):
         label = "Change" + label
 
     details = {"label": label, "value": value}
-    return details
+    return set_cc_payment(req, details)
 
 
 def get_payment_type_financing(registration):
@@ -499,7 +500,15 @@ def get_payment_type_financing(registration):
     return pay_trans_type, fee_quantity
 
 
-def get_payment_details_financing(registration):
+def set_cc_payment(req, details: dict) -> dict:
+    """Set optional cc payment indicator in details from the known request parameter."""
+    if not req:
+        return details
+    details["ccPayment"] = req.args.get(REQUEST_PARAM_CC_PAY) if request.args.get(REQUEST_PARAM_CC_PAY) else False
+    return details
+
+
+def get_payment_details_financing(registration: Registration, req=None):
     """Extract the payment details value from the request financing statement."""
     length = " Length: "
     if registration.registration_type == model_utils.REG_TYPE_REPAIRER_LIEN:
@@ -513,12 +522,16 @@ def get_payment_details_financing(registration):
 
     if not registration.reg_type:
         registration.get_registration_type()
-
+    label: str = "Register Financing Statement "
+    if not registration.registration_num:
+        label += registration.registration_type + " Type:"
+    else:
+        label += registration.registration_num + " Type:"
     details = {
-        "label": "Register Financing Statement " + registration.registration_num + " Type:",
+        "label": label,
         "value": registration.reg_type.registration_desc + length,
     }
-    return details
+    return set_cc_payment(req, details)
 
 
 def enqueue_verification_report(registration_id: int, party_id: int):
@@ -700,3 +713,46 @@ def valid_api_key(req) -> bool:
     if not apikey:
         return True
     return key == apikey
+
+
+def create_new_pay_registration(json_data: dict, account_id: str, reg_class: str = None) -> Registration:
+    """
+    Create a new registration with with the minimal informaton required to submit a payment.
+
+    Args:
+        json_data (dict): Unaltered request payload.
+        account_id (str): Request account ID.
+    """
+    registration: Registration = Registration(account_id=account_id)
+    reg_type = json_data.get("type", None)
+    if not reg_type and reg_class:
+        registration.registration_type_cl = reg_class
+        reg_type = model_utils.REG_CLASS_TO_REG_TYPE[reg_class]
+        registration.registration_type = reg_type
+        if registration.registration_type_cl in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
+            registration.registration_type = model_utils.amendment_change_type(json_data)
+            if registration.registration_type == model_utils.REG_TYPE_AMEND_COURT:
+                registration.registration_type_cl = model_utils.REG_CLASS_AMEND_COURT
+    else:
+        registration.registration_type_cl = model_utils.REG_TYPE_TO_REG_CLASS[reg_type]
+        registration.registration_type = reg_type
+    if reg_type == model_utils.REG_TYPE_REPAIRER_LIEN:
+        if "lienAmount" in json_data:
+            registration.lien_value = json_data["lienAmount"].strip()
+        if "surrenderDate" in json_data:
+            registration.surrender_date = model_utils.ts_from_date_iso_format(json_data["surrenderDate"])
+        registration.life = model_utils.REPAIRER_LIEN_YEARS
+    elif "lifeInfinite" in json_data and json_data["lifeInfinite"]:
+        registration.life = model_utils.LIFE_INFINITE
+    elif registration.registration_type_cl in (model_utils.REG_CLASS_CROWN, model_utils.REG_CLASS_MISC):
+        registration.life = model_utils.LIFE_INFINITE
+    elif reg_type in (
+        model_utils.REG_TYPE_MARRIAGE_SEPARATION,
+        model_utils.REG_TYPE_TAX_MH,
+        model_utils.REG_TYPE_LAND_TAX_MH,
+    ):
+        registration.life = model_utils.LIFE_INFINITE
+    elif "lifeYears" in json_data:
+        registration.life = json_data["lifeYears"]
+    registration.client_reference_id = json_data.get("clientReferenceId")
+    return registration

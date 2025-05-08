@@ -44,6 +44,7 @@ PARAM_TO_ORDER_BY = {
     "startDateTime": "create_ts",
     "endDateTime": "create_ts",
 }
+DRAFT_PAY_PENDING_PREFIX = "P"  # Special draft number when payment pending.
 
 
 class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -95,7 +96,13 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         if self.update_ts:
             draft["lastUpdateDateTime"] = model_utils.format_ts(self.update_ts)
         if self.document_number:
-            if self.registration_type_cl in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
+            if (
+                not draft.get("amendmentStatement")
+                and not draft.get("changeStatement")
+                and not draft.get("financingStatement")
+            ):
+                draft["documentId"] = self.document_number
+            elif self.registration_type_cl in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
                 draft["amendmentStatement"]["documentId"] = self.document_number
             elif self.registration_type_cl == model_utils.REG_CLASS_CHANGE:
                 draft["changeStatement"]["documentId"] = self.document_number
@@ -147,9 +154,10 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
     @staticmethod
     def __build_account_draft_result(row) -> dict:
         """Build a draft result from a query result set row."""
+        doc_id: str = str(row[0])
         draft_json = {
             "createDateTime": model_utils.format_ts(row[1]),
-            "documentId": str(row[0]),
+            "documentId": doc_id,
             "baseRegistrationNumber": str(row[5]),
             "registrationType": str(row[2]),
             "registrationDescription": str(row[4]),
@@ -161,6 +169,9 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
             "registeringName": str(row[11]) if row[11] else "",
             "clientReferenceId": str(row[8]) if row[8] else "",
         }
+        if doc_id.startswith(DRAFT_PAY_PENDING_PREFIX):
+            draft_json["paymentPending"] = True
+            draft_json["invoiceId"] = str(row[13])
         return draft_json
 
     @classmethod
@@ -184,6 +195,18 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
             message = model_utils.ERR_DRAFT_USED.format(code=code, document_number=document_number)
             raise BusinessException(error=message, status_code=HTTPStatus.BAD_REQUEST)
 
+        return draft
+
+    @classmethod
+    def find_by_invoice_id(cls, invoice_id: str):
+        """Return a draft statement by payment invoice id (payment pending state)."""
+        draft = None
+        if invoice_id:
+            try:
+                draft = db.session.query(Draft).filter(Draft.user_id == invoice_id).one_or_none()
+            except Exception as db_exception:  # noqa: B902; return nicer error
+                logger.error("DB find_by_invoice_id exception: " + str(db_exception))
+                raise DatabaseException(db_exception) from db_exception
         return draft
 
     @classmethod

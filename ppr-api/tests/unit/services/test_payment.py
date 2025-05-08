@@ -16,6 +16,7 @@
 
 Test-Suite to ensure that the client for the pay-api service is working as expected.
 """
+import copy
 import json
 import os
 from http import HTTPStatus
@@ -23,8 +24,8 @@ from http import HTTPStatus
 import pytest
 from flask import current_app
 
-from ppr_api.services.payment.client import SBCPaymentClient, ApiRequestError
-from ppr_api.services.payment import TransactionTypes
+from ppr_api.services.payment.client import SBCPaymentClient, ApiRequestError, CC_REQUEST_PAYMENT_INFO
+from ppr_api.services.payment import PaymentMethods, StatusCodes, TransactionTypes
 from ppr_api.services.payment.payment import Payment
 from ppr_api.services.payment.exceptions import SBCPaymentException
 from ppr_api.services.authz import PPR_ROLE
@@ -41,22 +42,71 @@ PAY_DETAILS_REGISTRATION = {
     'label': 'Reg Number',
     'value': '100468B'
 }
-# testdata pattern is ({pay_trans_type}, {quantity}, {filing_type})
-TEST_PAY_TYPE_FILING_TYPE = [
-    (TransactionTypes.FINANCING_CL.value, 5, 'CLREG'),
-    (TransactionTypes.FINANCING_LIFE_YEAR.value, 5, 'FSREG'),
-    (TransactionTypes.SEARCH.value, 1, 'SERCH'),
-    (TransactionTypes.AMENDMENT.value, 1, 'FSCHG'),
-    (TransactionTypes.CHANGE.value, 1, 'FSCHG'),
-    (TransactionTypes.DISCHARGE.value, 1, 'FSDIS'),
-    (TransactionTypes.FINANCING_FR.value, 1, 'FLREG'),
-    (TransactionTypes.FINANCING_NO_FEE.value, 1, 'NCREG'),
-    (TransactionTypes.FINANCING_INFINITE.value, 1, 'INFRG'),
-    (TransactionTypes.FINANCING_CL_INFINITE.value, 1, 'INFRG'),
-    (TransactionTypes.RENEWAL_INFINITE.value, 1, 'INFRN'),
-    (TransactionTypes.RENEWAL_LIFE_YEAR.value, 3, 'FSREN')
+PAY_DETAILS_CC = {
+    'label': 'CC TEST',
+    'value': 'UNIT TESTING',
+    'ccPayment': True
+}
+PAYMENT_REQUEST_TEMPLATE = {
+    "filingInfo": {
+        "filingIdentifier": "",
+        "folioNumber": "",
+        "filingTypes": [{"filingTypeCode": "", "priority": False, "futureEffective": False, "quantity": 1}],
+    },
+    "businessInfo": {"corpType": "PPR"},
+    "details": [{"label": "", "value": ""}],
+}
+
+# testdata pattern is ({valid}, {filing_type}, {pay_method}, {pay_status})
+TEST_PAY_METHOD_STATUS = [
+    (True, 'SERCH', PaymentMethods.DRAWDOWN.value, StatusCodes.COMPLETED.value),
+    (True, 'SSRCH', PaymentMethods.EJV.value, StatusCodes.COMPLETED.value),
+    (True, 'PPRCD', PaymentMethods.PAD.value, StatusCodes.COMPLETED.value),
+    (True, 'FSCHG', PaymentMethods.DRAWDOWN.value, StatusCodes.APPROVED.value),
+    (True, 'FSREG', PaymentMethods.EJV.value, StatusCodes.APPROVED.value),
+    (True, 'FSREN', PaymentMethods.PAD.value, StatusCodes.APPROVED.value),
+    (True, 'FSDIS', PaymentMethods.INTERNAL.value, StatusCodes.APPROVED.value),
+    (True, 'FSCHG', PaymentMethods.DRAWDOWN.value, StatusCodes.PAID.value),
+    (True, 'FSREG', PaymentMethods.EJV.value, StatusCodes.PAID.value),
+    (True, 'FSREN', PaymentMethods.PAD.value, StatusCodes.PAID.value),
+    (True, 'FSDIS', PaymentMethods.INTERNAL.value, StatusCodes.PAID.value),
+    (True, 'FSCHG', PaymentMethods.CC.value, StatusCodes.CREATED.value),
+    (True, 'FSREG', PaymentMethods.CC.value, StatusCodes.CREATED.value),
+    (True, 'FSREN', PaymentMethods.CC.value, StatusCodes.CREATED.value),
+    (True, 'FSDIS', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
+    (True, 'FSCHG', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
+    (True, 'FSREG', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
+    (True, 'FSREN', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
+    (True, 'FSDIS', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
+    (False, 'SERCH', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
+    (False, 'SSRCH', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
+    (False, 'PPRCD', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
+    (False, 'SERCH', PaymentMethods.CC.value, StatusCodes.CREATED.value),
+    (False, 'SSRCH', PaymentMethods.CC.value, StatusCodes.CREATED.value),
+    (False, 'PPRCD', PaymentMethods.CC.value, StatusCodes.CREATED.value),
 ]
-# testdata pattern is ({pay_trans_type}, {routingSlip}, {bcolNumber}, 'datNUmber', 'waiveFees')
+# testdata pattern is ({pay_trans_type}, {quantity}, {filing_type}, {cc})
+TEST_PAY_TYPE_FILING_TYPE = [
+    (TransactionTypes.FINANCING_CL.value, 5, 'CLREG', False),
+    (TransactionTypes.FINANCING_LIFE_YEAR.value, 5, 'FSREG', False),
+    (TransactionTypes.SEARCH.value, 1, 'SERCH', False),
+    (TransactionTypes.AMENDMENT.value, 1, 'FSCHG', False),
+    (TransactionTypes.CHANGE.value, 1, 'FSCHG', False),
+    (TransactionTypes.DISCHARGE.value, 1, 'FSDIS', False),
+    (TransactionTypes.FINANCING_FR.value, 1, 'FLREG', False),
+    (TransactionTypes.FINANCING_NO_FEE.value, 1, 'NCREG', False),
+    (TransactionTypes.FINANCING_INFINITE.value, 1, 'INFRG', False),
+    (TransactionTypes.FINANCING_CL_INFINITE.value, 1, 'INFRG', False),
+    (TransactionTypes.RENEWAL_INFINITE.value, 1, 'INFRN', False),
+    (TransactionTypes.RENEWAL_LIFE_YEAR.value, 3, 'FSREN', False),
+    (TransactionTypes.FINANCING_CL.value, 5, 'CLREG', True),
+    (TransactionTypes.FINANCING_LIFE_YEAR.value, 5, 'FSREG', True),
+    (TransactionTypes.AMENDMENT.value, 1, 'FSCHG', True),
+    (TransactionTypes.FINANCING_INFINITE.value, 1, 'INFRG', True),
+    (TransactionTypes.RENEWAL_INFINITE.value, 1, 'INFRN', True),
+    (TransactionTypes.RENEWAL_LIFE_YEAR.value, 3, 'FSREN', True),
+ ]
+# testdata pattern is ({pay_trans_type}, {routingSlip}, {bcolNumber}, {datNUmber}, {waiveFees})
 TEST_PAY_STAFF_SEARCH = [
     (TransactionTypes.SEARCH_STAFF_NO_FEE.value, None, None, None, True),
     (TransactionTypes.SEARCH_STAFF.value, '12345', None, None, False),
@@ -67,24 +117,29 @@ TEST_PAY_STAFF_SEARCH = [
     (TransactionTypes.SEARCH_STAFF_CERTIFIED.value, None, '62345', None, False),
     (TransactionTypes.SEARCH_STAFF_CERTIFIED.value, None, '62345', '72345', False)
 ]
-# testdata pattern is ({pay_trans_type}, {routingSlip}, {bcolNumber}, 'datNUmber', 'waiveFees')
+# testdata pattern is ({pay_trans_type}, {routingSlip}, {bcolNumber}, {datNUmber}, {waiveFees}, {cc})
 TEST_PAY_STAFF_REGISTRATION = [
-    (TransactionTypes.DISCHARGE.value, None, None, None, True),
-    (TransactionTypes.FINANCING_NO_FEE.value, None, None, None, True),
-    (TransactionTypes.FINANCING_INFINITE.value, None, None, None, True),
-    (TransactionTypes.FINANCING_CL_INFINITE.value, None, None, None, True),
-    (TransactionTypes.FINANCING_LIFE_YEAR.value, None, None, None, True),
-    (TransactionTypes.FINANCING_LIFE_YEAR.value, '12345', None, None, False),
-    (TransactionTypes.FINANCING_LIFE_YEAR.value, None, '62345', None, False),
-    (TransactionTypes.FINANCING_LIFE_YEAR.value, None, '62345', '72345', False),
-    (TransactionTypes.FINANCING_CL.value, None, None, None, True),
-    (TransactionTypes.FINANCING_CL.value, '12345', None, None, False),
-    (TransactionTypes.FINANCING_CL.value, None, '62345', None, False),
-    (TransactionTypes.FINANCING_CL.value, None, '62345', '72345', False),
-    (TransactionTypes.RENEWAL_LIFE_YEAR.value, None, None, None, True),
-    (TransactionTypes.AMENDMENT.value, '12345', None, None, False),
-    (TransactionTypes.AMENDMENT.value, None, None, None, True),
-    (TransactionTypes.RENEWAL_INFINITE.value, None, '62345', '72345', False)
+    (TransactionTypes.DISCHARGE.value, None, None, None, True, False),
+    (TransactionTypes.FINANCING_NO_FEE.value, None, None, None, True, False),
+    (TransactionTypes.FINANCING_INFINITE.value, None, None, None, True, False),
+    (TransactionTypes.FINANCING_CL_INFINITE.value, None, None, None, True, False),
+    (TransactionTypes.FINANCING_LIFE_YEAR.value, None, None, None, True, False),
+    (TransactionTypes.FINANCING_LIFE_YEAR.value, '12345', None, None, False, False),
+    (TransactionTypes.FINANCING_LIFE_YEAR.value, None, '62345', None, False, False),
+    (TransactionTypes.FINANCING_LIFE_YEAR.value, None, '62345', '72345', False, False),
+    (TransactionTypes.FINANCING_CL.value, None, None, None, True, False),
+    (TransactionTypes.FINANCING_CL.value, '12345', None, None, False, False),
+    (TransactionTypes.FINANCING_CL.value, None, '62345', None, False, False),
+    (TransactionTypes.FINANCING_CL.value, None, '62345', '72345', False, False),
+    (TransactionTypes.RENEWAL_LIFE_YEAR.value, None, None, None, True, False),
+    (TransactionTypes.AMENDMENT.value, '12345', None, None, False, False),
+    (TransactionTypes.AMENDMENT.value, None, None, None, True, False),
+    (TransactionTypes.RENEWAL_INFINITE.value, None, '62345', '72345', False, False),
+    (TransactionTypes.FINANCING_INFINITE.value, None, None, None, False, True),
+    (TransactionTypes.FINANCING_LIFE_YEAR.value, None, None, None, False, True),
+    (TransactionTypes.RENEWAL_LIFE_YEAR.value, None, None, None, False, True),
+    (TransactionTypes.RENEWAL_INFINITE.value, None, None, None, False, True),
+    (TransactionTypes.AMENDMENT.value, None, None, None, False, True),
 ]
 
 
@@ -161,9 +216,9 @@ def test_payment_staff_search_mock(client, jwt, pay_trans_type, routing_slip, bc
     assert pay_data['receipt']
 
 
-@pytest.mark.parametrize('pay_trans_type,routing_slip,bcol_number,dat_number,waive_fees', TEST_PAY_STAFF_REGISTRATION)
+@pytest.mark.parametrize('pay_trans_type,routing_slip,bcol_number,dat_number,waive_fees,cc', TEST_PAY_STAFF_REGISTRATION)
 def test_payment_data_staff_registration(client, jwt, pay_trans_type, routing_slip, bcol_number, dat_number,
-                                         waive_fees):
+                                         waive_fees, cc):
     """Assert that the staff payment payment-request body is as expected for a pay transaction type."""
     transaction_info = {
         'transactionType': pay_trans_type,
@@ -178,8 +233,15 @@ def test_payment_data_staff_registration(client, jwt, pay_trans_type, routing_sl
         transaction_info['bcolAccountNumber'] = bcol_number
     if dat_number:
         transaction_info['datNumber'] = dat_number
+ 
+    token = helper_create_jwt(jwt, [PPR_ROLE])
+    details: dict = PAY_DETAILS_REGISTRATION if not cc else PAY_DETAILS_CC
+    pay_client = SBCPaymentClient(jwt=token, account_id='PS12345', details=details)
+ 
     # test
-    data = SBCPaymentClient.create_payment_staff_registration_data(transaction_info, 'UT-PAY-0001')
+    data = pay_client.create_payment_staff_registration_data(transaction_info, 'UT-PAY-0001')
+    data = pay_client.update_payload_data(data)
+
     # check
     assert data
     assert len(data['filingInfo']['filingTypes']) == 1
@@ -198,15 +260,20 @@ def test_payment_data_staff_registration(client, jwt, pay_trans_type, routing_sl
         assert 'accountInfo' in data and data['accountInfo']['bcolAccountNumber'] == bcol_number
         if dat_number:
             assert data['accountInfo']['datNumber'] == dat_number
+    if cc:
+        assert data.get("paymentInfo") == CC_REQUEST_PAYMENT_INFO
+    else:
+        assert not data.get("paymentInfo")
 
 
-@pytest.mark.parametrize('pay_trans_type,routing_slip,bcol_number,dat_number,waive_fees', TEST_PAY_STAFF_REGISTRATION)
+@pytest.mark.parametrize('pay_trans_type,routing_slip,bcol_number,dat_number,waive_fees,cc', TEST_PAY_STAFF_REGISTRATION)
 def test_payment_staff_registration_mock(client, jwt, pay_trans_type, routing_slip, bcol_number, dat_number,
-                                         waive_fees):
+                                         waive_fees,cc):
     """Assert that a pay-api staff registration payment request works as expected with the mock service endpoint."""
     # setup
     token = helper_create_jwt(jwt, [PPR_ROLE])
-    payment = Payment(jwt=token, account_id=None, details=PAY_DETAILS_REGISTRATION)
+    details: dict = PAY_DETAILS_REGISTRATION if not cc else PAY_DETAILS_CC
+    payment = Payment(jwt=token, account_id=None, details=details)
     payment.api_url = MOCK_URL_NO_KEY
     transaction_info = {
         'transactionType': pay_trans_type,
@@ -229,15 +296,27 @@ def test_payment_staff_registration_mock(client, jwt, pay_trans_type, routing_sl
     assert pay_data
     assert pay_data['invoiceId']
     assert pay_data['receipt']
+    if cc:
+        assert pay_data.get("ccPayment")
+        assert "paymentActionRequired" in pay_data
+        assert "paymentPortalURL" in pay_data
+    else:
+        assert "ccPayment" not in pay_data
+        assert "paymentActionRequired" not in pay_data
+        assert "paymentPortalURL" not in pay_data
 
 
-@pytest.mark.parametrize('pay_trans_type,quantity,filing_type', TEST_PAY_TYPE_FILING_TYPE)
-def test_payment_filing_type(client, jwt, pay_trans_type, quantity, filing_type):
+@pytest.mark.parametrize('pay_trans_type,quantity,filing_type,cc', TEST_PAY_TYPE_FILING_TYPE)
+def test_payment_filing_type(client, jwt, pay_trans_type, quantity, filing_type, cc):
     """Assert that the payment-request body filing type is as expected for a pay transaction type."""
     # setup
+    token = helper_create_jwt(jwt, [PPR_ROLE])
+    details: dict = PAY_DETAILS_REGISTRATION if not cc else PAY_DETAILS_CC
+    pay_client = SBCPaymentClient(jwt=token, account_id='PS12345', details=details)
 
     # test
-    data = SBCPaymentClient.create_payment_data(pay_trans_type, quantity, '200000000', 'UT-PAY-0001')
+    data = pay_client.create_payment_data(pay_trans_type, quantity, '200000000', 'UT-PAY-0001')
+    data = pay_client.update_payload_data(data)
     # check
     assert data
     assert data['filingInfo']['filingIdentifier'] == '200000000'
@@ -246,6 +325,10 @@ def test_payment_filing_type(client, jwt, pay_trans_type, quantity, filing_type)
     assert data['filingInfo']['filingTypes'][0]['quantity'] == quantity
     assert data['filingInfo']['filingTypes'][0]['filingTypeCode'] == filing_type
     assert data['businessInfo']['corpType'] == 'PPR'
+    if cc:
+        assert data.get("paymentInfo") == CC_REQUEST_PAYMENT_INFO
+    else:
+        assert not data.get("paymentInfo")
 
 
 def test_payment_data_all(client, jwt):
@@ -441,6 +524,17 @@ def test_sa_get_token(client, jwt):
     # check
     assert jwt
     assert len(jwt) > 0
+
+
+@pytest.mark.parametrize('valid, filing_type, pay_method, pay_status', TEST_PAY_METHOD_STATUS)
+def test_verify_pay_status(session, client, jwt, valid, filing_type, pay_method, pay_status):
+    """Assert that checking the response status works as expected."""
+    token = helper_create_jwt(jwt, [PPR_ROLE])
+    pay_client = SBCPaymentClient(jwt=token, account_id='PS12345')
+    req_json = copy.deepcopy(PAYMENT_REQUEST_TEMPLATE)
+    req_json["filingInfo"]["filingTypes"][0]["filingTypeCode"] = filing_type
+    result = pay_client.valid_payment_status(pay_method, pay_status, req_json)
+    assert result == valid
 
 
 def is_ci_testing() -> bool:
