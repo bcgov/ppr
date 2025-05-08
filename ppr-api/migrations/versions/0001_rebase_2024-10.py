@@ -1252,7 +1252,9 @@ def upgrade():
         { 'event_tracking_type': 'EMAIL_REPORT', 'event_tracking_desc': 'Email delivery of report.' },
         { 'event_tracking_type': 'REGISTRATION_REPORT', 'event_tracking_desc': 'Registration Verification Statement generation and storage.' },
         { 'event_tracking_type': 'MHR_REG_REPORT', 'event_tracking_desc': 'MHR registration report generation and storage.' },
-        { 'event_tracking_type': 'REG_HIST_JOB', 'event_tracking_desc': 'Job to updated account IDs when registrations become historical.' }
+        { 'event_tracking_type': 'REG_HIST_JOB', 'event_tracking_desc': 'Job to updated account IDs when registrations become historical.' },
+        { 'event_tracking_type': 'PPR_PAYMENT', 'event_tracking_desc': 'PPR registration payment status (credit card).' },
+        { 'event_tracking_type': 'MHR_PAYMENT', 'event_tracking_desc': 'MHR registration payment status (credit card).' }
       ]
     )
     op.bulk_insert(securities_act_type,

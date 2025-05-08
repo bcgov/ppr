@@ -177,6 +177,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
     )
 
     document_number: str = None
+    # Use for pending payments
+    reg_json = None
 
     @property
     def json(self) -> dict:
@@ -733,7 +735,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
 
         if "clientReferenceId" in json_data:
             registration.client_reference_id = json_data["clientReferenceId"]
-
         # Create or update draft.
         draft = Registration.find_draft(json_data, registration.registration_type_cl, reg_type)
         reg_vals = Registration.get_generated_values(draft)
@@ -862,7 +863,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                     and not eval_party.registration_id_end
                 ):
                     party = eval_party
-
         return party
 
     @staticmethod

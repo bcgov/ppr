@@ -101,10 +101,9 @@ class VehicleCollateral(db.Model):  # pylint: disable=too-many-instance-attribut
         collateral = {"vehicleId": self.id, "type": self.vehicle_type}
         if self.year:
             collateral["year"] = self.year
-        if self.make:
-            collateral["make"] = self.make
-        if self.model:
-            collateral["model"] = self.model
+        # Conditionally set empty to pass schema validation when removing.
+        collateral["make"] = self.make if self.make else ""
+        collateral["model"] = self.model if self.model else ""
         if self.serial_number:
             collateral["serialNumber"] = self.serial_number
         if self.mhr_number:

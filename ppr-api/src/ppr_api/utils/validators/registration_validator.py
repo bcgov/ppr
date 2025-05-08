@@ -16,14 +16,14 @@
 Validation includes verifying delete collateral ID's and timestamps.
 """
 
-from ppr_api.models import ClientCode, FinancingStatement, VehicleCollateral
+from ppr_api.models import ClientCode, FinancingStatement, Registration, VehicleCollateral
 from ppr_api.models import registration_utils as reg_utils
 from ppr_api.models import utils as model_utils
 from ppr_api.models.registration import MiscellaneousTypes
 
 # from ppr_api.utils.logging import logger
 
-
+REG_STATUS_LOCKED = "L"
 COURT_ORDER_INVALID = "CourtOrderInformation is not allowed with a base registration type of {}. "
 COURT_ORDER_MISSING = "Required courtOrderInformation is missing. "
 COURT_ORDER_INVALID_DATE = (
@@ -45,6 +45,7 @@ SE_AMEND_SP_INVALID = "Secured Parties may not be changed when amending a Securi
 SE_DELETE_INVALID = "At least one Securities Act Notice is required. "
 SE_DELETE_MISSING_ID = "Required noticeId missing in delete Securities Act Notice. "
 SE_DELETE_INVALID_ID = "Invalid deleteId {} in delete Securities Act Notice. "
+STATE_INVALID_PAY_LOCKED = "Base registration change not allowed: payment pending on prior change. "
 
 
 def validate_registration(json_data: dict, account_id: str, financing_statement=None) -> str:
@@ -52,13 +53,15 @@ def validate_registration(json_data: dict, account_id: str, financing_statement=
     error_msg: str = ""
     if "authorizationReceived" not in json_data or not json_data["authorizationReceived"]:
         error_msg += AUTHORIZATION_INVALID
+    if financing_statement:
+        error_msg += validate_pending_state(financing_statement.registration[0])
     error_msg += validate_collateral(json_data, financing_statement)
     error_msg += validate_securities_act_access(account_id, financing_statement)
     error_msg += validate_securities_act_notices(financing_statement, json_data)
     return error_msg
 
 
-def validate_renewal(json_data, financing_statement) -> str:
+def validate_renewal(json_data: dict, financing_statement: FinancingStatement) -> str:
     """Perform all renewal registration data validation checks not covered by schema validation."""
     error_msg: str = ""
     if "authorizationReceived" not in json_data or not json_data["authorizationReceived"]:
@@ -66,7 +69,7 @@ def validate_renewal(json_data, financing_statement) -> str:
 
     if not financing_statement:
         return error_msg
-
+    error_msg += validate_pending_state(financing_statement.registration[0])
     rl_renewal: bool = reg_utils.is_rl_renewal(financing_statement.registration[0].registration_type)
     error_msg += validate_life(json_data, financing_statement, rl_renewal)
     if rl_renewal:
@@ -190,4 +193,12 @@ def validate_securities_act_notices(statement: FinancingStatement, json_data: di
                 notice = reg_utils.find_securities_notice_by_id(notice_id, statement)
                 if not notice or notice.registration_id_end is not None:
                     error_msg += SE_DELETE_INVALID_ID.format(str(notice_id))
+    return error_msg
+
+
+def validate_pending_state(base_reg: Registration) -> str:
+    """Verify base registration is not locked because of previous change pending payment completion."""
+    error_msg: str = ""
+    if base_reg and base_reg.ver_bypassed == REG_STATUS_LOCKED:
+        error_msg += STATE_INVALID_PAY_LOCKED
     return error_msg

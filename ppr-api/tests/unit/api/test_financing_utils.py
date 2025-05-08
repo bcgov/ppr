@@ -27,12 +27,17 @@ from ppr_api.resources import financing_utils as fs_utils
 from ppr_api.services.payment.client import SBCPaymentClient
 
 
+CC_PAYREF = {"invoiceId": "88888888", "receipt": "receipt", "ccPayment": True}
 # testdata pattern is ({desc}, {status}, {reg_id}, is_create)
 TEST_REGISTRATION_GET_DATA = [
     ('Valid POST', HTTPStatus.CREATED, 200000011, True),
     ('Valid GET', HTTPStatus.OK, 200000011, False),
     ('Pending', HTTPStatus.ACCEPTED, 200000000, False),
     ('Pending', HTTPStatus.ACCEPTED, 200000000, True),
+]
+# testdata pattern is ({pay_ref}, {account_id}, {username}, {usergroup})
+TEST_SETUP_CC_PAYMENT= [
+    (CC_PAYREF, "1234", "username", "ppr_staff")
 ]
 
 
@@ -80,6 +85,17 @@ def test_get_registration_callback_report(session, client, jwt):
     # check
     assert status == HTTPStatus.OK
     assert response_data == {}
+
+
+@pytest.mark.parametrize('pay_ref, account_id, username, usergroup',TEST_SETUP_CC_PAYMENT)
+def test_cc_payment_setup(session, client, jwt, pay_ref, account_id, username, usergroup):
+    """Assert that setting up the pay api invoice information by doc type works as expected."""
+    reg_json = {}
+    reg_json = fs_utils.setup_cc_draft(reg_json, pay_ref, account_id, username)
+    assert reg_json.get("payment")
+    assert reg_json["payment"] == pay_ref
+    assert reg_json.get("accountId") == account_id
+    assert reg_json.get("username") == username
 
 
 def is_ci_testing() -> bool:

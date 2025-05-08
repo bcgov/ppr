@@ -26,6 +26,7 @@ from registry_schemas.example_data.ppr import DRAFT_AMENDMENT_STATEMENT, DRAFT_C
 
 from ppr_api.exceptions import BusinessException
 from ppr_api.models import Draft, utils as model_utils
+from ppr_api.models.type_tables import RegistrationTypes
 from ppr_api.models.utils import now_ts
 from ppr_api.models.registration_utils import AccountRegistrationParams
 
@@ -71,6 +72,11 @@ TEST_QUERY_FILTER_DATA = [
     ('D-T-', None, 'A-00000', None, None, None),
     ('D-T-', None, None, None, '2022-01-22T16:00:00+00:00', '2022-01-28T16:00:00+00:00'),
     (None, 'SA', None, None, '2022-01-22T16:00:00+00:00', '2022-01-28T16:00:00+00:00')
+]
+# testdata pattern is ({account_id}, {base_reg_num}, {exists}, {reg_type}, {draft_data})
+TEST_INVOICE_DATA = [
+    ('PS12345', '125234', False, RegistrationTypes.AM.value, DRAFT_AMENDMENT_STATEMENT),
+    ('PS12345', '125234', True, RegistrationTypes.AM.value, DRAFT_AMENDMENT_STATEMENT)
 ]
 
 
@@ -171,6 +177,22 @@ def test_save_then_delete(session):
     document_id = draft['changeStatement']['documentId']
     delete_draft = Draft.delete(document_id)
     assert delete_draft
+
+
+@pytest.mark.parametrize('account_id, base_reg_num, exists, reg_type, draft_data', TEST_INVOICE_DATA)
+def test_find_by_invoice(session, account_id, base_reg_num, exists, reg_type, draft_data):
+    """Assert that finding a draft by invoice id returns the expected result."""
+    invoice_id: str = "98888888"
+    json_data = copy.deepcopy(draft_data)
+    if exists:
+        new_draft: Draft = Draft.create_from_json(draft_data, account_id, invoice_id)
+        new_draft.registration_number = base_reg_num
+        new_draft.save()
+    test_draft: Draft = Draft.find_by_invoice_id(invoice_id)
+    if exists:
+        assert test_draft
+    else:
+        assert not test_draft
 
 
 def test_update(session):

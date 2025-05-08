@@ -15,7 +15,8 @@
 import copy
 
 import pytest
-
+from registry_schemas.example_data.ppr import DISCHARGE_STATEMENT
+ 
 from ppr_api.models import FinancingStatement, utils as model_utils
 from ppr_api.models.registration import CrownChargeTypes
 from ppr_api.models.type_tables import RegistrationType, RegistrationTypes
@@ -510,6 +511,12 @@ TEST_AMEND_RL_DATA = [
     ('Valid before transition', True, 1, None),
     ('Valid after transition', True, -1, None),
 ]
+# testdata pattern is ({base_reg_num}, {json_data}, {valid}, {renewal}, {message content})
+TEST_PAY_LOCKED_DATA = [
+    ('TEST0001', RENEWAL_SA_VALID, False, True, validator.STATE_INVALID_PAY_LOCKED),
+    ('TEST0017', AMENDMENT_VALID, False, True, validator.STATE_INVALID_PAY_LOCKED),
+    ('TEST0001', DISCHARGE_STATEMENT, False, True, validator.STATE_INVALID_PAY_LOCKED),
+]
 
 
 @pytest.mark.parametrize('desc,valid,act_offset,message_content', TEST_AMEND_RL_DATA)
@@ -660,3 +667,26 @@ def test_amend_crown_charge_sc(session):
         if error_msg != '':
             print(error_msg)
         assert error_msg == ''
+
+
+@pytest.mark.parametrize('base_reg_num,data,valid,renewal,message_content', TEST_PAY_LOCKED_DATA)
+def test_validate_pay_pending(session, base_reg_num, data, valid, renewal, message_content):
+    """Assert that registration locked due to pay pending validation works as expected."""
+    json_data = copy.deepcopy(data)
+    # setup
+    account_id: str = 'PS12345'
+    error_msg: str = ""
+    statement: FinancingStatement = FinancingStatement.find_by_registration_number(base_reg_num, account_id, False)
+    assert statement
+    if not valid:
+        statement.registration[0].ver_bypassed = validator.REG_STATUS_LOCKED
+    # test
+    if renewal:
+        error_msg = validator.validate_renewal(json_data, statement)
+    else:
+        error_msg = validator.validate_registration(json_data, account_id, statement)
+    if valid:
+        assert error_msg == ''
+    elif message_content:
+        assert error_msg != ''
+        assert error_msg.find(message_content) != -1
