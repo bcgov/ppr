@@ -16,7 +16,10 @@ import type {
   SearchResponseIF,
   StaffPaymentIF,
   AdminRegistrationIF,
-  MhrHistoryRoIF
+  MhrHistoryRoIF,
+  MhrTransportPermitIF,
+  MhrTransferApiIF,
+  NewMhrRegistrationApiIF
 } from '@/interfaces'
 import type { APIMhrTypes, ApiTransferTypes} from '@/enums'
 import { ErrorCategories, ErrorCodes, ErrorRootCauses, StaffPaymentOptions } from '@/enums'
@@ -24,7 +27,6 @@ import { useSearch } from '@/composables/useSearch'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { addTimestampToDate } from '@/utils'
 import { trim } from 'lodash'
- 
 import type { AxiosError } from 'axios'
 
 // Create default request base URL and headers.
@@ -104,6 +106,9 @@ function mhrStaffPaymentParameters (staffPayment: StaffPaymentIF) {
       case StaffPaymentOptions.BCOL:
         paymentParams = paymentParams + 'bcolAccountNumber=' + staffPayment.bcolAccountNumber
         paymentParams = paymentParams + '&datNumber=' + staffPayment.datNumber
+        break
+      case StaffPaymentOptions.CREDIT_CARD:
+        paymentParams = paymentParams + 'ccPayment=true'
         break
     }
     if (staffPayment.isPriority) {
@@ -299,7 +304,10 @@ export async function searchMhrPDF (searchId: string): Promise<any> {
     })
 }
 
-export async function submitMhrRegistration (payloadData, staffPayment) {
+export async function submitMhrRegistration (
+  payloadData: NewMhrRegistrationApiIF,
+  staffPayment: StaffPaymentIF
+) {
   try {
     // assuming the staffPayment is always available because of validation
     const paymentParams = mhrStaffPaymentParameters(staffPayment)
@@ -416,10 +424,16 @@ export async function validateDocumentID (documentId: string) {
   }
 }
 
-export async function submitMhrTransfer (payloadData, mhrNumber, staffPayment) {
-  const paymentParams = `?${mhrStaffPaymentParameters(staffPayment)}`
+export async function submitMhrTransfer (
+  payloadData: MhrTransferApiIF,
+  mhrNumber: string,
+  staffPayment: StaffPaymentIF
+) {
+  const paymentParams = mhrStaffPaymentParameters(staffPayment)
+  const url = `transfers/${mhrNumber}?${paymentParams}`
+
   try {
-    const result = await axios.post(`transfers/${mhrNumber}${paymentParams}`, payloadData, getDefaultConfig())
+    const result = await axios.post(url, payloadData, getDefaultConfig())
     if (!result?.data) {
       throw new Error('Invalid API response')
     }
@@ -495,12 +509,16 @@ export async function submitMhrUnitNote (mhrNumber, payloadData, isAdminRegistra
 }
 
 // File a Transport Permit
-export async function submitMhrTransportPermit (mhrNumber, payloadData, staffPayment) {
+export async function submitMhrTransportPermit (
+  mhrNumber: string,
+  payloadData: MhrTransportPermitIF,
+  staffPayment: StaffPaymentIF
+) {
   try {
     const paymentParams = mhrStaffPaymentParameters(staffPayment)
-    const endpoint = `permits/${mhrNumber}`
+    const url = `permits/${mhrNumber}?${paymentParams}`
 
-    const result = await axios.post(`${endpoint}?${paymentParams}`, payloadData, getDefaultConfig())
+    const result = await axios.post(url, payloadData, getDefaultConfig())
     if (!result?.data) {
       throw new Error('Invalid API response')
     }

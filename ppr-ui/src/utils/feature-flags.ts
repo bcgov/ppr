@@ -27,6 +27,7 @@ export const defaultFlagSet: LDFlagSet = {
   'mhr-re-issue-permit-enabled': false, // Enables Create New and Extend Transport Permit: Staff Targeted for now
   'drs-integration-enabled': false, // Enables connections to Documents Record
   'mhr-enhanced-dealers-enabled': false, // Enables Dealer permissions for MHR Permits and Transfers
+  'mhr-credit-card-enabled': true, // Enables credit card payment processing for MHR Products
   'sentry-enable': false, // by default, no sentry logs
   'banner-text': '' // by default, there is no banner text
 }

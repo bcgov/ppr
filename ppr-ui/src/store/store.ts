@@ -55,7 +55,8 @@ import type {
   MhrTransportPermitIF,
   MhrRegistrationHomeLocationWithoutAddressIF,
   ExemptionNoteIF,
-  AddEditSaNoticeIF
+  AddEditSaNoticeIF,
+  PaymentInfoIF
 } from '@/interfaces'
 import type {
   LocationChangeTypes,
@@ -68,11 +69,12 @@ import {
   AccountTypes,
   APIRegistrationTypes,
   AuthRoles,
+  PaymentTypes,
   ProductCode,
   RegistrationFlowType,
   RouteNames
 } from '@/enums'
-import type { ComputedRef} from 'vue';
+import type { ComputedRef} from 'vue'
 import { computed, ref, toRefs } from 'vue'
 import { useMhrCorrections, useMhrValidations } from '@/composables'
 import { MhrSectVal } from '@/composables/mhrRegistration/enums'
@@ -141,6 +143,9 @@ export const useStore = defineStore('assetsStore', () => {
   })
   const isPremiumAccount = computed((): boolean => {
     return (state.value.accountInformation?.accountType === AccountTypes.PREMIUM)
+  })
+  const isCreditCardPreferredPayment = computed((): boolean => {
+    return state.value.accountPaymentInformation?.paymentMethod === PaymentTypes.DIRECT_PAY
   })
   const isRoleStaffReg = computed((): boolean => {
     return state.value.authorization?.authRoles.includes(AuthRoles.PPR_STAFF)
@@ -1007,6 +1012,10 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.accountProductSubscriptions = productSubscriptions
   }
 
+  function setAccountPaymentInformation (paymentInfo: PaymentInfoIF) {
+    state.value.accountPaymentInformation = paymentInfo
+  }
+
   function setUserProductSubscriptions (products: UserProductSubscriptionIF[]) {
     state.value.userProductSubscriptions = products
   }
@@ -1584,6 +1593,7 @@ export const useStore = defineStore('assetsStore', () => {
     getAccountId,
     getAccountLabel,
     isPremiumAccount,
+    isCreditCardPreferredPayment,
     getAccountProductSubscriptions,
     getUserProductSubscriptions,
     getUserProductSubscriptionsCodes,
@@ -1789,6 +1799,7 @@ export const useStore = defineStore('assetsStore', () => {
     resetNewRegistration,
     resetRegTableData,
     setAccountProductSubscription,
+    setAccountPaymentInformation,
     setUserProductSubscriptions,
     setUserProductSubscriptionsCodes,
     setAccountInformation,

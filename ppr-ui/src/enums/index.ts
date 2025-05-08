@@ -15,6 +15,7 @@ export * from './registrationTypes'
 export * from './registrationFlowTypes'
 export * from './tableActions'
 export * from './vehicleTypes'
+export * from './paymentTypes'
 export * from './productType'
 export * from './productStatus'
 export * from './productCode'
@@ -40,4 +41,5 @@ export enum StaffPaymentOptions {
   NO_FEE = 0,
   FAS = 1,
   BCOL = 2,
+  CREDIT_CARD = 3
 }

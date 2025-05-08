@@ -46,7 +46,7 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
     const { goToDash, navigateToUrl } = useNavigation()
-    const { isAuthenticated, loadAccountProductSubscriptions, initializeUserProducts } = useAuth()
+    const { isAuthenticated, loadAccountProductSubscriptions, initializeUserProducts, loadPaymentInfo } = useAuth()
     const {
       // Actions
       setRoleSbc,
@@ -223,6 +223,14 @@ export default defineComponent({
         console.error('Auth product subscription error = ', error)
       }
 
+      if (getFeatureFlag('mhr-credit-card-enabled')) {
+        try {
+          await loadPaymentInfo()
+        } catch (error) {
+          console.error('Fetch payment information error = ', error)
+        }
+      }
+
       // update Launch Darkly
       try {
         await updateLaunchDarkly()
@@ -374,7 +382,7 @@ export default defineComponent({
     }
 
     const handleError = (error: ErrorIF): void => {
-      switch (error.category) {
+      switch (error?.category) {
         case ErrorCategories.ACCOUNT_ACCESS:
           localState.errorOptions = authPprError
           localState.errorDisplay = true

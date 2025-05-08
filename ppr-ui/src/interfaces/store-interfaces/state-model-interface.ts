@@ -34,7 +34,8 @@ import type {
   StaffPaymentIF,
   MhrTransportPermitIF,
   AddEditSaNoticeIF,
-  MhrRegistrationHomeOwnerGroupIF
+  MhrRegistrationHomeOwnerGroupIF,
+  PaymentInfoIF
 } from '@/interfaces'
 import type { UnitNoteIF } from '@/interfaces/unit-note-interfaces/unit-note-interface'
 
@@ -43,6 +44,7 @@ export interface StateModelIF {
   accountInformation: AccountInformationIF
   isAccountAdministrator: boolean
   accountProductSubscriptions: AccountProductSubscriptionIF
+  accountPaymentInformation: PaymentInfoIF
   userProductSubscriptions: Array<UserProductSubscriptionIF>
   userProductSubscriptionsCodes: Array<ProductCode>
   authorization: AuthorizationIF
