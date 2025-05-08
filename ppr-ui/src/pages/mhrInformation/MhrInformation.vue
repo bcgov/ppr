@@ -896,7 +896,7 @@ export default defineComponent({
 
     // Payment Urls
     const authWebPayUrl = `${useRuntimeConfig()?.public.VUE_APP_AUTH_WEB_URL}/makePayment`
-    const homeRedirectUrl = `${useRuntimeConfig()?.public.BASE_URL}`
+    const homeRedirectUrl = sessionStorage.getItem('BASE_URL')
 
 
     const localState = reactive({
