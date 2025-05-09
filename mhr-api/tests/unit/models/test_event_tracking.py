@@ -49,7 +49,9 @@ TEST_DATA_CREATE = [
     ('Notification', 200000011, EventTracking.EventTrackingTypes.API_NOTIFICATION, int(HTTPStatus.OK), 'message'),
     ('Email', 200000012, EventTracking.EventTrackingTypes.EMAIL, int(HTTPStatus.OK), 'message'),
     ('Surface mail', 200000013, EventTracking.EventTrackingTypes.SURFACE_MAIL, int(HTTPStatus.OK), 'message'),
-    ('Email report', 200000014, EventTracking.EventTrackingTypes.EMAIL_REPORT, int(HTTPStatus.OK), 'message')
+    ('Email report', 200000014, EventTracking.EventTrackingTypes.EMAIL_REPORT, int(HTTPStatus.OK), 'message'),
+    ('CC payment', 200000015, EventTracking.EventTrackingTypes.MHR_PAYMENT, int(HTTPStatus.OK),
+     'Payment pending initial state.')
 ]
 # testdata pattern is ({description}, {results_size}, {key_id}, {type}, extra_key)
 TEST_DATA_KEY_ID_TYPE_EXTRA = [

@@ -12,9 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Helper methods for saving draft and registration info when payment is by credit card."""
+from http import HTTPStatus
+
 from sqlalchemy.sql import text
 
-from mhr_api.models import MhrDescription, MhrDocument, MhrDraft, MhrLocation, MhrNote, MhrParty, MhrRegistration, db
+from mhr_api.models import (
+    EventTracking,
+    MhrDescription,
+    MhrDocument,
+    MhrDraft,
+    MhrLocation,
+    MhrNote,
+    MhrParty,
+    MhrRegistration,
+    db,
+)
 from mhr_api.models import registration_change_utils as change_utils
 from mhr_api.models import registration_utils as reg_utils
 from mhr_api.models import utils as model_utils
@@ -34,6 +46,30 @@ DRAFT_QUERY_PKEYS = """
 select get_mhr_draft_number() AS draft_num,
        nextval('mhr_draft_id_seq') AS draft_id
 """
+TRACKING_MESSAGES = {
+    "00": "00: default credit card payment update error for invoice id={invoice_id}.",
+    "01": "01: credit card payment set up complete for invoice id={invoice_id}.",
+    "02": "02: credit card payment update set up error for invoice id={invoice_id}.",
+    "03": "03: credit card payment update error no draft found for invoice id={invoice_id}.",
+    "04": "04: credit card payment update error no registration for invoice id={invoice_id}.",
+    "05": "05: credit card payment update pay status CANCELLED for invoice id={invoice_id}.",
+    "06": "06: credit card payment update draft pending status CANCELLED for invoice id={invoice_id}.",
+    "09": "09: credit card payment completed successfully for invoice id={invoice_id}.",
+    "10": "10: create registration successful for cc payment invoice id={invoice_id}.",
+}
+
+
+def track_event(code: str, invoice_id: str, status_code: int, message: str = None):
+    """Capture a cc payment event in the event tracking table."""
+    msg: str = TRACKING_MESSAGES[code].format(invoice_id=invoice_id)
+    if message:
+        msg += " " + message
+    if status_code not in (HTTPStatus.OK, HTTPStatus.CREATED, HTTPStatus.ACCEPTED):
+        logger.error(msg)
+    else:
+        logger.info(msg)
+    EventTracking.create(int(invoice_id), EventTracking.EventTrackingTypes.MHR_PAYMENT, status_code, msg)
+    return msg
 
 
 def create_new_draft(json_data: dict) -> MhrDraft:
@@ -84,12 +120,11 @@ def save_change_cc_draft(base_reg: MhrRegistration, json_data: dict) -> MhrRegis
     draft.save()
     registration.draft = draft
     registration.reg_json = json_data
-    logger.info("Created minimal registration with saved draft: return draft.json in response.")
     # Lock the base registration here:
     base_reg.status_type = MhrRegistrationStatusTypes.DRAFT.value
     logger.info(f"Locking mhr {draft.mhr_number}: status changed from {current_status} to {base_reg.status_type}.")
     base_reg.save()
-
+    track_event("01", int(json_data["payment"].get("invoiceId")), HTTPStatus.OK, "Change registration draft saved.")
     return registration
 
 
@@ -115,7 +150,7 @@ def save_new_cc_draft(json_data: dict) -> MhrRegistration:
     draft.save()
     registration.draft = draft
     registration.reg_json = json_data
-    logger.info("Created minimal registration with saved draft: return draft.json in response.")
+    track_event("01", int(json_data["payment"].get("invoiceId")), HTTPStatus.OK, "New registration draft saved.")
     return registration
 
 

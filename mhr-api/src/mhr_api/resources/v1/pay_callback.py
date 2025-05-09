@@ -45,6 +45,11 @@ CALLBACK_MESSAGES = {
     resource_utils.CallbackExceptionCodes.DEFAULT: "04: default error for invoice id={key_id}.",
     resource_utils.CallbackExceptionCodes.SETUP_ERR: "10: setup failed for invoice id={key_id}.",
 }
+PAY_STATUS_MISSING_MSG = "Expected payment status missing in payload."
+PAY_STATUS_INVALID_MSG = "Payment status {pay_status} not an allowed value."
+PAY_CANCELLED_MSG = "Payment status cancelled/deleted: draft reverted."
+PAY_NO_REG_MSG = "Change no MH found for MHR#={mhr_num}."
+PAY_REG_SUCCESS_MSG = "Registration created reg_id={reg_id} MHR#={mhr_num}."
 
 
 @bp.route("/<string:invoice_id>", methods=["POST", "OPTIONS"])
@@ -63,40 +68,22 @@ def post_payment_callback(invoice_id: str):  # pylint: disable=too-many-return-s
         pay_status: str = request_json.get("statusCode") if request_json else None
         logger.info(f"pay callback request payload={request_json}")
         if not pay_status:
-            return pay_callback_error(
-                resource_utils.CallbackExceptionCodes.SETUP_ERR,
-                invoice_id,
-                HTTPStatus.BAD_REQUEST,
-                "Expected payment status missing in payload.",
-            )
+            return pay_callback_error("02", invoice_id, HTTPStatus.BAD_REQUEST, PAY_STATUS_MISSING_MSG)
         elif pay_status not in ALLOWED_PAY_STATUS:
-            return pay_callback_error(
-                resource_utils.CallbackExceptionCodes.SETUP_ERR,
-                invoice_id,
-                HTTPStatus.BAD_REQUEST,
-                f"Payment status {pay_status} not an allowed value.",
-            )
+            error_msg: str = PAY_STATUS_INVALID_MSG.format(pay_status=pay_status)
+            return pay_callback_error("02", invoice_id, HTTPStatus.BAD_REQUEST, error_msg)
         draft: MhrDraft = MhrDraft.find_by_invoice_id(invoice_id)
         if not draft:
-            return pay_callback_error(
-                resource_utils.CallbackExceptionCodes.UNKNOWN_ID, invoice_id, HTTPStatus.NOT_FOUND
-            )
-        # Check if payment already processed:
-        if pay_completed_registration(draft, invoice_id):
-            return pay_callback_error(
-                resource_utils.CallbackExceptionCodes.INVALID_ID, invoice_id, HTTPStatus.BAD_REQUEST
-            )
+            # Handles payment notification update previously successful.
+            return pay_callback_error("03", invoice_id, HTTPStatus.NOT_FOUND)
         base_reg: MhrRegistration = None
         if draft.mhr_number:
             base_reg = MhrRegistration.find_all_by_mhr_number(draft.mhr_number, draft.account_id, True)
         if not base_reg and draft.mhr_number:
-            return pay_callback_error(
-                resource_utils.CallbackExceptionCodes.UNKNOWN_ID,
-                invoice_id,
-                HTTPStatus.NOT_FOUND,
-                f"Change no registration found for MHR={draft.mhr_number}.",
-            )
+            error_msg: str = PAY_NO_REG_MSG.format(mhr_num=draft.mhr_number)
+            return pay_callback_error("04", invoice_id, HTTPStatus.NOT_FOUND, error_msg)
         logger.info(f"Request valid for invoice id={invoice_id}, creating registration.")
+        cc_payment_utils.track_event("09", invoice_id, HTTPStatus.OK, None)
         return complete_registration(draft, base_reg, request_json)
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception, None, "POST pay callback event")
@@ -111,22 +98,8 @@ def post_payment_callback(invoice_id: str):  # pylint: disable=too-many-return-s
 
 def pay_callback_error(code: str, key_id: int, status_code, message: str = None):
     """Return the payment event listener callback error response based on the code."""
-    error: str = CALLBACK_MESSAGES[code].format(key_id=key_id)
-    if message:
-        error += " " + message
+    error: str = cc_payment_utils.track_event(code, key_id, status_code, message)
     return resource_utils.error_response(status_code, error)
-
-
-def pay_completed_registration(draft: MhrDraft, invoice_id: str) -> bool:
-    """Verify by invoice id if the payment has already been processed."""
-    logger.info(f"Checking userid={draft.user_id} invoice_id={invoice_id} draft_num={draft.draft_number}")
-    if draft.user_id and draft.user_id != invoice_id:
-        return True
-    if draft.draft_number:
-        draft_num = str(draft.draft_number)
-        if not draft_num.startswith(DRAFT_PAY_PENDING_PREFIX):
-            return True
-    return False
 
 
 def update_registration_status(draft: MhrDraft, base_reg: MhrRegistration):
@@ -137,6 +110,8 @@ def update_registration_status(draft: MhrDraft, base_reg: MhrRegistration):
         base_reg.status_type = orig_status
         base_reg.save()
         logger.info(f"Home status for MHR# {base_reg.mhr_number} restored to {orig_status}")
+    else:
+        logger.info("No existing home found: unlock status update skipped.")
 
 
 def update_draft(draft: MhrDraft):
@@ -262,6 +237,7 @@ def complete_registration(draft: MhrDraft, base_reg: MhrRegistration, request_js
         reg_type: str = draft.registration_type
         logger.info(f"Completing registration for pay status={status} reg_type={reg_type}")
         if request_json.get("statusCode") in (StatusCodes.CANCELLED.value, StatusCodes.DELETED.value):
+            cc_payment_utils.track_event("05", draft.user_id, HTTPStatus.OK, PAY_CANCELLED_MSG)
             return update_draft(draft)
         new_reg: MhrRegistration = None
         if reg_type == MhrRegistrationTypes.MHREG:
@@ -281,6 +257,10 @@ def complete_registration(draft: MhrDraft, base_reg: MhrRegistration, request_js
         elif reg_type in (MhrRegistrationTypes.EXEMPTION_RES, MhrRegistrationTypes.EXEMPTION_NON_RES):
             new_reg = cc_payment_utils.create_change_registration(draft, base_reg)
             queue_exemption(draft, base_reg, new_reg)
+        msg: str = None
+        if new_reg:
+            msg = PAY_REG_SUCCESS_MSG.format(reg_id=new_reg.id, mhr_num=new_reg.mhr_number)
+        cc_payment_utils.track_event("10", draft.user_id, HTTPStatus.OK, msg)
         return update_draft(draft)
     except Exception as default_err:  # noqa: B902; return nicer default error
         return pay_callback_error(

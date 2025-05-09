@@ -46,14 +46,14 @@ PUB_SUB_PAYLOAD = {
 # testdata pattern is ({desc}, {status}, {draft_json}, {mhr_num}, {reg_type}, {invoice_id})
 TEST_CALLBACK_DATA = [
     ('Valid new reg', HTTPStatus.OK, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
-#    ('Valid exemption', HTTPStatus.OK, EXEMPTION, "000919", MhrRegistrationTypes.EXEMPTION_RES.value, "20000101"),
-#    ('Valid permit', HTTPStatus.OK, PERMIT, "000900", MhrRegistrationTypes.PERMIT.value, "20000102"),
-#    ('Valid transfer', HTTPStatus.OK, TRANSFER, "000919", MhrRegistrationTypes.TRANS.value, "20000103"),
-#    ('Invalid no key', HTTPStatus.UNAUTHORIZED, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
-#    ('Invalid missing payload', HTTPStatus.BAD_REQUEST, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
-#    ('Invalid missing status', HTTPStatus.BAD_REQUEST, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
-#    ('Invalid status', HTTPStatus.BAD_REQUEST, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
-#    ('Invalid used', HTTPStatus.OK, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
+    ('Valid exemption', HTTPStatus.OK, EXEMPTION, "000919", MhrRegistrationTypes.EXEMPTION_RES.value, "20000101"),
+    ('Valid permit', HTTPStatus.OK, PERMIT, "000900", MhrRegistrationTypes.PERMIT.value, "20000102"),
+    ('Valid transfer', HTTPStatus.OK, TRANSFER, "000919", MhrRegistrationTypes.TRANS.value, "20000103"),
+    ('Invalid no key', HTTPStatus.UNAUTHORIZED, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
+    ('Invalid missing payload', HTTPStatus.BAD_REQUEST, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
+    ('Invalid missing status', HTTPStatus.BAD_REQUEST, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
+    ('Invalid status', HTTPStatus.BAD_REQUEST, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
+    ('Invalid used', HTTPStatus.OK, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
 ]
 
 
