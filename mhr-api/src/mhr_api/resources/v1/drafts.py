@@ -27,6 +27,7 @@ from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrRegistrati
 from mhr_api.resources import utils as resource_utils
 from mhr_api.resources.cc_payment_utils import track_event
 from mhr_api.services.authz import authorized, is_staff
+from mhr_api.services.payment.client import SBCPaymentClient
 from mhr_api.utils.auth import jwt
 from mhr_api.utils.logging import logger
 
@@ -173,9 +174,27 @@ def delete_drafts(draft_number: str):  # pylint: disable=too-many-return-stateme
         # Verify request JWT and account ID
         if not authorized(account_id, jwt):
             return resource_utils.unauthorized_error_response(account_id)
-
+        draft: MhrDraft = MhrDraft.find_by_draft_number(draft_number, False)
         # Try to delete draft by draft number.
         MhrDraft.delete(draft_number)
+        draft_number: str = draft.draft_number
+        logger.info(f"Draft number {draft_number} deleted.")
+        if (
+            draft_number.startswith(DRAFT_PAY_PENDING_PREFIX)
+            and draft.registration_type != MhrRegistrationTypes.MHREG.value
+            and draft.mhr_number
+        ):
+            staff: bool = is_staff(jwt)
+            invoice_id: str = draft.user_id
+            orig_status: str = draft.draft.get("status")
+            mhr_reg: MhrRegistration = MhrRegistration.find_all_by_mhr_number(draft.mhr_number, draft.account_id, staff)
+            if mhr_reg and mhr_reg.status_type == MhrRegistrationStatusTypes.DRAFT:
+                logger.info(f"Reverting mhr {mhr_reg.mhr_number} status to {orig_status}")
+                mhr_reg.status_type = orig_status
+                mhr_reg.save()
+                logger.info(f"Home status for MHR# {mhr_reg.mhr_number} restored to {orig_status}")
+            track_event("06", invoice_id, HTTPStatus.OK, None)
+            cancel_pending_payment(jwt.get_token_auth_header(), account_id, invoice_id)
         return "", HTTPStatus.NO_CONTENT
     except BusinessException as exception:
         return resource_utils.business_exception_response(exception)
@@ -189,7 +208,7 @@ def delete_drafts(draft_number: str):  # pylint: disable=too-many-return-stateme
 @cross_origin(origin="*")
 @jwt.requires_auth
 def cancel_pending_drafts(draft_number: str):
-    """Delete a draft registration by draft number."""
+    """Cancel a payment pending draft by draft number: restore to a draft state."""
     try:
         logger.info(f"cancel_pending_drafts draft_number={draft_number}")
         if draft_number is None:
@@ -219,6 +238,7 @@ def cancel_pending_drafts(draft_number: str):
                 mhr_reg.save()
                 logger.info(f"Home status for MHR# {mhr_reg.mhr_number} restored to {orig_status}")
         track_event("06", invoice_id, HTTPStatus.OK, None)
+        cancel_pending_payment(jwt.get_token_auth_header(), account_id, invoice_id)
         return draft.json, HTTPStatus.OK
     except BusinessException as exception:
         return resource_utils.business_exception_response(exception)
@@ -226,6 +246,17 @@ def cancel_pending_drafts(draft_number: str):
         return resource_utils.db_exception_response(db_exception, account_id, "DELETE draft id=" + draft_number)
     except Exception as default_exception:  # noqa: B902; return nicer default error
         return resource_utils.default_exception_response(default_exception)
+
+
+def cancel_pending_payment(token: str, account_id: str, invoice_id: str):
+    """Attempt to mark the pending pay api transaction as deleted."""
+    try:
+        logger.info(f"Submitting pay api delete pending payment account={account_id}, invoice={invoice_id}")
+        pay_client = SBCPaymentClient(token, account_id)
+        api_response = pay_client.delete_pending_payment(invoice_id)
+        logger.info(f"Pay api delete pending payment response: invoice={invoice_id} response status={api_response}")
+    except Exception as err:  # noqa: B902; wrapping exception
+        logger.error(f"Cancel pending payment failed: account={account_id}, invoice={invoice_id}: {str(err)}")
 
 
 def revert_pending_draft(draft: MhrDraft):

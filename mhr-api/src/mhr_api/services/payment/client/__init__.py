@@ -206,7 +206,8 @@ class BaseClient:
                     logger.info("Pay api response=" + response.text)
             if not response.ok:
                 raise ApiRequestError(response, str(response.status_code) + ": " + response.text)
-
+            if method == HttpVerbs.DELETE:
+                return str(response.status_code)
             response_json = json.loads(response.text)
             pay_method: str = response_json.get("paymentMethod", "")
             invoice_status: str = response_json.get("statusCode", "")
@@ -459,6 +460,11 @@ class SBCPaymentClient(BaseClient):
         return self.call_api(
             HttpVerbs.POST, request_path, data=PAYMENT_REFUND_TEMPLATE, token=SBCPaymentClient.get_sa_token()
         )
+
+    def delete_pending_payment(self, invoice_id):
+        """Cancel a credit card payment pending transaction."""
+        request_path = PATH_INVOICE.format(invoice_id=invoice_id)
+        return self.call_api(HttpVerbs.DELETE, request_path, data=None, include_account=True)
 
     def get_payment(self, invoice_id):
         """Fetch the current state of the payment invoice."""
