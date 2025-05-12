@@ -753,6 +753,17 @@ export async function getMhrDraft (draftId: string): Promise<MhrDraftApiIF|any> 
     })
 }
 
+// Cancel an existing draft (any type) by draft id.
+export async function cancelMhrDraft (draftID: string): Promise<ErrorIF> {
+  if (!draftID) return { statusCode: StatusCodes.BAD_REQUEST, message: 'No draft ID given.' }
+
+  return axios
+    .patch<void>(`drafts/cancel/${draftID}`, getDefaultConfig())
+    .then(response => {
+      return { statusCode: response?.status as StatusCodes }
+    })
+}
+
 // Delete an existing draft (any type) by documentId.
 export async function deleteMhrDraft (draftID: string): Promise<ErrorIF> {
   if (!draftID) return { statusCode: StatusCodes.BAD_REQUEST, message: 'No draft ID given.' }

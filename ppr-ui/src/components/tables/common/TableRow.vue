@@ -294,6 +294,10 @@ export default defineComponent({
       return '_BCMHR_' + reg.registrationDescription.replace(/ /g, '_').toLowerCase()
     }
 
+    const cancelAndRemoveMhrDraft = (item: MhRegistrationSummaryIF): void => {
+      emit('action', { action: TableActions.CANCEL, regNum: item.draftNumber })
+    }
+
     const removeMhrDraft = (item: MhRegistrationSummaryIF): void => {
       emit('action', { action: TableActions.DELETE, regNum: item.draftNumber })
     }
@@ -361,6 +365,11 @@ export default defineComponent({
     }
 
     const isDraft = (item: any): boolean => {
+      // When registration is draft status but has an Assigned MHR number: it is a base registration pending payment
+      if (item.mhrNumber && item.statusType === MhApiStatusTypes.DRAFT && !localState.isChild) {
+        return false
+      }
+
       // RegistrationSummaryIF | DraftResultIF | MhrDraftApiIF
       return props.isPpr
         ? item.type !== undefined
@@ -516,6 +525,19 @@ export default defineComponent({
       return mhrTableChildItem.cancelledDocumentType !== UnitNoteDocTypes.NOTICE_OF_TAX_SALE
     }
 
+    const goToPayment = (invoiceId: string) => {
+      // Payment Urls
+      const authWebPayUrl = `${useRuntimeConfig()?.public.VUE_APP_AUTH_WEB_URL}/makePayment`
+      const homeRedirectUrl = sessionStorage.getItem('BASE_URL')
+      try {
+        window.location.href = `${authWebPayUrl}/${invoiceId}/${homeRedirectUrl}`
+        return
+      } catch (error) {
+        console.error('Error redirecting to payment:', error)
+        emitError({ error: 'Failed to redirect to payment page' })
+      }
+    }
+
     watch(() => props.setItem, () => {
     }, { deep: true, immediate: true })
 
@@ -575,6 +597,8 @@ export default defineComponent({
       MhApiStatusTypes,
       documentRecordUrl,
       hasDrsEnabled,
+      goToPayment,
+      cancelAndRemoveMhrDraft,
       ...toRefs(localState)
     }
   }
@@ -661,8 +685,7 @@ export default defineComponent({
         <v-col style="padding-top: 2px;">
           <p
             v-if="isDraft(item)"
-            class="ma-0"
-            :class="isChild && !isTransAffi(item.registrationType) && !hasFrozenParentReg(item) ? 'pl-9': 'pl-1'"
+            class="ma-0 pl-1"
           >
             Pending
           </p>
@@ -708,6 +731,11 @@ export default defineComponent({
           <InfoChip
             v-else-if="!isPpr && !isChild && hasLien(item)"
             action="LIEN"
+          />
+          <!-- Locked Badge when payment pending -->
+          <InfoChip
+            v-if="!isChild && item.mhrNumber && (item.statusType === MhApiStatusTypes.DRAFT)"
+            action="PAYMENT PENDING"
           />
         </v-col>
       </v-row>
@@ -876,10 +904,17 @@ export default defineComponent({
       v-if="inSelectedHeaders('statusType')"
       :class="isChild || item.expanded ? 'border-left': ''"
     >
-      <div v-if="!isChild || isDraft(item) || !isPpr">
+      <div v-if="item.invoiceId">Pending Payment</div>
+      <div v-else-if="!isChild || isDraft(item) || !isPpr">
         {{
           isMhrTransfer(item) && !isChild ?
-            'Completed' : getStatusDescription(item.statusType, isChild, isPpr, isDraft(item))
+            'Completed' : getStatusDescription(
+              item.statusType,
+              isChild,
+              isPpr,
+              isDraft(item),
+              !isChild && item.mhrNumber && (item.statusType === MhApiStatusTypes.DRAFT)
+            )
         }}
         <p
           v-if="!isChild && item.hasDraft"
@@ -1258,55 +1293,108 @@ export default defineComponent({
         class="actions pr-4"
         no-gutters
       >
-        <v-col
-          class="edit-action"
-          cols="10"
-        >
-          <v-btn
-            color="primary"
-            class="edit-btn"
-            aria-hidden="false"
-            aria-label="Edit Button"
-            @click="openMhr(item)"
+        <template v-if="!!item.invoiceId">
+          <v-col
+            class="edit-action"
+            cols="10"
           >
-            <span>Edit</span>
-          </v-btn>
-        </v-col>
-        <v-col
-          class="actions__more"
-          cols="1"
-        >
-          <v-menu
-            v-model="menuToggleState"
-            location="bottom right"
-            @mouseleave="menuToggleState = false"
+            <v-btn
+              color="primary"
+              class="resume-pay-btn py-1"
+              aria-hidden="false"
+              aria-label="Edit Button"
+              @click="goToPayment(item.invoiceId)"
+            >
+              <span>Resume <br> Payment</span>
+            </v-btn>
+          </v-col>
+          <v-col
+            class="actions__more"
+            cols="1"
           >
-            <template #activator="{ props }">
-              <v-btn
-                color="primary"
-                class="actions__more-actions__btn reg-table down-btn"
-                v-bind="props"
-              >
-                <v-icon v-if="menuToggleState">
-                  mdi-menu-up
-                </v-icon>
-                <v-icon v-else>
-                  mdi-menu-down
-                </v-icon>
-              </v-btn>
-            </template>
-            <v-list class="actions__more-actions registration-actions">
-              <v-list-item @click="removeMhrDraft(item)">
-                <v-list-item-subtitle>
-                  <v-icon size="small">
-                    mdi-delete
+            <v-menu
+              v-model="menuToggleState"
+              location="bottom right"
+              @mouseleave="menuToggleState = false"
+            >
+              <template #activator="{ props }">
+                <v-btn
+                  color="primary"
+                  class="actions__more-actions__btn reg-table down-btn"
+                  v-bind="props"
+                >
+                  <v-icon v-if="menuToggleState">
+                    mdi-menu-up
                   </v-icon>
-                  <span class="ml-1">Delete Draft</span>
-                </v-list-item-subtitle>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-        </v-col>
+                  <v-icon v-else>
+                    mdi-menu-down
+                  </v-icon>
+                </v-btn>
+              </template>
+              <v-list class="actions__more-actions registration-actions">
+                <v-list-item @click="cancelAndRemoveMhrDraft(item)">
+                  <v-list-item-subtitle>
+                    <v-icon size="small">
+                      mdi-delete
+                    </v-icon>
+                    <span class="ml-1">Cancel Registration</span>
+                  </v-list-item-subtitle>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </v-col>
+        </template>
+        <template v-else>
+          <v-col
+            class="edit-action"
+            cols="10"
+          >
+            <v-btn
+              color="primary"
+              class="edit-btn"
+              aria-hidden="false"
+              aria-label="Edit Button"
+              @click="openMhr(item)"
+            >
+              <span>Edit</span>
+            </v-btn>
+          </v-col>
+          <v-col
+            class="actions__more"
+            cols="1"
+          >
+            <v-menu
+              v-model="menuToggleState"
+              location="bottom right"
+              @mouseleave="menuToggleState = false"
+            >
+              <template #activator="{ props }">
+                <v-btn
+                  color="primary"
+                  class="actions__more-actions__btn reg-table down-btn"
+                  v-bind="props"
+                >
+                  <v-icon v-if="menuToggleState">
+                    mdi-menu-up
+                  </v-icon>
+                  <v-icon v-else>
+                    mdi-menu-down
+                  </v-icon>
+                </v-btn>
+              </template>
+              <v-list class="actions__more-actions registration-actions">
+                <v-list-item @click="removeMhrDraft(item)">
+                  <v-list-item-subtitle>
+                    <v-icon size="small">
+                      mdi-delete
+                    </v-icon>
+                    <span class="ml-1">Delete Draft</span>
+                  </v-list-item-subtitle>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </v-col>
+        </template>
       </v-row>
     </td>
   </tr>
@@ -1372,9 +1460,13 @@ img {
   min-width: 120px;
 }
 
-.edit-btn, .discharge-btn {
+.edit-btn, .discharge-btn, .resume-pay-btn {
   border-bottom-right-radius: 0;
   border-top-right-radius: 0;
+}
+
+.resume-pay-btn {
+  font-size: 10px
 }
 
 .down-btn {
