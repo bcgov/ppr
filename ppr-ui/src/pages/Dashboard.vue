@@ -25,11 +25,44 @@
     >
       <!-- Payment method messaging -->
       <CautionBox
-        v-if="getFeatureFlag('mhr-credit-card-enabled')"
+        v-if="getFeatureFlag('mhr-credit-card-enabled') && !isCreditCardPreferredPayment"
         class="mb-10 bg-white !border-white"
-        set-important-word="Note"
-        :set-msg="`Your current credit card method is “...” You can now pay using a credit card.
-        Click <a class='px-0' href=${accountPaymentUrl}>here</a> to change your current method of payment. `"
+        set-important-word="Updates to Preferred Payment Method"
+        :set-msg="`You can now pay by credit card. To update your current payment method,
+        <a class='px-0' href=${accountPaymentUrl}>click here</a>.`"
+      >
+        <template #prependSLot>
+          <v-icon
+            class="mr-2 pt-n1"
+            color="primary"
+          >
+            mdi-information-outline
+          </v-icon>
+        </template>
+
+        <template #appendSLot>
+          <v-row no-gutters>
+            <v-col>
+              <v-btn
+                variant="plain"
+                class="msg-hide-icon float-right"
+                :ripple="false"
+              >
+                <v-icon color="primary">
+                  mdi-close
+                </v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
+        </template>
+      </CautionBox>
+
+      <CautionBox
+        v-if="getFeatureFlag('mhr-credit-card-enabled') && isCreditCardPreferredPayment"
+        class="mb-10 bg-white !border-white"
+        set-important-word="Important"
+        :set-msg="`Credit card has been selected as the preferred payment method. Once ‘Register and Pay’ is clicked, no
+         changes can be made to the registration until payment is completed.`"
       >
         <template #prependSLot>
           <v-icon
@@ -292,7 +325,8 @@ export default defineComponent({
       getUserServiceFee,
       getSearchHistoryLength,
       isRoleQualifiedSupplier,
-      hasEnhancedDealerEnabled
+      hasEnhancedDealerEnabled,
+      isCreditCardPreferredPayment
     } = storeToRefs(useStore())
 
     const localState = reactive({
@@ -484,6 +518,7 @@ export default defineComponent({
       retrieveSearchHistory,
       confirmQsRequirements,
       hasEnhancedDealerEnabled,
+      isCreditCardPreferredPayment,
       ...toRefs(localState)
     }
   },

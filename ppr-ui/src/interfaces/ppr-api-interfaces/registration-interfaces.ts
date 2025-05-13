@@ -171,6 +171,7 @@ export interface MhRegistrationSummaryIF {
   baseRegistrationNumber?: string
   changes?: MhRegistrationSummaryIF []
   hasDraft?: boolean
+  invoiceId?: string
   documentId?: string
   documentRegistrationNumber?: string
   expand?: boolean // used in UI table to toggle expansion.

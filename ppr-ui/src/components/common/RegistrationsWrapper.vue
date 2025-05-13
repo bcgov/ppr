@@ -52,7 +52,7 @@ import {
   updateUserSettings
 } from '@/utils/ppr-api-helper'
 import {
-  addMHRegistrationSummary,
+  addMHRegistrationSummary, cancelMhrDraft,
   deleteMhrDraft,
   deleteMhRegistrationSummary,
   fetchMhRegistration,
@@ -74,7 +74,8 @@ import {
   staleDraftDialogOptions,
   manufacturedHomeDeliveredDialogOptions,
   tableDeleteDialog,
-  tableRemoveDialog
+  tableRemoveDialog,
+  mhrTableCancelDialog
 } from '@/resources/dialogOptions'
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
@@ -521,6 +522,10 @@ export default defineComponent({
           localState.myRegDeleteDialog = tableDeleteDialog
           localState.myRegDeleteDialogDisplay = true
           break
+        case TableActions.CANCEL:
+          localState.myRegDeleteDialog = props.isMhr ? mhrTableCancelDialog : tableRemoveDialog
+          localState.myRegDeleteDialogDisplay = true
+          break
         case TableActions.REMOVE:
           localState.myRegDeleteDialog = props.isMhr ? mhrTableRemoveDialog : tableRemoveDialog
           localState.myRegDeleteDialogDisplay = true
@@ -655,6 +660,13 @@ export default defineComponent({
       await goToRoute(RouteNames.SUBMITTING_PARTY)
     }
 
+    const cancelAndRemoveMhrDraft = async (mhrNumber: string): Promise<void> => {
+      localState.myRegDataLoading = true
+      await cancelMhrDraft(mhrNumber)
+      await removeMhrDraft(mhrNumber)
+    }
+
+
     const removeMhrDraft = async (mhrNumber: string): Promise<void> => {
       localState.myRegDataLoading = true
       await deleteMhrDraft(mhrNumber)
@@ -692,6 +704,11 @@ export default defineComponent({
           props.isPpr
             ? removeRegistration(localState.myRegActionRegNum)
             : removeMhRegistration(localState.myRegActionRegNum)
+        }
+        if (localState.myRegAction === TableActions.CANCEL) {
+          props.isPpr
+            ? removeDraft(localState.myRegActionRegNum, localState.myRegActionDocId)
+            : cancelAndRemoveMhrDraft(localState.myRegActionRegNum)
         }
       }
       localState.myRegAction = null

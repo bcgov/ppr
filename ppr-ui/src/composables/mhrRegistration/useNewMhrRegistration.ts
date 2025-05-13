@@ -455,8 +455,10 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
             path: draft.path,
             statusType: MhApiStatusTypes.DRAFT,
             username: '',
-            documentId: draft.draftNumber
+            documentId: draft.draftNumber,
+            invoiceId: draft?.invoiceId
           }
+
           if (sortOptions?.status === MhApiStatusTypes.DRAFT) {
             mhrTableData.push(newDraft)
           } else {

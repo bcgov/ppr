@@ -1,6 +1,7 @@
 export enum TableActions {
   AMEND = 'amend',
   DELETE = 'delete',
+  CANCEL = 'cancel',
   DISCHARGE = 'discharge',
   EDIT_AMEND = 'editAmendmentDraft',
   EDIT_NEW = 'editFinancingDraft',
