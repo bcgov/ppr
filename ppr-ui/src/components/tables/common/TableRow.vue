@@ -1143,7 +1143,8 @@ export default defineComponent({
 
       <!--      MHR ACTIONS-->
       <v-row
-        v-else-if="isEnabledMhr(item)"
+        v-else-if="isEnabledMhr(item) ||
+          (item.mhrNumber && (item.statusType === MhApiStatusTypes.DRAFT) && !isChild)"
         class="actions pr-4"
         no-gutters
       >
@@ -1156,6 +1157,7 @@ export default defineComponent({
             class="edit-btn"
             aria-hidden="false"
             aria-label="Open Button"
+            :disabled="(item.mhrNumber && (item.statusType === MhApiStatusTypes.DRAFT) && !isChild)"
             @click="openMhr(item)"
           >
             <span>Open</span>
@@ -1175,6 +1177,7 @@ export default defineComponent({
                 color="primary"
                 class="actions__more-actions__btn reg-table down-btn"
                 v-bind="props"
+                :disabled="(item.mhrNumber && (item.statusType === MhApiStatusTypes.DRAFT) && !isChild)"
               >
                 <v-icon v-if="value">
                   mdi-menu-up
