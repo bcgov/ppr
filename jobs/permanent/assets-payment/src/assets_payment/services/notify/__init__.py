@@ -48,8 +48,15 @@ class Notify:
             mhr_errors=status_data.get("mhr_errors"),
             mhr_expired=status_data.get("mhr_expired"),
         )
+        body = body.replace("$", "\n")
         if status_data.get("mhr_invoice_ids"):
-            body += "\n\nMHR Cancelled Invoices:\n" + status_data.get("mhr_invoice_ids")
+            body += "\n\nMHR cancelled invoices:\n" + status_data.get("mhr_invoice_ids")
+        else:
+            body += "\n\nnMHR cancelled invoices: none"
+        if status_data.get("mhr_draft_ids"):
+            body += "\n\nMHR updated draft IDs:\n" + status_data.get("mhr_draft_ids")
+        else:
+            body += "\n\nnMHR updated draft IDs: none"
         payload = copy.deepcopy(EMAIL_DATA_TEMPLATE)
         payload["recipients"] = self.status_recipients
         payload["content"]["subject"] = self.status_subject
