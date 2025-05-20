@@ -776,7 +776,7 @@ export default defineComponent({
   ],
   setup (props, context) {
     const router = useRouter()
-    const { goToDash } = useNavigation()
+    const { goToDash, goToPay } = useNavigation()
     const { isAuthenticated } = useAuth()
     const {
       // Actions
@@ -893,11 +893,6 @@ export default defineComponent({
     // Refs
     const homeOwnersComponentRef = ref(null) as Component
     const transferDetailsComponent = ref(null) as Component
-
-    // Payment Urls
-    const authWebPayUrl = `${useRuntimeConfig()?.public.VUE_APP_AUTH_WEB_URL}/makePayment`
-    const homeRedirectUrl = sessionStorage.getItem('BASE_URL')
-
 
     const localState = reactive({
       dataLoaded: false,
@@ -1293,20 +1288,7 @@ export default defineComponent({
             )
 
           if(transportPermitFilingResp?.paymentPending) {
-            if (transportPermitFilingResp.payment?.paymentPortalURL) {
-              try {
-                // ToDo: populate via api url
-                window.location.href = `${authWebPayUrl}/${transportPermitFilingResp.payment?.invoiceId}/
-                ${homeRedirectUrl}`
-                return
-              } catch (error) {
-                console.error('Error redirecting to payment:', error)
-                emitError({ error: 'Failed to redirect to payment page' })
-              }
-            } else {
-              console.error('Payment URL not found')
-              emitError({ error: 'Payment URL not found' })
-            }
+            goToPay(transportPermitFilingResp.payment?.invoiceId)
           }
 
           if (!transportPermitFilingResp?.error) {
@@ -1338,19 +1320,7 @@ export default defineComponent({
           )
 
         if(mhrTransferFiling?.paymentPending) {
-          if (mhrTransferFiling.payment?.paymentPortalURL) {
-            try {
-              // ToDo: populate via api url
-              window.location.href = `${authWebPayUrl}/${mhrTransferFiling.payment?.invoiceId}/${homeRedirectUrl}`
-              return
-            } catch (error) {
-              console.error('Error redirecting to payment:', error)
-              emitError({ error: 'Failed to redirect to payment page' })
-            }
-          } else {
-            console.error('Payment URL not found')
-            emitError({ error: 'Payment URL not found' })
-          }
+          goToPay(mhrTransferFiling.payment?.invoiceId)
         }
 
         if (!mhrTransferFiling.error) {

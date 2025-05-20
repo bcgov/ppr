@@ -43,7 +43,7 @@ import {
   setupFinancingStatementDraft
 } from '@/utils'
 import {
-  addRegistrationSummary,
+  addRegistrationSummary, cancelPprDraft,
   deleteDraft,
   deleteRegistrationSummary,
   draftHistory,
@@ -75,7 +75,7 @@ import {
   manufacturedHomeDeliveredDialogOptions,
   tableDeleteDialog,
   tableRemoveDialog,
-  mhrTableCancelDialog
+  tableCancelDialog
 } from '@/resources/dialogOptions'
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
@@ -233,28 +233,7 @@ export default defineComponent({
         await handleRegTableNewItem(getRegTableNewItem.value)
       } else if (props.isPpr) {
         // load in registrations from scratch
-        resetRegTableData(null)
-        const myRegDrafts = await draftHistory(getRegTableSortOptions.value)
-        const myRegHistory = await registrationHistory(getRegTableSortOptions.value)
-
-        if (myRegDrafts?.error || myRegHistory?.error) {
-          // prioritize reg error
-          const error = myRegHistory?.error || myRegDrafts?.error
-          emitError(error)
-        } else {
-          if (myRegHistory.registrations?.length < 1) setRegTableSortHasMorePages(false)
-          // add child drafts to their base registration in registration history
-          const historyDraftsCollapsed = myRegHistoryDraftCollapse(
-            myRegDrafts.drafts, myRegHistory.registrations, false)
-          // only add parent drafts to draft results
-          setRegTableDraftsBaseReg(historyDraftsCollapsed.drafts)
-          setRegTableBaseRegs(historyDraftsCollapsed.registrations)
-          if (myRegHistory.registrations?.length > 0) {
-            setRegTableTotalRowCount(myRegHistory.registrations[0].totalRegistrationCount || 0)
-          }
-          // add base reg drafts length to total reg length
-          setRegTableTotalRowCount(getRegTableTotalRowCount.value + historyDraftsCollapsed.drafts.length)
-        }
+        await loadPprRegistrations()
       } else if (props.isMhr && !props.isTabView) { // If Tab view, Mhr Data will be loaded in dashboardTabs component
         await fetchMhRegistrations(getRegTableMhSortOptions.value)
       }
@@ -285,6 +264,33 @@ export default defineComponent({
       localState.myRegDataLoading = false
       localState.loading = false
     })
+
+    /** Load Ppr Base registrations **/
+    const loadPprRegistrations = async (): void => {
+      // load in registrations from scratch
+      resetRegTableData(null)
+      const myRegDrafts = await draftHistory(getRegTableSortOptions.value)
+      const myRegHistory = await registrationHistory(getRegTableSortOptions.value)
+
+      if (myRegDrafts?.error || myRegHistory?.error) {
+        // prioritize reg error
+        const error = myRegHistory?.error || myRegDrafts?.error
+        emitError(error)
+      } else {
+        if (myRegHistory.registrations?.length < 1) setRegTableSortHasMorePages(false)
+        // add child drafts to their base registration in registration history
+        const historyDraftsCollapsed = myRegHistoryDraftCollapse(
+          myRegDrafts.drafts, myRegHistory.registrations, false)
+        // only add parent drafts to draft results
+        setRegTableDraftsBaseReg(historyDraftsCollapsed.drafts)
+        setRegTableBaseRegs(historyDraftsCollapsed.registrations)
+        if (myRegHistory.registrations?.length > 0) {
+          setRegTableTotalRowCount(myRegHistory.registrations[0].totalRegistrationCount || 0)
+        }
+        // add base reg drafts length to total reg length
+        setRegTableTotalRowCount(getRegTableTotalRowCount.value + historyDraftsCollapsed.drafts.length)
+      }
+    }
 
     /** Set registration type in the store and route to the first registration step */
     const startNewRegistration = async (selectedRegistration: RegistrationTypeIF, draftNumber: string = ''):
@@ -523,7 +529,7 @@ export default defineComponent({
           localState.myRegDeleteDialogDisplay = true
           break
         case TableActions.CANCEL:
-          localState.myRegDeleteDialog = props.isMhr ? mhrTableCancelDialog : tableRemoveDialog
+          localState.myRegDeleteDialog = tableCancelDialog
           localState.myRegDeleteDialogDisplay = true
           break
         case TableActions.REMOVE:
@@ -664,6 +670,14 @@ export default defineComponent({
       localState.myRegDataLoading = true
       await cancelMhrDraft(mhrNumber)
       await removeMhrDraft(mhrNumber)
+      localState.myRegDataLoading = false
+    }
+
+    const cancelAndRemovePprDraft = async (regNum: string, draftId: string): Promise<void> => {
+      localState.myRegDataLoading = true
+      await cancelPprDraft(draftId)
+      await removeDraft(regNum, draftId)
+      localState.myRegDataLoading = false
     }
 
 
@@ -707,7 +721,7 @@ export default defineComponent({
         }
         if (localState.myRegAction === TableActions.CANCEL) {
           props.isPpr
-            ? removeDraft(localState.myRegActionRegNum, localState.myRegActionDocId)
+            ? cancelAndRemovePprDraft(localState.myRegActionRegNum, localState.myRegActionDocId)
             : cancelAndRemoveMhrDraft(localState.myRegActionRegNum)
         }
       }
