@@ -174,7 +174,7 @@ export default defineComponent({
       isMhrReRegistration,
       getMhrInformation
     } = storeToRefs(useStore())
-    const { goToDash, goToRoute } = useNavigation()
+    const { goToDash, goToRoute, goToPay } = useNavigation()
     const { mhrDraftHandler } = useNewMhrRegistration()
     const { isMhrCorrection } = useMhrCorrections()
 
@@ -331,6 +331,8 @@ export default defineComponent({
         if (apiResponse.error !== undefined) {
           // Emit error message.
           emit('error', apiResponse.error)
+        } else if (apiResponse.paymentPending) {
+          goToPay(apiResponse.payment?.invoiceId)
         } else {
           const prevDraftId = stateModel.registration?.draft?.financingStatement?.documentId || ''
           const newItem: RegTableNewItemI = {

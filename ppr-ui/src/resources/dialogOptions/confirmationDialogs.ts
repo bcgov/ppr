@@ -70,7 +70,7 @@ export const mhrTableRemoveDialog: DialogOptionsIF = {
     'table? If you remove this registration from your table, you can add it back later ' +
     'by retrieving the registration using the MHR Number.'
 }
-export const mhrTableCancelDialog: DialogOptionsIF = {
+export const tableCancelDialog: DialogOptionsIF = {
   acceptText: 'Cancel Registration',
   cancelText: 'Back to Dashboard',
   title: 'Cancel Registration',

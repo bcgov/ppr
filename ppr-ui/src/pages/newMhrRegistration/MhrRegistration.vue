@@ -162,7 +162,7 @@ export default defineComponent({
   },
   emits: ['error', 'emitHaveData'],
   setup (props, context) {
-    const { isRouteName, goToDash, goToRoute } = useNavigation()
+    const { isRouteName, goToDash, goToRoute, goToPay } = useNavigation()
     const { isAuthenticated } = useAuth()
     const {
       // Actions
@@ -208,10 +208,6 @@ export default defineComponent({
     const {
       setShowGroups
     } = useHomeOwners(false, isMhrCorrection.value)
-
-    // Payment Urls
-    const authWebPayUrl = `${useRuntimeConfig()?.public.VUE_APP_AUTH_WEB_URL}/makePayment`
-    const homeRedirectUrl = sessionStorage.getItem('BASE_URL')
 
     const localState = reactive({
       dataLoaded: false,
@@ -352,19 +348,7 @@ export default defineComponent({
           setUnsavedChanges(false)
           goToDash()
         } else if (mhrSubmission?.paymentPending) {
-          if (mhrSubmission.payment?.paymentPortalURL) {
-            try {
-              // ToDo: populate via api url
-              window.location.href = `${authWebPayUrl}/${mhrSubmission.payment?.invoiceId}/${homeRedirectUrl}`
-              return
-            } catch (error) {
-              console.error('Error redirecting to payment:', error)
-              emitError({ error: 'Failed to redirect to payment page' })
-            }
-          } else {
-            console.error('Payment URL not found')
-            emitError({ error: 'Payment URL not found' })
-          }
+          goToPay(mhrSubmission.payment?.invoiceId)
         } else {
           emitError(mhrSubmission?.error)
         }

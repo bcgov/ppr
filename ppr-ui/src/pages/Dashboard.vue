@@ -25,7 +25,7 @@
     >
       <!-- Payment method messaging -->
       <CautionBox
-        v-if="getFeatureFlag('mhr-credit-card-enabled') && !isCreditCardPreferredPayment"
+        v-if="showCcPaymentMsg && !isCreditCardPreferredPayment"
         class="mb-10 bg-white !border-white"
         set-important-word="Updates to Preferred Payment Method"
         :set-msg="`You can now pay by credit card. To update your current payment method,
@@ -47,6 +47,7 @@
                 variant="plain"
                 class="msg-hide-icon float-right"
                 :ripple="false"
+                @click="hideCcStatusMsg(true)"
               >
                 <v-icon color="primary">
                   mdi-close
@@ -58,7 +59,7 @@
       </CautionBox>
 
       <CautionBox
-        v-if="getFeatureFlag('mhr-credit-card-enabled') && isCreditCardPreferredPayment"
+        v-if="showCcPaymentMsg && isCreditCardPreferredPayment"
         class="mb-10 bg-white !border-white"
         set-important-word="Important"
         :set-msg="`Credit card has been selected as the preferred payment method. Once ‘Register and Pay’ is clicked, no
@@ -80,6 +81,7 @@
                 variant="plain"
                 class="msg-hide-icon float-right"
                 :ripple="false"
+                @click="hideCcStatusMsg(true)"
               >
                 <v-icon color="primary">
                   mdi-close
@@ -295,7 +297,7 @@ export default defineComponent({
     const router = useRouter()
     const { navigateToUrl } = useNavigation()
     const { isAuthenticated } = useAuth()
-    const { fetchIsAccountAdmin, qsMsgContent, hideStatusMsg } = useUserAccess()
+    const { fetchIsAccountAdmin, qsMsgContent, hideStatusMsg, updateUserMiscSettings } = useUserAccess()
     const {
       // Actions
       setSearchHistory,
@@ -378,6 +380,12 @@ export default defineComponent({
           !getUserSettings.value[SettingOptions.MISCELLANEOUS_PREFERENCES]?.some(
           setting => setting.accountId === getAccountId.value && !!setting[SettingOptions.RL_MSG_HIDE]
         )
+      }),
+      showCcPaymentMsg: computed((): boolean => {
+        return getFeatureFlag('mhr-credit-card-enabled') && !isRoleStaff.value &&
+          !getUserSettings.value[SettingOptions.MISCELLANEOUS_PREFERENCES]?.some(
+            setting => setting?.accountId === getAccountId.value && setting[SettingOptions.CC_MSG_HIDE] === true
+          )
       }),
       accountPaymentUrl: computed((): string => {
         return useRuntimeConfig().public?.VUE_APP_AUTH_WEB_URL + '/account/' + getAccountId.value +
@@ -482,7 +490,11 @@ export default defineComponent({
 
     /** Update Qualified Supplier status message - locally and user settings **/
     const hideRlMessage = async (hideMsg: boolean): Promise<void> => {
-      await useUserAccess().updateUserMiscSettings(SettingOptions.RL_MSG_HIDE, hideMsg)
+      await updateUserMiscSettings(SettingOptions.RL_MSG_HIDE, hideMsg)
+    }
+
+    const hideCcStatusMsg = async (hideMsg: boolean): Promise<void> => {
+      await updateUserMiscSettings(SettingOptions.CC_MSG_HIDE, hideMsg)
     }
 
     watch(() => props.appReady, (val: boolean) => {
@@ -511,6 +523,7 @@ export default defineComponent({
       hideRlMessage,
       qsMsgContent,
       hideStatusMsg,
+      hideCcStatusMsg,
       getFeatureFlag,
       getUserServiceFee,
       setSearchDebtorName,

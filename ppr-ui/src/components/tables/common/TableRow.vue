@@ -27,7 +27,7 @@ import {
   HomeLocationTypes
 } from '@/enums'
 import { useRegistration } from '@/composables/useRegistration'
-import { useExemptions, useMhrInformation, useTransferOwners } from '@/composables'
+import { useExemptions, useMhrInformation, useNavigation, useTransferOwners } from '@/composables'
 import moment from 'moment'
 import { storeToRefs } from 'pinia'
 import { QSLockedStateUnitNoteTypes } from '@/resources'
@@ -50,6 +50,7 @@ export default defineComponent({
   },
   emits: ['action', 'error', 'freezeScroll', 'toggleExpand'],
   setup (props, { emit }) {
+    const { goToPay } = useNavigation()
     const {
       getAccountLabel,
       isRoleQualifiedSupplier,
@@ -294,8 +295,8 @@ export default defineComponent({
       return '_BCMHR_' + reg.registrationDescription.replace(/ /g, '_').toLowerCase()
     }
 
-    const cancelAndRemoveMhrDraft = (item: MhRegistrationSummaryIF): void => {
-      emit('action', { action: TableActions.CANCEL, regNum: item.draftNumber })
+    const cancelAndRemoveDraft = (item: MhRegistrationSummaryIF): void => {
+      emit('action', { action: TableActions.CANCEL, docId: item?.documentId, regNum: item.draftNumber })
     }
 
     const removeMhrDraft = (item: MhRegistrationSummaryIF): void => {
@@ -525,19 +526,6 @@ export default defineComponent({
       return mhrTableChildItem.cancelledDocumentType !== UnitNoteDocTypes.NOTICE_OF_TAX_SALE
     }
 
-    const goToPayment = (invoiceId: string) => {
-      // Payment Urls
-      const authWebPayUrl = `${useRuntimeConfig()?.public.VUE_APP_AUTH_WEB_URL}/makePayment`
-      const homeRedirectUrl = sessionStorage.getItem('BASE_URL')
-      try {
-        window.location.href = `${authWebPayUrl}/${invoiceId}/${homeRedirectUrl}`
-        return
-      } catch (error) {
-        console.error('Error redirecting to payment:', error)
-        emitError({ error: 'Failed to redirect to payment page' })
-      }
-    }
-
     watch(() => props.setItem, () => {
     }, { deep: true, immediate: true })
 
@@ -595,10 +583,11 @@ export default defineComponent({
       HomeLocationTypes,
       isNonResExemptionEnabled,
       MhApiStatusTypes,
+      APIStatusTypes,
       documentRecordUrl,
       hasDrsEnabled,
-      goToPayment,
-      cancelAndRemoveMhrDraft,
+      goToPay,
+      cancelAndRemoveDraft,
       ...toRefs(localState)
     }
   }
@@ -732,9 +721,13 @@ export default defineComponent({
             v-else-if="!isPpr && !isChild && hasLien(item)"
             action="LIEN"
           />
-          <!-- Locked Badge when payment pending -->
+          <!-- Locked Badges when payment pending -->
           <InfoChip
-            v-if="!isChild && item.mhrNumber && (item.statusType === MhApiStatusTypes.DRAFT)"
+            v-if="!isPpr && !isChild && item.mhrNumber && (item.statusType === MhApiStatusTypes.DRAFT)"
+            action="PAYMENT PENDING"
+          />
+          <InfoChip
+            v-if="isPpr && !isChild && item.paymentPending && (item.statusType === APIStatusTypes.ACTIVE)"
             action="PAYMENT PENDING"
           />
         </v-col>
@@ -928,8 +921,9 @@ export default defineComponent({
       v-if="inSelectedHeaders('registeringName')"
       :class="isChild || item.expanded ? 'border-left': ''"
     >
-      <span v-if="item.registeringName">{{ item.accountId }}<br>{{ getRegisteringName(item.registeringName) }}</span>
-      <span v-else>{{ item.accountId }}<br>{{ item.username || 'N/A' }}</span>
+      <span v-if="item.accountId">{{ item.accountId }}<br></span>
+      <span v-if="item.registeringName">{{ getRegisteringName(item.registeringName) }}</span>
+      <span v-else>{{ item.username || 'N/A' }}</span>
     </td>
     <td
       v-if="inSelectedHeaders('registeringParty')"
@@ -974,171 +968,225 @@ export default defineComponent({
         class="actions pr-4"
         no-gutters
       >
-        <v-col
-          cols="10"
-          class="edit-action"
-        >
-          <v-btn
-            v-if="isDraft(item)"
-            class="edit-btn"
-            color="primary"
-            aria-label="Edit Button"
-            @click="editDraft(item)"
+        <template v-if="!!item.invoiceId">
+          <v-col
+            cols="10"
+            class="edit-action"
           >
-            <span>Edit</span>
-          </v-btn>
-          <v-btn
-            v-else-if="isRepairersLien(item) && isActive(item)"
-            class="edit-btn"
-            color="primary"
-            @click="handleAction(item, TableActions.DISCHARGE)"
-          >
-            <span class="discharge-btn text-wrap fs-12">Total Discharge</span>
-          </v-btn>
-          <v-btn
-            v-else-if="!isExpired(item) && !isDischarged(item)"
-            class="edit-btn"
-            color="primary"
-            aria-hidden="false"
-            aria-label="Amend Button"
-            @click="handleAction(item, TableActions.AMEND)"
-          >
-            <span>Amend</span>
-          </v-btn>
-          <v-btn
-            v-else
-            color="primary"
-            class="remove-btn"
-            aria-label="Remove From Table Button"
-            aria-hidden="false"
-            @click="handleAction(item, TableActions.REMOVE)"
-          >
-            <span class="fs-12">Remove From Table</span>
-          </v-btn>
-        </v-col>
-
-        <!-- Menu Dropdown -->
-        <v-col
-          v-if="!isExpired(item) && !isDischarged(item)"
-          class="actions__more"
-          cols="1"
-        >
-          <v-menu
-            v-model="menuToggleState"
-            location="bottom right"
-            @mouseleave="menuToggleState = false"
-          >
-            <template #activator="{ props }">
-              <v-btn
-                color="primary"
-                class="actions__more-actions__btn reg-table down-btn"
-                v-bind="props"
-              >
-                <v-icon v-if="menuToggleState">
-                  mdi-menu-up
-                </v-icon>
-                <v-icon v-else>
-                  mdi-menu-down
-                </v-icon>
-              </v-btn>
-            </template>
-            <v-list
-              v-if="isDraft(item)"
-              class="actions__more-actions registration-actions draft-actions"
+            <v-btn
+              class="resume-pay-btn py-1"
+              color="primary"
+              aria-label="Edit Button"
+              @click="goToPay(item.invoiceId)"
             >
-              <v-list-item
-                @click="deleteDraft(item, TableActions.DELETE)"
-              >
-                <v-list-item-subtitle>
-                  <v-icon size="small">
-                    mdi-delete
+              <span>Resume<br>Payment</span>
+            </v-btn>
+          </v-col>
+          <v-col
+            class="actions__more"
+            cols="1"
+          >
+            <v-menu
+              v-model="menuToggleState"
+              location="bottom right"
+              @mouseleave="menuToggleState = false"
+            >
+              <template #activator="{ props }">
+                <v-btn
+                  color="primary"
+                  class="actions__more-actions__btn reg-table down-btn"
+                  v-bind="props"
+                >
+                  <v-icon v-if="menuToggleState">
+                    mdi-menu-up
                   </v-icon>
-                  <span class="ml-1">Delete Draft</span>
-                </v-list-item-subtitle>
-              </v-list-item>
-            </v-list>
-            <v-list
-              v-else
-              class="actions__more-actions registration-actions"
+                  <v-icon v-else>
+                    mdi-menu-down
+                  </v-icon>
+                </v-btn>
+              </template>
+              <v-list class="actions__more-actions registration-actions">
+                <v-list-item @click="cancelAndRemoveDraft(item)">
+                  <v-list-item-subtitle>
+                    <v-icon size="small">
+                      mdi-delete
+                    </v-icon>
+                    <span class="ml-1">Cancel Registration</span>
+                  </v-list-item-subtitle>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </v-col>
+        </template>
+        <template v-else>
+          <v-col
+            cols="10"
+            class="edit-action"
+          >
+            <v-btn
+              v-if="isDraft(item)"
+              class="edit-btn"
+              color="primary"
+              aria-label="Edit Button"
+              @click="editDraft(item)"
             >
-              <v-tooltip
-                location="bottom right"
-                content-class="left-tooltip pa-2 mr-2 pl-4"
-                transition="fade-transition"
-                :disabled="!isRepairersLienAmendDisabled(item)"
+              <span>Edit</span>
+            </v-btn>
+            <v-btn
+              v-else-if="isRepairersLien(item) && isActive(item)"
+              class="edit-btn"
+              color="primary"
+              @click="handleAction(item, TableActions.DISCHARGE)"
+            >
+              <span class="discharge-btn text-wrap fs-12">Total Discharge</span>
+            </v-btn>
+            <v-btn
+              v-else-if="!isExpired(item) && !isDischarged(item)"
+              class="edit-btn"
+              color="primary"
+              aria-hidden="false"
+              aria-label="Amend Button"
+              :disabled="isPpr && !isChild && item.paymentPending && (item.statusType === APIStatusTypes.ACTIVE)"
+              @click="handleAction(item, TableActions.AMEND)"
+            >
+              <span>Amend</span>
+            </v-btn>
+            <v-btn
+              v-else
+              color="primary"
+              class="remove-btn"
+              aria-label="Remove From Table Button"
+              aria-hidden="false"
+              @click="handleAction(item, TableActions.REMOVE)"
+            >
+              <span class="fs-12">Remove From Table</span>
+            </v-btn>
+          </v-col>
+
+          <!-- Menu Dropdown -->
+          <v-col
+            v-if="!isExpired(item) && !isDischarged(item)"
+            class="actions__more"
+            cols="1"
+          >
+            <v-menu
+              v-model="menuToggleState"
+              location="bottom right"
+              @mouseleave="menuToggleState = false"
+            >
+              <template #activator="{ props }">
+                <v-btn
+                  color="primary"
+                  class="actions__more-actions__btn reg-table down-btn"
+                  v-bind="props"
+                  :disabled="!isChild && item.paymentPending && (item.statusType === APIStatusTypes.ACTIVE)"
+                >
+                  <v-icon v-if="menuToggleState">
+                    mdi-menu-up
+                  </v-icon>
+                  <v-icon v-else>
+                    mdi-menu-down
+                  </v-icon>
+                </v-btn>
+              </template>
+              <v-list
+                v-if="isDraft(item)"
+                class="actions__more-actions registration-actions draft-actions"
               >
-                <template #activator="{ props }">
-                  <div v-bind="props">
-                    <v-list-item
-                      v-if="isRepairersLien(item)"
-                      :disabled="isRepairersLienAmendDisabled(item)"
-                      @click="handleAction(item, TableActions.AMEND)"
-                    >
-                      <v-list-item-subtitle>
-                        <v-icon size="small">
-                          mdi-pencil
-                        </v-icon>
-                        <span class="ml-1">Amend
+                <v-list-item
+                  @click="deleteDraft(item, TableActions.DELETE)"
+                >
+                  <v-list-item-subtitle>
+                    <v-icon size="small">
+                      mdi-delete
+                    </v-icon>
+                    <span class="ml-1">Delete Draft</span>
+                  </v-list-item-subtitle>
+                </v-list-item>
+              </v-list>
+              <v-list
+                v-else
+                class="actions__more-actions registration-actions"
+              >
+                <v-tooltip
+                  location="bottom right"
+                  content-class="left-tooltip pa-2 mr-2 pl-4"
+                  transition="fade-transition"
+                  :disabled="!isRepairersLienAmendDisabled(item)"
+                >
+                  <template #activator="{ props }">
+                    <div v-bind="props">
+                      <v-list-item
+                        v-if="isRepairersLien(item)"
+                        :disabled="isRepairersLienAmendDisabled(item)"
+                        @click="handleAction(item, TableActions.AMEND)"
+                      >
+                        <v-list-item-subtitle>
+                          <v-icon size="small">
+                            mdi-pencil
+                          </v-icon>
+                          <span class="ml-1">Amend
                           <span v-if="isRepairersLienAndTransitioning(item)">as Commercial Lien</span>
                         </span>
-                      </v-list-item-subtitle>
-                    </v-list-item>
-                  </div>
-                </template>
-                <span>
+                        </v-list-item-subtitle>
+                      </v-list-item>
+                    </div>
+                  </template>
+                  <span>
                   This lien has only one item of vehicle collateral and cannot be amended.
                 </span>
-              </v-tooltip>
-              <v-list-item
-                v-if="isActive(item) && !isExpired(item) && !isDischarged(item) && !isRepairersLien(item)"
-                @click="handleAction(item, TableActions.DISCHARGE)"
-              >
-                <v-list-item-subtitle>
-                  <v-icon size="small">
-                    mdi-note-remove-outline
-                  </v-icon>
-                  <span class="ml-1">Total Discharge</span>
-                </v-list-item-subtitle>
-              </v-list-item>
-              <v-tooltip
-                location="bottom right"
-                content-class="left-tooltip pa-2 mr-2"
-                transition="fade-transition"
-                :disabled="!isRenewalDisabled(item)"
-              >
-                <template #activator="{ props }">
-                  <div v-bind="props">
-                    <v-list-item
-                      v-if="isActive(item) && !isExpired(item) && !isDischarged(item)"
-                      :disabled="isRenewalDisabled(item)"
-                      @click="handleAction(item, TableActions.RENEW)"
-                    >
-                      <v-list-item-subtitle>
-                        <v-icon size="small">
-                          mdi-calendar-clock
-                        </v-icon>
-                        <span class="ml-1">Renew
+                </v-tooltip>
+                <v-list-item
+                  v-if="isActive(item) && !isExpired(item) && !isDischarged(item) && !isRepairersLien(item)"
+                  @click="handleAction(item, TableActions.DISCHARGE)"
+                >
+                  <v-list-item-subtitle>
+                    <v-icon size="small">
+                      mdi-note-remove-outline
+                    </v-icon>
+                    <span class="ml-1">Total Discharge</span>
+                  </v-list-item-subtitle>
+                </v-list-item>
+                <v-tooltip
+                  location="bottom right"
+                  content-class="left-tooltip pa-2 mr-2"
+                  transition="fade-transition"
+                  :disabled="!isRenewalDisabled(item)"
+                >
+                  <template #activator="{ props }">
+                    <div v-bind="props">
+                      <v-list-item
+                        v-if="isActive(item) && !isExpired(item) && !isDischarged(item)"
+                        :disabled="isRenewalDisabled(item)"
+                        @click="handleAction(item, TableActions.RENEW)"
+                      >
+                        <v-list-item-subtitle>
+                          <v-icon size="small">
+                            mdi-calendar-clock
+                          </v-icon>
+                          <span class="ml-1">Renew
                           <span v-if="isRepairersLienAndTransitioning(item)">as Commercial Lien</span>
                         </span>
-                      </v-list-item-subtitle>
-                    </v-list-item>
-                  </div>
-                </template>
-                <span v-if="item.expireDays === -99">
+                        </v-list-item-subtitle>
+                      </v-list-item>
+                    </div>
+                  </template>
+                  <span v-if="item.expireDays === -99">
                   Infinite registrations cannot be renewed.
                 </span>
-              </v-tooltip>
-              <v-list-item @click="handleAction(item, TableActions.REMOVE)">
-                <v-list-item-subtitle>
-                  <v-icon size="small">
-                    mdi-delete
-                  </v-icon>
-                  <span class="ml-1">Remove From Table</span>
-                </v-list-item-subtitle>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-        </v-col>
+                </v-tooltip>
+                <v-list-item @click="handleAction(item, TableActions.REMOVE)">
+                  <v-list-item-subtitle>
+                    <v-icon size="small">
+                      mdi-delete
+                    </v-icon>
+                    <span class="ml-1">Remove From Table</span>
+                  </v-list-item-subtitle>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </v-col>
+        </template>
       </v-row>
 
       <!--      MHR ACTIONS-->
@@ -1306,7 +1354,7 @@ export default defineComponent({
               class="resume-pay-btn py-1"
               aria-hidden="false"
               aria-label="Edit Button"
-              @click="goToPayment(item.invoiceId)"
+              @click="goToPay(item.invoiceId)"
             >
               <span>Resume <br> Payment</span>
             </v-btn>
@@ -1335,7 +1383,7 @@ export default defineComponent({
                 </v-btn>
               </template>
               <v-list class="actions__more-actions registration-actions">
-                <v-list-item @click="cancelAndRemoveMhrDraft(item)">
+                <v-list-item @click="cancelAndRemoveDraft(item)">
                   <v-list-item-subtitle>
                     <v-icon size="small">
                       mdi-delete
