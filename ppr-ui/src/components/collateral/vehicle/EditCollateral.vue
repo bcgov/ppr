@@ -51,7 +51,7 @@
                   persistent-hint
                 />
               </v-col>
-              <v-col v-else-if="excludesManufacturedHomeCollateral() || isRlTransition">
+              <v-col v-else-if="excludesManufacturedHomeCollateral() && !isRlTransition">
                 <v-select
                   id="txt-type-drop"
                   v-model="currentVehicle.type"
