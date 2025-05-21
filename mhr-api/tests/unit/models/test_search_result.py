@@ -220,7 +220,7 @@ TEST_MHR_NUM_DATA_NOTE = [
 def test_search_valid(session, desc, search_data, select_data,certified):
     """Assert that search detail results on registration matches returns the expected result."""
     # test
-    search_query = SearchRequest.create_from_json(search_data, 'PS12345')
+    search_query: SearchRequest = SearchRequest.create_from_json(search_data, 'PS12345')
     search_query.search()
     # current_app.logger.info(search_query.json)
     search_detail = SearchResult.create_from_search_query(search_query)
@@ -230,8 +230,16 @@ def test_search_valid(session, desc, search_data, select_data,certified):
     assert search_detail.search_id == search_query.id
     assert not search_detail.search_select
 
+    pay_params: dict = {
+        "searchId": str(search_detail.search_id),
+        "clientReferenceId": search_query.client_reference_id,
+        "accountId": search_query.account_id,
+        "certified": certified,
+        "staff": False,
+        "callbackURL": ""
+    }
     search_detail2 = SearchResult.validate_search_select(select_data, search_detail.search_id)
-    search_detail2.update_selection(select_data, 'account name', None, certified)
+    search_detail2.update_selection(select_data, 'account name', pay_params, None)
 
     # check
     # current_app.logger.debug(search_detail2.search_select)
@@ -442,7 +450,7 @@ def test_search_notes(session, mhr_num, has_notes, ncan_doc_id):
     # test
     search_data = copy.deepcopy(MHR_NUMBER_JSON)
     search_data['criteria']['value'] = mhr_num
-    search_query = SearchRequest.create_from_json(search_data, 'PS12345')
+    search_query: SearchRequest = SearchRequest.create_from_json(search_data, 'PS12345')
     search_query.search()
     # current_app.logger.info(search_query.json)
     search_detail = SearchResult.create_from_search_query(search_query)
@@ -453,8 +461,16 @@ def test_search_notes(session, mhr_num, has_notes, ncan_doc_id):
     assert not search_detail.search_select
     query_json = search_query.json
     select_data = query_json.get('results')
+    pay_params: dict = {
+        "searchId": str(search_detail.search_id),
+        "clientReferenceId": search_query.client_reference_id,
+        "accountId": search_query.account_id,
+        "certified": False,
+        "staff": True,
+        "callbackURL": ""
+    }
     search_detail2 = SearchResult.validate_search_select(select_data, search_detail.search_id)
-    search_detail2.update_selection(select_data, 'account name', None, True)
+    search_detail2.update_selection(select_data, 'account name', pay_params, None)
     # check
     # current_app.logger.debug(search_detail2.search_select)
     assert search_detail2.search_select

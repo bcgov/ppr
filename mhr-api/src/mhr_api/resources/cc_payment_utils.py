@@ -46,9 +46,11 @@ DRAFT_QUERY_PKEYS = """
 select get_mhr_draft_number() AS draft_num,
        nextval('mhr_draft_id_seq') AS draft_id
 """
+# 07 used by payment tracking job
 TRACKING_MESSAGES = {
     "00": "00: default credit card payment update error for invoice id={invoice_id}.",
     "01": "01: credit card payment set up complete for invoice id={invoice_id}.",
+    "01S": "01S: staff credit card payment set up complete for invoice id={invoice_id}.",
     "02": "02: credit card payment update set up error for invoice id={invoice_id}.",
     "03": "03: credit card payment update error no draft found for invoice id={invoice_id}.",
     "04": "04: credit card payment update error no registration for invoice id={invoice_id}.",
@@ -56,6 +58,10 @@ TRACKING_MESSAGES = {
     "06": "06: credit card payment update draft pending status CANCELLED for invoice id={invoice_id}.",
     "09": "09: credit card payment completed successfully for invoice id={invoice_id}.",
     "10": "10: create registration successful for cc payment invoice id={invoice_id}.",
+    "11": "11: search credit card payment set up complete for invoice id={invoice_id}.",
+    "11S": "11S: staff search credit card payment set up complete for invoice id={invoice_id}.",
+    "13": "13: credit card payment update error no search found for invoice id={invoice_id}.",
+    "14": "14: credit card payment update error search no pending payment for invoice id={invoice_id}.",
 }
 
 
@@ -92,6 +98,26 @@ def create_new_draft(json_data: dict) -> MhrDraft:
     return draft
 
 
+def track_search_payment(json_data: dict, account_id: str, search_id: str):
+    """
+    Create an event tracking record for search cc payment request.
+
+    Args:
+        json_data (dict): Search results response with payment informatiob.
+        account_id (str): Account ID that submitted the search request.
+        search_id (str): Search ID of the search request.
+    """
+    try:
+        invoice_id: int = int(json_data["payment"].get("invoiceId"))
+        if account_id != STAFF_ROLE:
+            track_event("11", invoice_id, HTTPStatus.OK, f"Search id=*{search_id}*.")
+        else:
+            pay_account_id: str = json_data["payment"].get("accountId", "")
+            track_event("11S", invoice_id, HTTPStatus.OK, f"Account {pay_account_id} search id=*{search_id}*.")
+    except Exception as err:  # noqa: B902; return nicer default error
+        logger.info(f"track_search_payment failed for search id {search_id}: {err}")
+
+
 def save_change_cc_draft(base_reg: MhrRegistration, json_data: dict) -> MhrRegistration:
     """
     Change registration with credit card payment create/update draft. Returns an unsaved registration
@@ -124,7 +150,12 @@ def save_change_cc_draft(base_reg: MhrRegistration, json_data: dict) -> MhrRegis
     base_reg.status_type = MhrRegistrationStatusTypes.DRAFT.value
     logger.info(f"Locking mhr {draft.mhr_number}: status changed from {current_status} to {base_reg.status_type}.")
     base_reg.save()
-    track_event("01", int(json_data["payment"].get("invoiceId")), HTTPStatus.OK, "Change registration draft saved.")
+    invoice_id: int = int(json_data["payment"].get("invoiceId"))
+    if draft.account_id != STAFF_ROLE:
+        track_event("01", invoice_id, HTTPStatus.OK, "Change registration draft saved.")
+    else:
+        pay_account_id: str = json_data["payment"].get("accountId", "")
+        track_event("01S", invoice_id, HTTPStatus.OK, f"Account {pay_account_id} change registration draft saved.")
     return registration
 
 
@@ -150,7 +181,12 @@ def save_new_cc_draft(json_data: dict) -> MhrRegistration:
     draft.save()
     registration.draft = draft
     registration.reg_json = json_data
-    track_event("01", int(json_data["payment"].get("invoiceId")), HTTPStatus.OK, "New registration draft saved.")
+    invoice_id: int = int(json_data["payment"].get("invoiceId"))
+    if draft.account_id != STAFF_ROLE:
+        track_event("01", invoice_id, HTTPStatus.OK, "New registration draft saved.")
+    else:
+        pay_account_id: str = json_data["payment"].get("accountId", "")
+        track_event("01S", invoice_id, HTTPStatus.OK, f"Account {pay_account_id} new registration draft saved.")
     return registration
 
 

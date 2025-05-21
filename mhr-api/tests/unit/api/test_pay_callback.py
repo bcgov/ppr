@@ -23,13 +23,29 @@ import pytest
 from flask import current_app
 from registry_schemas.example_data.mhr import REGISTRATION, EXEMPTION, PERMIT, TRANSFER
 
-from mhr_api.models import MhrDraft, MhrRegistration
+from mhr_api.models import MhrDraft, MhrRegistration, SearchRequest, SearchResult
 from mhr_api.models.mhr_draft import DRAFT_PAY_PENDING_PREFIX
+from mhr_api.models.search_result import SCORE_PAY_PENDING
 from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrRegistrationTypes
 from mhr_api.resources import cc_payment_utils
 from mhr_api.resources.registration_utils import setup_cc_draft
+from mhr_api.resources.v1.pay_callback import get_search_id
 
 
+# Valid search test data
+MHR_NUMBER_JSON = {
+    'type': 'MHR_NUMBER',
+    'criteria': {
+        'value': '000900'
+    },
+    'clientReferenceId': 'T-SQ-MM-1'
+}
+SET_SELECT_MM = [
+    {'mhrNumber': '000900', 'status': 'ACTIVE', 'createDateTime': '1995-11-14T00:00:01+00:00',
+     'homeLocation': 'CITY', 'serialNumber': '000060',
+     'baseInformation': {'year': 2015, 'make': 'make', 'model': 'model'},
+     'ownerName': {'first': 'BOB', 'middle': 'ARTHUR', 'last': 'MCKAY'}}
+]
 CC_PAYREF = {
      "invoiceId": "88888888",
      "receipt": "receipt",
@@ -54,6 +70,14 @@ TEST_CALLBACK_DATA = [
     ('Invalid missing status', HTTPStatus.BAD_REQUEST, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
     ('Invalid status', HTTPStatus.BAD_REQUEST, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
     ('Invalid used', HTTPStatus.OK, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
+]
+# testdata pattern is ({desc}, {invoice_id},  {search_id})
+TEST_SEARCH_ID_DATA = [
+    ('Valid', 20000200, 20000200),
+]
+# testdata pattern is ({description}, {status}, {search data}, {select data}, {invoice_id})
+TEST_SEARCH_DATA = [
+    ('MHR Number Match', HTTPStatus.OK, MHR_NUMBER_JSON, SET_SELECT_MM, "88888888"),
 ]
 
 
@@ -87,6 +111,47 @@ def setup_registration(draft_json: dict, reg_type: str, invoice_id: str) -> dict
     json_data = setup_cc_draft(json_data, pay_ref, "PS12345", "username@idir", "ppr_staff")
     return json_data
 
+
+# testdata pattern is ({description}, {search data}, {select data}, {invoice_id})
+@pytest.mark.parametrize('desc,status,search_data,select_data,invoice_id', TEST_SEARCH_DATA)
+def test_pay_callback_search(session, client, jwt, desc, status, search_data, select_data, invoice_id):
+    """Assert that completing a new cc payment search from a callback works as expected."""
+    if not current_app.config.get('SUBSCRIPTION_API_KEY'):
+        return
+    apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
+    headers = {
+        'x-apikey': apikey
+    }
+    pay_ref = copy.deepcopy(CC_PAYREF)
+    pay_ref["invoiceId"] = invoice_id
+    search_query: SearchRequest = SearchRequest.create_from_json(search_data, 'PS12345')
+    search_query.pay_invoice_id = int(invoice_id)
+    search_query.pay_path = invoice_id
+    search_query.search()
+    # current_app.logger.info(search_query.json)
+    search_detail: SearchResult = SearchResult.create_from_search_query(search_query)
+    search_detail.save()
+    pay_params: dict = {
+        "searchId": str(search_detail.search_id),
+        "clientReferenceId": search_query.client_reference_id,
+        "accountId": search_query.account_id,
+        "certified": False,
+        "staff": False,
+        "callbackURL": ""
+    }
+    search_detail2: SearchResult = SearchResult.validate_search_select(select_data, search_detail.search_id)
+    search_detail2.score = SCORE_PAY_PENDING
+    search_detail2.update_selection(select_data, 'account name', pay_params, pay_ref)
+    cc_payment_utils.track_search_payment(search_detail.search_response, "PS12345", str(search_query.id))
+    payload = copy.deepcopy(PUB_SUB_PAYLOAD)
+    payload["id"] = invoice_id
+    rv = client.post('/api/v1/pay-callback/' + invoice_id,
+                     json=payload,
+                     headers=headers,
+                     content_type='application/json')
+    # check
+    assert rv.status_code == status
+ 
 
 @pytest.mark.parametrize('desc,status,draft_json,mhr_num,reg_type,invoice_id', TEST_CALLBACK_DATA)
 def test_pay_callback(session, client, jwt, desc, status, draft_json, mhr_num, reg_type, invoice_id):
@@ -130,3 +195,15 @@ def test_pay_callback(session, client, jwt, desc, status, draft_json, mhr_num, r
                         headers=headers,
                         content_type='application/json')
         assert rv.status_code in (HTTPStatus.NOT_FOUND, HTTPStatus.BAD_REQUEST)
+
+
+@pytest.mark.parametrize('desc,invoice_id,search_id', TEST_SEARCH_ID_DATA)
+def test_get_search_id(session, client, jwt, desc, invoice_id, search_id):
+    """Assert that extracting a search id from event tracking record message works as expected."""
+    json_data = {
+        "payment": {"invoiceId": str(invoice_id)}
+    }
+    cc_payment_utils.track_search_payment(json_data, "PS12345", str(search_id))
+    test_search_id: int = get_search_id(str(invoice_id))
+    assert test_search_id
+    assert test_search_id == search_id
