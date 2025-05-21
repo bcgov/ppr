@@ -31,7 +31,7 @@ from mhr_api.utils.logging import logger
 MSG_CLIENT_CREDENTIALS_REQ_FAILED = "Client credentials request failed"
 MSG_INVALID_HTTP_VERB = "Invalid HTTP verb"
 
-EXCLUDED_CC_FILING_TYPES = ["MSRCH", "CSRCH", "MSRCS", "CSRCS", "MHRCD"]
+EXCLUDED_CC_FILING_TYPES = []  # ["MSRCH", "CSRCH", "MSRCS", "CSRCS", "MHRCD"]
 # Mapping from PPR transaction to Pay API filing type
 TRANSACTION_TO_FILING_TYPE = {
     "SEARCH": "MSRCH",
@@ -422,13 +422,7 @@ class SBCPaymentClient(BaseClient):
         logger.debug("create non-staff search paymnent payload:")
         logger.debug(json.dumps(data))
         invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data)
-        invoice_id = str(invoice_data["id"])
-        receipt_path = self.api_url.replace("https://", "")
-        receipt_path = receipt_path[receipt_path.find("/") : None] + PATH_RECEIPT.format(invoice_id=invoice_id)
-        # Return the pay reference to include in the API response.
-        pay_reference = {"invoiceId": invoice_id, "receipt": receipt_path}
-
-        return pay_reference
+        return SBCPaymentClient.build_pay_reference(invoice_data, self.api_url)
 
     def create_payment_staff_search(self, selections, transaction_info, mhr_id=None, client_reference_id=None):
         """Submit a staff search payment request for the MHR API transaction."""
@@ -440,7 +434,7 @@ class SBCPaymentClient(BaseClient):
         logger.debug("staff search create payment payload for account: " + self.account_id)
         logger.debug(json.dumps(data))
         invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data, include_account=True)
-        return SBCPaymentClient.build_pay_reference(invoice_data, self.api_url)
+        return SBCPaymentClient.build_pay_reference(invoice_data, self.api_url, self.account_id)
 
     def create_payment_staff(self, transaction_info, client_reference_id=None):
         """Submit a staff registration payment request for the MHR API transaction."""
@@ -450,7 +444,7 @@ class SBCPaymentClient(BaseClient):
         logger.debug("staff registration create payment payload: ")
         logger.debug(json.dumps(data))
         invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data, include_account=True)
-        return SBCPaymentClient.build_pay_reference(invoice_data, self.api_url)
+        return SBCPaymentClient.build_pay_reference(invoice_data, self.api_url, self.account_id)
 
     def cancel_payment(self, invoice_id):
         """Immediately cancel or refund the transaction payment as a state rollback."""
@@ -498,7 +492,7 @@ class SBCPaymentClient(BaseClient):
             raise err
 
     @staticmethod
-    def build_pay_reference(invoice_data, api_url: str):
+    def build_pay_reference(invoice_data, api_url: str, account_id: str = None):
         """Build a payment reference from the pay api response invoice info."""
         invoice_id = str(invoice_data["id"])
         receipt_path = api_url.replace("https://", "")
@@ -510,4 +504,6 @@ class SBCPaymentClient(BaseClient):
             pay_reference["paymentActionRequired"] = invoice_data.get("isPaymentActionRequired")
             # Replace with env var {PAYMENT_PORTAL_URL}
             pay_reference["paymentPortalURL"] = "{PAYMENT_PORTAL_URL}/{invoice_id}/{return_URL}"
+            if account_id:
+                pay_reference["accountId"] = account_id  # For staff payments this is the user account ID.
         return pay_reference

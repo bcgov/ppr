@@ -28,7 +28,9 @@ from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.models import EventTracking, SearchRequest, SearchResult
 from mhr_api.models import utils as model_utils
 from mhr_api.models.search_request import REPORT_STATUS_PENDING
+from mhr_api.models.search_result import SCORE_PAY_PENDING
 from mhr_api.resources import utils as resource_utils
+from mhr_api.resources.cc_payment_utils import track_search_payment
 from mhr_api.resources.v1.search_report_callback import get_search_report
 from mhr_api.services.authz import STAFF_ROLE, authorized, is_bcol_help, is_sbc_office_account, is_staff_account
 from mhr_api.services.document_storage.storage_service import GoogleStorageService
@@ -46,6 +48,7 @@ SAVE_ERROR_MESSAGE = "Account {0} search db save failed: {1}"
 PAY_REFUND_MESSAGE = "Account {0} search refunding payment for invoice {1}."
 PAY_REFUND_ERROR = "Account {0} search payment refund failed for invoice {1}: {2}."
 GET_DETAILS_ERROR = "Submit a search step 2 select results request before getting search result details."
+PAY_PENDING_ERROR = "Search results unavailable pending payment completion."
 SEARCH_RESULTS_DOC_NAME = "search-results-report-{search_id}.pdf"
 CALLBACK_MESSAGES = {
     resource_utils.CallbackExceptionCodes.UNKNOWN_ID: "01: no search result data found for id={search_id}.",
@@ -73,6 +76,7 @@ DAT_NUMBER_PARAM = "datNumber"
 BCOL_NUMBER_PARAM = "bcolAccountNumber"
 PRIORITY_PARAM = "priority"
 CLIENT_REF_PARAM = "clientReferenceId"
+REQUEST_PARAM_CC_PAY: str = "ccPayment"
 
 
 @bp.route("/<string:search_id>", methods=["POST", "OPTIONS"])
@@ -103,6 +107,8 @@ def post_search_results(search_id: str):  # pylint: disable=too-many-branches, t
             valid_format, errors = schema_utils.validate(request_json, "searchSummary", "mhr")
             if not valid_format:
                 return resource_utils.validation_error_response(errors, VAL_ERROR)
+        if request.args.get(ROUTING_SLIP_PARAM) and request.args.get(BCOL_NUMBER_PARAM):
+            return resource_utils.staff_payment_bcol_fas()
 
         # Perform any extra data validation such as start and end dates here
         search_detail: SearchResult = SearchResult.validate_search_select(request_json, search_id)
@@ -118,51 +124,11 @@ def post_search_results(search_id: str):  # pylint: disable=too-many-branches, t
         else:
             callback_url = None
 
-        # Charge a search fee.
-        payment = Payment(
-            jwt=jwt.get_token_auth_header(),
-            account_id=account_id,
-            details=get_payment_details(search_detail, request_json),
-        )
         query: SearchRequest = search_detail.search
-        pay_ref: None
-        invoice_id = None
-        certified: bool = False
-        # Conditionally update client reference id from request parameter.
-        # Do here to pass to an updated value to the pay api.
-        if request.args.get(CLIENT_REF_PARAM):
-            client_ref: str = request.args.get(CLIENT_REF_PARAM)
-            client_ref = client_ref.strip()
-            if client_ref is not None and len(client_ref) < 51:  # Allow empty strings as clearing the value.
-                query.client_reference_id = client_ref
-                # Also update the original search criteria json as this is used in the account search history.
-                criteria = copy.deepcopy(query.search_criteria)
-                criteria["clientReferenceId"] = client_ref
-                query.search_criteria = criteria
-                logger.info(f"POST search results updating client ref to {client_ref}.")
-
-        # Staff has special payment rules and setup.
-        if is_staff_account(account_id, jwt) or is_bcol_help(account_id, jwt):
-            logger.info(f"Setting up reg staff search for {account_id}.")
-            payment_info = build_staff_payment(request, account_id)
-            # bcol help is no fee; reg staff can be no fee.
-            # FAS is routing slip only.
-            # BCOL is dat number (optional) and BCOL account number (mandatory).
-            # All staff roles including SBC can submit no fee searches.
-            if ROUTING_SLIP_PARAM in payment_info and BCOL_NUMBER_PARAM in payment_info:
-                return resource_utils.staff_payment_bcol_fas()
-            pay_ref = payment.create_payment_staff_search(
-                request_json, payment_info, str(query.id), query.client_reference_id
-            )
-            if is_staff_account(account_id, jwt):
-                certified = payment_info.get(CERTIFIED_PARAM)
-        else:
-            pay_ref = payment.create_payment_search(
-                request_json,
-                str(query.id),
-                query.client_reference_id,
-                is_sbc_office_account(jwt.get_token_auth_header(), account_id),
-            )
+        query = update_reference_id(request, query)
+        pay_params = build_pay_request_params(request, jwt, account_id, query, callback_url)
+        # Charge a search fee.
+        payment, pay_ref = pay(request, jwt, search_detail, request_json, pay_params)
         invoice_id = pay_ref["invoiceId"]
         query.pay_invoice_id = int(invoice_id)
         query.pay_path = pay_ref["receipt"]
@@ -170,10 +136,7 @@ def post_search_results(search_id: str):  # pylint: disable=too-many-branches, t
             # Save the search query selection and details that match the selection.
             account_name = resource_utils.get_account_name(jwt.get_token_auth_header(), account_id)
             logger.debug("SearchResult.update_selection start")
-            # Add user access group for conditional report content.
-            search_detail.update_selection(
-                request_json, account_name, callback_url, certified, is_staff_account(account_id, jwt)
-            )
+            search_detail.update_selection(request_json, account_name, pay_params, pay_ref)
             query.save()
             logger.debug("SearchResult.update_selection end")
         except Exception as db_exception:  # noqa: B902; handle all db related errors.
@@ -187,13 +150,16 @@ def post_search_results(search_id: str):  # pylint: disable=too-many-branches, t
             raise db_exception
 
         response_data = search_detail.json
-        # queue report generation.
-        enqueue_search_report(search_id)
-        response_data["getReportURL"] = REPORT_URL.format(search_id=search_id)
+        if not pay_ref.get("ccPayment"):  # Queue report generation if payment complete (not cc payment pending).
+            enqueue_search_report(search_id)
+            response_data["getReportURL"] = REPORT_URL.format(search_id=search_id)
+        else:
+            logger.info(f"Report generation skipped (cc payment pending) for search ID={search_id}")
+            response_data["paymentPending"] = True
+            track_search_payment(response_data, account_id, search_id)
         if callback_url is None and search_detail.callback_url is not None:
             callback_url = search_detail.callback_url
             response_data["callbackURL"] = requests.utils.unquote(callback_url)
-
         return jsonify(response_data), HTTPStatus.OK
 
     except SBCPaymentException as pay_exception:
@@ -228,7 +194,7 @@ def get_search_results(search_id: str):  # pylint: disable=too-many-branches
         if search_id.find(("_" + REPORT_STATUS_PENDING)) != -1:
             search_id = search_id.replace(("_" + REPORT_STATUS_PENDING), "")
         logger.info(f"Fetching search detail for {search_id}.")
-        search_detail = SearchResult.find_by_search_id(search_id, True)
+        search_detail: SearchResult = SearchResult.find_by_search_id(search_id, True)
         if not search_detail:
             return resource_utils.not_found_error_response("searchId", search_id)
 
@@ -236,6 +202,9 @@ def get_search_results(search_id: str):  # pylint: disable=too-many-branches
         # with no exact matches and no results selected - nil, which is valid.
         if search_detail.search_select is None and search_detail.search.total_results_size > 0:
             return resource_utils.bad_request_response(GET_DETAILS_ERROR)
+
+        if search_detail.is_payment_pending():
+            return resource_utils.bad_request_response(PAY_PENDING_ERROR)
 
         if resource_utils.is_pdf(request):
             if search_detail.doc_storage_url is None:
@@ -295,7 +264,7 @@ def is_async(search_detail: SearchResult, search_select) -> bool:
     return False
 
 
-def get_payment_details(search_detail: SearchResult, request_json):
+def get_payment_details(search_detail: SearchResult, request_json, req: request):
     """Extract the payment details value from the search request criteria."""
     label = "MHR Search"
     for selected in request_json:
@@ -311,7 +280,77 @@ def get_payment_details(search_detail: SearchResult, request_json):
         )
     else:
         details["value"] = search_criteria["criteria"]["value"]
+    if req:
+        details["ccPayment"] = req.args.get(REQUEST_PARAM_CC_PAY) if request.args.get(REQUEST_PARAM_CC_PAY) else False
     return details
+
+
+def update_reference_id(req: request, query: SearchRequest):
+    """Conditionally update the search client reference id from the results request parameter."""
+    if request.args.get(CLIENT_REF_PARAM):
+        client_ref: str = request.args.get(CLIENT_REF_PARAM)
+        client_ref = client_ref.strip()
+        if client_ref is not None and len(client_ref) < 51:  # Allow empty strings as clearing the value.
+            query.client_reference_id = client_ref
+            # Also update the original search criteria json as this is used in the account search history.
+            criteria = copy.deepcopy(query.search_criteria)
+            criteria["clientReferenceId"] = client_ref
+            query.search_criteria = criteria
+            logger.info(f"POST search results id = {query.id} updating client ref to {client_ref}.")
+    return query
+
+
+def build_pay_request_params(req: request, jwt_, account_id: str, query: SearchRequest, callback_url: str) -> dict:
+    """Set up the basic pay-api request properties from the the search results request."""
+    pay_params: dict = {
+        "searchId": str(query.id),
+        "clientReferenceId": query.client_reference_id,
+        "accountId": account_id,
+        "certified": False,
+        "staff": is_staff_account(account_id, jwt_),
+        "callbackURL": callback_url if callback_url else "",
+    }
+    if is_staff_account(account_id, jwt_):
+        certified = req.args.get(CERTIFIED_PARAM)
+        if certified is not None and isinstance(certified, bool) and certified:
+            pay_params["certified"] = True
+        elif certified is not None and isinstance(certified, str) and certified.lower() in ["true", "1", "y", "yes"]:
+            pay_params["certified"] = True
+    return pay_params
+
+
+def pay(req: request, jwt_, search_detail: SearchResult, request_json: dict, pay_params: dict):
+    """Set up and submit a pay-api request."""
+    pay_ref = None
+    account_id: str = pay_params.get("accountId")
+    search_id: str = pay_params.get("searchId")
+    client_ref: str = pay_params.get("clientReferenceId")
+
+    payment = Payment(
+        jwt=jwt_.get_token_auth_header(),
+        account_id=account_id,
+        details=get_payment_details(search_detail, request_json, req),
+    )
+    # Staff has special payment rules and setup.
+    if is_staff_account(account_id, jwt_) or is_bcol_help(account_id, jwt_):
+        logger.info(f"Setting up reg staff search for {account_id}.")
+        payment_info = build_staff_payment(request, account_id)
+        # bcol help is no fee; reg staff can be no fee.
+        # FAS is routing slip only.
+        # BCOL is dat number (optional) and BCOL account number (mandatory).
+        # All staff roles including SBC can submit no fee searches.
+        pay_ref = payment.create_payment_staff_search(request_json, payment_info, search_id, client_ref)
+    else:
+        pay_ref = payment.create_payment_search(
+            request_json,
+            search_id,
+            client_ref,
+            is_sbc_office_account(jwt_.get_token_auth_header(), account_id),
+        )
+    if pay_ref.get("ccPayment"):
+        logger.info("Search result payment response CC method.")
+        search_detail.score = SCORE_PAY_PENDING
+    return payment, pay_ref
 
 
 def build_staff_payment(req: request, account_id: str):
@@ -341,7 +380,7 @@ def build_staff_payment(req: request, account_id: str):
     elif priority is not None and isinstance(priority, str) and priority.lower() in ["true", "1", "y", "yes"]:
         payment_info[PRIORITY_PARAM] = True
 
-    if ROUTING_SLIP_PARAM in payment_info or BCOL_NUMBER_PARAM in payment_info:
+    if ROUTING_SLIP_PARAM in payment_info or BCOL_NUMBER_PARAM in payment_info or req.args.get(REQUEST_PARAM_CC_PAY):
         payment_info["waiveFees"] = False
     logger.debug(payment_info)
     return payment_info
