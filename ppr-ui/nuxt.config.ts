@@ -62,7 +62,7 @@ export default defineNuxtConfig({
     '~/components/unitNotes',
     '~/components/userAccess'
   ],
-  // extends: '@sbc-connect/nuxt-core-layer',
+  extends: '@sbc-connect/nuxt-core-layer',
   app: {
     buildAssetsDir: '/src/',
     head: {
@@ -106,7 +106,6 @@ export default defineNuxtConfig({
     'nuxt-lodash',
     '@nuxt/test-utils/module',
     '@nuxt/ui',
-    '@nuxtjs/tailwindcss',
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
         config.plugins.push(vuetify({ autoImport: true }))
@@ -127,6 +126,11 @@ export default defineNuxtConfig({
     typeCheck: false
   },
   vite: {
+    server: {
+      watch: {
+        usePolling: true
+      }
+    },
     // Configure Vite's logging level
     logLevel: 'silent', // Options: 'info', 'warn', 'error', 'silent'
     optimizeDeps: {
