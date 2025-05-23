@@ -1,0 +1,247 @@
+/* Lines below re-import Tailwind base styles to fix issues where utilities didn't work due to Vuetify's global reset */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import "tailwindcss" theme(static);
+@import "@nuxt/ui";
+@source "../../../node_modules/@sbc-connect/nuxt-core-layer-beta";
+
+/* Customize Nuxt UI default tokens */
+:root {
+  /* Slightly elevated background */
+  --ui-bg-elevated: var(--ui-color-neutral-200);
+  /* More prominent background */
+  --ui-bg-accented: var(--ui-color-neutral-300);
+}
+
+@theme static {
+  /* font */
+  --font-sans: 'BCSans', 'Verdana', 'Arial', 'sans-serif';
+
+  /* widths */
+  --container-bcGovMd: 1020px;
+  --container-bcGovLg: 1360px;
+  --container-bcGovInput: 600px;
+
+  /* list style types */
+  --marker-alpha: lower-alpha;
+  --marker-upper-alpha: upper-alpha;
+
+  /* box shadow */
+  --shadow-bcGovInput: inset 0 -1px 0 0px #495057;
+  --shadow-bcGovInputFocus: inset 0 -2px 0 0px #1669bb;
+  --shadow-bcGovInputError: inset 0 -2px 0 0px #D3272C;
+
+  /* COLOURS */
+  /* these colours are as defined in styleguide: */
+  /* https://preview.uxpin.com/73eb31e6346bc2863a066f02218a3af289325619#/pages/138840439/simulate/sitemap?mode=i */
+  /* for more details see previous link */
+  /* last updated on (2023-10-16) */
+  /* PRIMARY COLOURS */
+  --color-bcGovColor-footer: #003366;
+  --color-bcGovColor-header: #003366;
+  --color-bcGovColor-navDivider: #FCBA19;
+  /* LINK COLOURS */
+  --color-bcGovColor-activeBlue: #1669BB;
+  --color-bcGovColor-markBlue: #1a5a96;
+  --color-bcGovColor-markBlueHover: #0000EE;
+  /* TEXT/NON-CLICKABLE COLOURS */
+  --color-bcGovColor-darkGray: #212529;
+  --color-bcGovColor-midGray: #495057;
+  --color-bcGovColor-lightGray: #757575;
+  --color-bcGovColor-nonClickable: #38598A;
+  /* BACKGROUND COLOURS */
+  --color-bcGovColor-white: #FFFFFF;
+  --color-bcGovColor-gray1: #F1F3F5;
+  --color-bcGovColor-gray2: #E2E8EE;
+  --color-bcGovColor-lightBlue: #E4EDF7;
+  /* LINES */
+  --color-bcGovColor-hairlinesOnWhite: #DEE2E6;
+  --color-bcGovColor-specialityDottedLines: #899EB2;
+  --color-bcGovColor-formFieldLines: #6F7780;
+  /* OUTCOMES */
+  --color-outcomes-approved: #2E8540;
+  --color-outcomes-error: #D3272C;
+  --color-outcomes-caution: #F8661A;
+
+  /* GRAY */
+  --color-bcGovGray-50: #f8f9fa;
+  --color-bcGovGray-100: #f1f3f5;
+  --color-bcGovGray-200: #e9ecef;
+  --color-bcGovGray-300: #dee2e6;
+  --color-bcGovGray-400: #ced4da;
+  --color-bcGovGray-500: #adb5bd;
+  --color-bcGovGray-600: #868e96;
+  --color-bcGovGray-700: #495057;
+  --color-bcGovGray-800: #343a40;
+  --color-bcGovGray-900: #212529;
+  --color-bcGovGray-950: #232529;
+  
+  /* BLUE */
+  --color-blue-50: #e4edf7;
+  --color-blue-100: #e0e7ed;
+  --color-blue-150: #b3c2d1;
+  --color-blue-200: #8099b3;
+  --color-blue-300: #4d7094;
+  --color-blue-350: #38598a;
+  --color-blue-400: #26527d;
+  --color-blue-500: #1669bb;
+  --color-blue-600: #125192;
+  --color-blue-700: #002e5e;
+  --color-blue-800: #002753;
+  --color-blue-900: #002049;
+  --color-blue-950: #001438;
+
+  /* RED */
+  --color-red-50: #fef2f2;
+  --color-red-100: #fde3e4;
+  --color-red-200: #fdcbcc;
+  --color-red-300: #faa7a9;
+  --color-red-400: #f57478;
+  --color-red-500: #eb484d;
+  --color-red-600: #d3272c;
+  --color-red-700: #b52024;
+  --color-red-800: #961e21;
+  --color-red-900: #7d1f22;
+  --color-red-950: #440b0d;
+
+  /* YELLOW */
+  --color-yellow-50: #fffbeb;
+  --color-yellow-100: #fef2c7;
+  --color-yellow-200: #fee589;
+  --color-yellow-300: #fdd14c;
+  --color-yellow-400: #fcba19;
+  --color-yellow-500: #f69b0a;
+  --color-yellow-600: #da7505;
+  --color-yellow-700: #b55108;
+  --color-yellow-800: #933e0d;
+  --color-yellow-900: #79340e;
+  --color-yellow-950: #451903;
+
+  /* GREEN */
+  --color-green-50: #f2fbf4;
+  --color-green-100: #e2f6e6;
+  --color-green-200: #c6eccd;
+  --color-green-300: #99dca6;
+  --color-green-400: #65c378;
+  --color-green-500: #40a755;
+  --color-green-600: #2e8540;
+  --color-green-700: #286d37;
+  --color-green-800: #24572f;
+  --color-green-900: #1f4828;
+  --color-green-950: #0c2713;
+
+  /* MIDNIGHT BLUE */
+  --color-midnightBlue-50: #eef7ff;
+  --color-midnightBlue-100: #dceeff;
+  --color-midnightBlue-200: #b2dfff;
+  --color-midnightBlue-300: #6dc6ff;
+  --color-midnightBlue-400: #20a8ff;
+  --color-midnightBlue-500: #008dff;
+  --color-midnightBlue-600: #006edf;
+  --color-midnightBlue-700: #0057b4;
+  --color-midnightBlue-800: #004a94;
+  --color-midnightBlue-900: #003366;
+  --color-midnightBlue-950: #002651;
+}
+
+@font-face {
+  font-family: "BCSans";
+  font-style: normal;
+  font-weight: 400;
+  src: url("BCGovFonts/BCSans-Regular.woff2") format("woff2"),
+       url("BCGovFonts/BCSans-Regular.woff") format("woff"); /* Optimized for very modern browsers */
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "BCSans";
+  font-style: italic;
+  font-weight: 400;
+  src: url("BCGovFonts/BCSans-Italic.woff2") format("woff2"),
+       url("BCGovFonts/BCSans-Italic.woff") format("woff"); /* Optimized for very modern browsers */
+  font-display: swap;
+}
+@font-face {
+  font-family: "BCSans";
+  font-weight: 700;
+  src: url("BCGovFonts/BCSans-Bold.woff2") format("woff2"),
+       url("BCGovFonts/BCSans-Bold.woff") format("woff"); /* Optimized for very modern browsers */
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "BCSans";
+  font-style: italic;
+  font-weight: 700;
+  src: url("BCGovFonts/BCSans-BoldItalic.woff2") format("woff2"),
+       url("BCGovFonts/BCSans-BoldItalic.woff") format("woff"); /* Optimized for very modern browsers */
+  font-display: swap;
+}
+
+html,
+body {
+  min-height: 100dvh; /* Modern browsers */
+  min-height: 100vh;
+  font-family: 'BCSans', Verdana, Arial, sans-serif;
+  font-size: 0.875rem;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (min-width: 960px) {
+  html,
+  body {
+    font-size: 1rem;
+  }
+}
+
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply text-bcGovGray-900;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-bold;
+  }
+
+  h1,
+  h2 {
+    @apply leading-9;
+  }
+
+  h1 {
+    @apply text-3xl;
+  }
+
+  h2 {
+    @apply text-lg;
+  }
+
+  h3 {
+    @apply text-base;
+  }
+
+  p {
+    @apply font-normal text-bcGovColor-midGray;
+  }
+
+  td,
+  th {
+    @apply text-gray-900 text-sm;
+  }
+
+  /* floating labels */
+  .floating-label-input {
+    @apply pointer-events-none absolute left-0 top-3 text-bcGovGray-900 transition-all motion-reduce:transition-none duration-100 text-xs font-medium px-2.5 peer-focus:top-1 peer-focus:text-xs peer-placeholder-shown:text-sm peer-placeholder-shown:top-1/2 -translate-y-1/2 peer-focus:text-blue-500;
+  }
+  
+  .floating-label-textarea {
+    @apply pointer-events-none absolute left-0 top-1 text-bcGovGray-900 text-xs font-medium px-2.5 transition-all peer-focus:top-1 peer-focus:text-xs peer-placeholder-shown:text-sm peer-placeholder-shown:top-2.5 peer-focus:translate-none peer-focus:text-blue-500;
+  }
+}
