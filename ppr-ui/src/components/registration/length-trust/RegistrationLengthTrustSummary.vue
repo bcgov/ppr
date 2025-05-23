@@ -7,8 +7,11 @@
       v-if="isRenewal"
       class="pt-2 pb-5 renewal-title"
     >
-      Renewal Length and <span v-if="showTrustIndenture">Trust Indenture</span>
+      Renewal Length
+      <span v-if="!isRlTransition">
+        and <span v-if="showTrustIndenture">Trust Indenture</span>
       <span v-else>Terms</span>
+      </span>
     </h2>
     <v-row
       v-else
@@ -115,36 +118,38 @@
           {{ trustIndentureSummary }}
         </v-col>
       </v-row>
-      <v-row
-        v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
-        no-gutters
-        class="pt-6"
+      <template
+        v-if="!getFeatureFlag('cla-enabled') && !isRenewal && registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
       >
-        <v-col
-          cols="3"
-          class="generic-label"
+        <v-row
+          no-gutters
+          class="pt-6"
         >
-          Amount of Lien
-        </v-col>
-        <v-col class="summary-text">
-          {{ lienAmountSummary }}
-        </v-col>
-      </v-row>
-      <v-row
-        v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
-        no-gutters
-        class="pt-6"
-      >
-        <v-col
-          cols="3"
-          class="generic-label"
+          <v-col
+            cols="3"
+            class="generic-label"
+          >
+            Amount of Lien
+          </v-col>
+          <v-col class="summary-text">
+            {{ lienAmountSummary }}
+          </v-col>
+        </v-row>
+        <v-row
+          no-gutters
+          class="pt-6"
         >
-          Surrender Date
-        </v-col>
-        <v-col class="summary-text">
-          {{ surrenderDateSummary }}
-        </v-col>
-      </v-row>
+          <v-col
+            cols="3"
+            class="generic-label"
+          >
+            Surrender Date
+          </v-col>
+          <v-col class="summary-text">
+            {{ surrenderDateSummary }}
+          </v-col>
+        </v-row>
+      </template>
     </v-container>
   </v-card>
 </template>
@@ -162,7 +167,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 // local
 import type { LengthTrustIF } from '@/interfaces'
-import { convertDate, formatExpiryDate, isInt } from '@/utils'
+import { convertDate, formatExpiryDate, getFeatureFlag, isInt } from '@/utils'
 import { APIRegistrationTypes, RouteNames, RegistrationFlowType } from '@/enums'
 import { getFinancingFee } from '@/composables/fees/factories'
 import { storeToRefs } from 'pinia'
@@ -327,6 +332,7 @@ export default defineComponent({
     }
 
     return {
+      getFeatureFlag,
       isRlTransition,
       goToLengthTrust,
       APIRegistrationTypes,

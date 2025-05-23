@@ -98,7 +98,7 @@ export async function fetchConfig (): Promise<any> {
 
   // set Base for Vue Router
   // eg, "/basePath/xxxx/"
-  const vueRouterBase = processEnvBaseUrl
+  const vueRouterBase = window.location.pathname
   sessionStorage.setItem('VUE_ROUTER_BASE', vueRouterBase)
   console.info('Set Vue Router Base to: ' + vueRouterBase)
 
