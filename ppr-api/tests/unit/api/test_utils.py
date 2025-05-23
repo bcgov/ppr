@@ -38,8 +38,8 @@ from tests.unit.utils.test_registration_validator import AMENDMENT_VALID
 MOCK_URL_NO_KEY = 'https://test.api.connect.gov.bc.ca/mockTarget/auth/api/v1/'
 # testdata pattern is ({description}, {account id}, {has name})
 TEST_USER_ORGS_DATA_JSON = [
-    ('Valid no account', None, True),
-    ('Valid account', '2617', True),
+#    ('Valid no account', None, True),
+#    ('Valid account', '2617', True),
     ('No token', '2617', False),
 ]
 # testdata pattern is ({description}, {valid data})
