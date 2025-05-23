@@ -668,7 +668,7 @@ def test_get_statement(session, client, jwt, desc, roles, status, has_account, r
     current_app.config.update(AUTH_SVC_URL=MOCK_URL_NO_KEY)
     headers = None
     if status == HTTPStatus.UNAUTHORIZED and desc.startswith('Report'):
-        headers = create_header_account_report(jwt, roles)
+        headers = create_header_account_report(jwt, roles, 'test-user', 'PS987621')
     elif has_account and BCOL_HELP in roles:
         headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
     elif has_account and STAFF_ROLE in roles:

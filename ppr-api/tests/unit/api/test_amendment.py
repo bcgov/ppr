@@ -584,7 +584,7 @@ def test_get_amendment(session, client, jwt, desc, roles, status, has_account, r
     headers = None
     # setup
     if status == HTTPStatus.UNAUTHORIZED and desc.startswith('Report'):
-        headers = create_header_account_report(jwt, roles)
+        headers = create_header_account_report(jwt, roles, 'test-user', 'PS987621')
     elif has_account and BCOL_HELP in roles:
         headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
     elif has_account and STAFF_ROLE in roles:
