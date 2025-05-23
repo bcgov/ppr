@@ -118,36 +118,38 @@
           {{ trustIndentureSummary }}
         </v-col>
       </v-row>
-      <v-row
-        v-if="!getFeatureFlag('cla-enabled') && registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
-        no-gutters
-        class="pt-6"
+      <template
+        v-if="!getFeatureFlag('cla-enabled') && !isRenewal && registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
       >
-        <v-col
-          cols="3"
-          class="generic-label"
+        <v-row
+          no-gutters
+          class="pt-6"
         >
-          Amount of Lien
-        </v-col>
-        <v-col class="summary-text">
-          {{ lienAmountSummary }}
-        </v-col>
-      </v-row>
-      <v-row
-        v-if="!getFeatureFlag('cla-enabled') && registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
-        no-gutters
-        class="pt-6"
-      >
-        <v-col
-          cols="3"
-          class="generic-label"
+          <v-col
+            cols="3"
+            class="generic-label"
+          >
+            Amount of Lien
+          </v-col>
+          <v-col class="summary-text">
+            {{ lienAmountSummary }}
+          </v-col>
+        </v-row>
+        <v-row
+          no-gutters
+          class="pt-6"
         >
-          Surrender Date
-        </v-col>
-        <v-col class="summary-text">
-          {{ surrenderDateSummary }}
-        </v-col>
-      </v-row>
+          <v-col
+            cols="3"
+            class="generic-label"
+          >
+            Surrender Date
+          </v-col>
+          <v-col class="summary-text">
+            {{ surrenderDateSummary }}
+          </v-col>
+        </v-row>
+      </template>
     </v-container>
   </v-card>
 </template>
