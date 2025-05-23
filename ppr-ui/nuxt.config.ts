@@ -96,9 +96,6 @@ export default defineNuxtConfig({
     '@': path.resolve(__dirname, './src'),
     '@sbc': path.resolve(__dirname, './node_modules/sbc-common-components/src')
   },
-  ui: {
-    icons: ['mdi']
-  },
   ssr: false,
   modules: [
     '@nuxt/eslint',
@@ -107,12 +104,40 @@ export default defineNuxtConfig({
     '@nuxt/test-utils/module',
     '@nuxt/ui',
     '@nuxtjs/tailwindcss',
+    '@nuxtjs/i18n',
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
         config.plugins.push(vuetify({ autoImport: true }))
       })
     }
   ],
+  ui: {
+    icons: ['mdi']
+  },
+  i18n: {
+    locales: [
+      {
+        name: 'English',
+        code: 'en-CA',
+        iso: 'en-CA',
+        dir: 'ltr',
+        file: 'en-CA.ts'
+      },
+      {
+        name: 'Français',
+        code: 'fr-CA',
+        iso: 'fr-CA',
+        dir: 'ltr',
+        file: 'fr-CA.ts'
+      }
+    ],
+      strategy: 'prefix',
+      lazy: true,
+      langDir: 'locales',
+      defaultLocale: 'en-CA',
+      detectBrowserLanguage: false,
+      vueI18n: './i18n.config.ts'
+  },
   typescript: {
     tsConfig: {
       compilerOptions: {

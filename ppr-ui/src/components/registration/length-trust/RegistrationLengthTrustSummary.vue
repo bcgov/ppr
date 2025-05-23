@@ -7,8 +7,11 @@
       v-if="isRenewal"
       class="pt-2 pb-5 renewal-title"
     >
-      Renewal Length and <span v-if="showTrustIndenture">Trust Indenture</span>
+      Renewal Length
+      <span v-if="!isRlTransition">
+        and <span v-if="showTrustIndenture">Trust Indenture</span>
       <span v-else>Terms</span>
+      </span>
     </h2>
     <v-row
       v-else
@@ -116,7 +119,7 @@
         </v-col>
       </v-row>
       <v-row
-        v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
+        v-if="!getFeatureFlag('cla-enabled') && registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
         no-gutters
         class="pt-6"
       >
@@ -131,7 +134,7 @@
         </v-col>
       </v-row>
       <v-row
-        v-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
+        v-if="!getFeatureFlag('cla-enabled') && registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
         no-gutters
         class="pt-6"
       >
@@ -162,7 +165,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 // local
 import type { LengthTrustIF } from '@/interfaces'
-import { convertDate, formatExpiryDate, isInt } from '@/utils'
+import { convertDate, formatExpiryDate, getFeatureFlag, isInt } from '@/utils'
 import { APIRegistrationTypes, RouteNames, RegistrationFlowType } from '@/enums'
 import { getFinancingFee } from '@/composables/fees/factories'
 import { storeToRefs } from 'pinia'
@@ -327,6 +330,7 @@ export default defineComponent({
     }
 
     return {
+      getFeatureFlag,
       isRlTransition,
       goToLengthTrust,
       APIRegistrationTypes,
