@@ -34,6 +34,7 @@ from .search_utils import GET_HISTORY_DAYS_LIMIT
 
 # PPR UI search detail report callbackURL parameter: skip notification if request originates from UI.
 UI_CALLBACK_URL = "PPR_UI"
+SCORE_PAY_PENDING: int = 1000
 
 
 class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -68,13 +69,28 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return the search query results as a json object."""
         result = None
         if self.search_response:
-            result = self.search_response
+            if self.score and self.score == SCORE_PAY_PENDING:
+                result = {
+                    "searchDateTime": self.search_response.get("searchDateTime", ""),
+                    "searchQuery": self.search_response.get("searchQuery", ""),
+                    "exactResultsSize": self.search_response.get("exactResultsSize", 0),
+                    "similarResultsSize": self.search_response.get("similarResultsSize", 0),
+                    "payment": self.search_response.get("payment"),
+                    "paymentPending": True,
+                    "totalResultsSize": self.search_response.get("totalResultsSize", 0),
+                }
+            else:
+                result = self.search_response
             # Distinguish a search with matches where none are selected from no results found.
             if not self.search_select and self.search.total_results_size > 0:
                 result["selected"] = self.search_select
             elif self.search_select:
                 result["selected"] = self.search_select
         return result
+
+    def is_payment_pending(self):
+        """Evaluate if search results are waiting on payment completion."""
+        return self.score and self.score == SCORE_PAY_PENDING
 
     def save(self):
         """Render a search results detail information to the local cache."""
@@ -85,14 +101,7 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             logger.error("DB search_result save exception: " + str(db_exception))
             raise DatabaseException(db_exception) from db_exception
 
-    def update_selection(  # pylint: disable=too-many-arguments,too-many-positional-arguments
-        self,
-        search_select,
-        account_name: str = None,
-        callback_url: str = None,
-        certified: bool = False,
-        staff: bool = False,
-    ):
+    def update_selection(self, search_select, account_name: str, pay_params: dict, pay_ref: dict):
         """Update the set of search details from the search query selection.
 
         Remove any original matches that are not in the current search query selection.
@@ -103,11 +112,13 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             "searchQuery": self.search.search_criteria,
             "certified": False,
         }
-        if certified:
+        if pay_params.get("certified"):
             detail_response["certified"] = True
         client_ref: str = "" if not self.search.client_reference_id else self.search.client_reference_id
         detail_response["searchQuery"]["clientReferenceId"] = client_ref
-        if self.search.pay_invoice_id and self.search.pay_path:
+        if pay_ref:
+            detail_response["payment"] = pay_ref
+        elif self.search.pay_invoice_id and self.search.pay_path:
             payment = {"invoiceId": str(self.search.pay_invoice_id), "receipt": self.search.pay_path}
             detail_response["payment"] = payment
         # Nothing else to do if search had no results.
@@ -116,9 +127,8 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             self.search_response = detail_response
             self.save()
             return
-
         self.set_search_selection(search_select)
-        detail_response["details"] = self.build_details(staff)
+        detail_response["details"] = self.build_details(pay_params.get("staff"))
         # logger.debug('saving updates')
         # Update summary information and save.
         select_count = len(detail_response["details"])
@@ -127,8 +137,8 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         self.search_response = detail_response
         if account_name:
             self.account_name = account_name
-        if callback_url:
-            self.callback_url = callback_url
+        if pay_params.get("callbackURL"):
+            self.callback_url = pay_params.get("callbackURL")
         else:
             results_length = len(json.dumps(detail_response["details"]))
             logger.debug(f"Search id= {self.search_id} results size={results_length}.")

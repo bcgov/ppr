@@ -42,6 +42,7 @@ export interface FinancingStatementIF {
   error?: ErrorIF
   transitioned?: boolean // Included if the CL registration was transitioned from a repairers lien.
   authorizationReceived?: boolean // Always true for the UI: API requirement.
+  paymentPending?: boolean
 }
 
 // Amendment Statement interface. All dates/date time properties are in the ISO 8601 format YYYY-MM-DDThh:mm:ssTZD.
@@ -71,6 +72,7 @@ export interface AmendmentStatementIF {
   payment?: PaymentIF // Included in a successful response.
   error?: ErrorIF
   authorizationReceived?: boolean // Always true for the UI: API requirement.
+  paymentPending?: boolean
 }
 
 // Draft interface. Change statement draft is out of scope.
@@ -171,6 +173,7 @@ export interface MhRegistrationSummaryIF {
   baseRegistrationNumber?: string
   changes?: MhRegistrationSummaryIF []
   hasDraft?: boolean
+  invoiceId?: string
   documentId?: string
   documentRegistrationNumber?: string
   expand?: boolean // used in UI table to toggle expansion.
@@ -219,4 +222,5 @@ export interface RenewRegistrationIF {
   error?: ErrorIF
   authorizationReceived?: boolean // Always true for the UI: API requirement.
   courtOrderInformation?: CourtOrderIF // Only populated if RL renewal and all court order elements present.
+  paymentPending?: boolean
 }

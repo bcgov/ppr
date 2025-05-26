@@ -261,7 +261,7 @@ def test_get_payment_details(session, client, jwt, desc, type, search_data, sele
     result: SearchResult = SearchResult(search_id=1, search=search)
 
     # test
-    details = get_payment_details(result, select_data)
+    details = get_payment_details(result, select_data, None)
 
     # check
     assert details

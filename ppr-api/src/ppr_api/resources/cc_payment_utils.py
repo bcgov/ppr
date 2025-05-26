@@ -34,6 +34,7 @@ from ppr_api.models import utils as model_utils
 from ppr_api.models.draft import DRAFT_PAY_PENDING_PREFIX
 from ppr_api.models.registration import ACCOUNT_DRAFT_USED_SUFFIX, MiscellaneousTypes
 from ppr_api.resources.financing_utils import save_rl_transition
+from ppr_api.services.authz import STAFF_ROLE
 from ppr_api.utils.logging import logger
 
 DRAFT_QUERY_PKEYS = """
@@ -41,15 +42,23 @@ select get_draft_document_number() AS doc_num,
        nextval('draft_id_seq') AS draft_id
 """
 REG_STATUS_LOCKED = "L"
+REG_STATUS_UNLOCKED = "Y"
+# 07 used by payment tracking job
 TRACKING_MESSAGES = {
     "00": "00: default credit card payment update error for invoice id={invoice_id}.",
     "01": "01: credit card payment set up complete for invoice id={invoice_id}.",
+    "01S": "01S: staff credit card payment set up complete for invoice id={invoice_id}.",
     "02": "02: credit card payment update set up error for invoice id={invoice_id}.",
     "03": "03: credit card payment update error no draft found for invoice id={invoice_id}.",
     "04": "04: credit card payment update error no registration for invoice id={invoice_id}.",
     "05": "05: credit card payment update pay status CANCELLED for invoice id={invoice_id}.",
+    "06": "06: credit card payment update draft pending status CANCELLED for invoice id={invoice_id}.",
     "09": "09: credit card payment completed successfully for invoice id={invoice_id}.",
     "10": "10: create registration successful for cc payment invoice id={invoice_id}.",
+    "11": "11: search credit card payment set up complete for invoice id={invoice_id}.",
+    "11S": "11S: staff search credit card payment set up complete for invoice id={invoice_id}.",
+    "13": "13: credit card payment update error no search found for invoice id={invoice_id}.",
+    "14": "14: credit card payment update error search no pending payment for invoice id={invoice_id}.",
 }
 
 
@@ -94,6 +103,26 @@ def create_new_draft(json_data: dict, registration_class: str, base_reg_num: str
     draft.id = int(row[1])
     logger.info(f"New draft created id={draft.id} doc number={draft.document_number}")
     return draft
+
+
+def track_search_payment(json_data: dict, account_id: str, search_id: str):
+    """
+    Create an event tracking record for search cc payment request.
+
+    Args:
+        json_data (dict): Search results response with payment informatiob.
+        account_id (str): Account ID that submitted the search request.
+        search_id (str): Search ID of the search request.
+    """
+    try:
+        invoice_id: int = int(json_data["payment"].get("invoiceId"))
+        if account_id != STAFF_ROLE:
+            track_event("11", invoice_id, HTTPStatus.OK, f"Search id=*{search_id}*.")
+        else:
+            pay_account_id: str = json_data["payment"].get("accountId", "")
+            track_event("11S", invoice_id, HTTPStatus.OK, f"Account {pay_account_id} search id=*{search_id}*.")
+    except Exception as err:  # noqa: B902; return nicer default error
+        logger.info(f"track_search_payment failed for search id {search_id}: {err}")
 
 
 def save_change_cc_draft(base_reg: Registration, json_data: dict, new_reg: Registration) -> Registration:

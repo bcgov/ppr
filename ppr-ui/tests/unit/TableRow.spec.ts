@@ -3,7 +3,7 @@ import { useStore } from '@/store/store'
 import type { DraftResultIF, MhrDraftIF, MhRegistrationSummaryIF, RegistrationSummaryIF } from '@/interfaces'
 import {
   mockedDraft1,
-  mockedDraftAmend,
+  mockedDraftAmend, mockedDraftRegistration,
   mockedLockedMhRegistration,
   mockedManufacturerAuthRoles,
   mockedMhDraft,
@@ -637,7 +637,7 @@ describe('Mhr TableRow tests', () => {
       { ...mockedMhRegistration, statusType: MhApiStatusTypes.EXEMPT },
       { ...mockedMhRegistration, statusType: MhApiStatusTypes.CANCELLED },
       { ...mockedMhRegistration, statusType: MhApiStatusTypes.ACTIVE },
-      { ...mockedMhRegistration, statusType: MhApiStatusTypes.DRAFT },
+      { ...mockedDraftRegistration, statusType: MhApiStatusTypes.DRAFT },
       { ...mockedMhRegistration, statusType: MhApiStatusTypes.FROZEN }
     ]
 

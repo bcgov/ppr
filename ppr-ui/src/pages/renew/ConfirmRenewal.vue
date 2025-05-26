@@ -184,7 +184,7 @@ export default defineComponent({
   setup (props, { emit }) {
     const route = useRoute()
     const router = useRouter()
-    const { goToDash } = useNavigation()
+    const { goToDash, goToPay } = useNavigation()
     const { isAuthenticated } = useAuth()
     const {
       // Actions
@@ -311,6 +311,8 @@ export default defineComponent({
       localState.submitting = false
       if (apiResponse === undefined || apiResponse?.error !== undefined) {
         emit('error', apiResponse?.error)
+      } else if (apiResponse.paymentPending) {
+        goToPay(apiResponse.payment?.invoiceId)
       } else {
         // set new added reg
         const newItem: RegTableNewItemI = {

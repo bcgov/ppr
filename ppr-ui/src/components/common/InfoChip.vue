@@ -44,12 +44,13 @@ export default defineComponent({
             return { bgColor: 'grey-lighten-2' }
           case 'LIEN':
           case 'LOCKED':
+          case 'PAYMENT PENDING':
             return { bgColor: 'darkGray' }
           default:
             return { bgColor: 'primary' }
         }
       }),
-      isLockedAction: computed((): boolean => props.action === 'LOCKED')
+      isLockedAction: computed((): boolean => ['LOCKED', 'PAYMENT PENDING'].includes(props.action))
     })
 
     return {
@@ -61,8 +62,13 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
-.info-chip-badge img {
-  height: 9px;
-  margin-right: 6px;
+.info-chip-badge {
+  img {
+    height: 10px;
+    margin-right: 6px;
+  }
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
 }
+
 </style>

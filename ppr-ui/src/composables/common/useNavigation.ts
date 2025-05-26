@@ -6,6 +6,10 @@ export const useNavigation = () => {
   const route = useRoute()
   const router = useRouter()
 
+  // Payment Urls
+  const authWebPayUrl = `${useRuntimeConfig()?.public.VUE_APP_AUTH_WEB_URL}/makePayment`
+  const homeRedirectUrl = `${useRuntimeConfig()?.public.BASE_URL}`
+
   /**
    * Simple Navigation helper
    * @routeName The specified route name to navigate too.
@@ -29,6 +33,23 @@ export const useNavigation = () => {
   /** Helper to check if the specified routes contain the current route */
   const containsCurrentRoute = (routeNames: Array<RouteNames>): boolean => {
     return routeNames.includes(route?.name as RouteNames)
+  }
+
+  /**
+   * Redirects to payment page for the specified invoice
+   * @param invoiceId - The ID of the invoice to process payment for
+   */
+  const goToPay = (invoiceId: string): void => {
+    if (invoiceId) {
+      try {
+        window.location.href = `${authWebPayUrl}/${invoiceId}/${homeRedirectUrl}`
+        return
+      } catch (error) {
+        console.error('Error redirecting to payment:', error)
+      }
+    } else {
+      console.error('Payment ID not found')
+    }
   }
 
   /**
@@ -62,6 +83,7 @@ export const useNavigation = () => {
     router,
     goToRoute,
     goToDash,
+    goToPay,
     navigateToUrl,
     isRouteName,
     containsCurrentRoute

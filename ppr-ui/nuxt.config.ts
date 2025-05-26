@@ -87,9 +87,6 @@ export default defineNuxtConfig({
     '@': path.resolve(__dirname, './src'),
     '@sbc': path.resolve(__dirname, './node_modules/sbc-common-components/src')
   },
-  ui: {
-    icons: ['mdi']
-  },
   ssr: false,
   modules: [
     '@nuxt/eslint',
@@ -106,6 +103,33 @@ export default defineNuxtConfig({
   css: [
     '~/assets/css/tw.css'
   ],
+  ui: {
+    icons: ['mdi']
+  },
+  i18n: {
+    locales: [
+      {
+        name: 'English',
+        code: 'en-CA',
+        iso: 'en-CA',
+        dir: 'ltr',
+        file: 'en-CA.ts'
+      },
+      {
+        name: 'Français',
+        code: 'fr-CA',
+        iso: 'fr-CA',
+        dir: 'ltr',
+        file: 'fr-CA.ts'
+      }
+    ],
+      strategy: 'prefix',
+      lazy: true,
+      langDir: 'locales',
+      defaultLocale: 'en-CA',
+      detectBrowserLanguage: false,
+      vueI18n: './i18n.config.ts'
+  },
   typescript: {
     tsConfig: {
       compilerOptions: {
@@ -118,14 +142,6 @@ export default defineNuxtConfig({
     },
     // NOTE: https://github.com/vuejs/language-tools/issues/3969
     typeCheck: false
-  },
-  i18n: {
-    lazy: true,
-    defaultLocale: 'en',
-    langDir: './lang',
-    locales: [
-      { code: 'en', file: 'en.ts' }
-    ]
   },
   vite: {
     server: {

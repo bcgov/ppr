@@ -69,7 +69,7 @@ import {
   AccountTypes,
   APIRegistrationTypes,
   AuthRoles,
-  PaymentTypes,
+  ConnectPaymentMethod,
   ProductCode,
   RegistrationFlowType,
   RouteNames
@@ -145,7 +145,7 @@ export const useStore = defineStore('assetsStore', () => {
     return (state.value.accountInformation?.accountType === AccountTypes.PREMIUM)
   })
   const isCreditCardPreferredPayment = computed((): boolean => {
-    return state.value.accountPaymentInformation?.paymentMethod === PaymentTypes.DIRECT_PAY
+    return state.value.accountPaymentInformation?.paymentMethod === ConnectPaymentMethod.DIRECT_PAY
   })
   const isRoleStaffReg = computed((): boolean => {
     return state.value.authorization?.authRoles.includes(AuthRoles.PPR_STAFF)

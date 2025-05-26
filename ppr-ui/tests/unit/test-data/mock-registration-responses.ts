@@ -173,6 +173,23 @@ export const mockedMhRegistration: MhRegistrationSummaryIF = {
   statusType: MhApiStatusTypes.ACTIVE,
   expand: true
 }
+export const mockedDraftRegistration: MhRegistrationSummaryIF = {
+  mhrNumber: '',
+  ownerNames: 'John Smith',
+  clientReferenceId: 'ABC123',
+  createDateTime: '2021-07-20T17:21:17+00:00',
+  expireDays: 500, // Number of days until expiry
+  hasDraft: true,
+  path: '/path/to/doc',
+  username: 'John Smith',
+  submittingParty: 'some Submitting Party',
+  registrationDescription: 'PPSA SECURITY AGREEMENT',
+  documentRegistrationNumber: 'GOV2343',
+  baseRegistrationNumber: '654321',
+  registrationType: APIMhrTypes.MANUFACTURED_HOME_REGISTRATION,
+  statusType: MhApiStatusTypes.ACTIVE,
+  expand: true
+}
 
 export const mockedLockedMhRegistration: MhRegistrationSummaryIF = {
   mhrNumber: '123456',

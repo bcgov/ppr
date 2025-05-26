@@ -133,14 +133,14 @@ TEST_PAY_METHOD_STATUS = [
     (True, 'INREG', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
     (True, 'NTTRF', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
     (True, 'EXEMP', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
-    (False, 'MSRCH', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
-    (False, 'CSRCH', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
-    (False, 'MSRCS', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
-    (False, 'CSRCS', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
-    (False, 'MSRCH', PaymentMethods.CC.value, StatusCodes.CREATED.value),
-    (False, 'CSRCH', PaymentMethods.CC.value, StatusCodes.CREATED.value),
-    (False, 'MSRCS', PaymentMethods.CC.value, StatusCodes.CREATED.value),
-    (False, 'CSRCS', PaymentMethods.CC.value, StatusCodes.CREATED.value),
+    (True, 'MSRCH', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
+    (True, 'CSRCH', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
+    (True, 'MSRCS', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
+    (True, 'CSRCS', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
+    (True, 'MSRCH', PaymentMethods.CC.value, StatusCodes.CREATED.value),
+    (True, 'CSRCH', PaymentMethods.CC.value, StatusCodes.CREATED.value),
+    (True, 'MSRCS', PaymentMethods.CC.value, StatusCodes.CREATED.value),
+    (True, 'CSRCS', PaymentMethods.CC.value, StatusCodes.CREATED.value),
 ]
 # testdata pattern is ({filing_type}, {selection}, {staff})
 TEST_PAY_TYPE_FILING_TYPE_SEARCH = [

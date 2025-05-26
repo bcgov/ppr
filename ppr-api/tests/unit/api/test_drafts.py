@@ -19,17 +19,37 @@ Test-Suite to ensure that the /drafts endpoint is working as expected.
 import copy
 from http import HTTPStatus
 
-from registry_schemas.example_data.ppr import DRAFT_FINANCING_STATEMENT, DRAFT_CHANGE_STATEMENT, \
-     DRAFT_AMENDMENT_STATEMENT
+import pytest
 
+from registry_schemas.example_data.ppr import DRAFT_FINANCING_STATEMENT, DRAFT_CHANGE_STATEMENT, \
+     DRAFT_AMENDMENT_STATEMENT, AMENDMENT_STATEMENT, FINANCING_STATEMENT
+
+from ppr_api.models import Draft, FinancingStatement, Registration, utils as model_utils
+from ppr_api.resources import cc_payment_utils, utils as resource_utils
+from ppr_api.resources.financing_utils import setup_cc_draft
 from ppr_api.services.authz import STAFF_ROLE, COLIN_ROLE, PPR_ROLE
 from tests.unit.services.utils import create_header_account, create_header
 
 
+CC_PAYREF = {
+     "invoiceId": "88888888",
+     "receipt": "receipt",
+     "ccPayment": True,
+     "paymentActionRequired": True,
+     "paymentPortalURL": "{PAYMENT_PORTAL_URL}/{invoice_id}/{return_URL}"
+}
 # prep sample post, put draft statement data
 SAMPLE_JSON_FINANCING = copy.deepcopy(DRAFT_FINANCING_STATEMENT)
 SAMPLE_JSON_CHANGE = copy.deepcopy(DRAFT_CHANGE_STATEMENT)
 SAMPLE_JSON_AMENDMENT = copy.deepcopy(DRAFT_AMENDMENT_STATEMENT)
+# testdata pattern is ({desc}, {role}, {status}, {draft_json}, {reg_num}, {reg_type}, {invoice_id}, {draft_num})
+TEST_CANCEL_DRAFT = [
+    ('Valid new SA', [PPR_ROLE], HTTPStatus.OK, FINANCING_STATEMENT, None, "SA", "20000100", None),
+    ('Valid amendment', [PPR_ROLE], HTTPStatus.OK, AMENDMENT_STATEMENT, "TEST0001", "AM", "20000102", None),
+    ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, FINANCING_STATEMENT, None, "SA", "20000100", 'PT500002'),
+    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, FINANCING_STATEMENT, None, "SA", "20000100", 'PT500002'),
+    ('Invalid Draft Number', [PPR_ROLE], HTTPStatus.NOT_FOUND, FINANCING_STATEMENT, None, "SA", "20000100", 'PT500002'),
+]
 
 
 def test_draft_create_invalid_type(session, client, jwt):
@@ -372,3 +392,83 @@ def test_draft_get_nonstaff_unauthorized_401(session, client, jwt):
                     headers=create_header_account(jwt, [COLIN_ROLE]))
     # check
     assert rv.status_code == HTTPStatus.UNAUTHORIZED
+
+
+@pytest.mark.parametrize('desc,roles,status,draft_json,reg_num,reg_type,invoice_id,draft_num', TEST_CANCEL_DRAFT)
+def test_cancel_drafts(session, client, jwt, desc, roles, status, draft_json, reg_num, reg_type, invoice_id, draft_num):
+    """Assert that cancelling a draft in a pending state works as expected."""
+    headers = None
+    # setup
+    test_id: str = draft_num if draft_num else ""
+    if desc != "Missing account":
+        headers = create_header_account(jwt, roles)
+    else:
+        headers = create_header(jwt, roles)
+    # test
+    if status == HTTPStatus.OK:
+        json_data = setup_cancel_registration(draft_json, reg_type, invoice_id)
+        new_reg: Registration = None
+        base_reg: Registration = None
+        if reg_type == "SA":
+            save_reg: Registration = resource_utils.create_new_pay_registration(json_data, "PS12345")
+            new_fs: FinancingStatement = cc_payment_utils.save_new_cc_draft(json_data, save_reg)
+            new_reg = new_fs.registration[0]
+        else:
+            financing_statement: FinancingStatement = FinancingStatement.find_by_financing_id(200000000)
+            assert financing_statement
+            for party in financing_statement.parties:
+                if party.registration_id != 200000000 and not party.registration_id_end:
+                    if party.party_type == 'DB' or party.party_type == 'DI':
+                        json_data['deleteDebtors'][0]['partyId'] = party.id
+                    elif party.party_type == 'SP':
+                        json_data['deleteSecuredParties'][0]['partyId'] = party.id
+
+            for gc in financing_statement.general_collateral:
+                if gc.registration_id != 200000000 and not gc.registration_id_end:
+                    json_data['deleteGeneralCollateral'][0]['collateralId'] = gc.id
+
+            for vc in financing_statement.vehicle_collateral:
+                if vc.registration_id != 200000000 and not vc.registration_id_end:
+                    json_data['deleteVehicleCollateral'][0]['vehicleId'] = vc.id
+
+            save_reg: Registration = resource_utils.create_new_pay_registration(json_data, "PS12345", model_utils.REG_CLASS_AMEND)
+            new_reg: Registration = cc_payment_utils.save_change_cc_draft(financing_statement.registration[0],
+                                                                          json_data,
+                                                                          save_reg)
+        draft: Draft = new_reg.draft
+        test_id = draft.document_number
+
+    rv = client.patch('/api/v1/drafts/cancel/' + test_id, headers=headers)
+
+    # check
+    assert rv.status_code == status
+
+
+def setup_cancel_registration(draft_json: dict, reg_type: str, invoice_id: str) -> dict:
+    """Create pending draft to cancel."""
+    json_data = copy.deepcopy(draft_json)
+    if reg_type == "SA":
+        json_data['type'] = reg_type
+        del json_data['createDateTime']
+        del json_data['baseRegistrationNumber']
+        del json_data['payment']
+        del json_data['lifeInfinite']
+        del json_data['expiryDate']
+        del json_data['documentId']
+        del json_data['lienAmount']
+        del json_data['surrenderDate']
+    elif reg_type == "AM":
+        del json_data['createDateTime']
+        del json_data['amendmentRegistrationNumber']
+        del json_data['payment']
+        del json_data['addTrustIndenture']
+        del json_data['removeTrustIndenture']
+        if json_data.get("courtOrderInformation"):
+            del json_data["courtOrderInformation"]
+        if "documentId" in json_data:
+            del json_data["documentId"]
+    pay_ref: dict = copy.deepcopy(CC_PAYREF)
+    if invoice_id:
+        pay_ref["invoiceId"] = invoice_id
+    json_data = setup_cc_draft(json_data, pay_ref, "PS12345", "username@idir")
+    return json_data

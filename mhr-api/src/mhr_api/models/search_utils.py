@@ -43,13 +43,14 @@ SEARCH_RESULTS_MAX_SIZE = 5000
 RESULTS_SIZE_LIMIT_CLAUSE = "FETCH FIRST :max_results_size ROWS ONLY"
 
 ACCOUNT_SEARCH_HISTORY_DATE_QUERY = f"""
-SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size,
-       sr.callback_url, sr.doc_storage_url,
+SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size, sc.user_id,
+       sr.callback_url, sr.doc_storage_url, sr.api_result,
        json_array_length(sr.api_result) as selected_match_count,
        (SELECT CASE WHEN sc.user_id IS NULL THEN ''
          ELSE (SELECT u.firstname || ' ' || u.lastname FROM users u WHERE u.username = sc.user_id
                FETCH FIRST 1 ROWS ONLY)
-         END) AS username
+         END) AS username,
+         sr.score, sc.pay_invoice_id
 FROM search_requests sc, search_results sr
 WHERE sc.id = sr.search_id
   AND sc.account_id = '?'
@@ -60,13 +61,14 @@ FETCH FIRST {str(ACCOUNT_SEARCH_HISTORY_MAX_SIZE)} ROWS ONLY
 """
 
 ACCOUNT_SEARCH_HISTORY_QUERY = f"""
-SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size,
-       sr.callback_url, sr.doc_storage_url,
+SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size, sc.user_id,
+       sr.callback_url, sr.doc_storage_url, sr.api_result,
        json_array_length(sr.api_result) as selected_match_count,
        (SELECT CASE WHEN sc.user_id IS NULL THEN ''
          ELSE (SELECT u.firstname || ' ' || u.lastname FROM users u WHERE u.username = sc.user_id
                FETCH FIRST 1 ROWS ONLY)
-         END) AS username
+         END) AS username,
+         sr.score, sc.pay_invoice_id
 FROM search_requests sc, search_results sr
 WHERE sc.id = sr.search_id
   AND sc.account_id = '?'
@@ -82,7 +84,8 @@ SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_
        (SELECT CASE WHEN sc.user_id IS NULL THEN ''
          ELSE (SELECT u.firstname || ' ' || u.lastname FROM users u WHERE u.username = sc.user_id
                FETCH FIRST 1 ROWS ONLY)
-         END) AS username
+         END) AS username,
+         sr.score, sc.pay_invoice_id
 FROM search_requests sc, search_results sr
 WHERE sc.id = sr.search_id
   AND sc.account_id = '?'
@@ -99,7 +102,8 @@ SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_
        (SELECT CASE WHEN sc.user_id IS NULL THEN ''
          ELSE (SELECT u.firstname || ' ' || u.lastname FROM users u WHERE u.username = sc.user_id
                FETCH FIRST 1 ROWS ONLY)
-         END) AS username
+         END) AS username,
+         sr.score, sc.pay_invoice_id
 FROM search_requests sc, search_results sr
 WHERE sc.id = sr.search_id
   AND sc.account_id = '?'

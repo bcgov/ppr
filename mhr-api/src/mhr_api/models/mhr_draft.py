@@ -59,7 +59,8 @@ SELECT d.draft_number, d.create_ts, d.registration_type,
                    WHERE r.mhr_number = d.mhr_number
                      AND r.registration_ts > d.create_ts)
             END stale_count,
-        d.account_id
+        d.account_id,
+        d.user_id
   FROM mhr_drafts d, mhr_registration_types rt
  WHERE d.account_id = :query_account
    AND d.registration_type = rt.registration_type
@@ -284,6 +285,7 @@ class MhrDraft(db.Model):
             draft_json["outOfDate"] = stale_count > 0
         if draft_number.startswith(DRAFT_PAY_PENDING_PREFIX):
             draft_json["paymentPending"] = True
+            draft_json["invoiceId"] = str(row[11])
         return draft_json
 
     @classmethod
@@ -302,7 +304,7 @@ class MhrDraft(db.Model):
             message = model_utils.ERR_DRAFT_NOT_FOUND.format(code=code, draft_number=draft_number)
             raise BusinessException(error=message, status_code=HTTPStatus.NOT_FOUND)
 
-        if (draft.registration or draft_number.startswith(DRAFT_PAY_PENDING_PREFIX)) and not allow_used:
+        if draft.registration and not allow_used:
             code = ResourceErrorCodes.UNAUTHORIZED_ERR.value
             message = model_utils.ERR_DRAFT_USED.format(code=code, draft_number=draft_number)
             raise BusinessException(error=message, status_code=HTTPStatus.BAD_REQUEST)
@@ -328,8 +330,6 @@ class MhrDraft(db.Model):
     def delete(cls, draft_number: str = None):
         """Delete a draft statement by document ID."""
         draft = None
-        if draft_number and draft_number.startswith(DRAFT_PAY_PENDING_PREFIX):
-            return None  # Cannot delete a payment pending draft.
         if draft_number:
             draft = cls.find_by_draft_number(draft_number, False)
         if draft:

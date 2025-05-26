@@ -21,11 +21,16 @@ from flask import Blueprint, current_app, g, jsonify, request
 from flask_cors import cross_origin
 
 from ppr_api.exceptions import BusinessException, DatabaseException
-from ppr_api.models import Draft, User
+from ppr_api.models import Draft, Registration, User
+from ppr_api.models import utils as model_utils
+from ppr_api.models.draft import DRAFT_PAY_PENDING_PREFIX
 from ppr_api.models.registration_utils import AccountRegistrationParams
 from ppr_api.resources import utils as resource_utils
-from ppr_api.services.authz import authorized
+from ppr_api.resources.cc_payment_utils import REG_STATUS_LOCKED, REG_STATUS_UNLOCKED, track_event
+from ppr_api.services.authz import authorized, is_staff
+from ppr_api.services.payment.client import SBCPaymentClient
 from ppr_api.utils.auth import jwt
+from ppr_api.utils.logging import logger
 
 bp = Blueprint("DRAFTS1", __name__, url_prefix="/api/v1/drafts")  # pylint: disable=invalid-name
 VAL_ERROR = "Draft request data validation errors."  # Validation error prefix
@@ -196,7 +201,24 @@ def delete_drafts(document_id: str):  # pylint: disable=too-many-return-statemen
 
         # Try to delete draft statement by document ID
         try:
+            draft: Draft = Draft.find_by_document_number(document_id, False)
             Draft.delete(document_id)
+            doc_number: str = draft.document_number
+            logger.info(f"Draft doc number {doc_number} deleted.")
+            if doc_number.startswith(DRAFT_PAY_PENDING_PREFIX):
+                staff: bool = is_staff(jwt)
+                invoice_id: str = draft.user_id
+                reg_num: str = draft.registration_number
+                if not model_utils.is_financing(draft.registration_type_cl) and reg_num:
+                    reg: Registration = Registration.find_by_registration_number(reg_num, account_id, staff)
+                    if reg and reg.ver_bypassed == REG_STATUS_LOCKED:
+                        reg.ver_bypassed = REG_STATUS_UNLOCKED
+                        reg.save()
+                        logger.info(f"Unlocked pending payment for base registration {reg_num}")
+                    track_event("06", invoice_id, HTTPStatus.OK, f"Reg num = {reg_num} draft id={draft.id}")
+                else:
+                    track_event("06", invoice_id, HTTPStatus.OK, f"Draft id={draft.id}")
+                cancel_pending_payment(jwt.get_token_auth_header(), account_id, invoice_id)
         except BusinessException as exception:
             return resource_utils.business_exception_response(exception)
         except Exception as db_exception:  # noqa: B902; return nicer default error
@@ -206,3 +228,79 @@ def delete_drafts(document_id: str):  # pylint: disable=too-many-return-statemen
 
     except Exception as default_exception:  # noqa: B902; return nicer default error
         return resource_utils.default_exception_response(default_exception)
+
+
+@bp.route("/cancel/<string:document_id>", methods=["PATCH", "OPTIONS"])
+@cross_origin(origin="*")
+@jwt.requires_auth
+def cancel_pending_drafts(document_id: str):
+    """Cancel a payment pending draft by draft number: restore to a draft state."""
+    try:
+        if document_id is None:
+            return resource_utils.path_param_error_response("document ID")
+
+        # Quick check: must be staff or provide an account ID.
+        account_id = resource_utils.get_account_id(request)
+        if account_id is None:
+            return resource_utils.account_required_response()
+
+        # Verify request JWT and account ID
+        if not authorized(account_id, jwt):
+            return resource_utils.unauthorized_error_response(account_id)
+        if not document_id.startswith(DRAFT_PAY_PENDING_PREFIX):
+            error_msg: str = f"Draft doc number {document_id} is not in a pending state."
+            logger.error(error_msg)
+            return resource_utils.bad_request_response(error_msg)
+
+        # Try to delete draft statement by document ID
+        draft: Draft = Draft.find_by_document_number(document_id, False)
+        invoice_id: str = draft.user_id
+        revert_pending_draft(draft)
+        # Now unlock base registration if draft is not for a new financing statement.
+        if not model_utils.is_financing(draft.registration_type_cl) and draft.registration_number:
+            staff: bool = is_staff(jwt)
+            reg: Registration = Registration.find_by_registration_number(draft.registration_number, account_id, staff)
+            if reg and reg.ver_bypassed == REG_STATUS_LOCKED:
+                reg.ver_bypassed = REG_STATUS_UNLOCKED
+                reg.save()
+                logger.info(f"Unlocked pending payment for base registration {reg.registration_num}")
+            track_event("06", invoice_id, HTTPStatus.OK, f"Reg num = {reg.registration_num} draft id={draft.id}")
+        else:
+            track_event("06", invoice_id, HTTPStatus.OK, f"Draft id={draft.id}")
+        cancel_pending_payment(jwt.get_token_auth_header(), account_id, invoice_id)
+        return draft.json, HTTPStatus.OK
+    except BusinessException as exception:
+        return resource_utils.business_exception_response(exception)
+    except Exception as default_exception:  # noqa: B902; return nicer default error
+        return resource_utils.default_exception_response(default_exception)
+
+
+def cancel_pending_payment(token: str, account_id: str, invoice_id: str):
+    """Attempt to mark the pending pay api transaction as deleted."""
+    try:
+        logger.info(f"Submitting pay api delete pending payment account={account_id}, invoice={invoice_id}")
+        pay_client = SBCPaymentClient(token, account_id)
+        api_response = pay_client.delete_pending_payment(invoice_id)
+        logger.info(f"Pay api delete pending payment response: invoice={invoice_id} response status={api_response}")
+    except Exception as err:  # noqa: B902; wrapping exception
+        logger.error(f"Cancel pending payment failed: account={account_id}, invoice={invoice_id}: {str(err)}")
+
+
+def revert_pending_draft(draft: Draft):
+    """Update the draft to regular state instead of payment pending."""
+    draft_json = draft.draft
+    draft.user_id = draft_json.get("username", None)
+    if draft_json.get("username"):
+        del draft_json["username"]
+    if draft_json.get("accountId"):
+        del draft_json["accountId"]
+    if draft_json.get("status"):
+        del draft_json["status"]
+    if "paymentPending" in draft_json:
+        del draft_json["paymentPending"]
+    draft.draft = draft_json
+    draft_num: str = str(draft.document_number)
+    if draft_num.startswith(DRAFT_PAY_PENDING_PREFIX):
+        draft.document_number = draft_num[1:]
+    draft.save()
+    logger.info(f"Updated draft id={draft.id} number={draft.document_number} userid={draft.user_id}")

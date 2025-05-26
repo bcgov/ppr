@@ -51,7 +51,7 @@
                   persistent-hint
                 />
               </v-col>
-              <v-col v-else-if="excludesManufacturedHomeCollateral()">
+              <v-col v-else-if="excludesManufacturedHomeCollateral() && !isRlTransition">
                 <v-select
                   id="txt-type-drop"
                   v-model="currentVehicle.type"
@@ -232,6 +232,8 @@
 import { defineComponent, onMounted, reactive, computed, toRefs } from 'vue'
 import { useCollateralValidation, useVehicle } from './factories'
 import { APIVehicleTypes } from '@/enums'
+import { storeToRefs } from 'pinia'
+import { useStore } from '@/store/store'
 
 export default defineComponent({
   props: {
@@ -273,6 +275,7 @@ export default defineComponent({
       validateCollateralForm,
       resetSerialError
     } = useCollateralValidation()
+    const { isRlTransition } = storeToRefs(useStore())
 
     const localState = reactive({
       currentIndex: computed((): number => {
@@ -332,6 +335,7 @@ export default defineComponent({
       mustHaveManufacturedHomeCollateral,
       excludesManufacturedHomeCollateral,
       resetSerialError,
+      isRlTransition,
       ...toRefs(localState)
     }
   }
