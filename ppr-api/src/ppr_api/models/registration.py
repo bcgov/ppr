@@ -24,6 +24,7 @@ from ppr_api.models import registration_utils
 from ppr_api.models import utils as model_utils
 from ppr_api.models.registration_utils import AccountRegistrationParams
 from ppr_api.models.type_tables import RegistrationTypes
+from ppr_api.services.authz import is_staff_account
 from ppr_api.utils.base import BaseEnum
 from ppr_api.utils.logging import logger
 
@@ -368,7 +369,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                 ),
                 status_code=HTTPStatus.NOT_FOUND,
             )
-
+        # logger.info(f"staff={staff} account_id={account_id} reg account={registration.account_id}")
         if not staff and account_id and registration.account_id != account_id:
             # Check extra registrations
             extra_reg = UserExtraRegistration.find_by_registration_number(base_reg_num, account_id)
@@ -381,7 +382,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                     ),
                     status_code=HTTPStatus.UNAUTHORIZED,
                 )
-
         if not staff and model_utils.is_historical(registration.financing_statement, False):
             raise BusinessException(
                 error=model_utils.ERR_FINANCING_HISTORICAL.format(
@@ -389,7 +389,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                 ),
                 status_code=HTTPStatus.BAD_REQUEST,
             )
-
         if not staff and base_reg_num and base_reg_num != registration.base_registration_num:
             raise BusinessException(
                 error=model_utils.ERR_REGISTRATION_MISMATCH.format(
@@ -399,7 +398,6 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                 ),
                 status_code=HTTPStatus.BAD_REQUEST,
             )
-
         return registration
 
     @classmethod
@@ -433,7 +431,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                 return Registration.find_all_by_account_id_api_filter(params, new_feature_enabled)
 
             results = db.session.execute(
-                text(model_utils.QUERY_ACCOUNT_REGISTRATIONS),
+                text(registration_utils.QUERY_ACCOUNT_REGISTRATIONS),
                 {"query_account": params.account_id, "max_results_size": model_utils.MAX_ACCOUNT_REGISTRATIONS_DEFAULT},
             )
             rows = results.fetchall()
@@ -540,7 +538,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
             return result
         try:
             results = db.session.execute(
-                text(model_utils.QUERY_ACCOUNT_ADD_REGISTRATION),
+                text(registration_utils.QUERY_ACCOUNT_ADD_REGISTRATION),
                 {"query_account": account_id, "query_reg_num": registration_num},
             )
             rows = results.fetchall()
@@ -549,35 +547,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                     reg_num = str(row[0])
                     base_reg_num = str(row[5])
                     reg_class = str(row[3])
-                    result = {
-                        "registrationNumber": reg_num,
-                        "baseRegistrationNumber": base_reg_num,
-                        "createDateTime": model_utils.format_ts(row[1]),
-                        "registrationType": str(row[2]),
-                        "registrationDescription": str(row[4]),
-                        "registrationClass": reg_class,
-                        "registeringParty": str(row[10]),
-                        "securedParties": str(row[11]),
-                        "clientReferenceId": str(row[12]),
-                        "registeringName": str(row[13]) if row[13] else "",
-                        "accountId": str(row[14]),
-                        "vehicleCount": int(row[16]),
-                    }
-                    result["legacy"] = result.get("accountId") == "0"
+                    result = registration_utils.build_add_reg_result(row, reg_class, base_reg_num, reg_num)
                     if model_utils.is_financing(reg_class):
-                        result["baseRegistrationNumber"] = reg_num
-                        result["path"] = FINANCING_PATH + reg_num
-                        result["statusType"] = str(row[6])
-                        result["expireDays"] = int(row[8])
-                        result["lastUpdateDateTime"] = model_utils.format_ts(row[9])
-                        result["existsCount"] = int(row[15])
-                        if (
-                            result["statusType"] == model_utils.STATE_ACTIVE
-                            and result["expireDays"] < 0
-                            and result["expireDays"] != -99
-                        ):
-                            result["statusType"] = model_utils.STATE_EXPIRED
-
                         # Another account already added.
                         if result["existsCount"] > 0 and result["accountId"] not in (account_id, account_id + "_R"):
                             result["inUserList"] = True
@@ -590,27 +561,20 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                         # Another account excluded by default.
                         else:
                             result["inUserList"] = False
-                    elif reg_class == model_utils.REG_CLASS_DISCHARGE:
-                        result["path"] = FINANCING_PATH + base_reg_num + "/discharges/" + reg_num
-                    elif reg_class == model_utils.REG_CLASS_RENEWAL:
-                        result["path"] = FINANCING_PATH + base_reg_num + "/renewals/" + reg_num
-                    elif reg_class == model_utils.REG_CLASS_CHANGE:
-                        result["path"] = FINANCING_PATH + base_reg_num + "/changes/" + reg_num
-                    elif reg_class in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
-                        result["path"] = FINANCING_PATH + base_reg_num + "/amendments/" + reg_num
                     # Set if user can access verification statement.
                     if not registration_utils.can_access_report(account_id, account_name, result, sbc_staff):
                         result["path"] = ""
-                    if not row[7]:
-                        # doc is not generated yet
-                        result["path"] = ""
+                    if is_staff_account(account_id):
+                        if result.get("accountId", "0") == "0":
+                            result["accountId"] = "N/A"
+                        elif row[18]:
+                            result["accountId"] = str(row[18])
                     result = registration_utils.update_summary_optional(result, account_id, sbc_staff)
                     if not model_utils.is_financing(reg_class):
                         changes.append(result)
         except Exception as db_exception:  # noqa: B902; return nicer error
             logger.error("DB find_summary_by_reg_num exception: " + str(db_exception))
             raise DatabaseException(db_exception) from db_exception
-
         if not result:
             return None
         if result and changes:

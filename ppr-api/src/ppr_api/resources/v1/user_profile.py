@@ -23,9 +23,11 @@ from ppr_api.exceptions import BusinessException
 from ppr_api.models import ClientCode, User, UserProfile
 from ppr_api.resources import utils as resource_utils
 from ppr_api.services.authz import (
+    BCOL_HELP,
     GENERAL_USER_GROUP,
     MANUFACTURER_GROUP,
     QUALIFIED_USER_GROUP,
+    STAFF_ROLE,
     authorized,
     get_mhr_group,
     is_staff,
@@ -51,6 +53,9 @@ def get_user_profile():
         # Verify request JWT and account ID
         if not authorized(account_id, jwt):
             return resource_utils.unauthorized_error_response(account_id)
+        # If staff/helpdesk use the original, actual account ID.
+        if account_id in (BCOL_HELP, STAFF_ROLE) and resource_utils.get_staff_account_id(request):
+            account_id = resource_utils.get_staff_account_id(request)
         token = g.jwt_oidc_token_info
         logger.debug(f"Getting user profile for account {account_id} with token: {token}")
 

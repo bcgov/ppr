@@ -253,180 +253,6 @@ SELECT r.id, r.registration_number, r.registration_ts, r.registration_type, r.re
 ORDER BY r.registration_ts DESC
 FETCH FIRST :max_results_size ROWS ONLY
 """
-
-QUERY_ACCOUNT_REGISTRATIONS = """
-WITH q AS (
-  SELECT (TO_TIMESTAMP(TO_CHAR(current_date, 'YYYY-MM-DD') || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc')
-      AS current_expire_ts
-)
-SELECT r.registration_number, r.registration_ts, r.registration_type, r.registration_type_cl, r.account_id,
-       rt.registration_desc, r.base_reg_number, fs.state_type AS state,
-       CASE WHEN fs.life = 99 THEN -99
-            ELSE CAST(EXTRACT(day from ((fs.expire_date at time zone 'utc') - current_expire_ts)) AS INT)
-            END expire_days,
-       (SELECT MAX(r2.registration_ts)
-          FROM registrations r2
-         WHERE r2.financing_id = r.financing_id) AS last_update_ts,
-       (SELECT CASE WHEN p.business_name IS NOT NULL THEN p.business_name
-                    WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
-                    WHEN p.middle_initial IS NOT NULL THEN p.first_name || ' ' || p.middle_initial || ' ' || p.last_name
-                    ELSE p.first_name || ' ' || p.last_name END
-          FROM parties p
-         WHERE p.registration_id = r.id
-           AND p.party_type = 'RG') AS registering_party,
-       (SELECT string_agg((CASE WHEN p.business_name IS NOT NULL THEN p.business_name
-                                WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
-                                WHEN p.middle_initial IS NOT NULL THEN p.first_name || ' ' || p.middle_initial ||
-                                     ' ' || p.last_name
-                                ELSE p.first_name || ' ' || p.last_name END), ', ')
-          FROM parties p
-         WHERE p.financing_id = fs.id
-           AND p.registration_id_end IS NULL
-           AND p.party_type = 'SP') AS secured_party,
-       r.client_reference_id,
-       (SELECT CASE WHEN r.user_id IS NULL THEN ''
-                    ELSE (SELECT CASE WHEN u.lastname = '' or u.lastname IS NULL THEN u.firstname
-                                 ELSE u.firstname || ' ' || u.lastname END
-                            FROM users u
-                           WHERE u.username = r.user_id FETCH FIRST 1 ROWS ONLY) END) AS registering_name,
-      (SELECT COUNT(id)
-         FROM user_extra_registrations uer
-        WHERE uer.registration_number = r.registration_number
-          AND uer.account_id = r.account_id
-          AND uer.removed_ind = 'Y') AS removed_count
-  FROM registrations r, registration_types rt, financing_statements fs, q
- WHERE r.registration_type = rt.registration_type
-   AND fs.id = r.financing_id
-   AND fs.id IN (SELECT fs2.id
-                   FROM financing_statements fs2, registrations r2
-                  WHERE fs2.id = r2.financing_id
-                    AND r2.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
-                    AND r2.account_id = :query_account)
-   AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
-   AND NOT EXISTS (SELECT r3.id
-                     FROM registrations r3
-                    WHERE r3.financing_id = fs.id
-                      AND r3.registration_type_cl = 'DISCHARGE'
-                      AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
-  AND NOT EXISTS (SELECT r2.financing_id
-                    FROM user_extra_registrations uer, registrations r2
-                   WHERE uer.account_id = :query_account
-                     AND uer.registration_number = r2.registration_number
-                     AND r2.financing_id = r.financing_id
-                     AND uer.removed_ind = 'Y')
-UNION (
-SELECT r.registration_number, r.registration_ts, r.registration_type, r.registration_type_cl, r.account_id,
-       rt.registration_desc, r.base_reg_number, fs.state_type AS state,
-       CASE WHEN fs.life = 99 THEN -99
-            ELSE CAST(EXTRACT(day from ((fs.expire_date at time zone 'utc') - current_expire_ts)) AS INT)
-            END expire_days,
-       (SELECT MAX(r2.registration_ts)
-          FROM registrations r2
-         WHERE r2.financing_id = r.financing_id) AS last_update_ts,
-       (SELECT CASE WHEN p.business_name IS NOT NULL THEN p.business_name
-                    WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
-                    WHEN p.middle_initial IS NOT NULL THEN p.first_name || ' ' || p.middle_initial || ' ' || p.last_name
-                    ELSE p.first_name || ' ' || p.last_name END
-          FROM parties p
-         WHERE p.registration_id = r.id
-           AND p.party_type = 'RG') AS registering_party,
-       (SELECT string_agg((CASE WHEN p.business_name IS NOT NULL THEN p.business_name
-                                WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
-                                WHEN p.middle_initial IS NOT NULL THEN p.first_name || ' ' || p.middle_initial ||
-                                     ' ' || p.last_name
-                                ELSE p.first_name || ' ' || p.last_name END), ', ')
-          FROM parties p
-         WHERE p.financing_id = fs.id
-           AND p.registration_id_end IS NULL
-           AND p.party_type = 'SP') AS secured_party,
-       r.client_reference_id,
-       (SELECT CASE WHEN r.user_id IS NULL THEN ''
-                    ELSE (SELECT CASE WHEN u.lastname = '' or u.lastname IS NULL THEN u.firstname
-                                 ELSE u.firstname || ' ' || u.lastname END
-                            FROM users u
-                           WHERE u.username = r.user_id FETCH FIRST 1 ROWS ONLY) END) AS registering_name,
-       0 AS removed_count
-  FROM registrations r, registration_types rt, financing_statements fs, q
- WHERE r.registration_type = rt.registration_type
-   AND fs.id = r.financing_id
-   AND fs.id IN (SELECT fs2.id
-                   FROM financing_statements fs2, registrations r2
-                  WHERE fs2.id = r2.financing_id
-                    AND r2.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
-                    AND r2.registration_number IN (SELECT uer.registration_number
-                                                      FROM user_extra_registrations uer
-                                                     WHERE uer.account_id = :query_account
-                                                       AND uer.removed_ind IS NULL))
-   AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
-   AND NOT EXISTS (SELECT r3.id
-                     FROM registrations r3
-                    WHERE r3.financing_id = fs.id
-                      AND r3.registration_type_cl = 'DISCHARGE'
-                      AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
-)
-ORDER BY registration_ts DESC
-FETCH FIRST :max_results_size ROWS ONLY
-"""
-
-QUERY_ACCOUNT_ADD_REGISTRATION = """
-SELECT r.registration_number, r.registration_ts, r.registration_type, r.registration_type_cl,
-       rt.registration_desc, r.base_reg_number, fs.state_type AS state, vr.doc_storage_url,
-       CASE WHEN fs.life = 99 THEN -99
-            ELSE CAST(EXTRACT(day from (fs.expire_date - (now() at time zone 'utc'))) AS INT) END expire_days,
-       (SELECT MAX(r2.registration_ts)
-          FROM registrations r2
-         WHERE r2.financing_id = r.financing_id) AS last_update_ts,
-       (SELECT CASE WHEN p.business_name IS NOT NULL THEN p.business_name
-                    WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
-                    WHEN p.middle_initial IS NOT NULL THEN p.first_name || ' ' || p.middle_initial || ' ' || p.last_name
-                    ELSE p.first_name || ' ' || p.last_name END
-          FROM parties p
-         WHERE p.registration_id = r.id
-           AND p.party_type = 'RG') AS registering_party,
-       (SELECT string_agg((CASE WHEN p.business_name IS NOT NULL THEN p.business_name
-                                WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
-                                WHEN p.middle_initial IS NOT NULL THEN p.first_name || ' ' || p.middle_initial ||
-                                ' ' || p.last_name
-                                ELSE p.first_name || ' ' || p.last_name END), ', ')
-          FROM parties p
-         WHERE p.financing_id = fs.id
-           AND p.registration_id_end IS NULL
-           AND p.party_type = 'SP') AS secured_party,
-       r.client_reference_id,
-       (SELECT CASE WHEN r.user_id IS NULL THEN ''
-                    ELSE (SELECT CASE WHEN u.lastname = '' or u.lastname IS NULL THEN u.firstname
-                                 ELSE u.firstname || ' ' || u.lastname END
-                            FROM users u
-                           WHERE u.username = r.user_id FETCH FIRST 1 ROWS ONLY) END) AS registering_name,
-       r.account_id,
-       (SELECT COUNT(uer.id)
-          FROM user_extra_registrations uer
-         WHERE uer.account_id = :query_account
-           AND (uer.registration_number = :query_reg_num OR
-                uer.registration_number = r.registration_number)) AS exists_count,
-       (SELECT COUNT(sc.id)
-         FROM serial_collateral sc
-        WHERE sc.financing_id = fs.id
-          AND (sc.registration_id = r.id OR
-               (sc.registration_id <= r.id AND (sc.registration_id_end IS NULL OR
-                                                sc.registration_id_end > r.id)))) AS vehicle_count
-  FROM registrations r
-    INNER JOIN registration_types rt
-    ON r.registration_type = rt.registration_type
-    INNER JOIN financing_statements fs
-    ON fs.id = r.financing_id
-        AND fs.id IN (SELECT fs2.id
-                    FROM financing_statements fs2, registrations r2
-                    WHERE fs2.id = r2.financing_id AND r2.registration_number = :query_reg_num)
-        AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
-    LEFT OUTER JOIN verification_reports vr ON r.id=vr.registration_id
- WHERE NOT EXISTS (SELECT r3.id FROM registrations r3
-                    WHERE r3.financing_id = fs.id
-                      AND r3.registration_type_cl = 'DISCHARGE'
-                      AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
-ORDER BY r.registration_ts DESC
-"""
-
 QUERY_ACCOUNT_DRAFTS_LIMIT = " FETCH FIRST :max_results_size ROWS ONLY"
 QUERY_ACCOUNT_DRAFTS_DEFAULT_ORDER = " ORDER BY create_ts DESC"
 QUERY_ACCOUNT_DRAFTS_DOC_NUM_CLAUSE = " AND document_number LIKE :doc_num || '%'"
@@ -467,6 +293,14 @@ QUERY_ACCOUNT_BASE_REG_BASE = """
 SELECT registration_number, registration_ts, registration_type, registration_type_cl, account_id,
        registration_desc, base_reg_number, state, expire_days, last_update_ts, registering_party,
        secured_party, client_reference_id, registering_name, orig_account_id, pending_count, vehicle_count,
+       CASE WHEN arv.account_id IN ('ppr_staff', 'helpdesk')
+            THEN (SELECT u.account_id
+                   FROM users u, registrations r
+                  WHERE arv.registration_id = r.id
+                    AND r.user_id = u.username
+                 ORDER BY u.id DESC
+                 FETCH FIRST 1 ROWS ONLY)
+            ELSE NULL END staff_account_id,
        (SELECT r.ver_bypassed FROM registrations r WHERE r.id = arv.registration_id) as locked_status
   FROM account_registration_vw arv
  WHERE arv.account_id = :query_account
@@ -483,7 +317,15 @@ QUERY_ACCOUNT_BASE_REG_FILTER = """
 SELECT * FROM (
 SELECT registration_number, registration_ts, registration_type, registration_type_cl, account_id,
        registration_desc, base_reg_number, state, expire_days, last_update_ts, registering_party,
-       secured_party, client_reference_id, registering_name, orig_account_id, pending_count, vehicle_count
+       secured_party, client_reference_id, registering_name, orig_account_id, pending_count, vehicle_count,
+       CASE WHEN arv1.account_id IN ('ppr_staff', 'helpdesk')
+            THEN (SELECT u.account_id
+                   FROM users u, registrations r
+                  WHERE arv1.registration_id = r.id
+                    AND r.user_id = u.username
+                 ORDER BY u.id DESC
+                 FETCH FIRST 1 ROWS ONLY)
+            ELSE NULL END staff_account_id
   FROM account_registration_vw arv1
  WHERE arv1.account_id = :query_account
    AND arv1.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
@@ -503,7 +345,15 @@ SELECT arv2.financing_id
 QUERY_ACCOUNT_CHANGE_REG = """
 SELECT registration_number, registration_ts, registration_type, registration_type_cl, account_id,
        registration_desc, base_reg_number, state, expire_days, last_update_ts, registering_party,
-       secured_party, client_reference_id, registering_name, orig_account_id, pending_count, vehicle_count
+       secured_party, client_reference_id, registering_name, orig_account_id, pending_count, vehicle_count,
+       CASE WHEN account_id IN ('ppr_staff', 'helpdesk')
+            THEN (SELECT u.account_id
+                   FROM users u, registrations r
+                  WHERE registration_id = r.id
+                    AND r.user_id = u.username
+                 ORDER BY u.id DESC
+                 FETCH FIRST 1 ROWS ONLY)
+            ELSE NULL END staff_account_id
   FROM account_registration_vw
  WHERE registration_type_cl NOT IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
    AND (account_id = :query_account OR base_account_id = :query_account)
@@ -514,7 +364,15 @@ ORDER BY registration_ts DESC
 QUERY_ACCOUNT_CHANGE_REG_FILTER = """
 SELECT registration_number, registration_ts, registration_type, registration_type_cl, account_id,
        registration_desc, base_reg_number, state, expire_days, last_update_ts, registering_party,
-       secured_party, client_reference_id, registering_name, orig_account_id, pending_count, vehicle_count
+       secured_party, client_reference_id, registering_name, orig_account_id, pending_count, vehicle_count,
+       CASE WHEN account_id IN ('ppr_staff', 'helpdesk')
+            THEN (SELECT u.account_id
+                   FROM users u, registrations r
+                  WHERE registration_id = r.id
+                    AND r.user_id = u.username
+                 ORDER BY u.id DESC
+                 FETCH FIRST 1 ROWS ONLY)
+            ELSE NULL END staff_account_id
   FROM account_registration_vw
  WHERE registration_type_cl NOT IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
    AND (account_id = :query_account OR base_account_id = :query_account)
