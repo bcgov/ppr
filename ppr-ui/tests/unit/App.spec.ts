@@ -2,8 +2,8 @@ import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { useStore } from '@/store/store'
 import { createComponent } from './utils'
 import App from '@/app.vue'
-import SbcHeader from 'sbc-common-components/src/components/SbcHeader.vue'
-import SbcFooter from 'sbc-common-components/src/components/SbcFooter.vue'
+import ConnectHeader from '@sbc-connect/nuxt-core-layer-beta/app/components/Connect/Header/index.vue'
+import ConnectFooter from '@sbc-connect/nuxt-core-layer-beta/app/components/Connect/Footer.vue'
 import { Tombstone } from '@/components/tombstones'
 import { Breadcrumb, SkipToMainContent } from '@/components/common'
 import {
@@ -104,8 +104,8 @@ describe.skip('App component basic rendering normal account', () => {
   it('renders the sub-components properly', async () => {
     expect(wrapper.findComponent(App).exists()).toBe(true)
     expect(wrapper.findComponent(SkipToMainContent).exists()).toBe(true)
-    expect(wrapper.findComponent(SbcHeader).exists()).toBe(true)
-    expect(wrapper.findComponent(SbcFooter).exists()).toBe(true)
+    expect(wrapper.findComponent(ConnectHeader).exists()).toBe(true)
+    expect(wrapper.findComponent(ConnectFooter).exists()).toBe(true)
     expect(wrapper.findComponent(Tombstone).exists()).toBe(false)
     expect(wrapper.findComponent(Breadcrumb).exists()).toBe(false)
   })

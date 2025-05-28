@@ -3,9 +3,10 @@ import { useStore } from '@/store/store'
 import { StatusCodes } from 'http-status-codes'
 import KeycloakService from 'sbc-common-components/src/services/keycloak.services'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-import SbcHeader from 'sbc-common-components/src/components/SbcHeader.vue'
-import SbcFooter from 'sbc-common-components/src/components/SbcFooter.vue'
-import SbcSystemBanner from 'sbc-common-components/src/components/SbcSystemBanner.vue'
+import ConnectHeader from '@sbc-connect/nuxt-core-layer-beta/app/components/Connect/Header/index.vue'
+import ConnectSystemBanner from '@sbc-connect/nuxt-core-layer-beta/app/components/Connect/SystemBanner.vue'
+import ConnectFooter from '@sbc-connect/nuxt-core-layer-beta/app/components/Connect/Footer.vue'
+
 import {
   authPprError, authAssetsError, draftDeleteError, historyRegError, loginError, openDocError, paymentErrorReg,
   paymentErrorSearch, registrationCompleteError, registrationDeleteError, registrationLoadError,
@@ -38,9 +39,9 @@ import type {
 export default defineComponent({
   name: 'App',
   components: {
-    SbcHeader,
-    SbcFooter,
-    SbcSystemBanner,
+    ConnectHeader,
+    ConnectSystemBanner,
+    ConnectFooter
   },
   setup () {
     const route = useRoute()
@@ -632,6 +633,8 @@ export default defineComponent({
 })
 </script>
 <template>
+  <!-- To provide tooltip context, UApp needs to be added. -->
+  <UApp>
   <v-app
     id="app"
     class="app-container"
@@ -652,21 +655,8 @@ export default defineComponent({
       @proceed="payErrorDialogHandler($event)"
     />
     <!-- Application Header -->
-    <SbcHeader
-      class="sbc-header"
-      :in-auth="false"
-      :show-login-menu="false"
-    />
-
-    <SbcSystemBanner
-      v-if="bannerText != null"
-      class="mt-n1 sbc-system-banner"
-      :show="bannerText != null"
-      type="warning"
-      icon="''"
-      :message="bannerText"
-      :dismissible="false"
-    />
+    <connect-header />
+    <connect-system-banner />
 
     <nav v-if="haveData">
       <Breadcrumb />
@@ -700,8 +690,10 @@ export default defineComponent({
       </main>
     </div>
 
-    <sbc-footer :about-text="aboutText" />
+    <!-- <sbc-footer :about-text="aboutText" /> -->
+     <connect-footer />
   </v-app>
+</UApp>
 </template>
 
 <style lang="scss">

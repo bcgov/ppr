@@ -1,8 +1,8 @@
 /* eslint-disable */
-import { computed, reactive, ref, Ref } from 'vue'
+import { computed, reactive, ref, type Ref } from 'vue'
 import { uniqueId } from 'lodash'
 
-import { AddressIF, SchemaIF } from '@/composables/address/interfaces'
+import type { AddressIF, SchemaIF } from '@/composables/address/interfaces'
 
 export function useAddress (address: Ref<AddressIF>, schema: SchemaIF) {
 
