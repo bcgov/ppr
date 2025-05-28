@@ -911,7 +911,7 @@ def __get_report_path(account_id: str, staff: bool, summary: dict, row, timestam
     summary["legacy"] = rep_count <= 0
     if is_staff_account(account_id):
         if reg_account_id != "0":
-            summary["accountId"] = reg_account_id
+            summary["accountId"] = str(row[25]) if row[25] else reg_account_id
         else:
             summary["accountId"] = "N/A"
     # To be consistent with PPR, allow registries staff to generate reports for legacy registrations

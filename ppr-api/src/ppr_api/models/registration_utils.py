@@ -43,6 +43,187 @@ PARAM_TO_ORDER_BY_CHANGE = {
 }
 
 FINANCING_PATH = "/ppr/api/v1/financing-statements/"
+
+QUERY_ACCOUNT_REGISTRATIONS = """
+WITH q AS (
+  SELECT (TO_TIMESTAMP(TO_CHAR(current_date, 'YYYY-MM-DD') || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS') at time zone 'utc')
+      AS current_expire_ts
+)
+SELECT r.registration_number, r.registration_ts, r.registration_type, r.registration_type_cl, r.account_id,
+       rt.registration_desc, r.base_reg_number, fs.state_type AS state,
+       CASE WHEN fs.life = 99 THEN -99
+            ELSE CAST(EXTRACT(day from ((fs.expire_date at time zone 'utc') - current_expire_ts)) AS INT)
+            END expire_days,
+       (SELECT MAX(r2.registration_ts)
+          FROM registrations r2
+         WHERE r2.financing_id = r.financing_id) AS last_update_ts,
+       (SELECT CASE WHEN p.business_name IS NOT NULL THEN p.business_name
+                    WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
+                    WHEN p.middle_initial IS NOT NULL THEN p.first_name || ' ' || p.middle_initial || ' ' || p.last_name
+                    ELSE p.first_name || ' ' || p.last_name END
+          FROM parties p
+         WHERE p.registration_id = r.id
+           AND p.party_type = 'RG') AS registering_party,
+       (SELECT string_agg((CASE WHEN p.business_name IS NOT NULL THEN p.business_name
+                                WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
+                                WHEN p.middle_initial IS NOT NULL THEN p.first_name || ' ' || p.middle_initial ||
+                                     ' ' || p.last_name
+                                ELSE p.first_name || ' ' || p.last_name END), ', ')
+          FROM parties p
+         WHERE p.financing_id = fs.id
+           AND p.registration_id_end IS NULL
+           AND p.party_type = 'SP') AS secured_party,
+       r.client_reference_id,
+       (SELECT CASE WHEN r.user_id IS NULL THEN ''
+                    ELSE (SELECT CASE WHEN u.lastname = '' or u.lastname IS NULL THEN u.firstname
+                                 ELSE u.firstname || ' ' || u.lastname END
+                            FROM users u
+                           WHERE u.username = r.user_id FETCH FIRST 1 ROWS ONLY) END) AS registering_name,
+      (SELECT COUNT(id)
+         FROM user_extra_registrations uer
+        WHERE uer.registration_number = r.registration_number
+          AND uer.account_id = r.account_id
+          AND uer.removed_ind = 'Y') AS removed_count
+  FROM registrations r, registration_types rt, financing_statements fs, q
+ WHERE r.registration_type = rt.registration_type
+   AND fs.id = r.financing_id
+   AND fs.id IN (SELECT fs2.id
+                   FROM financing_statements fs2, registrations r2
+                  WHERE fs2.id = r2.financing_id
+                    AND r2.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
+                    AND r2.account_id = :query_account)
+   AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
+   AND NOT EXISTS (SELECT r3.id
+                     FROM registrations r3
+                    WHERE r3.financing_id = fs.id
+                      AND r3.registration_type_cl = 'DISCHARGE'
+                      AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
+  AND NOT EXISTS (SELECT r2.financing_id
+                    FROM user_extra_registrations uer, registrations r2
+                   WHERE uer.account_id = :query_account
+                     AND uer.registration_number = r2.registration_number
+                     AND r2.financing_id = r.financing_id
+                     AND uer.removed_ind = 'Y')
+UNION (
+SELECT r.registration_number, r.registration_ts, r.registration_type, r.registration_type_cl, r.account_id,
+       rt.registration_desc, r.base_reg_number, fs.state_type AS state,
+       CASE WHEN fs.life = 99 THEN -99
+            ELSE CAST(EXTRACT(day from ((fs.expire_date at time zone 'utc') - current_expire_ts)) AS INT)
+            END expire_days,
+       (SELECT MAX(r2.registration_ts)
+          FROM registrations r2
+         WHERE r2.financing_id = r.financing_id) AS last_update_ts,
+       (SELECT CASE WHEN p.business_name IS NOT NULL THEN p.business_name
+                    WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
+                    WHEN p.middle_initial IS NOT NULL THEN p.first_name || ' ' || p.middle_initial || ' ' || p.last_name
+                    ELSE p.first_name || ' ' || p.last_name END
+          FROM parties p
+         WHERE p.registration_id = r.id
+           AND p.party_type = 'RG') AS registering_party,
+       (SELECT string_agg((CASE WHEN p.business_name IS NOT NULL THEN p.business_name
+                                WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
+                                WHEN p.middle_initial IS NOT NULL THEN p.first_name || ' ' || p.middle_initial ||
+                                     ' ' || p.last_name
+                                ELSE p.first_name || ' ' || p.last_name END), ', ')
+          FROM parties p
+         WHERE p.financing_id = fs.id
+           AND p.registration_id_end IS NULL
+           AND p.party_type = 'SP') AS secured_party,
+       r.client_reference_id,
+       (SELECT CASE WHEN r.user_id IS NULL THEN ''
+                    ELSE (SELECT CASE WHEN u.lastname = '' or u.lastname IS NULL THEN u.firstname
+                                 ELSE u.firstname || ' ' || u.lastname END
+                            FROM users u
+                           WHERE u.username = r.user_id FETCH FIRST 1 ROWS ONLY) END) AS registering_name,
+       0 AS removed_count
+  FROM registrations r, registration_types rt, financing_statements fs, q
+ WHERE r.registration_type = rt.registration_type
+   AND fs.id = r.financing_id
+   AND fs.id IN (SELECT fs2.id
+                   FROM financing_statements fs2, registrations r2
+                  WHERE fs2.id = r2.financing_id
+                    AND r2.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
+                    AND r2.registration_number IN (SELECT uer.registration_number
+                                                      FROM user_extra_registrations uer
+                                                     WHERE uer.account_id = :query_account
+                                                       AND uer.removed_ind IS NULL))
+   AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
+   AND NOT EXISTS (SELECT r3.id
+                     FROM registrations r3
+                    WHERE r3.financing_id = fs.id
+                      AND r3.registration_type_cl = 'DISCHARGE'
+                      AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
+)
+ORDER BY registration_ts DESC
+FETCH FIRST :max_results_size ROWS ONLY
+"""
+
+QUERY_ACCOUNT_ADD_REGISTRATION = """
+SELECT r.registration_number, r.registration_ts, r.registration_type, r.registration_type_cl,
+       rt.registration_desc, r.base_reg_number, fs.state_type AS state, vr.doc_storage_url,
+       CASE WHEN fs.life = 99 THEN -99
+            ELSE CAST(EXTRACT(day from (fs.expire_date - (now() at time zone 'utc'))) AS INT) END expire_days,
+       (SELECT MAX(r2.registration_ts)
+          FROM registrations r2
+         WHERE r2.financing_id = r.financing_id) AS last_update_ts,
+       (SELECT CASE WHEN p.business_name IS NOT NULL THEN p.business_name
+                    WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
+                    WHEN p.middle_initial IS NOT NULL THEN p.first_name || ' ' || p.middle_initial || ' ' || p.last_name
+                    ELSE p.first_name || ' ' || p.last_name END
+          FROM parties p
+         WHERE p.registration_id = r.id
+           AND p.party_type = 'RG') AS registering_party,
+       (SELECT string_agg((CASE WHEN p.business_name IS NOT NULL THEN p.business_name
+                                WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
+                                WHEN p.middle_initial IS NOT NULL THEN p.first_name || ' ' || p.middle_initial ||
+                                ' ' || p.last_name
+                                ELSE p.first_name || ' ' || p.last_name END), ', ')
+          FROM parties p
+         WHERE p.financing_id = fs.id
+           AND p.registration_id_end IS NULL
+           AND p.party_type = 'SP') AS secured_party,
+       r.client_reference_id,
+       (SELECT CASE WHEN r.user_id IS NULL THEN ''
+                    ELSE (SELECT CASE WHEN u.lastname = '' or u.lastname IS NULL THEN u.firstname
+                                 ELSE u.firstname || ' ' || u.lastname END
+                            FROM users u
+                           WHERE u.username = r.user_id FETCH FIRST 1 ROWS ONLY) END) AS registering_name,
+       r.account_id,
+       (SELECT COUNT(uer.id)
+          FROM user_extra_registrations uer
+         WHERE uer.account_id = :query_account
+           AND (uer.registration_number = :query_reg_num OR
+                uer.registration_number = r.registration_number)) AS exists_count,
+       (SELECT COUNT(sc.id)
+         FROM serial_collateral sc
+        WHERE sc.financing_id = fs.id
+          AND (sc.registration_id = r.id OR
+               (sc.registration_id <= r.id AND (sc.registration_id_end IS NULL OR
+                                                sc.registration_id_end > r.id)))) AS vehicle_count,
+       r.ver_bypassed as locked_status,
+       CASE WHEN r.account_id IN ('ppr_staff', 'helpdesk')
+            THEN (SELECT u.account_id
+                    FROM users u
+                   WHERE r.user_id = u.username
+                ORDER BY u.id DESC
+                FETCH FIRST 1 ROWS ONLY)
+            ELSE NULL END staff_account_id
+  FROM registrations r
+    INNER JOIN registration_types rt
+    ON r.registration_type = rt.registration_type
+    INNER JOIN financing_statements fs
+    ON fs.id = r.financing_id
+        AND fs.id IN (SELECT fs2.id
+                    FROM financing_statements fs2, registrations r2
+                    WHERE fs2.id = r2.financing_id AND r2.registration_number = :query_reg_num)
+        AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
+    LEFT OUTER JOIN verification_reports vr ON r.id=vr.registration_id
+ WHERE NOT EXISTS (SELECT r3.id FROM registrations r3
+                    WHERE r3.financing_id = fs.id
+                      AND r3.registration_type_cl = 'DISCHARGE'
+                      AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
+ORDER BY r.registration_ts DESC
+"""
 QUERY_ACCOUNT_REG_DEFAULT_ORDER = " ORDER BY registration_ts DESC"
 QUERY_ACCOUNT_CHANGE_DEFAULT_ORDER = " ORDER BY arv2.registration_ts DESC"
 QUERY_ACCOUNT_REG_LIMIT = " LIMIT :page_size OFFSET :page_offset"
@@ -455,7 +636,7 @@ def __build_account_reg_result(
     if model_utils.is_financing(reg_class) and not api_filter:
         result["expand"] = False
         if params.from_ui:
-            status: str = str(row[17])
+            status: str = str(row[18])
             if status and status == "L":
                 result["paymentPending"] = True
     result = set_path(params, result, reg_num, base_reg_num, int(row[15]))
@@ -470,8 +651,62 @@ def __build_account_reg_result(
         if is_staff_account(params.account_id):
             if result.get("accountId", "0") == "0":
                 result["accountId"] = "N/A"
+            elif params.from_ui and row[17]:
+                result["accountId"] = str(row[17])
         else:
             del result["accountId"]  # Only use this for report access checking.
+    return result
+
+
+def build_add_reg_result(row, reg_class, base_reg_num: str, reg_num: str) -> dict:
+    """Build a registration result when adding a registration to an account."""
+    result = {
+        "registrationNumber": reg_num,
+        "baseRegistrationNumber": base_reg_num,
+        "createDateTime": model_utils.format_ts(row[1]),
+        "registrationType": str(row[2]),
+        "registrationDescription": str(row[4]),
+        "registrationClass": reg_class,
+        "registeringParty": str(row[10]),
+        "securedParties": str(row[11]),
+        "clientReferenceId": str(row[12]),
+        "registeringName": str(row[13]) if row[13] else "",
+        "accountId": str(row[14]),
+        "vehicleCount": int(row[16]),
+    }
+    result["legacy"] = result.get("accountId") == "0"
+    if not row[7]:  # Report not generated
+        result["path"] = ""
+    elif model_utils.is_financing(reg_class):
+        result["path"] = FINANCING_PATH + reg_num
+    elif reg_class == model_utils.REG_CLASS_DISCHARGE:
+        result["path"] = FINANCING_PATH + base_reg_num + "/discharges/" + reg_num
+    elif reg_class == model_utils.REG_CLASS_RENEWAL:
+        result["path"] = FINANCING_PATH + base_reg_num + "/renewals/" + reg_num
+    elif reg_class == model_utils.REG_CLASS_CHANGE:
+        result["path"] = FINANCING_PATH + base_reg_num + "/changes/" + reg_num
+    elif reg_class in (model_utils.REG_CLASS_AMEND, model_utils.REG_CLASS_AMEND_COURT):
+        result["path"] = FINANCING_PATH + base_reg_num + "/amendments/" + reg_num
+    if model_utils.is_financing(reg_class):
+        result["baseRegistrationNumber"] = reg_num
+        result["statusType"] = str(row[6])
+        result["expireDays"] = int(row[8])
+        result["lastUpdateDateTime"] = model_utils.format_ts(row[9])
+        result["existsCount"] = int(row[15])
+        if (
+            result["statusType"] == model_utils.STATE_ACTIVE
+            and result["expireDays"] < 0
+            and result["expireDays"] != -99
+        ):
+            result["statusType"] = model_utils.STATE_EXPIRED
+    status: str = str(row[17])
+    if status and status == "L":
+        result["paymentPending"] = True
+    if result.get("registrationType") == RegistrationTypes.CL.value:
+        cl_type: RegistrationType = RegistrationType.find_by_registration_type(RegistrationTypes.CL.value)
+        if cl_type and cl_type.act_ts:
+            result["transitioned"] = row[1] < cl_type.act_ts
+            result["transitionTS"] = model_utils.format_ts(cl_type.act_ts)
     return result
 
 

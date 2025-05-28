@@ -112,7 +112,15 @@ SELECT mhr_number, status_type, registration_ts, submitting_name, client_referen
            AND mer.account_id = :query_value1
            AND mer.account_id != arv.account_id
            AND (mer.removed_ind IS NULL OR mer.removed_ind != 'Y')) AS extra_reg_count,
-       location_type, affirm_by, report_count
+       location_type, affirm_by, report_count,
+       CASE WHEN arv.account_id IN ('ppr_staff', 'helpdesk')
+            THEN (SELECT u.account_id
+                   FROM users u, mhr_registrations r
+                  WHERE arv.registration_id = r.id
+                    AND r.user_id = u.username
+                 ORDER BY u.id DESC
+                 FETCH FIRST 1 ROWS ONLY)
+            ELSE NULL END staff_account_id
   FROM mhr_account_reg_vw arv
 """
 

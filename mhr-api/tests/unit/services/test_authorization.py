@@ -28,7 +28,7 @@ MOCK_URL = 'https://test.api.connect.gov.bc.ca/auth/api/v1/'
 
 # testdata pattern is ({description}, {account id}, {valid})
 TEST_SBC_DATA = [
-#    ('Valid account id', '1234', True),
+    ('Valid account id', '1234', True),
     ('No account id', None, False),
     ('Invalid account id', authz.STAFF_ROLE, False),
     ('Invalid account id', '2518', False)
