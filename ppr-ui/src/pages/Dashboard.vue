@@ -138,7 +138,7 @@
         <template #contentSLot>
           <PreClaMessage />
           <!-- Post Message to be enabled following the CLA Launch -->
-          <!-- <PostClaMessage /> -->
+<!--           <PostClaMessage />-->
         </template>
         <template
           v-if="true"
@@ -151,7 +151,7 @@
                 class="msg-hide-icon float-right"
                 :ripple="false"
                 @click="hideRlMessage(true)"
-              >
+              ><a href="">Dismiss</a>
                 <v-icon color="primary">
                   mdi-close
                 </v-icon>
@@ -405,6 +405,10 @@ export default defineComponent({
       useTransportPermits().setExtendLocationChange(false)
       useTransportPermits().setNewPermitChange(false)
       onAppReady(props.appReady)
+
+      setTimeout(() => {
+        hideRlMessage(false)
+      }, 5000)
     })
 
     /** Redirects browser to Business Registry home page. */

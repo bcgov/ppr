@@ -7,8 +7,7 @@ const { rlTransitionDate } = storeToRefs(useStore())
     <v-row no-gutters>
       <v-col cols="12">
         <h3>
-          Personal Property Registry (PPR) notice: The new Commercial Lien (CL) registration type will come into effect
-          {{ rlTransitionDate }}
+          Personal Property Registry update: Commercial Lien (CL) registrations take effect {{ rlTransitionDate }}
         </h3>
       </v-col>
 
@@ -19,12 +18,19 @@ const { rlTransitionDate } = storeToRefs(useStore())
         <p>
           <a
             class="font-weight-regular"
-            href="https://www.bclaws.gov.bc.ca/civix/document/id/bills/billsprevious/3rd42nd:gov11-1"
+            href="https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/22009"
             target="_blank"
           >
-            The Commercial Liens Act (CLA) through Bill 11
-            <v-icon size="18">mdi-open-in-new</v-icon>
-          </a>and Personal Property Security Regulation (PPSR) amendments take effect on {{ rlTransitionDate }}. The
+            The Commercial Liens Act (CLA)
+          </a>and
+          <a
+            class="font-weight-regular"
+            href="https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/227_2002"
+            target="_blank"
+          >
+            amendments
+          </a>
+          Personal Property Security Regulation (PPSR) amendments take effect on {{ rlTransitionDate }}. The
           CLA reforms and consolidates British Columbia’s law for liens that secure payment on repaired, stored, and
           transported goods, replacing the Repairers Lien Act, Warehouse Lien Act, and Livestock Lien Act. PPSR
           amendments define Commercial Lien registration terms and requirements.
@@ -36,7 +42,14 @@ const { rlTransitionDate } = storeToRefs(useStore())
         class="mt-4"
       >
         <p>
-          Note: The CLA explicitly <b>does not</b> apply to liens under the Forestry Service Providers Protection Act.
+          <b>Need help?</b> For step-by-step instructions, refer to our
+          <a
+            class="font-weight-regular"
+            href="https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/22009"
+            target="_blank"
+          >
+            Commercial Liens User Guide
+          </a>
         </p>
 
         <v-divider class="mt-3" />
@@ -68,6 +81,9 @@ const { rlTransitionDate } = storeToRefs(useStore())
           </li>
           <li>
             Collateral may include serial numbered goods and a general description of collateral
+          </li>
+          <li>
+            Serial numbered goods may include a manufactured home
           </li>
           <li>
             All debtor, secured party and collateral data may be amended

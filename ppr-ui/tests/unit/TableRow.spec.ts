@@ -228,8 +228,8 @@ describe('TableRow tests', () => {
         // secured party
         expect(rowData.at(8).text()).toContain(baseReg.securedParties)
         // pdf
-        if (baseReg.path) expect(rowData.at(3).text()).toContain('PDF')
-        else expect(rowData.at(3).find('.mdi-information-outline').exists()).toBe(true)
+        if (baseReg.path) expect(rowData.at(3).find('.pdf-btn').exists()).toBe(true)
+        else expect(rowData.at(3).find('.pdf-pending-btn').exists()).toBe(true)
       } else {
         // draft registration
         let rowData
@@ -574,8 +574,8 @@ describe('Mhr TableRow tests', () => {
           // submitted date
           expect(rowData.at(4).text()).toContain(wrapper.vm.getFormattedDate(baseReg.createDateTime))
           // pdf
-          if (baseReg.path) expect(rowData.at(3).text()).toContain('PDF')
-          else expect(rowData.at(3).find('.mdi-information-outline').exists()).toBe(true)
+          if (baseReg.path) expect(rowData.at(3).find('.pdf-btn').exists()).toBe(true)
+          else expect(rowData.at(3).find('.pdf-pending-btn').exists()).toBe(true)
         }
         // check things that apply to all items
         const rowData = wrapper.findAll(tableRow + ' td')
