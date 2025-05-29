@@ -613,7 +613,7 @@ export default defineComponent({
 </script>
 <template>
   <!-- To provide tooltip context, UApp needs to be added. -->
-  <UApp class="pr-0">
+  <UApp>
     <v-app
       id="app"
       class="app-container"
@@ -669,7 +669,6 @@ export default defineComponent({
         </main>
       </div>
 
-      <!-- <sbc-footer :about-text="aboutText" /> -->
        <connect-footer />
     </v-app>
   </UApp>
@@ -678,9 +677,4 @@ export default defineComponent({
 <style lang="scss">
 @import '@/assets/styles/theme';
 @import '@/assets/styles/overrides';
-
-.sbc-system-banner {
-  min-height: 60px;
-  flex-grow: 0;
-}
 </style>

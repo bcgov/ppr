@@ -405,10 +405,6 @@ export default defineComponent({
       useTransportPermits().setExtendLocationChange(false)
       useTransportPermits().setNewPermitChange(false)
       onAppReady(props.appReady)
-
-      setTimeout(() => {
-        hideRlMessage(false)
-      }, 5000)
     })
 
     /** Redirects browser to Business Registry home page. */
@@ -451,7 +447,10 @@ export default defineComponent({
     const onAppReady = async (val: boolean): Promise<void> => {
       localState.loading = true
       // do not proceed if app is not ready
-      if (!val) return
+      if (!val) {
+        localState.loading = false
+        return
+      }
 
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
       if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
