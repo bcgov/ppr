@@ -57,6 +57,42 @@
           />
           <RegistrationLengthTrustSummary class="mt-11" />
 
+          <!-- Historical Repairers Lien Information -->
+          <v-card
+            v-if="displayHistoricalLienInfo"
+            flat
+            class="mt-1 bg-white pa-6 rounded"
+          >
+            <v-row
+              no-gutters
+              class="pt-4"
+            >
+              <v-col
+                cols="12"
+                class="generic-label"
+              >
+                Historical Information
+              </v-col>
+              <p>Surrender Date and Lien Amount are kept for historical reference from the original Repairers Lien.</p>
+            </v-row>
+            <v-row no-gutters class="mt-4">
+              <v-col cols="3" class="generic-label-14">
+                Surrender Date
+              </v-col>
+              <v-col cols="9">
+                {{ convertDate(new Date(getLengthTrust.surrenderDate), false, false) }}
+              </v-col>
+            </v-row>
+            <v-row no-gutters class="mt-4">
+              <v-col cols="3" class="generic-label-14">
+                Amount of Lien
+              </v-col>
+              <v-col cols="9">
+                {{ lienAmountSummary }}
+              </v-col>
+            </v-row>
+          </v-card>
+
           <template v-if="isSecurityActNotice">
             <v-row
               no-gutters
@@ -152,7 +188,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { RegistrationLengthTrustSummary, SecuritiesActNoticesPanels } from '@/components/registration'
 import { DebtorSummary, RegisteringPartySummary, SecuredPartySummary } from '@/components/parties/summaries'
 import { notCompleteDialog } from '@/resources/dialogOptions'
-import { getFeatureFlag, pacificDate } from '@/utils'
+import { convertDate, getFeatureFlag, pacificDate } from '@/utils'
 import { getFinancingStatement } from '@/utils/ppr-api-helper'
 import type {
   APIRegistrationTypes
@@ -193,9 +229,11 @@ export default defineComponent({
     const {
       // Getters
       isRlTransition,
+      getLengthTrust,
       rlTransitionDate,
       getRegistrationType,
-      getConfirmDebtorName
+      getConfirmDebtorName,
+      displayHistoricalLienInfo
     } = storeToRefs(useStore())
 
     const localState = reactive({
@@ -229,6 +267,20 @@ export default defineComponent({
       }),
       registrationType: computed((): APIRegistrationTypes => {
         return getRegistrationType.value?.registrationTypeAPI || null
+      }),
+      lienAmountSummary: computed((): string => {
+        if (getLengthTrust.value.lienAmount) {
+          // Format as CDN currency.
+          const currency = getLengthTrust.value.lienAmount
+            ?.replace('$', '')
+            ?.replaceAll(',', '')
+          const lienFloat = parseFloat(currency)
+          if (isNaN(lienFloat)) {
+            return getLengthTrust.value.lienAmount
+          }
+          return '$' + lienFloat.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
+        }
+        return 'Not entered'
       })
     })
 
@@ -312,12 +364,15 @@ export default defineComponent({
     }
 
     return {
+      convertDate,
+      getLengthTrust,
       isRlTransition,
       rlTransitionDate,
       confirmDischarge,
       handleDialogResp,
       isSecurityActNotice,
       UIRegistrationTypes,
+      displayHistoricalLienInfo,
       ...toRefs(localState)
     }
   }

@@ -2,9 +2,12 @@ import { defineNuxtPlugin } from '#app'
 import Vuelidate from 'vuelidate'
 import tabFocus from './tabFocus'
 import { vMaska } from 'maska'
-import { initLdClient, setAllFlagDefaults } from '@/utils'
+import { fetchConfig, initLdClient, setAllFlagDefaults } from '@/utils'
 
 export default defineNuxtPlugin(async (nuxtApp) => {
+  // Set Configurations
+  await fetchConfig()
+
   // initialize Launch Darkly
   if (useRuntimeConfig().public.VUE_APP_PPR_LD_CLIENT_ID) {
     console.info('Initializing Launch Darkly...')
@@ -16,7 +19,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     // Set all feature flags to true
     setAllFlagDefaults(true)
   }
-  
+
   nuxtApp.vueApp.use(Vuelidate)
   nuxtApp.vueApp.use(tabFocus)
   nuxtApp.vueApp.directive('maska', vMaska)

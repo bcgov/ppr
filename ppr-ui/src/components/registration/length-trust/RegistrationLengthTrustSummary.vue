@@ -9,8 +9,8 @@
     >
       Renewal Length
       <span v-if="!isRlTransition">
-        and <span v-if="showTrustIndenture">Trust Indenture</span>
-      <span v-else>Terms</span>
+        <span v-if="showTrustIndenture">and Trust Indenture</span>
+        <span v-else-if="registrationType !== APIRegistrationTypes.COMMERCIAL_LIEN">and Terms</span>
       </span>
     </h2>
     <v-row
@@ -32,7 +32,7 @@
           {{ regTitle }} Length and Trust Indenture
         </h3>
         <h3
-          v-else-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
+          v-else-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN && !isRlTransition"
           class="lh-24 ml-3"
         >
           Amount and Date of Surrender
@@ -249,7 +249,7 @@ export default defineComponent({
         return ''
       }),
       lengthSummary: computed((): string => {
-        if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN && !isRlTransition.value) {
+        if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
           return '180 Days'
         }
         if (!getLengthTrust.value.lifeInfinite && getRegistrationFlowType.value === RegistrationFlowType.NEW &&

@@ -250,7 +250,7 @@ export default defineComponent({
 
     const countryProvincesHelpers = useCountriesProvinces()
 
-    const countryChangeHandler = (val: string, oldVal: string) => {
+    const countryChangeHandler = (val: string, clearAddress: boolean) => {
       // do not trigger any changes if it is view only (summary instance)
       if (!props.editing) return
 
@@ -269,7 +269,7 @@ export default defineComponent({
         localSchema.city = [baseRules.maxLength(40), ...spaceRules]
       }
       // reset other address fields (check is for loading an existing address)
-      if (oldVal) {
+      if (clearAddress) {
         addressLocal.value.street = ''
         addressLocal.value.streetAdditional = ''
         addressLocal.value.city = ''
@@ -282,8 +282,15 @@ export default defineComponent({
       }, 5)
     }
 
+    /** Return TRUE when the provided region belongs to the provided country **/
+    const isRegionMatch = (country: string, region: string): boolean => {
+      return useCountriesProvinces().getCountryRegions(country)?.some(regionObj => {
+        return regionObj?.short === region
+      })
+    }
+
     onMounted(() => {
-      countryChangeHandler(addressLocal.value.country, null)
+      countryChangeHandler(addressLocal.value.country, false)
     })
 
     watch(() => addressLocal.value, (val) => {
@@ -304,8 +311,8 @@ export default defineComponent({
       emit('updateAddress', val)
     }, { immediate: true, deep: true })
 
-    watch(() => country.value, (val, oldVal) => {
-      countryChangeHandler(val, oldVal)
+    watch(() => country.value, (val) => {
+      countryChangeHandler(val, !isRegionMatch(country.value, addressLocal.value.region))
     })
 
     watch(() => props.triggerErrors, () => {

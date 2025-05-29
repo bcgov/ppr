@@ -1,4 +1,3 @@
-export * from './auth'
 export * from './discharge'
 export * from './exemption'
 export * from './renew'

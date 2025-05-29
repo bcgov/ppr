@@ -7,7 +7,7 @@ const { rlTransitionDate } = storeToRefs(useStore())
     <v-row no-gutters>
       <v-col cols="12">
         <h3>
-          Personal Property Registry (PPR) update: The new Commercial Lien (CL) registration type is now active.
+          Personal Property Registry update: Commercial Lien (CL) registrations are now active.
         </h3>
       </v-col>
 
@@ -24,7 +24,15 @@ const { rlTransitionDate } = storeToRefs(useStore())
             The Commercial Liens Act (CLA) through Bill 11
             <v-icon size="18">mdi-open-in-new</v-icon>
           </a>
-          and amendments to the Personal Property Security
+          and
+          <a
+            class="font-weight-regular"
+            href="https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/227_2002"
+            target="_blank"
+          >
+            amendments
+          </a>
+          to the Personal Property Security
           Regulation (PPSR) came into effect on {{ rlTransitionDate }}. The CLA reforms and consolidates
           British Columbia’s law for liens that secure payment on repaired, stored, and transported goods. The
           CLA repeals and replaces the Repairers Lien Act, Livestock Lien Act, Tugboat Worker Lien Act, Warehouse
@@ -57,7 +65,10 @@ const { rlTransitionDate } = storeToRefs(useStore())
             A court order is no longer required for renewal
           </li>
           <li>
-            Collateral may include a general description of collateral
+            Collateral may include serial numbered goods and a general description of collateral
+          </li>
+          <li>
+            Serial numbered goods may include a manufactured home
           </li>
           <li>
             All debtor, secured party and collateral data may be amended

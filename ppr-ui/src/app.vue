@@ -1,7 +1,6 @@
 <script lang="ts">
 import { useStore } from '@/store/store'
 import { StatusCodes } from 'http-status-codes'
-import KeycloakService from 'sbc-common-components/src/services/keycloak.services'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import ConnectHeader from '@sbc-connect/nuxt-core-layer-beta/app/components/Connect/Header/index.vue'
 import ConnectSystemBanner from '@sbc-connect/nuxt-core-layer-beta/app/components/Connect/SystemBanner.vue'
@@ -75,6 +74,7 @@ export default defineComponent({
       getRegistrationFlowType,
       getUserProductSubscriptionsCodes
     } = storeToRefs(useStore())
+    const { $authApi, $keycloak } = useNuxtApp()
 
     const localState = reactive({
       errorDisplay: false,
@@ -175,6 +175,12 @@ export default defineComponent({
      * (since we won't get the event from signin component)
      */
     const authVerificationHandler = () => {
+      // Set account and token to session
+      const currentAccount = JSON.parse(sessionStorage.getItem('connect-core-account-store'))?.currentAccount
+      sessionStorage.setItem('CURRENT_ACCOUNT', JSON.stringify(currentAccount))
+      sessionStorage.setItem('KEYCLOAK_TOKEN', $keycloak.token)
+
+      //
       setTimeout(() => {
         isAuthenticated.value && !!sessionStorage.getItem(SessionStorageKeys.CurrentAccount)
           ? onProfileReady(true)
@@ -580,9 +586,6 @@ export default defineComponent({
 
     const onProfileReady = async (val: boolean): Promise<void> => {
       if (val && !localState.loggedOut) {
-        // start KC token service
-        await startTokenService()
-
         // load account information
         loadAccountInformation()
 
@@ -591,30 +594,6 @@ export default defineComponent({
 
         // set browser title
         setBrowserTitle()
-      }
-    }
-
-    /** Starts token service that refreshes KC token periodically. */
-    const startTokenService = async (): Promise<void> => {
-      // only initialize once
-      // don't start during Vitest as it messes up the test JWT
-      if (localState.tokenService) return
-
-      try {
-        console.info('Starting token refresh service...')
-        await KeycloakService.initializeToken()
-        localState.tokenService = true
-      } catch (e) {
-        // this happens when the refresh token has expired
-        // 1. clear flags and keycloak data
-        localState.tokenService = false
-        localState.profileReady = false
-        sessionStorage.removeItem(SessionStorageKeys.KeyCloakToken)
-        sessionStorage.removeItem(SessionStorageKeys.KeyCloakRefreshToken)
-        sessionStorage.removeItem(SessionStorageKeys.KeyCloakIdToken)
-        sessionStorage.removeItem(SessionStorageKeys.CurrentAccount)
-        // 2. reload app to get new tokens
-        location.reload()
       }
     }
 
@@ -635,73 +614,67 @@ export default defineComponent({
 <template>
   <!-- To provide tooltip context, UApp needs to be added. -->
   <UApp>
-  <v-app
-    id="app"
-    class="app-container"
-  >
-    <SkipToMainContent main-content-id="main-content" />
+    <v-app
+      id="app"
+      class="app-container"
+    >
+      <SkipToMainContent main-content-id="main-content" />
 
-    <!-- Dialogs -->
-    <BaseDialog
-      id="errorDialogApp"
-      :set-display="errorDisplay"
-      :set-options="errorOptions"
-      @proceed="proceedAfterError"
-    />
-    <BaseDialog
-      id="payErrorDialogApp"
-      :set-display="payErrorDisplay"
-      :set-options="payErrorOptions"
-      @proceed="payErrorDialogHandler($event)"
-    />
-    <!-- Application Header -->
-    <connect-header />
-    <connect-system-banner />
+      <!-- Dialogs -->
+      <BaseDialog
+        id="errorDialogApp"
+        :set-display="errorDisplay"
+        :set-options="errorOptions"
+        @proceed="proceedAfterError"
+      />
+      <BaseDialog
+        id="payErrorDialogApp"
+        :set-display="payErrorDisplay"
+        :set-options="payErrorOptions"
+        @proceed="payErrorDialogHandler($event)"
+      />
+      <!-- Application Header -->
+      <connect-header />
+      <connect-system-banner />
 
-    <nav v-if="haveData">
-      <Breadcrumb />
-    </nav>
+      <nav v-if="haveData">
+        <Breadcrumb />
+      </nav>
 
-    <div class="app-body">
-      <main
-        id="main-content"
-        tabindex="-1"
-      >
-        <Tombstone
-          v-if="haveData"
-          :action-in-progress="actionInProgress"
-        />
-        <v-container class="py-0">
-          <v-row no-gutters>
-            <v-col cols="12">
-              <NuxtPage
-                :app-loading-data="!haveData"
-                :app-ready="appReady"
-                :save-draft-exit="saveDraftExitToggle"
-                :registry-url="registryUrl"
-                @profile-ready="profileReady = true"
-                @error="handleError($event)"
-                @have-data="haveData = $event"
-                @action-in-progress="actionInProgress = $event"
-              />
-            </v-col>
-          </v-row>
-        </v-container>
-      </main>
-    </div>
+      <div class="app-body">
+        <main
+          id="main-content"
+          tabindex="-1"
+        >
+          <Tombstone
+            v-if="haveData"
+            :action-in-progress="actionInProgress"
+          />
+          <v-container class="py-0">
+            <v-row no-gutters>
+              <v-col cols="12">
+                <NuxtPage
+                  :app-loading-data="!haveData"
+                  :app-ready="appReady"
+                  :save-draft-exit="saveDraftExitToggle"
+                  :registry-url="registryUrl"
+                  @profile-ready="profileReady = true"
+                  @error="handleError($event)"
+                  @have-data="haveData = $event"
+                  @action-in-progress="actionInProgress = $event"
+                />
+              </v-col>
+            </v-row>
+          </v-container>
+        </main>
+      </div>
 
-    <!-- <sbc-footer :about-text="aboutText" /> -->
-     <connect-footer />
-  </v-app>
-</UApp>
+       <connect-footer />
+    </v-app>
+  </UApp>
 </template>
 
 <style lang="scss">
 @import '@/assets/styles/theme';
 @import '@/assets/styles/overrides';
-
-.sbc-system-banner {
-  min-height: 60px;
-  flex-grow: 0;
-}
 </style>
