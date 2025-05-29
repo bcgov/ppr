@@ -63,7 +63,7 @@
   },
   "devDependencies": {
     "@mdi/font": "^6.9.96",
-    "@nuxt/test-utils": "^3.13.1",
+    "@nuxt/test-utils": "^3.15.1",
     "@nuxtjs/eslint-config-typescript": "^12.1.0",
     "@nuxtjs/i18n": "^9.5.4",
     "@originjs/vite-plugin-commonjs": "^1.0.3",
