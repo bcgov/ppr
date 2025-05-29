@@ -18,11 +18,8 @@ import {
   RenewRegistration,
   ConfirmRenewal,
   Search,
-  Signin,
-  Signout,
   AmendRegistration,
   ConfirmAmendment,
-  Login,
   MhrUnitNote,
   UserAccess,
   SubmittingParty,
@@ -41,37 +38,6 @@ export default <RouterConfig> {
   // https://router.vuejs.org/api/interfaces/routeroptions.html#routes
   // alternatively, could put this inside the setup for each page
   routes: _routes => [
-    {
-      // router.beforeEach() routes here:
-      path: '/login',
-      name: RouteNames.LOGIN,
-      component: Login,
-      props: true,
-      meta: {
-        requiresAuth: false,
-        title: 'BC Registries Account Login',
-      },
-    },
-    {
-      // router.beforeEach() routes here:
-      path: '/signin',
-      name: RouteNames.SIGN_IN,
-      component: Signin,
-      props: true,
-      meta: {
-        requiresAuth: false,
-      },
-    },
-    {
-      // SbcHeader.logout() redirects here:
-      path: '/signout',
-      name: RouteNames.SIGN_OUT,
-      component: Signout,
-      props: true,
-      meta: {
-        requiresAuth: false,
-      },
-    },
     {
       path: '/dashboard',
       name: RouteNames.DASHBOARD,

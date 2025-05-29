@@ -613,66 +613,66 @@ export default defineComponent({
 </script>
 <template>
   <!-- To provide tooltip context, UApp needs to be added. -->
-  <UApp>
-  <v-app
-    id="app"
-    class="app-container"
-  >
-    <SkipToMainContent main-content-id="main-content" />
+  <UApp class="pr-0">
+    <v-app
+      id="app"
+      class="app-container"
+    >
+      <SkipToMainContent main-content-id="main-content" />
 
-    <!-- Dialogs -->
-    <BaseDialog
-      id="errorDialogApp"
-      :set-display="errorDisplay"
-      :set-options="errorOptions"
-      @proceed="proceedAfterError"
-    />
-    <BaseDialog
-      id="payErrorDialogApp"
-      :set-display="payErrorDisplay"
-      :set-options="payErrorOptions"
-      @proceed="payErrorDialogHandler($event)"
-    />
-    <!-- Application Header -->
-    <connect-header />
-    <connect-system-banner />
+      <!-- Dialogs -->
+      <BaseDialog
+        id="errorDialogApp"
+        :set-display="errorDisplay"
+        :set-options="errorOptions"
+        @proceed="proceedAfterError"
+      />
+      <BaseDialog
+        id="payErrorDialogApp"
+        :set-display="payErrorDisplay"
+        :set-options="payErrorOptions"
+        @proceed="payErrorDialogHandler($event)"
+      />
+      <!-- Application Header -->
+      <connect-header />
+      <connect-system-banner />
 
-    <nav v-if="haveData">
-      <Breadcrumb />
-    </nav>
+      <nav v-if="haveData">
+        <Breadcrumb />
+      </nav>
 
-    <div class="app-body">
-      <main
-        id="main-content"
-        tabindex="-1"
-      >
-        <Tombstone
-          v-if="haveData"
-          :action-in-progress="actionInProgress"
-        />
-        <v-container class="py-0">
-          <v-row no-gutters>
-            <v-col cols="12">
-              <NuxtPage
-                :app-loading-data="!haveData"
-                :app-ready="appReady"
-                :save-draft-exit="saveDraftExitToggle"
-                :registry-url="registryUrl"
-                @profile-ready="profileReady = true"
-                @error="handleError($event)"
-                @have-data="haveData = $event"
-                @action-in-progress="actionInProgress = $event"
-              />
-            </v-col>
-          </v-row>
-        </v-container>
-      </main>
-    </div>
+      <div class="app-body">
+        <main
+          id="main-content"
+          tabindex="-1"
+        >
+          <Tombstone
+            v-if="haveData"
+            :action-in-progress="actionInProgress"
+          />
+          <v-container class="py-0">
+            <v-row no-gutters>
+              <v-col cols="12">
+                <NuxtPage
+                  :app-loading-data="!haveData"
+                  :app-ready="appReady"
+                  :save-draft-exit="saveDraftExitToggle"
+                  :registry-url="registryUrl"
+                  @profile-ready="profileReady = true"
+                  @error="handleError($event)"
+                  @have-data="haveData = $event"
+                  @action-in-progress="actionInProgress = $event"
+                />
+              </v-col>
+            </v-row>
+          </v-container>
+        </main>
+      </div>
 
-    <!-- <sbc-footer :about-text="aboutText" /> -->
-     <connect-footer />
-  </v-app>
-</UApp>
+      <!-- <sbc-footer :about-text="aboutText" /> -->
+       <connect-footer />
+    </v-app>
+  </UApp>
 </template>
 
 <style lang="scss">
