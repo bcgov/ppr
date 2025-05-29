@@ -32,7 +32,7 @@
           {{ regTitle }} Length and Trust Indenture
         </h3>
         <h3
-          v-else-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
+          v-else-if="registrationType === APIRegistrationTypes.REPAIRERS_LIEN && !isRlTransition"
           class="lh-24 ml-3"
         >
           Amount and Date of Surrender

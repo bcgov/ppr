@@ -10,7 +10,6 @@
       <h3 class="fs-16 lh-24 ml-3 pr-2">
         Current Expiry Date and Time
         <span v-if="showTrustIndenture"> and Trust Indenture</span>
-        <span v-if="displayHistoricalLienInfo"> and Historical Information</span>
       </h3>
     </header>
     <v-card
@@ -157,11 +156,20 @@
       flat
       class="mt-1 bg-white pa-6 rounded"
     >
-      <v-row no-gutters>
-        <InfoChip action="HISTORICAL" />
+      <v-row
+        no-gutters
+        class="pt-4"
+      >
+        <v-col
+          cols="12"
+          class="generic-label"
+        >
+          Historical Information
+        </v-col>
+        <p>Surrender Date and Lien Amount are kept for historical reference from the original Repairers Lien.</p>
       </v-row>
       <v-row no-gutters class="mt-4">
-        <v-col cols="3" class="generic-label">
+        <v-col cols="3" class="generic-label-14">
           Surrender Date
         </v-col>
         <v-col cols="9">
@@ -169,7 +177,7 @@
         </v-col>
       </v-row>
       <v-row no-gutters class="mt-4">
-        <v-col cols="3" class="generic-label">
+        <v-col cols="3" class="generic-label-14">
           Amount of Lien
         </v-col>
         <v-col cols="9">
