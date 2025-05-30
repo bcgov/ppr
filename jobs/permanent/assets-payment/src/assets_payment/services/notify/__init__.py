@@ -57,6 +57,14 @@ class Notify:
             body += "\n\nMHR updated draft IDs:\n" + status_data.get("mhr_draft_ids")
         else:
             body += "\n\nMHR updated draft IDs: none"
+        if status_data.get("ppr_invoice_ids"):
+            body += "\n\nPPR cancelled invoices:\n" + status_data.get("ppr_invoice_ids")
+        else:
+            body += "\n\nPPR cancelled invoices: none"
+        if status_data.get("ppr_draft_ids"):
+            body += "\n\nPPR updated draft IDs:\n" + status_data.get("ppr_draft_ids")
+        else:
+            body += "\n\nPPR updated draft IDs: none"
         payload = copy.deepcopy(EMAIL_DATA_TEMPLATE)
         payload["recipients"] = self.status_recipients
         payload["content"]["subject"] = self.status_subject
