@@ -447,10 +447,7 @@ export default defineComponent({
     const onAppReady = async (val: boolean): Promise<void> => {
       localState.loading = true
       // do not proceed if app is not ready
-      if (!val) {
-        localState.loading = false
-        return
-      }
+      if (!val) return
 
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
       if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
