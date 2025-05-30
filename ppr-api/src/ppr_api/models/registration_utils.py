@@ -658,8 +658,9 @@ def __build_account_reg_result(
     return result
 
 
-def build_add_reg_result(row, reg_class, base_reg_num: str, reg_num: str) -> dict:
+def build_add_reg_result(row, account_id: str, base_reg_num: str, reg_num: str) -> dict:
     """Build a registration result when adding a registration to an account."""
+    reg_class: str = str(row[3])
     result = {
         "registrationNumber": reg_num,
         "baseRegistrationNumber": base_reg_num,
@@ -693,21 +694,38 @@ def build_add_reg_result(row, reg_class, base_reg_num: str, reg_num: str) -> dic
         result["expireDays"] = int(row[8])
         result["lastUpdateDateTime"] = model_utils.format_ts(row[9])
         result["existsCount"] = int(row[15])
+        result["inUserList"] = False
         if (
             result["statusType"] == model_utils.STATE_ACTIVE
             and result["expireDays"] < 0
             and result["expireDays"] != -99
         ):
             result["statusType"] = model_utils.STATE_EXPIRED
+        # Another account already added.
+        if result["existsCount"] > 0 and result["accountId"] not in (account_id, account_id + "_R"):
+            result["inUserList"] = True
+        # User account previously removed (can be added back).
+        elif result["existsCount"] > 0 and result["accountId"] in (account_id, account_id + "_R"):
+            result["inUserList"] = False
+        # User account added by default.
+        elif result["accountId"] == account_id:
+            result["inUserList"] = True
+        # Or Another account excluded by default.
     status: str = str(row[17])
     if status and status == "L":
         result["paymentPending"] = True
-    if result.get("registrationType") == RegistrationTypes.CL.value:
-        cl_type: RegistrationType = RegistrationType.find_by_registration_type(RegistrationTypes.CL.value)
-        if cl_type and cl_type.act_ts:
-            result["transitioned"] = row[1] < cl_type.act_ts
-            result["transitionTS"] = model_utils.format_ts(cl_type.act_ts)
     return result
+
+
+def update_add_reg_changes(changes, cl_type: RegistrationType, transitioned: bool):
+    """If CL base reg type set change registration transitioned property."""
+    if not cl_type or not changes or not cl_type.act_ts or not transitioned:
+        return changes
+    for reg in changes:
+        create_ts = model_utils.ts_from_iso_format(reg.get("createDateTime"))
+        reg["transitioned"] = create_ts.timestamp() > cl_type.act_ts.timestamp()
+        reg["transitionTS"] = model_utils.format_ts(cl_type.act_ts)
+    return changes
 
 
 def api_account_reg_filter(params: AccountRegistrationParams) -> bool:
