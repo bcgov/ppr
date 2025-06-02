@@ -536,6 +536,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         changes = []
         if account_id is None or registration_num is None:
             return result
+        cl_type: RegistrationType = None
+        transitioned: bool = False
         try:
             results = db.session.execute(
                 text(registration_utils.QUERY_ACCOUNT_ADD_REGISTRATION),
@@ -546,21 +548,13 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                 for row in rows:
                     reg_num = str(row[0])
                     base_reg_num = str(row[5])
-                    reg_class = str(row[3])
-                    result = registration_utils.build_add_reg_result(row, reg_class, base_reg_num, reg_num)
-                    if model_utils.is_financing(reg_class):
-                        # Another account already added.
-                        if result["existsCount"] > 0 and result["accountId"] not in (account_id, account_id + "_R"):
-                            result["inUserList"] = True
-                        # User account previously removed (can be added back).
-                        elif result["existsCount"] > 0 and result["accountId"] in (account_id, account_id + "_R"):
-                            result["inUserList"] = False
-                        # User account added by default.
-                        elif result["accountId"] == account_id:
-                            result["inUserList"] = True
-                        # Another account excluded by default.
-                        else:
-                            result["inUserList"] = False
+                    result = registration_utils.build_add_reg_result(row, account_id, base_reg_num, reg_num)
+                    if result.get("registrationType") == RegistrationTypes.CL.value:
+                        cl_type = RegistrationType.find_by_registration_type(RegistrationTypes.CL.value)
+                        if cl_type and cl_type.act_ts:
+                            result["transitioned"] = row[1] < cl_type.act_ts
+                            result["transitionTS"] = model_utils.format_ts(cl_type.act_ts)
+                            transitioned = result.get("transitioned")
                     # Set if user can access verification statement.
                     if not registration_utils.can_access_report(account_id, account_name, result, sbc_staff):
                         result["path"] = ""
@@ -570,7 +564,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
                         elif row[18]:
                             result["accountId"] = str(row[18])
                     result = registration_utils.update_summary_optional(result, account_id, sbc_staff)
-                    if not model_utils.is_financing(reg_class):
+                    if not model_utils.is_financing(result.get("registrationClass")):
                         changes.append(result)
         except Exception as db_exception:  # noqa: B902; return nicer error
             logger.error("DB find_summary_by_reg_num exception: " + str(db_exception))
@@ -578,7 +572,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         if not result:
             return None
         if result and changes:
-            result["changes"] = changes
+            result["changes"] = registration_utils.update_add_reg_changes(changes, cl_type, transitioned)
         return result
 
     def verification_json(self, reg_num_name: str):
