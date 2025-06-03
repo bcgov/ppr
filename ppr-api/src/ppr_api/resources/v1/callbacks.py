@@ -21,7 +21,7 @@ from flask_cors import cross_origin
 from ppr_api.callback.document_storage.storage_service import DocumentTypes, GoogleStorageService
 from ppr_api.callback.utils.exceptions import ReportDataException, ReportException, StorageException
 from ppr_api.exceptions import DatabaseException
-from ppr_api.models import Draft, FinancingStatement, MailReport, Registration
+from ppr_api.models import Draft, EventTracking, FinancingStatement, MailReport, Registration, SearchResult
 from ppr_api.models import utils as model_utils
 from ppr_api.reports import get_callback_pdf
 from ppr_api.reports.v2.report_utils import ReportTypes
@@ -39,6 +39,7 @@ PAY_STATUS_INVALID_MSG = "Payment status {pay_status} not an allowed value."
 PAY_CANCELLED_MSG = "Payment status cancelled/deleted: draft reverted."
 PAY_NO_REG_MSG = "Change no financing statement found for base reg num={reg_num}."
 PAY_REG_SUCCESS_MSG = "Registration created fs id={fs_id} reg_id={reg_id} reg num={reg_num}."
+PAY_SEARCH_SUCCESS_MSG = "Search selection allowed for search id={search_id}."
 ALLOWED_PAY_STATUS = [
     StatusCodes.CANCELLED.value,
     StatusCodes.COMPLETED.value,
@@ -151,6 +152,11 @@ def post_payment_callback(invoice_id: str):  # pylint: disable=too-many-return-s
         elif pay_status not in ALLOWED_PAY_STATUS:
             error_msg: str = PAY_STATUS_INVALID_MSG.format(pay_status=pay_status)
             return pay_callback_error("02", invoice_id, HTTPStatus.BAD_REQUEST, error_msg)
+
+        search_id: int = get_search_id(invoice_id)
+        if search_id and search_id > 0:
+            return pay_callback_search(search_id, invoice_id)
+
         draft: Draft = Draft.find_by_invoice_id(invoice_id)
         if not draft:
             return pay_callback_error("03", invoice_id, HTTPStatus.NOT_FOUND)
@@ -169,6 +175,40 @@ def post_payment_callback(invoice_id: str):  # pylint: disable=too-many-return-s
         return resource_utils.db_exception_response(db_exception, None, "POST pay callback event")
     except Exception as default_err:  # noqa: B902; return nicer default error
         return pay_callback_error("00", invoice_id, HTTPStatus.INTERNAL_SERVER_ERROR, str(default_err))
+
+
+def get_search_id(invoice_id: str):
+    """Try to get the search id if the payment is for a search request."""
+    events = EventTracking.find_by_key_id(int(invoice_id))
+    if not events:
+        return None
+    for event in events:
+        if event.event_tracking_type == EventTracking.EventTrackingTypes.PPR_PAYMENT.value and event.message:
+            message: str = str(event.message)
+            if message.startswith("11"):
+                tokens = message.split("*")
+                if tokens and len(tokens) > 1:
+                    search_id = int(tokens[1])
+                    logger.info(f"get_search_id found id={search_id}")
+                    return search_id
+    return None
+
+
+def pay_callback_search(search_id: int, invoice_id: str):
+    """Handle a payment complete notification for a search request."""
+    search_result: SearchResult = SearchResult.find_by_search_id(search_id)
+    if not search_result:
+        return pay_callback_error("13", invoice_id, HTTPStatus.NOT_FOUND)
+    if not search_result.is_payment_pending():
+        return pay_callback_error("14", invoice_id, HTTPStatus.BAD_REQUEST, f"Search id={search_id}")
+    logger.info(f"Request valid for invoice id={invoice_id} search id={search_id}, marking search as completed.")
+    cc_payment_utils.track_event("09", invoice_id, HTTPStatus.OK, f"Search id={search_id}")
+    search_result.score = None
+    search_result.save()
+    logger.info(f"Search pending payment status removed for {search_id}.")
+    msg = PAY_SEARCH_SUCCESS_MSG.format(search_id=search_id)
+    cc_payment_utils.track_event("15", invoice_id, HTTPStatus.OK, msg)
+    return {}, HTTPStatus.OK
 
 
 def pay_callback_error(code: str, key_id: int, status_code, message: str = None):

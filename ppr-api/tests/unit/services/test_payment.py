@@ -78,12 +78,12 @@ TEST_PAY_METHOD_STATUS = [
     (True, 'FSREG', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
     (True, 'FSREN', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
     (True, 'FSDIS', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
-    (False, 'SERCH', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
-    (False, 'SSRCH', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
-    (False, 'PPRCD', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
-    (False, 'SERCH', PaymentMethods.CC.value, StatusCodes.CREATED.value),
-    (False, 'SSRCH', PaymentMethods.CC.value, StatusCodes.CREATED.value),
-    (False, 'PPRCD', PaymentMethods.CC.value, StatusCodes.CREATED.value),
+    (True, 'SERCH', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
+    (True, 'SSRCH', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
+    (True, 'PPRCD', PaymentMethods.DIRECT_PAY.value, StatusCodes.CREATED.value),
+    (True, 'SERCH', PaymentMethods.CC.value, StatusCodes.CREATED.value),
+    (True, 'SSRCH', PaymentMethods.CC.value, StatusCodes.CREATED.value),
+    (True, 'PPRCD', PaymentMethods.CC.value, StatusCodes.CREATED.value),
 ]
 # testdata pattern is ({pay_trans_type}, {quantity}, {filing_type}, {cc})
 TEST_PAY_TYPE_FILING_TYPE = [

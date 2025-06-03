@@ -59,6 +59,7 @@ TRACKING_MESSAGES = {
     "11S": "11S: staff search credit card payment set up complete for invoice id={invoice_id}.",
     "13": "13: credit card payment update error no search found for invoice id={invoice_id}.",
     "14": "14: credit card payment update error search no pending payment for invoice id={invoice_id}.",
+    "15": "15: search selection allowed for invoice id={invoice_id}.",
 }
 
 
