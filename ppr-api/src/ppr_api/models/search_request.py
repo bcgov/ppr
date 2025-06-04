@@ -35,6 +35,7 @@ from .db import db
 # Async search report status pending.
 REPORT_STATUS_PENDING = "PENDING"
 CHARACTER_SET_UNSUPPORTED = "The search name {} charcter set is not supported.\n"
+PAY_PENDING: int = 1000
 
 
 class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -92,7 +93,10 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             "maxResultsSize": search_utils.SEARCH_RESULTS_MAX_SIZE,
             "searchQuery": self.search_criteria,
         }
-        if self.updated_selection:
+        if self.search_result and self.search_result.is_payment_pending():
+            result["paymentPending"] = True
+            result["results"] = []
+        elif self.updated_selection:
             result["results"] = self.updated_selection
         elif self.search_response:
             result["results"] = self.search_response
@@ -100,7 +104,6 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         if self.pay_invoice_id and self.pay_path:
             payment = {"invoiceId": str(self.pay_invoice_id), "receipt": self.pay_path}
             result["payment"] = payment
-
         return result
 
     def save(self):
@@ -418,7 +421,11 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                         # if api_result is null then the selections have not been finished
                         search["inProgress"] = not row[11] and row[11] != [] and search["totalResultsSize"] > 0
                         search["userId"] = str(row[12])
-                        if not search.get("inProgress") and (row[8] or model_utils.report_retry_elapsed(search_ts)):
+                        if row[13] and int(row[13]) == PAY_PENDING:
+                            search["paymentPending"] = True
+                            search["invoiceId"] = str(row[14]) if row[14] else ""
+                            search["reportAvailable"] = False
+                        elif not search.get("inProgress") and (row[8] or model_utils.report_retry_elapsed(search_ts)):
                             search["reportAvailable"] = True
                         else:
                             search["reportAvailable"] = False

@@ -107,6 +107,40 @@ TEST_STAFF_SEARCH_DATA = [
     (GOV_ACCOUNT_ROLE, None, '654321', '111111', False, HTTPStatus.CREATED),
     (GOV_ACCOUNT_ROLE, None, None, None, False, HTTPStatus.CREATED)
 ]
+# testdata pattern is ({desc}, {roles}, {status}, {has_account}, {search_id})
+TEST_GET_DATA = [
+    ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 200000005),
+    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 200000005),
+    ('Inalid completed request', [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 200000005),
+    ('Valid no search selection', [PPR_ROLE], HTTPStatus.OK, True, 200000001),
+    ('Invalid search Id', [PPR_ROLE], HTTPStatus.NOT_FOUND, True, 300000006),
+    ('Invalid request staff no account', [PPR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False, 200000005),
+]
+
+
+@pytest.mark.parametrize('desc,roles,status,has_account, search_id', TEST_GET_DATA)
+def test_get_search_query(session, client, jwt, desc, roles, status, has_account, search_id):
+    """Assert that a get search query info by search id works as expected."""
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
+    headers = None
+    # setup
+    if has_account and BCOL_HELP in roles:
+        headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
+    elif has_account and STAFF_ROLE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', STAFF_ROLE)
+    elif has_account and GOV_ACCOUNT_ROLE in roles:
+        headers = create_header_account(jwt, roles, 'test-user', GOV_ACCOUNT_ROLE)
+    elif has_account:
+        headers = create_header_account(jwt, roles)
+    else:
+        headers = create_header(jwt, roles)
+    # test
+    rv = client.get('/api/v1/searches/' + str(search_id),
+                    headers=headers)
+
+    # check
+    # print(rv.json)
+    assert rv.status_code == status
 
 
 @pytest.mark.parametrize('search_type,json_data', TEST_VALID_DATA)

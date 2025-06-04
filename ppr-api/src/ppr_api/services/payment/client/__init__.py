@@ -96,7 +96,7 @@ PAYMENT_CERTIFIED_STAFF_SEARCH_REQUEST_TEMPLATE = {
 
 PAYMENT_REFUND_TEMPLATE = {"reason": "Immediate transaction rollback."}
 CC_REQUEST_PAYMENT_INFO = {"methodOfPayment": "DIRECT_PAY"}
-EXCLUDED_CC_FILING_TYPES = ["SERCH", "SSRCH", "PPRCD"]
+EXCLUDED_CC_FILING_TYPES = []  # ["SERCH", "SSRCH", "PPRCD"]
 
 PATH_PAYMENT = "payment-requests"
 PATH_REFUND = "payment-requests/{invoice_id}/refunds"

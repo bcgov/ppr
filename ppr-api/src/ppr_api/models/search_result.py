@@ -34,6 +34,7 @@ UI_CALLBACK_URL = "PPR_UI"
 SCORE_LARGE_REPORT: int = 999
 LARGE_REPORT_REG_COUNT: int = 400
 LARGE_REPORT_JSON_SIZE: int = 1024000
+SCORE_PAY_PENDING: int = 1000
 
 
 class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -75,6 +76,10 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
             elif self.search_select:
                 result["selected"] = self.search_select
         return result
+
+    def is_payment_pending(self):
+        """Evaluate if search results are waiting on payment completion."""
+        return self.score and self.score == SCORE_PAY_PENDING
 
     def save(self):
         """Render a search results detail information to the local cache."""

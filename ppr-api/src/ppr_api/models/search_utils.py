@@ -313,7 +313,7 @@ SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_
                        ELSE '' END
              FROM users u WHERE u.username = sc.user_id FETCH FIRST 1 ROWS ONLY)
       END) AS username,
-  sr.api_result, sc.user_id
+  sr.api_result, sc.user_id, sr.score, sc.pay_invoice_id
 FROM search_requests sc, search_results sr
 WHERE sc.id = sr.search_id
   AND sc.account_id = '?'
@@ -347,7 +347,7 @@ SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_
                        ELSE '' END
              FROM users u WHERE u.username = sc.user_id FETCH FIRST 1 ROWS ONLY)
       END) AS username,
-  sr.api_result, sc.user_id
+  sr.api_result, sc.user_id, sr.score, sc.pay_invoice_id
 FROM search_requests sc, search_results sr
 WHERE sc.id = sr.search_id
   AND sc.account_id = '?'
@@ -379,7 +379,7 @@ SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_
                        ELSE '' END
              FROM users u WHERE u.username = sc.user_id FETCH FIRST 1 ROWS ONLY)
       END) AS username,
-  sr.api_result, sc.user_id
+  sr.api_result, sc.user_id, sr.score, sc.pay_invoice_id
 FROM search_requests sc, search_results sr
 WHERE sc.id = sr.search_id
   AND sc.account_id = '?'
@@ -412,7 +412,7 @@ SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_
                        ELSE '' END
              FROM users u WHERE u.username = sc.user_id FETCH FIRST 1 ROWS ONLY)
       END) AS username,
-  sr.api_result, sc.user_id
+  sr.api_result, sc.user_id, sr.score, sc.pay_invoice_id
 FROM search_requests sc, search_results sr
 WHERE sc.id = sr.search_id
   AND sc.account_id = '?'

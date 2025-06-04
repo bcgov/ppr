@@ -22,8 +22,17 @@ from registry_schemas import utils as schema_utils
 
 from ppr_api.exceptions import BusinessException, DatabaseException
 from ppr_api.models import SearchRequest, SearchResult
+from ppr_api.models.search_request import PAY_PENDING
 from ppr_api.resources import utils as resource_utils
-from ppr_api.services.authz import authorized, is_bcol_help, is_gov_account, is_sbc_office_account, is_staff_account
+from ppr_api.resources.cc_payment_utils import track_search_payment
+from ppr_api.services.authz import (
+    authorized,
+    is_bcol_help,
+    is_gov_account,
+    is_sbc_office_account,
+    is_staff,
+    is_staff_account,
+)
 from ppr_api.services.payment import TransactionTypes
 from ppr_api.services.payment.exceptions import SBCPaymentException
 from ppr_api.services.payment.payment import Payment
@@ -72,34 +81,15 @@ def post_searches():  # pylint: disable=too-many-locals,too-many-branches; only 
             return resource_utils.validation_error_response(errors, VAL_ERROR)
         # Perform any extra data validation such as start and end dates here
         SearchRequest.validate_query(request_json)
-        # Staff has special payment rules and setup.
-        if is_staff_account(account_id) or is_bcol_help(account_id):
-            return staff_search(request, request_json, account_id)
+        if request.args.get(ROUTING_SLIP_PARAM) and request.args.get(BCOL_NUMBER_PARAM):
+            return resource_utils.staff_payment_bcol_fas()
 
+        pay_params = build_pay_request_params(request, jwt, account_id, request_json)
+        if pay_params.get("certified"):
+            request_json["certified"] = pay_params.get("certified")
         query = SearchRequest.create_from_json(request_json, account_id, g.jwt_oidc_token_info.get("username", None))
-
         # Charge a search fee.
-        invoice_id = None
-        payment = Payment(
-            jwt=jwt.get_token_auth_header(),
-            account_id=account_id,
-            details=get_payment_details(query, request_json["type"]),
-        )
-
-        transaction_type = TransactionTypes.SEARCH.value
-        # if gov account user then check if sbc
-        if is_gov_account(jwt):
-            # if SBC staff user (authy, api call) then change transaction type to $10 fee
-            is_sbc = is_sbc_office_account(jwt.get_token_auth_header(), account_id)
-            if is_sbc:
-                transaction_type = TransactionTypes.SEARCH_STAFF.value
-            elif is_sbc is None:
-                # didn't get a succesful response from auth
-                raise BusinessException(
-                    "Unable to verify possible SBC staff user before payment.", HTTPStatus.INTERNAL_SERVER_ERROR
-                )
-
-        pay_ref = payment.create_payment(transaction_type, 1, None, query.client_reference_id)
+        payment, pay_ref = pay(request, jwt, query, request_json, pay_params)
         invoice_id = pay_ref["invoiceId"]
         query.pay_invoice_id = int(invoice_id)
         query.pay_path = pay_ref["receipt"]
@@ -107,12 +97,13 @@ def post_searches():  # pylint: disable=too-many-locals,too-many-branches; only 
         # Execute the search query: treat no results as a success.
         try:
             query.search()
-
             # Now save the initial detail results in the search_result table with no
             # search selection criteria (the absence indicates an incomplete search).
             search_result = SearchResult.create_from_search_query(query)
+            if pay_ref.get("ccPayment"):
+                logger.info("Search result payment response CC method.")
+                search_result.score = PAY_PENDING
             search_result.save()
-
         except Exception as db_exception:  # noqa: B902; handle all db related errors.
             logger.error(SAVE_ERROR_MESSAGE.format(account_id, str(db_exception)))
             if invoice_id is not None:
@@ -121,9 +112,12 @@ def post_searches():  # pylint: disable=too-many-locals,too-many-branches; only 
                     payment.cancel_payment(invoice_id)
                 except Exception as cancel_exception:  # noqa: B902; log exception
                     logger.error(PAY_REFUND_ERROR.format(account_id, invoice_id, str(cancel_exception)))
-
             raise db_exception
-
+        if pay_ref.get("ccPayment"):
+            response_data: dict = query.json
+            response_data["paymentPending"] = True
+            track_search_payment(response_data, account_id, query.id)
+            return response_data, HTTPStatus.CREATED
         return query.json, HTTPStatus.CREATED
 
     except SBCPaymentException as pay_exception:
@@ -174,53 +168,94 @@ def put_searches(search_id: str):
         return resource_utils.default_exception_response(default_exception)
 
 
-def staff_search(req: request, request_json, account_id: str):
-    """Execute a staff search with special payment validation and methods."""
-    payment_info = build_staff_payment(req, account_id)
-    # bcol help is no fee; reg staff can be no fee.
-    # FAS is routing slip only.
-    # BCOL is dat number (optional) and BCOL account number (mandatory).
-    # All staff roles including SBC can submit no fee searches.
-    if ROUTING_SLIP_PARAM in payment_info and BCOL_NUMBER_PARAM in payment_info:
-        return resource_utils.staff_payment_bcol_fas()
-
-    if CERTIFIED_PARAM in payment_info:
-        request_json["certified"] = True
-    query: SearchRequest = SearchRequest.create_from_json(
-        request_json, account_id, g.jwt_oidc_token_info.get("username", None)
-    )
-
-    # Always create a payment transaction.
-    invoice_id = None
-    payment = Payment(
-        jwt=jwt.get_token_auth_header(), account_id=account_id, details=get_payment_details(query, request_json["type"])
-    )
-    # staff payment
-    pay_ref = payment.create_payment_staff_search(payment_info, query.client_reference_id)
-    invoice_id = pay_ref["invoiceId"]
-    query.pay_invoice_id = int(invoice_id)
-    query.pay_path = pay_ref["receipt"]
-
-    # Execute the search query: treat no results as a success.
+@bp.route("/<string:search_id>", methods=["GET", "OPTIONS"])
+@cross_origin(origin="*")
+@jwt.requires_auth
+def get_searches(search_id: str):
+    """Get search selection when search is incomplete after a payment completion."""
     try:
-        query.search()
+        if search_id is None:
+            return resource_utils.path_param_error_response("search ID")
 
-        # Now save the initial detail results in the search_result table with no
-        # search selection criteria (the absence indicates an incomplete search).
-        search_result = SearchResult.create_from_search_query(query)
-        search_result.save()
+        # Quick check: must be staff or provide an account ID.
+        account_id = resource_utils.get_account_id(request)
+        if account_id is None:
+            return resource_utils.account_required_response()
+        logger.info(f"get_searches starting search ID={search_id} account ID={account_id}")
+        # Verify request JWT and account ID
+        if not authorized(account_id, jwt):
+            return resource_utils.unauthorized_error_response(account_id)
 
-    except Exception as db_exception:  # noqa: B902; handle all db related errors.
-        logger.error(SAVE_ERROR_MESSAGE.format(account_id, str(db_exception)))
-        if invoice_id is not None:
-            logger.info(PAY_REFUND_MESSAGE.format(account_id, invoice_id))
-            try:
-                payment.cancel_payment(invoice_id)
-            except Exception as cancel_exception:  # noqa: B902; log exception
-                logger.error(PAY_REFUND_ERROR.format(account_id, invoice_id, str(cancel_exception)))
-        raise db_exception
+        search_request: SearchRequest = SearchRequest.find_by_id(search_id)
+        if not search_request or not search_request.search_result:
+            return resource_utils.not_found_error_response("searchId", search_id)
+        if search_request.search_result.is_payment_pending():
+            return resource_utils.bad_request_response(f"Invalid request: payment pending for search ID={search_id}")
+        if search_request.search_result.search_select:
+            return resource_utils.bad_request_response(f"Invalid request: search completed for search ID={search_id}")
+        logger.info(f"get_searches request valid search ID={search_id}: returning OK response")
+        return search_request.json, HTTPStatus.OK
+    except DatabaseException as db_exception:
+        return resource_utils.db_exception_response(db_exception, account_id, "PUT search selection update")
+    except BusinessException as exception:
+        return resource_utils.business_exception_response(exception)
+    except Exception as default_exception:  # noqa: B902; return nicer default error
+        return resource_utils.default_exception_response(default_exception)
 
-    return query.json, HTTPStatus.CREATED
+
+def build_pay_request_params(req: request, jwt_, account_id: str, request_json: dict) -> dict:
+    """Set up the basic pay-api request properties from the the search results request."""
+    pay_params: dict = {
+        "accountId": account_id,
+        "certified": False,
+        "staff": is_staff_account(account_id) or is_staff(jwt_),
+    }
+    if "clientReferenceId" in request_json and str(request_json["clientReferenceId"]).strip() != "":
+        pay_params["clientReferenceId"] = request_json["clientReferenceId"]
+    if is_staff_account(account_id) or is_staff(jwt_):
+        certified = req.args.get(CERTIFIED_PARAM)
+        if certified is not None and isinstance(certified, bool) and certified:
+            pay_params["certified"] = True
+        elif certified is not None and isinstance(certified, str) and certified.lower() in ["true", "1", "y", "yes"]:
+            pay_params["certified"] = True
+    return pay_params
+
+
+def pay(req: request, jwt_, query: SearchRequest, request_json: dict, pay_params: dict):
+    """Set up and submit a pay-api request."""
+    pay_ref = None
+    account_id: str = pay_params.get("accountId")
+    client_ref: str = pay_params.get("clientReferenceId")
+
+    payment = Payment(
+        jwt=jwt_.get_token_auth_header(),
+        account_id=account_id,
+        details=get_payment_details(query, request_json["type"]),
+    )
+    # Staff has special payment rules and setup.
+    if is_staff_account(account_id) or is_bcol_help(account_id) or is_staff(jwt_):
+        logger.info(f"Setting up reg staff search for {account_id}.")
+        payment_info = build_staff_payment(req, account_id)
+        # bcol help is no fee; reg staff can be no fee.
+        # FAS is routing slip only.
+        # BCOL is dat number (optional) and BCOL account number (mandatory).
+        # All staff roles including SBC can submit no fee searches.
+        pay_ref = payment.create_payment_staff_search(payment_info, client_ref)
+    else:
+        transaction_type = TransactionTypes.SEARCH.value
+        # if gov account user then check if sbc
+        if is_gov_account(jwt):
+            # if SBC staff user (authy, api call) then change transaction type to $10 fee
+            is_sbc = is_sbc_office_account(jwt.get_token_auth_header(), account_id)
+            if is_sbc:
+                transaction_type = TransactionTypes.SEARCH_STAFF.value
+            elif is_sbc is None:
+                # didn't get a succesful response from auth
+                raise BusinessException(
+                    "Unable to verify possible SBC staff user before payment.", HTTPStatus.INTERNAL_SERVER_ERROR
+                )
+        pay_ref = payment.create_payment(transaction_type, 1, None, query.client_reference_id)
+    return payment, pay_ref
 
 
 def build_staff_payment(req: request, account_id: str):
