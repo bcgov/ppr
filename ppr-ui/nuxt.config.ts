@@ -54,6 +54,9 @@ export default defineNuxtConfig({
   extends: [
     '@sbc-connect/nuxt-core-layer-beta'
   ],
+  imports: {
+    dirs: ['store', 'composables', 'enums', 'interfaces', 'utils']
+  },
   app: {
     buildAssetsDir: '/src/',
     head: {
@@ -144,6 +147,9 @@ export default defineNuxtConfig({
     typeCheck: false
   },
   vite: {
+    plugins: [
+      vuetify({ styles: { configFile: '/assets/styles/vuetify-variables.scss' } })
+    ],
     server: {
       watch: {
         usePolling: true

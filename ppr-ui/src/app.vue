@@ -75,6 +75,7 @@ export default defineComponent({
       getUserProductSubscriptionsCodes
     } = storeToRefs(useStore())
     const { $authApi, $keycloak } = useNuxtApp()
+    const { initAlternatePaymentMethod } = useConnectFeeStore()
 
     const localState = reactive({
       errorDisplay: false,
@@ -592,6 +593,9 @@ export default defineComponent({
         // initialize app
         await initApp()
 
+        // initialize payment options
+        await initAlternatePaymentMethod()
+
         // set browser title
         setBrowserTitle()
       }
@@ -652,7 +656,7 @@ export default defineComponent({
           />
           <v-container class="py-0">
             <v-row no-gutters>
-              <v-col cols="12">
+              <v-col cols="9">
                 <NuxtPage
                   :app-loading-data="!haveData"
                   :app-ready="appReady"
@@ -663,6 +667,11 @@ export default defineComponent({
                   @have-data="haveData = $event"
                   @action-in-progress="actionInProgress = $event"
                 />
+              </v-col>
+              <v-col cols="3">
+                <div class="sticky bottom-0 z-10 w-full lg:static lg:mt-[96px] lg:w-[340px] lg:px-5">
+                  <ConnectFeeWidget class="sticky lg:top-10" />
+                </div>
               </v-col>
             </v-row>
           </v-container>
@@ -675,6 +684,7 @@ export default defineComponent({
 </template>
 
 <style lang="scss">
+@import '@/assets/css/tw.css';
 @import '@/assets/styles/theme';
 @import '@/assets/styles/overrides';
 </style>

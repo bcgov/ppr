@@ -27,5 +27,9 @@ export default {
       JV: 'Paying with Journal Voucher',
       undefined: 'Paying with default method'
     }
+  },
+  currency: {
+    cad: 'CAD',
+    usd: 'USD'
   }
 }
