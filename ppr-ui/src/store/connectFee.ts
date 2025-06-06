@@ -10,7 +10,7 @@ export const useConnectFeeStore = defineStore('connect/fee', () => {
     showProcessingFees: false,
     showGst: false,
     showPst: false,
-    showServiceFees: true
+    showServiceFees: false
   })
 
   const fees = ref<ConnectFees>({})
@@ -38,20 +38,14 @@ export const useConnectFeeStore = defineStore('connect/fee', () => {
         continue
       }
       const quantity = fees.value[key]?.quantity ?? 1
-      // @ts-ignore
       if (isTax && fees.value[key].tax[feeValue]) {
         // @ts-ignore
         total += fees.value[key].tax[feeValue] * quantity
-      // @ts-ignore
       } else if (fees.value[key][feeValue]) {
         // @ts-ignore
         if (feeValue === 'total') {
-          // ignore service fee and processing fee
-          // - (otherwise incorrectly adding it for each item instead of once at the end)
-          // @ts-ignore
-          total += (fees.value[key].total - fees.value[key].serviceFees - fees.value[key].processingFees) * quantity
+          total += (fees.value[key].filingFees + totalPriorityFees.value + totalServiceFees.value)
         } else {
-          // @ts-ignore
           total += fees.value[key][feeValue] * quantity
         }
       }
@@ -62,7 +56,6 @@ export const useConnectFeeStore = defineStore('connect/fee', () => {
   const getMaxFromFees = (feeValue: string) => {
     let maxFee = 0
     for (const key of Object.keys(fees.value)) {
-      // @ts-ignore
       const itemFee = fees.value[key][feeValue]
       if (itemFee && (itemFee > maxFee)) {
         maxFee = itemFee
@@ -95,6 +88,10 @@ export const useConnectFeeStore = defineStore('connect/fee', () => {
     }
   }
 
+  const setFees = (feeItem: ConnectFeeItem) => {
+    fees.value = feeItem
+  }
+
   const addReplaceFee = (fee: ConnectFeeItem) => {
     fees.value[fee.filingTypeCode] = fee
   }
@@ -118,7 +115,7 @@ export const useConnectFeeStore = defineStore('connect/fee', () => {
   // alternate payment option stuff
   const PAD_PENDING_STATES = [ConnectPayCfsStatus.PENDING, ConnectPayCfsStatus.PENDING_PAD_ACTIVATION]
   const userPaymentAccount = ref<ConnectPayAccount>({} as ConnectPayAccount)
-  const userSelectedPaymentMethod = ref<ConnectPaymentMethod>(ConnectPaymentMethod.DIRECT_PAY)
+  const userSelectedPaymentMethod = ref<ConnectPaymentMethod>(null)
   const allowAlternatePaymentMethod = ref<boolean>(false)
   const allowedPaymentMethods = ref<{ label: string, value: ConnectPaymentMethod }[]>([])
 
@@ -126,12 +123,7 @@ export const useConnectFeeStore = defineStore('connect/fee', () => {
     // if pad in confirmation period then set selected payment to CC
     if (PAD_PENDING_STATES.includes(userPaymentAccount.value?.cfsAccount?.status)) {
       userSelectedPaymentMethod.value = ConnectPaymentMethod.DIRECT_PAY
-      // show modal for user
-      useStrrModals().openErrorModal(
-        t('modal.padConfirmationPeriod.title'),
-        t('modal.padConfirmationPeriod.content'),
-        false
-      )
+      // TODO: show modal for user
     }
   })
 
@@ -192,6 +184,7 @@ export const useConnectFeeStore = defineStore('connect/fee', () => {
     totalServiceFees,
     total,
     getFee,
+    setFees,
     addReplaceFee,
     removeFee,
     setFeeQuantity,

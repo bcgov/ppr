@@ -2,6 +2,7 @@ import type { StaffPaymentOptions } from '@/enums'
 
 export * from './account-interfaces'
 export * from './breadcrumb-interface'
+export * from './connect-interfaces'
 export * from './error-interface'
 export * from './data-table-interfaces'
 export * from './date-picker-interfaces'

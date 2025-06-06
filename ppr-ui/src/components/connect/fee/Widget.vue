@@ -26,8 +26,6 @@ const feeItems = computed<ConnectFeeItem[]>(() => {
     isPlaceholderActive.value = false
     return Object.values(fees.value)
   }
-  isPlaceholderActive.value = true
-  return [placeholderFeeItem.value]
 })
 
 // folding stuff
@@ -151,7 +149,7 @@ const getFeeItemLabelTooltip = (typeCode: string) => {
             v-if="feeOptions.showPriorityFees"
             :description="$t('ConnectFeeWidget.feeSummary.priorityFees')"
             :fee="totalPriorityFees"
-            :show-fee-value="isPlaceholderActive"
+            show-fee-value
           />
           <ConnectFeeExtraFee
             v-if="feeOptions.showProcessingFees"
@@ -199,21 +197,21 @@ const getFeeItemLabelTooltip = (typeCode: string) => {
           value-key="value"
           :trailing="true"
           icon="i-mdi-caret-down"
+          :content="{
+            side: 'bottom',
+            sideOffset: 0
+          }"
           :ui="{
             base: 'flex w-full bg-white',
-            trailingIcon: 'size-5 text-blue-500 group-data-[state=open]:rotate-180 transition-transform duration-200'
-          }"
-          :ui-menu="{
-            option: {
-              base: 'cursor-pointer',
-              size: 'text-xs'
-            },
-            base: '-mt-1',
-            rounded: 'rounded-b'
+            trailingIcon: 'cursor-pointer size-5 text-blue-500 group-data-[state=open]:rotate-180 ' +
+             'transition-transform duration-200',
+            item: 'cursor-pointer',
+            itemTrailing: 'text-blue-500'
           }"
         >
-          <button
-            class="flex w-full items-center justify-between gap-4 py-2 pl-1 text-left bg-white cursor-pointer"
+          <UButton
+            class="rounded-b flex w-full items-center justify-between gap-4 py-2 pl-1 text-left bg-white
+             cursor-pointer"
           >
             <span class="text-xs">
               {{
@@ -222,7 +220,7 @@ const getFeeItemLabelTooltip = (typeCode: string) => {
                 )
               }}
             </span>
-          </button>
+          </UButton>
         </USelectMenu>
       </div>
     </ConnectTransitionCollapse>
