@@ -30,14 +30,12 @@ export const useConnectFeesHandler = () => {
 
   /** Set the priority fee (ie $100) */
   const setPriority = async (registrationFeeType: FeeSummaryTypes, isPriority: boolean): Promise<void> => {
-    console.log(isPriority)
     setFees({
       [registrationFeeType]: {
         ...RegistrationFees[registrationFeeType],
         priorityFees: isPriority ? 100 : 0
       }
     })
-    console.log(fees.value)
   }
 
   watch(() => getStaffPayment.value?.option, async (option: number) => {
