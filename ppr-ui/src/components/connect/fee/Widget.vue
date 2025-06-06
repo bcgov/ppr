@@ -21,11 +21,12 @@ const {
 
 const isPlaceholderActive = ref(false)
 
-const feeItems = computed<ConnectFeeItem[]>(() => {
+const feeItems = computed<ConnectFeeItem[]>((): ConnectFeeItem[] => {
   if (fees.value && (Object.keys(fees.value).length > 0)) {
     isPlaceholderActive.value = false
     return Object.values(fees.value)
   }
+  return []
 })
 
 // folding stuff

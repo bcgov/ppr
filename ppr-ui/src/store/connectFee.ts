@@ -39,10 +39,8 @@ export const useConnectFeeStore = defineStore('connect/fee', () => {
       }
       const quantity = fees.value[key]?.quantity ?? 1
       if (isTax && fees.value[key].tax[feeValue]) {
-        // @ts-ignore
         total += fees.value[key].tax[feeValue] * quantity
       } else if (fees.value[key][feeValue]) {
-        // @ts-ignore
         if (feeValue === 'total') {
           total += (fees.value[key].filingFees + totalPriorityFees.value + totalServiceFees.value)
         } else {
