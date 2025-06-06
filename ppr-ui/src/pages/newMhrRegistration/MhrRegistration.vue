@@ -85,18 +85,11 @@
 
           </v-col>
           <v-col
-            class="pl-6 pt-5"
-            cols="3"
+            class="pt-5 ml-4"
+            cols="2"
           >
             <aside>
-              <StickyContainer
-                :set-right-offset="true"
-                :set-show-fee-summary="true"
-                :set-fee-type="feeType"
-                :set-fee-subtitle="getRegistrationType.registrationTypeUI"
-                :set-registration-length="registrationLength"
-                :set-registration-type="registrationTypeUI"
-              />
+              <ConnectFeeWidget class="" />
             </aside>
           </v-col>
         </v-row>
@@ -124,19 +117,20 @@
 <script lang="ts">
 import { computed, defineComponent, nextTick, onBeforeUnmount, onMounted, reactive, toRefs } from 'vue'
 import { useStore } from '@/store/store'
+import { useConnectFeeStore } from '@/store/connectFee'
 import { storeToRefs } from 'pinia'
-import type { UIRegistrationTypes } from '@/enums';
+import { APIRegistrationTypes, ConnectPaymentMethod, type UIRegistrationTypes } from '@/enums'
 import { APIMhrTypes, ErrorCategories, RegistrationFlowType, RouteNames } from '@/enums'
 import { getFeatureFlag } from '@/utils'
 import { getMhrDraft, submitAdminRegistration, submitMhrRegistration } from '@/utils/mhr-api-helper'
-import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import {
   useAuth,
   useHomeOwners,
   useMhrCorrections,
   useMhrValidations,
   useNavigation,
-  useNewMhrRegistration
+  useNewMhrRegistration,
+  useConnectFeesHandler
 } from '@/composables'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import type { ErrorIF, MhrRegistrationIF, RegTableNewItemI, StepIF } from '@/interfaces'
@@ -145,11 +139,6 @@ import { outOfDateOwnersDialogOptions } from '@/resources/dialogOptions/confirma
 
 export default defineComponent({
   name: 'MhrRegistration',
-  components: {
-    ButtonFooter,
-    Stepper,
-    StickyContainer
-  },
   props: {
     appReady: {
       type: Boolean,
@@ -208,6 +197,8 @@ export default defineComponent({
     const {
       setShowGroups
     } = useHomeOwners(false, isMhrCorrection.value)
+    const { setRegistrationFees } = useConnectFeesHandler()
+    const { userSelectedPaymentMethod } = storeToRefs(useConnectFeeStore())
 
     const localState = reactive({
       dataLoaded: false,
@@ -278,6 +269,10 @@ export default defineComponent({
         const { registration } = await getMhrDraft(getMhrDraftNumber.value)
         await initDraftOrCurrentMhr(registration as unknown as MhrRegistrationIF)
       }
+
+      // Set Fees
+      setRegistrationFees(FeeSummaryTypes.NEW_MHR)
+
       context.emit('emitHaveData', true)
       localState.dataLoaded = true
     })
@@ -330,7 +325,11 @@ export default defineComponent({
               buildCorrectionPayload(data),
               parseStaffPayment()
             )
-          : await submitMhrRegistration(data, parseStaffPayment())
+          : await submitMhrRegistration(
+            data,
+            parseStaffPayment(),
+            userSelectedPaymentMethod.value === ConnectPaymentMethod.DIRECT_PAY
+          )
 
         localState.submitting = false
         if (!mhrSubmission.error && mhrSubmission?.mhrNumber) {

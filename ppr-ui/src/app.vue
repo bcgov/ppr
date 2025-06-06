@@ -74,7 +74,8 @@ export default defineComponent({
       getRegistrationFlowType,
       getUserProductSubscriptionsCodes
     } = storeToRefs(useStore())
-    const { $authApi, $keycloak } = useNuxtApp()
+    const { $keycloak } = useNuxtApp()
+    const { initAlternatePaymentMethod } = useConnectFeeStore()
 
     const localState = reactive({
       errorDisplay: false,
@@ -591,6 +592,9 @@ export default defineComponent({
 
         // initialize app
         await initApp()
+
+        // initialize payment options
+        if (!isRoleStaff.value) await initAlternatePaymentMethod()
 
         // set browser title
         setBrowserTitle()

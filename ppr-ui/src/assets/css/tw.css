@@ -76,7 +76,7 @@
   --color-bcGovGray-800: #343a40;
   --color-bcGovGray-900: #212529;
   --color-bcGovGray-950: #232529;
-  
+
   /* BLUE */
   --color-blue-50: #e4edf7;
   --color-blue-100: #e0e7ed;
@@ -240,7 +240,7 @@ body {
   .floating-label-input {
     @apply pointer-events-none absolute left-0 top-3 text-bcGovGray-900 transition-all motion-reduce:transition-none duration-100 text-xs font-medium px-2.5 peer-focus:top-1 peer-focus:text-xs peer-placeholder-shown:text-sm peer-placeholder-shown:top-1/2 -translate-y-1/2 peer-focus:text-blue-500;
   }
-  
+
   .floating-label-textarea {
     @apply pointer-events-none absolute left-0 top-1 text-bcGovGray-900 text-xs font-medium px-2.5 transition-all peer-focus:top-1 peer-focus:text-xs peer-placeholder-shown:text-sm peer-placeholder-shown:top-2.5 peer-focus:translate-none peer-focus:text-blue-500;
   }

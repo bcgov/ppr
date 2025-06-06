@@ -306,11 +306,13 @@ export async function searchMhrPDF (searchId: string): Promise<any> {
 
 export async function submitMhrRegistration (
   payloadData: NewMhrRegistrationApiIF,
-  staffPayment: StaffPaymentIF
+  staffPayment: StaffPaymentIF,
+  isCcOverride = false
 ) {
   try {
     // assuming the staffPayment is always available because of validation
-    const paymentParams = mhrStaffPaymentParameters(staffPayment)
+    let paymentParams = mhrStaffPaymentParameters(staffPayment)
+    if (isCcOverride) paymentParams += 'ccPayment=true'
 
     const result = await axios.post(`registrations?${paymentParams}`, payloadData, getDefaultConfig())
     if (!result?.data) {
