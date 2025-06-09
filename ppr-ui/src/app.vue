@@ -74,7 +74,8 @@ export default defineComponent({
       getRegistrationFlowType,
       getUserProductSubscriptionsCodes
     } = storeToRefs(useStore())
-    const { $authApi, $keycloak } = useNuxtApp()
+    const { $keycloak } = useNuxtApp()
+    const { initAlternatePaymentMethod } = useConnectFeeStore()
 
     const localState = reactive({
       errorDisplay: false,
@@ -83,7 +84,7 @@ export default defineComponent({
       payErrorDisplay: false,
       payErrorOptions: null as DialogOptionsIF,
       profileReady: false,
-      appReady: false,
+      appReady: null,
       haveData: false,
       loggedOut: false,
       tokenService: false,
@@ -389,6 +390,7 @@ export default defineComponent({
     }
 
     const handleError = (error: ErrorIF): void => {
+      localState.appReady = null
       switch (error?.category) {
         case ErrorCategories.ACCOUNT_ACCESS:
           localState.errorOptions = authPprError
@@ -591,6 +593,9 @@ export default defineComponent({
 
         // initialize app
         await initApp()
+
+        // initialize payment options
+        if (!isRoleStaff.value) await initAlternatePaymentMethod()
 
         // set browser title
         setBrowserTitle()

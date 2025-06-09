@@ -42,6 +42,7 @@
           class="lh-24 ml-3"
         >
           {{ regTitle }} Length
+          <span v-if="isRlTransition">and Historical Information</span>
         </h3>
       </v-col>
     </v-row>
@@ -249,7 +250,7 @@ export default defineComponent({
         return ''
       }),
       lengthSummary: computed((): string => {
-        if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN) {
+        if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN && !isRlTransition.value) {
           return '180 Days'
         }
         if (!getLengthTrust.value.lifeInfinite && getRegistrationFlowType.value === RegistrationFlowType.NEW &&

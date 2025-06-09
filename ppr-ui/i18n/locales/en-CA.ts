@@ -8,9 +8,10 @@ export default {
       futureEffectiveFees: 'Future Effective Fees',
       serviceFees: 'Service Fee',
       itemLabels: {
-        PLACEHOLDER: 'Placeholder (Replace Me)', // each project using the connect fee widget should change the placeholder filingTypeCode
+        PLACEHOLDER: '-',
         TEST: 'This is test entry',
-        undefined: 'Item Fee'
+        undefined: '-',
+        new_mhr: 'Manufactured Home Registration'
       }
     },
     paymentMethod: {
@@ -27,5 +28,9 @@ export default {
       JV: 'Paying with Journal Voucher',
       undefined: 'Paying with default method'
     }
+  },
+  currency: {
+    cad: 'CAD',
+    usd: 'USD'
   }
 }

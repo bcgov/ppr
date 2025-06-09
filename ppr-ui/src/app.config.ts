@@ -16,6 +16,17 @@ export default defineAppConfig({
           (connectLayerName && connnectLayerVersion) ? `${connectLayerName} v${connnectLayerVersion}` : ''
         ]
       },
-    }
+    },
+    feeWidget: {
+      itemLabelTooltip: {
+        test: {
+          i18nkey: '',
+          hrefRtcKey: ''
+        }
+      }
+    },
+  },
+  ui: {
+    icons: {}
   }
 })

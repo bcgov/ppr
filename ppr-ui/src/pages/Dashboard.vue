@@ -265,7 +265,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, onMounted, onBeforeMount, reactive, toRefs, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
@@ -393,6 +393,10 @@ export default defineComponent({
       })
     })
 
+    onBeforeMount(() => {
+      onAppReady(props.appReady)
+    })
+
     onMounted(() => {
       // clear search data in the store
       setRegistrationType(null)
@@ -404,7 +408,6 @@ export default defineComponent({
       useTransportPermits().setLocationChange(false)
       useTransportPermits().setExtendLocationChange(false)
       useTransportPermits().setNewPermitChange(false)
-      onAppReady(props.appReady)
     })
 
     /** Redirects browser to Business Registry home page. */
@@ -445,7 +448,6 @@ export default defineComponent({
 
     /** Called when App is ready and this component can load its data. */
     const onAppReady = async (val: boolean): Promise<void> => {
-      localState.loading = true
       // do not proceed if app is not ready
       if (!val) return
 
@@ -498,6 +500,7 @@ export default defineComponent({
     }
 
     watch(() => props.appReady, (val: boolean) => {
+      localState.loading = !val && val !== null
       onAppReady(val)
     })
 
