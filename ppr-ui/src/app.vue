@@ -84,7 +84,7 @@ export default defineComponent({
       payErrorDisplay: false,
       payErrorOptions: null as DialogOptionsIF,
       profileReady: false,
-      appReady: false,
+      appReady: null,
       haveData: false,
       loggedOut: false,
       tokenService: false,
@@ -390,6 +390,7 @@ export default defineComponent({
     }
 
     const handleError = (error: ErrorIF): void => {
+      localState.appReady = null
       switch (error?.category) {
         case ErrorCategories.ACCOUNT_ACCESS:
           localState.errorOptions = authPprError

@@ -8,8 +8,9 @@
         mdi-calendar-clock
       </v-icon>
       <h3 class="fs-16 lh-24 ml-3 pr-2">
-        Current Expiry Date and Time
+        Current Expiry
         <span v-if="showTrustIndenture"> and Trust Indenture</span>
+        <span v-if="displayHistoricalLienInfo"> and Historical Information</span>
       </h3>
     </header>
     <v-card

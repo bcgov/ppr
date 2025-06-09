@@ -21,6 +21,7 @@
           <strong>
             Renewal Length
             <span v-if="showTrustIndenture"> and Trust Indenture</span>
+            <span v-if="displayHistoricalLienInfo"> and Historical Information</span>
           </strong>
         </label>
       </v-col>
