@@ -137,7 +137,7 @@ SELECT id, user_id, registration_number
  ORDER BY id
 """
 PPR_RESTORE_STATUS = """
-UPDATE registrations SET ver_pybassed = 'Y'
+UPDATE registrations SET ver_bypassed = 'Y'
   FROM drafts
  WHERE drafts.id IN ({draft_ids})
    AND drafts.registration_number IS NOT NULL
@@ -176,6 +176,7 @@ def track_event(  # pylint: disable=too-many-positional-arguments,too-many-argum
         db_cursor.execute(sql_statement)
         db_conn.commit()
     except (psycopg2.Error, Exception) as err:
+        db_conn.rollback()
         error_message = f"Error attempting event_tracking insert: {err}"
         logger.error(error_message)
 
@@ -195,6 +196,7 @@ def restore_mhr_status(
         db_conn.commit()
         logger.info(f"Restore MHR home status updated for draft ID's {draft_ids} mhr numbers {mhr_numbers}")
     except (psycopg2.Error, Exception) as err:
+        db_conn.rollback()
         error_message = f"Error attempting restore mhr base registration status {err}"
         logger.error(error_message)
 
@@ -212,6 +214,7 @@ def restore_mhr_draft(db_conn: psycopg2.extensions.connection, db_cursor: psycop
         db_conn.commit()
         logger.info(f"Restore MHR draft state updated for draft ID's {draft_ids}")
     except (psycopg2.Error, Exception) as err:
+        db_conn.rollback()
         error_message = f"Error attempting restore mhr draft state {err}"
         logger.error(error_message)
 
@@ -229,9 +232,10 @@ def restore_ppr_status(
         sql_statement = PPR_RESTORE_STATUS.format(draft_ids=draft_ids)
         db_cursor.execute(sql_statement)
         db_conn.commit()
-        logger.info(f"Restore MHR home status updated for draft ID's {draft_ids} base reg numbers {reg_numbers}")
+        logger.info(f"Restore PPR home status updated for draft ID's {draft_ids} base reg numbers {reg_numbers}")
     except (psycopg2.Error, Exception) as err:
-        error_message = f"Error attempting restore mhr base registration status {err}"
+        db_conn.rollback()
+        error_message = f"Error attempting restore PPR base registration status {err}"
         logger.error(error_message)
 
 
@@ -248,7 +252,8 @@ def restore_ppr_draft(db_conn: psycopg2.extensions.connection, db_cursor: psycop
         db_conn.commit()
         logger.info(f"Restore PPR draft state updated for draft ID's {draft_ids}")
     except (psycopg2.Error, Exception) as err:
-        error_message = f"Error attempting restore ppr draft state {err}"
+        db_conn.rollback()
+        error_message = f"Error attempting restore PPR draft state {err}"
         logger.error(error_message)
 
 
@@ -331,7 +336,7 @@ def cancel_ppr_expired(  # pylint: disable=too-many-locals
         restore_ppr_status(db_conn, db_cursor, reg_numbers, draft_ids)
         restore_ppr_draft(db_conn, db_cursor, draft_ids)
     except (psycopg2.Error, Exception) as err:
-        error_message = f"Error attempting event_tracking insert: {err}"
+        error_message = f"Error attempting to cancel PPR expired payments: {err}"
         logger.error(error_message)
     return cancel_count
 
@@ -390,7 +395,7 @@ def cancel_mhr_expired(  # pylint: disable=too-many-locals
         restore_mhr_status(db_conn, db_cursor, mhr_numbers, draft_ids)
         restore_mhr_draft(db_conn, db_cursor, draft_ids)
     except (psycopg2.Error, Exception) as err:
-        error_message = f"Error attempting event_tracking insert: {err}"
+        error_message = f"Error attempting to cancel MHR expired payments: {err}"
         logger.error(error_message)
     return cancel_count
 
