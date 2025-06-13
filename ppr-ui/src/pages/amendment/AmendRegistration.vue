@@ -426,7 +426,6 @@ export default defineComponent({
         }
       }
       if (localState.securedPartyOpen || !localState.securedPartiesValid) {
-        console.log('Invalid Secured Parties')
         const component = document.getElementById('secured-parties-component')
         if (component) {
           await component.scrollIntoView({ behavior: 'smooth' })
