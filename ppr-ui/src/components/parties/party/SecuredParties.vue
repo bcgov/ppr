@@ -188,7 +188,7 @@
                 </template>
                 <!-- Table Cells -->
                 <template v-else>
-                  <td class="list-item__title">
+                  <td class="list-item__title chip-cell">
                     <v-row
                       no-gutters
                       :aria-label="`${isBusiness(item) ? 'Business' : 'Person'} ${getName(item)}`"

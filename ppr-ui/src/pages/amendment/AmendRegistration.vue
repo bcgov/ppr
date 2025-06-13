@@ -192,6 +192,7 @@ import {
   getFeatureFlag,
   pacificDate,
   saveAmendmentStatementDraft,
+  scrollToTop,
   setupAmendmentStatementFromDraft
 } from '@/utils'
 import { getFinancingStatement } from '@/utils/ppr-api-helper'
@@ -468,6 +469,7 @@ export default defineComponent({
       if (!hasAmendmentChanged() || !localState.debtorValid || !localState.securedPartiesValid) {
         localState.amendErrMsg = '< Please make any required changes'
         localState.errorBar = true
+        scrollToInvalid()
         return
       }
       const description = getAmendmentDescription.value

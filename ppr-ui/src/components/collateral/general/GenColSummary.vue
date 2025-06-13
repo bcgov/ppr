@@ -243,7 +243,7 @@
     >
       <p
         v-if="generalCollateral.length > 0"
-        class="ma-0"
+        class="ma-0 fs-14"
       >
         <span v-html="generalCollateral[0].description" />
       </p>

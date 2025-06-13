@@ -16,7 +16,7 @@
     <v-card
       v-if="!summaryView"
       flat
-      class="bg-white pb-6 px-6 rounded-bottom"
+      class="bg-white pb-6 px-8 rounded-bottom"
       :class="{ 'border-error-left': showErrorBar && editInProgress }"
     >
       <v-row
@@ -155,11 +155,11 @@
     <v-card
       v-if="displayHistoricalLienInfo"
       flat
-      class="mt-1 bg-white pa-6 rounded"
+      class="mt-1 pl-8 bg-white py-6 rounded"
     >
       <v-row
         no-gutters
-        class="pt-4"
+        class="pt-1"
       >
         <v-col
           cols="12"

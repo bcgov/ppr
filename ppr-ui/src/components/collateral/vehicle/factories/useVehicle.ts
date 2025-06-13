@@ -62,7 +62,7 @@ export const useVehicle = (props, context) => {
     } else {
       localState.currentVehicle = {
         id: -1,
-        type: '',
+        type: null,
         serialNumber: '',
         model: '',
         make: '',

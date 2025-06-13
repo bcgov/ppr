@@ -35,7 +35,7 @@
                 <th
                   v-for="header in headers"
                   :key="header.value"
-                  :class="header.class"
+                  :class="isReview ? 'pl-0' : header.class"
                 >
                   {{ header.text }}
                 </th>
@@ -52,6 +52,7 @@
               >
                 <td
                   class="list-item__title"
+                  :class="{ 'pl-0': isReview }"
                 >
                   <v-row
                     no-gutters
@@ -164,6 +165,10 @@ export default defineComponent({
     setItems: {
       type: Array,
       default: () => [] as Array<PartyIF>
+    },
+    isReview: {
+      type: Boolean,
+      default: false
     },
     setOptions: {
       type: Object,

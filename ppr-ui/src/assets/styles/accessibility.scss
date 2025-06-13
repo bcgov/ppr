@@ -24,8 +24,6 @@
 }
 
 a {
-  padding: 0 4px;
-
   &:focus-visible {
     @include focus-visible-style(2px, 4px)
   }

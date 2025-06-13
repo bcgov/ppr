@@ -1,6 +1,7 @@
 <template>
   <v-container class="pa-0 party-summary flat">
     <base-party-summary
+      :is-review="isReview"
       :set-headers="debtorHeaders"
       :set-items="debtors"
       :set-options="debtorOptions"
@@ -31,7 +32,11 @@ export default defineComponent({
     setHeader: {
       type: String,
       default: ''
-    }
+    },
+    isReview: {
+      type: Boolean,
+      default: false
+    },
   },
   setup (props) {
     const router = useRouter()

@@ -2,7 +2,7 @@
   <v-container
     id="length-trust-component"
     fluid
-    class="bg-white pt-0 pb-6 pr-10 pl-8 rounded noGutters"
+    class="bg-white pt-5 pb-2 pr-8 pl-8 rounded noGutters"
     :class="{ 'border-error-left': showInvalid && !isSecurityActNotice }"
   >
     <v-row

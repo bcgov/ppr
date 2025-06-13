@@ -39,7 +39,7 @@
             ref="vehicleForm"
             class="vehicle-form"
           >
-            <v-row no-gutters>
+            <v-row no-gutters class="pb-[5px]">
               <v-col v-if="mustHaveManufacturedHomeCollateral()">
                 <v-text-field
                   id="txt-type"
@@ -87,6 +87,7 @@
             <v-row
               v-if="currentVehicle.type === 'MH'"
               no-gutters
+              class="py-[5px]"
             >
               <v-col>
                 <v-text-field
@@ -106,7 +107,10 @@
                 />
               </v-col>
             </v-row>
-            <v-row no-gutters>
+            <v-row
+              no-gutters
+              class="py-[5px]"
+            >
               <v-col>
                 <v-text-field
                   id="txt-serial"
@@ -126,7 +130,10 @@
                 />
               </v-col>
             </v-row>
-            <v-row no-gutters>
+            <v-row
+              no-gutters
+              class="py-[5px]"
+            >
               <v-col cols="4">
                 <v-text-field
                   id="txt-years"
@@ -143,7 +150,10 @@
                 />
               </v-col>
             </v-row>
-            <v-row no-gutters>
+            <v-row
+              no-gutters
+              class="py-[5px]"
+            >
               <v-col>
                 <v-text-field
                   id="txt-make"
@@ -159,7 +169,10 @@
                 />
               </v-col>
             </v-row>
-            <v-row no-gutters>
+            <v-row
+              no-gutters
+              class="py-[5px]"
+            >
               <v-col>
                 <v-text-field
                   id="txt-model"
@@ -343,7 +356,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@import '@/assets/styles/theme.scss';d
 
 .container .v-card > .border-error-left {
   border-top-left-radius: unset;
