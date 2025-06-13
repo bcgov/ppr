@@ -250,7 +250,8 @@ export default defineComponent({
         return ''
       }),
       lengthSummary: computed((): string => {
-        if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN && !isRlTransition.value) {
+        if (registrationType === APIRegistrationTypes.REPAIRERS_LIEN && (!isRlTransition.value ||
+          getRegistrationFlowType.value === RegistrationFlowType.DISCHARGE)) {
           return '180 Days'
         }
         if (!getLengthTrust.value.lifeInfinite && getRegistrationFlowType.value === RegistrationFlowType.NEW &&

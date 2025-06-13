@@ -812,6 +812,10 @@ export default defineComponent({
           src="@/assets/svgs/pdf-icon-blue.svg"
           role="img"
         >
+        <span
+          class="pl-1 mt-1 text-blue-500"
+          aria-hidden="true"
+        >PDF</span>
       </v-btn>
       <v-tooltip
         v-else-if="!isDraft(item)"

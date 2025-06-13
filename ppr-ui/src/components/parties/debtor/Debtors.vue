@@ -121,7 +121,7 @@
                 </template>
                 <template v-else>
                   <td
-                    class="list-item__title title-text generic-label"
+                    class="list-item__title title-text generic-label chip-cell"
                     style="padding-left:30px"
                   >
                     <v-row

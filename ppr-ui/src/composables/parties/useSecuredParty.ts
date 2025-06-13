@@ -16,7 +16,7 @@ const initAddress = {
   streetAdditional: '',
   city: '',
   region: '',
-  country: '',
+  country: null,
   postalCode: '',
   deliveryInstructions: ''
 }
@@ -178,14 +178,14 @@ export const useSecuredParty = (context?) => {
   }
 
   const addSecuredParty = (newParty: PartyIF, activeIndex: number = -1) => {
-    const parties = getAddSecuredPartiesAndDebtors.value  
+    const parties = getAddSecuredPartiesAndDebtors.value
     const newList: PartyIF[] = parties.securedParties
     if (activeIndex > -1) {
       newParty.action = ActionTypes.ADDED
       newList.splice(activeIndex, 1, newParty)
     } else {
       // Add
-       
+
       newParty.action = ActionTypes.ADDED
       newList.push(newParty)
     }

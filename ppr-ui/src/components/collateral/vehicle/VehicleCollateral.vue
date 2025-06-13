@@ -11,7 +11,7 @@
     >
       <v-col
         cols="12"
-        class="pt-4 generic-label"
+        class="pl-4 pt-4 generic-label"
       >
         Vehicle Collateral
       </v-col>
@@ -199,7 +199,7 @@
                 </template>
 
                 <template v-else>
-                  <td class="pl-4">
+                  <td class="chip-cell pl-4">
                     <div :class="{ 'disabled-text': item.action === ActionTypes.REMOVED}">
                       {{ getVehicleDescription(item.type) }}
                     </div>

@@ -17,7 +17,7 @@ const initAddress = {
   streetAdditional: '',
   city: '',
   region: '',
-  country: '',
+  country: null,
   postalCode: '',
   deliveryInstructions: ''
 }

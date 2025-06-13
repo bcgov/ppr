@@ -17,7 +17,7 @@ import { useNavigation, useNewMhrRegistration, useTransportPermits } from '@/com
 import type {
   AdminRegistrationIF,
   HomeSectionIF,
-  MhRegistrationSummaryIF,
+  MhRegistrationSummaryIF, MhrRegistrationHomeLocationIF,
   NewMhrRegistrationApiIF,
   RegistrationTypeIF,
   SubmittingPartyIF,
@@ -111,6 +111,16 @@ export const useMhrCorrections = () => {
   /** Array of keys representing location-related correction groups.*/
   const locationGroup: Array<string> = ['location', 'civicAddress']
 
+  /** Returns Registration Home Location with mapped Other Location Types */
+  const mappedOtherLocationType: ComputedRef<MhrRegistrationHomeLocationIF> = computed(() => {
+    return {
+      ...getMhrRegistrationLocation.value,
+      ...(getMhrRegistrationLocation.value.otherType && {
+        locationType: getMhrRegistrationLocation.value.otherType
+      })
+    }
+  })
+
   /** Correction State Models: Used in multiple ui-locations for CORRECTED LABELS, centralized for re-use **/
   const correctionState = reactive({
     action: computed((): ActionTypes => isPublicAmendment.value ? ActionTypes.EDITED : ActionTypes.CORRECTED),
@@ -188,16 +198,14 @@ export const useMhrCorrections = () => {
           getMhrBaseline.value?.location,
           'address',
           'otherType',
-          'locationType',
           'permitWithinSamePark',
           'taxCertificate',
           'leaveProvince'
         ),
         currentState: omit(
-          getMhrRegistrationLocation.value,
+          mappedOtherLocationType.value,
           'address',
           'otherType',
-          'locationType',
           'permitWithinSamePark',
           'taxCertificate',
           'leaveProvince'

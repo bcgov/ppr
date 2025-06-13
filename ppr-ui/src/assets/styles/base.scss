@@ -191,7 +191,7 @@ a {
 }
 
 .disabled-text {
-  opacity: 0.4;
+  opacity: 0.7;
 }
 
 .v-input--disabled {
@@ -311,8 +311,8 @@ a {
   width: 0;
 }
 
-.disabled-text, tr.disabled-text-not-action td:not(.actions-width), tr.disabled-text-not-first td {
-  opacity: .4;
+.disabled-text, tr.disabled-text-not-action td:not(.chip-cell), tr.disabled-text-not-first td {
+  opacity: .7;
 }
 
 #registration-table.v-table.v-table--fixed-header > .v-table__wrapper > table > thead > tr > th.registration-action,

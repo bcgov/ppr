@@ -138,7 +138,7 @@
         <template #contentSLot>
           <PreClaMessage />
           <!-- Post Message to be enabled following the CLA Launch -->
-<!--           <PostClaMessage />-->
+          <!--  <PostClaMessage />-->
         </template>
         <template
           v-if="true"
@@ -148,11 +148,11 @@
             <v-col>
               <v-btn
                 variant="plain"
-                class="msg-hide-icon float-right"
+                class="msg-hide-icon float-right mt-1"
                 :ripple="false"
                 @click="hideRlMessage(true)"
               ><a href="">Dismiss</a>
-                <v-icon color="primary">
+                <v-icon class="mt-[1px]" color="primary">
                   mdi-close
                 </v-icon>
               </v-btn>

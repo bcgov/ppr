@@ -54,7 +54,7 @@
         <v-row no-gutters>
           <v-col
             cols="9"
-            class="m-auto pb-0 py-2"
+            class="pb-0 py-2"
           >
             <p class="generic-label">
               Legal Land Description

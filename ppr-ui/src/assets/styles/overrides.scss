@@ -164,6 +164,10 @@
 }
 
 // Table Overrides
+.v-table--density-default {
+  border-radius: 4px;
+}
+
 .v-table > .v-table__wrapper > table > thead > tr > th {
   padding-right: 0;
   font-weight: bold;

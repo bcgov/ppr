@@ -107,11 +107,12 @@
 
             <div v-if="showSecuredParties">
               <v-divider v-if="showLengthTrustIndenture" />
-              <h3 class="pt-6 px-3">
+              <h3 class="pt-6 px-4">
                 Secured Parties
               </h3>
               <SecuredPartySummary
-                class="secured-party-summary px-8"
+                is-review
+                class="secured-party-summary"
                 :set-enable-no-data-action="true"
               />
             </div>
@@ -125,7 +126,8 @@
                 Debtors
               </h3>
               <DebtorSummary
-                class="debtor-summary px-4"
+                is-review
+                class="debtor-summary"
                 :set-enable-no-data-action="true"
               />
             </div>
