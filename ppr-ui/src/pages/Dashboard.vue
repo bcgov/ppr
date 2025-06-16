@@ -136,9 +136,9 @@
         class="mb-10"
       >
         <template #contentSLot>
-          <PreClaMessage />
           <!-- Post Message to be enabled following the CLA Launch -->
-          <!--  <PostClaMessage />-->
+          <PostClaMessage v-if="getFeatureFlag('cla-enabled')" />
+          <PreClaMessage v-else />
         </template>
         <template
           v-if="true"
@@ -376,8 +376,7 @@ export default defineComponent({
         return localState.hasPPR && localState.hasMhrTableEnabled
       }),
       showCommercialLiensMessaging: computed((): boolean => {
-        return getFeatureFlag('cla-enabled') &&
-          !getUserSettings.value[SettingOptions.MISCELLANEOUS_PREFERENCES]?.some(
+        return !getUserSettings.value[SettingOptions.MISCELLANEOUS_PREFERENCES]?.some(
           setting => setting.accountId === getAccountId.value && !!setting[SettingOptions.RL_MSG_HIDE]
         )
       }),

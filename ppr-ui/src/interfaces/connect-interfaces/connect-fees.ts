@@ -17,6 +17,7 @@ export interface ConnectFeeItem {
   quantityDesc?: string
   isPlaceholder?: boolean
   waived?: boolean
+  feeDesc?: string
 }
 
 export interface ConnectFees { // this could have multiple mapped feeItems

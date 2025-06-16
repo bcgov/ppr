@@ -18,13 +18,11 @@ const { rlTransitionDate } = storeToRefs(useStore())
         <p>
           <a
             class="font-weight-regular"
-            href="https://www.bclaws.gov.bc.ca/civix/document/id/bills/billsprevious/3rd42nd:gov11-1"
+            href="https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/22009"
             target="_blank"
           >
-            The Commercial Liens Act (CLA) through Bill 11
-            <v-icon size="18">mdi-open-in-new</v-icon>
-          </a>
-          and
+            The Commercial Liens Act (CLA)
+          </a>and
           <a
             class="font-weight-regular"
             href="https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/227_2002"
@@ -32,13 +30,29 @@ const { rlTransitionDate } = storeToRefs(useStore())
           >
             amendments
           </a>
-          to the Personal Property Security
-          Regulation (PPSR) came into effect on {{ rlTransitionDate }}. The CLA reforms and consolidates
-          British Columbia’s law for liens that secure payment on repaired, stored, and transported goods. The
-          CLA repeals and replaces the Repairers Lien Act, Livestock Lien Act, Tugboat Worker Lien Act, Warehouse
-          Lien Act, and Woodworker Lien Act. PPSR amendments define Commercial Lien registration terms and
-          requirements.
+          Personal Property Security Regulation (PPSR) amendments are now active. The
+          CLA reforms and consolidates British Columbia’s law for liens that secure payment on repaired, stored, and
+          transported goods, replacing the Repairers Lien Act, Warehouse Lien Act, and Livestock Lien Act. PPSR
+          amendments define Commercial Lien registration terms and requirements.
         </p>
+      </v-col>
+
+      <v-col
+        cols="12"
+        class="mt-4"
+      >
+        <p>
+          <b>Need help?</b> For step-by-step instructions, refer to our
+          <a
+            class="font-weight-regular"
+            href="https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/22009"
+            target="_blank"
+          >
+            Commercial Liens User Guide
+          </a>
+        </p>
+
+        <v-divider class="mt-3" />
       </v-col>
 
       <v-col
@@ -57,7 +71,7 @@ const { rlTransitionDate } = storeToRefs(useStore())
         class="mt-4"
       >
         <p>Commercial Liens differ from Repairers Liens in the following ways::</p>
-        <ul class="ml-5">
+        <ul class="ml-5 mt-4">
           <li>
             Registration length may be from 1 to 25 years or infinity instead of being a fixed 180 day period
           </li>
