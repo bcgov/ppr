@@ -91,16 +91,6 @@
             <aside>
               <ConnectFeeWidget class="" />
             </aside>
-            <aside>
-              <StickyContainer
-                :set-right-offset="true"
-                :set-show-fee-summary="true"
-                :set-fee-type="feeType"
-                :set-fee-subtitle="getRegistrationType.registrationTypeUI"
-                :set-registration-length="registrationLength"
-                :set-registration-type="registrationTypeUI"
-              />
-            </aside>
           </v-col>
         </v-row>
       </div>
