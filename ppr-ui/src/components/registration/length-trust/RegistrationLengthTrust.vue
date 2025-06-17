@@ -2,13 +2,13 @@
   <v-container
     id="length-trust-component"
     fluid
-    class="bg-white pt-5 pb-2 pr-8 pl-8 rounded noGutters"
+    class="bg-white pt-5 pb-2 px-8 rounded noGutters"
     :class="{ 'border-error-left': showInvalid && !isSecurityActNotice }"
   >
     <v-row
       v-if="renewalView"
       no-gutters
-      class="summary-header pa-2 mb-8 ml-n8 mr-n10"
+      class="summary-header pa-2 mb-8 mt-n5 mx-n8"
     >
       <v-col
         cols="auto"
