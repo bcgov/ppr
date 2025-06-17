@@ -67,6 +67,7 @@
 
             <!-- Mhr Header -->
             <v-row
+              v-else
               id="registration-header"
               no-gutters
               class="pt-3 pb-3 soft-corners-top"
