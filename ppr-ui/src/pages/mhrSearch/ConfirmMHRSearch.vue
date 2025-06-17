@@ -159,7 +159,7 @@ export default defineComponent({
   emits: ['haveData', 'error'],
   setup (props, { emit }) {
     const router = useRouter()
-    const { goToDash } = useNavigation()
+    const { goToDash, goToPay } = useNavigation()
     const { isAuthenticated } = useAuth()
     const {
       // Actions
@@ -283,11 +283,13 @@ export default defineComponent({
         )
       }
       localState.submitting = false
-      if (apiResponse === undefined || apiResponse !== 200) {
+      if (apiResponse === undefined || apiResponse.status !== 200) {
         emit('error', { category: ErrorCategories.SEARCH })
       } else {
         // On success return to dashboard
-        goToDash()
+        if (apiResponse?.data.paymentPending) {
+          goToPay(apiResponse.data.payment?.invoiceId)
+        } else goToDash()
       }
     }
 

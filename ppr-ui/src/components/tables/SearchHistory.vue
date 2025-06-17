@@ -1,272 +1,11 @@
-<template>
-  <v-container
-    class="main-results-div pa-0 bg-white"
-    role="region"
-  >
-    <v-row
-      no-gutters
-      class="pt-4"
-    >
-      <v-col cols="12">
-        <v-table
-          v-if="searchHistory"
-          id="search-history-table"
-          height="20rem"
-          fixed-header
-        >
-          <template #default>
-            <thead>
-              <tr>
-                <th
-                  v-for="header in headers"
-                  :key="header.value"
-                  class="pr-2 py-0"
-                  :class="header.class"
-                >
-                  {{ header.text }}
-                  <!-- Date Sort Icon/Button -->
-                  <SortingIcon
-                    v-if="header.sortable"
-                    :sort-asc="sortAsc"
-                    @sort-event="dateSortHandler(searchHistory, 'searchDateTime', $event)"
-                  />
-                </th>
-              </tr>
-            </thead>
-
-            <tbody v-if="searchHistory.length > 0">
-              <tr
-                v-for="(item, index) in searchHistory"
-                :key="item.searchId"
-                :class="{ 'added-search-effect': searchAdded && index === 0 }"
-              >
-                <td>
-                  <v-icon
-                    class="pr-2 mt-n1"
-                    color="#212529"
-                    aria-hidden="false"
-                    :aria-label="
-                      headers[0].text + ',' + (isPprSearch(item) ? 'PPR' : 'MHR') + displaySearchValue(item.searchQuery)
-                    "
-                  >
-                    {{ isPprSearch(item) ? 'mdi-account-details' : 'mdi-home' }}
-                  </v-icon>
-                  <span aria-hidden="true">{{ displaySearchValue(item.searchQuery) }}</span>
-                </td>
-                <td>
-                  <span
-                    class="aria-label-only"
-                    aria-hidden="false"
-                  >
-                    {{ headers[1].text }}
-                  </span>
-                  {{ isPprSearch(item) ? displayType(item.searchQuery.type) : displayMhrType(item.searchQuery.type) }}
-                </td>
-                <td>
-                  <span
-                    class="aria-label-only"
-                    aria-hidden="false"
-                  >
-                    {{ headers[2].text }}
-                  </span>
-                  <span v-if="isPprSearch(item)">Personal Property</span>
-                  <span v-else>Manufactured Homes</span>
-                </td>
-                <td>
-                  <span
-                    class="aria-label-only"
-                    aria-hidden="false"
-                  >
-                    {{ headers[3].text }}
-                  </span>
-                  <span v-if="!item.inProgress || isSearchOwner(item)">
-                    {{ displayDate(item.searchDateTime) }}
-                  </span>
-                  <span v-else>Pending</span>
-                </td>
-                <td>
-                  <span
-                    class="aria-label-only"
-                    aria-hidden="false"
-                  >
-                    {{ headers[4].text }}
-                  </span>
-                  {{ isStaff ? item.username : item.searchQuery.clientReferenceId || '-' }}
-                </td>
-                <td>
-                  <span
-                    class="aria-label-only"
-                    aria-hidden="false"
-                  >
-                    {{ headers[5].text }}
-                  </span>
-                  <span v-if="!item.inProgress || isSearchOwner(item)">
-                    {{ item.totalResultsSize }}
-                  </span>
-                  <span
-                    v-else
-                    role="img"
-                    aria-label="None"
-                  >-</span>
-                </td>
-                <td>
-                  <span
-                    class="aria-label-only"
-                    aria-hidden="false"
-                  >
-                    {{ headers[6].text }}
-                  </span>
-                  <span v-if="(!item.inProgress || isSearchOwner(item)) && item.exactResultsSize >= 0">
-                    {{ item.exactResultsSize }}
-                  </span>
-                  <span
-                    v-else
-                    role="img"
-                    aria-label="None"
-                  >-</span>
-                </td>
-                <td>
-                  <span
-                    class="aria-label-only"
-                    aria-hidden="false"
-                  >
-                    {{ headers[7].text }}
-                  </span>
-                  <span v-if="!item.inProgress || isSearchOwner(item)">
-                    {{ item.selectedResultsSize }}
-                  </span>
-                  <span
-                    v-else
-                    role="img"
-                    aria-label="None"
-                  >-</span>
-                </td>
-                <td>
-                  <v-btn
-                    v-if="!item.isPending &&
-                      !item.inProgress && isPDFAvailable(item)"
-                    :id="`pdf-btn-${item.searchId}`"
-                    class="pdf-btn px-0 mt-n3"
-                    variant="plain"
-                    :ripple="false"
-                    :loading="item.loadingPDF"
-                    aria-label="Download PDF"
-                    @click="downloadPDF(item)"
-                  >
-                    <img src="@/assets/svgs/pdf-icon-blue.svg">
-                    <span class="pl-1">PDF</span>
-                  </v-btn>
-                  <v-tooltip
-                    v-else
-                    class="pa-2"
-                    content-class="top-tooltip"
-                    location="top"
-                    transition="fade-transition"
-                  >
-                    <template #activator="{ props }">
-                      <v-btn
-                        v-if="!item.inProgress"
-                        variant="plain"
-                        color="primary"
-                        :ripple="false"
-                        :loading="item.loadingPDF"
-                        aria-label="Refresh Download Button"
-                        @click="refreshRow(item)"
-                      >
-                        <v-icon
-                          color="primary"
-                          size="20"
-                          v-bind="props"
-                        >
-                          mdi-information-outline
-                        </v-icon>
-                      </v-btn>
-                      <v-btn
-                        v-else-if="isSearchOwner(item)"
-                        color="primary"
-                        variant="plain"
-                        :ripple="false"
-                        :loading="item.loadingPDF"
-                        aria-label="Generate Report Button"
-                        @click="generateReport(item)"
-                      >
-                        <v-icon
-                          color="primary"
-                          size="20"
-                          v-bind="props"
-                        >
-                          mdi-information-outline
-                        </v-icon>
-                      </v-btn>
-                      <v-icon
-                        v-else
-                        color="primary"
-                        size="20"
-                        class="ml-5"
-                        v-bind="props"
-                        tabindex="0"
-                        role="img"
-                        aria-hidden="false"
-                        :aria-label="getTooltipTxtPdf(item)"
-                      >
-                        mdi-information-outline
-                      </v-icon>
-                    </template>
-                    <div class="pt-2 pb-2">
-                      <span v-html="getTooltipTxtPdf(item)" />
-                    </div>
-                  </v-tooltip>
-                </td>
-              </tr>
-            </tbody>
-            <tbody v-else>
-              <tr>
-                <td
-                  :colspan="headers.length"
-                  style="text-align: center"
-                >
-                  <div
-                    v-if="!isSearchHistory"
-                    id="no-history-info"
-                    class="pt-4 pb-3"
-                  >
-                    We were unable to retrieve your search history. Please try
-                    again later. If this issue persists, please contact us.
-                    <br><br>
-                    <v-btn
-                      id="retry-search-history"
-                      variant="plain"
-                      color="primary"
-                      :ripple="false"
-                      aria-label="Retry Button"
-                      @click="retrySearch()"
-                    >
-                      Retry <v-icon>mdi-refresh</v-icon>
-                    </v-btn>
-                    <error-contact class="search-contact-container pt-6" />
-                  </div>
-                  <div
-                    v-else
-                    id="no-history-info"
-                  >
-                    Your search history will display here
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </template>
-        </v-table>
-      </v-col>
-    </v-row>
-  </v-container>
-</template>
-
 <script lang="ts">
 import {
   computed,
-  defineComponent, nextTick,
+  defineComponent,
+  nextTick,
   reactive,
-  toRefs, watch
+  toRefs,
+  watch
 } from 'vue'
 import { useStore } from '@/store/store'
 import type { SearchCriteriaIF, SearchResponseIF } from '@/interfaces'
@@ -274,26 +13,20 @@ import { MHRSearchTypes, searchHistoryTableHeaders, searchHistoryTableHeadersSta
 import { convertDate } from '@/utils'
 import { searchPDF, submitSelected, successfulPPRResponses } from '@/utils/ppr-api-helper'
 import { searchMhrPDF, delayActions } from '@/utils/mhr-api-helper'
-
-import { ErrorContact } from '../common'
 import { useSearch } from '@/composables/useSearch'
 import { cloneDeep } from 'lodash' // eslint-disable-line
 import _ from 'lodash' // eslint-disable-line
 import { ErrorCategories } from '@/enums'
 import { useTableFeatures } from '@/composables'
-import { SortingIcon } from '@/components/tables/common'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({
-  components: {
-    SortingIcon,
-    ErrorContact
-  },
   props: {
     searchAdded: { type: Boolean, default: false },
   },
   emits: ['error', 'retry'],
   setup (props, { emit }) {
+    const { goToPay } = useNavigation()
     const {
       getSearchHistory,
       getUserUsername,
@@ -543,11 +276,285 @@ export default defineComponent({
       isSearchOwner,
       refreshRow,
       retrySearch,
-      dateSortHandler
+      dateSortHandler,
+      goToPay
     }
   }
 })
 </script>
+
+<template>
+  <v-container
+    class="main-results-div pa-0 bg-white"
+    role="region"
+  >
+    <v-row
+      no-gutters
+      class="pt-4"
+    >
+      <v-col cols="12">
+        <v-table
+          v-if="searchHistory"
+          id="search-history-table"
+          height="20rem"
+          fixed-header
+        >
+          <template #default>
+            <thead>
+            <tr>
+              <th
+                v-for="header in headers"
+                :key="header.value"
+                class="px-1 py-0"
+                :class="header.class"
+              >
+                {{ header.text }}
+                <!-- Date Sort Icon/Button -->
+                <SortingIcon
+                  v-if="header.sortable"
+                  :sort-asc="sortAsc"
+                  @sort-event="dateSortHandler(searchHistory, 'searchDateTime', $event)"
+                />
+              </th>
+            </tr>
+            </thead>
+
+            <tbody v-if="searchHistory.length > 0">
+            <tr
+              v-for="(item, index) in searchHistory"
+              :key="item.searchId"
+              :class="{ 'added-search-effect': searchAdded && index === 0 }"
+            >
+              <td>
+                <v-icon
+                  class="pr-2 mt-n1"
+                  color="#212529"
+                  aria-hidden="false"
+                  :aria-label="
+                      headers[0].text + ',' + (isPprSearch(item) ? 'PPR' : 'MHR') + displaySearchValue(item.searchQuery)
+                    "
+                >
+                  {{ isPprSearch(item) ? 'mdi-account-details' : 'mdi-home' }}
+                </v-icon>
+                <span aria-hidden="true">{{ displaySearchValue(item.searchQuery) }}</span>
+              </td>
+              <td>
+                  <span
+                    class="aria-label-only"
+                    aria-hidden="false"
+                  >
+                    {{ headers[1].text }}
+                  </span>
+                {{ isPprSearch(item) ? displayType(item.searchQuery.type) : displayMhrType(item.searchQuery.type) }}
+              </td>
+              <td>
+                  <span
+                    class="aria-label-only"
+                    aria-hidden="false"
+                  >
+                    {{ headers[2].text }}
+                  </span>
+                <span v-if="isPprSearch(item)">Personal Property</span>
+                <span v-else>Manufactured Homes</span>
+              </td>
+              <td>
+                  <span
+                    class="aria-label-only"
+                    aria-hidden="false"
+                  >
+                    {{ headers[3].text }}
+                  </span>
+                <span v-if="!item.inProgress || isSearchOwner(item)">
+                    {{ displayDate(item.searchDateTime) }}
+                  </span>
+                <span v-else>Pending</span>
+              </td>
+              <td>
+                <span
+                  class="aria-label-only"
+                  aria-hidden="false"
+                >
+                  {{ headers[4].text }}
+                </span>
+                {{ isStaff ? item.username : item.searchQuery.clientReferenceId || '-' }}
+              </td>
+              <td class="text-center">
+                <span
+                  class="aria-label-only"
+                  aria-hidden="false"
+                >
+                  {{ headers[5].text }}
+                </span>
+                <span v-if="!item.inProgress || isSearchOwner(item)">
+                  {{ item.totalResultsSize }}
+                </span>
+                <span
+                  v-else
+                  role="img"
+                  aria-label="None"
+                >-</span>
+              </td>
+              <td class="text-center">
+                <span
+                  class="aria-label-only"
+                  aria-hidden="false"
+                >
+                  {{ headers[6].text }}
+                </span>
+                <span v-if="(!item.inProgress || isSearchOwner(item)) && item.exactResultsSize >= 0">
+                  {{ item.exactResultsSize }}
+                </span>
+                <span
+                  v-else
+                  role="img"
+                  aria-label="None"
+                >-</span>
+              </td>
+              <td class="text-center">
+                <span
+                  class="aria-label-only"
+                  aria-hidden="false"
+                >
+                  {{ headers[7].text }}
+                </span>
+                <span v-if="!item.inProgress || isSearchOwner(item)">
+                  {{ item.selectedResultsSize }}
+                </span>
+                <span
+                  v-else
+                  role="img"
+                  aria-label="None"
+                >-</span>
+              </td>
+              <td class="text-center">
+                <v-btn
+                  v-if="item.paymentPending"
+                  class="resume-pay-btn px-6"
+                  color="primary"
+                  aria-label="Resume Pay Button"
+                  variant="outlined"
+                  @click="goToPay(item.invoiceId)"
+                >
+                  <span class="fs-14 leading-none">Resume<br>Payment</span>
+                </v-btn>
+                <v-btn
+                  v-else-if="!item.isPending &&
+                      !item.inProgress && isPDFAvailable(item)"
+                  :id="`pdf-btn-${item.searchId}`"
+                  class="pdf-btn px-0 mt-n3"
+                  variant="plain"
+                  :ripple="false"
+                  :loading="item.loadingPDF"
+                  aria-label="Download PDF"
+                  @click="downloadPDF(item)"
+                >
+                  <img src="@/assets/svgs/pdf-icon-blue.svg">
+                  <span class="pl-1 text-blue-500">PDF</span>
+                </v-btn>
+                <v-tooltip
+                  v-else
+                  class="pa-2"
+                  content-class="top-tooltip"
+                  location="top"
+                  transition="fade-transition"
+                >
+                  <template #activator="{ props }">
+                    <v-btn
+                      v-if="!item.inProgress"
+                      variant="plain"
+                      color="primary"
+                      :ripple="false"
+                      :loading="item.loadingPDF"
+                      aria-label="Refresh Download Button"
+                      @click="refreshRow(item)"
+                    >
+                      <v-icon
+                        color="primary"
+                        size="20"
+                        v-bind="props"
+                      >
+                        mdi-information-outline
+                      </v-icon>
+                    </v-btn>
+                    <v-btn
+                      v-else-if="isSearchOwner(item)"
+                      color="primary"
+                      variant="plain"
+                      :ripple="false"
+                      :loading="item.loadingPDF"
+                      aria-label="Generate Report Button"
+                      @click="generateReport(item)"
+                    >
+                      <v-icon
+                        color="primary"
+                        size="20"
+                        v-bind="props"
+                      >
+                        mdi-information-outline
+                      </v-icon>
+                    </v-btn>
+                    <v-icon
+                      v-else
+                      color="primary"
+                      size="20"
+                      class="ml-5"
+                      v-bind="props"
+                      tabindex="0"
+                      role="img"
+                      aria-hidden="false"
+                      :aria-label="getTooltipTxtPdf(item)"
+                    >
+                      mdi-information-outline
+                    </v-icon>
+                  </template>
+                  <div class="pt-2 pb-2">
+                    <span v-html="getTooltipTxtPdf(item)" />
+                  </div>
+                </v-tooltip>
+              </td>
+            </tr>
+            </tbody>
+            <tbody v-else>
+            <tr>
+              <td
+                :colspan="headers.length"
+                style="text-align: center"
+              >
+                <div
+                  v-if="!isSearchHistory"
+                  id="no-history-info"
+                  class="pt-4 pb-3"
+                >
+                  We were unable to retrieve your search history. Please try
+                  again later. If this issue persists, please contact us.
+                  <br><br>
+                  <v-btn
+                    id="retry-search-history"
+                    variant="plain"
+                    color="primary"
+                    :ripple="false"
+                    aria-label="Retry Button"
+                    @click="retrySearch()"
+                  >
+                    Retry <v-icon>mdi-refresh</v-icon>
+                  </v-btn>
+                  <error-contact class="search-contact-container pt-6" />
+                </div>
+                <div
+                  v-else
+                  id="no-history-info"
+                >
+                  Your search history will display here
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </template>
+        </v-table>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';

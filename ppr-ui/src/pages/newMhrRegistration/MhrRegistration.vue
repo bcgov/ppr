@@ -89,7 +89,7 @@
             cols="2"
           >
             <aside>
-              <ConnectFeeWidget class="" />
+              <ConnectFeeWidget />
             </aside>
           </v-col>
         </v-row>
