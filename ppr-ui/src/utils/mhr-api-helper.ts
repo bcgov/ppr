@@ -234,7 +234,7 @@ export async function submitSelectedMhr (
   folioOrReferenceNumber: string = null,
   staffPayment: StaffPaymentIF = null,
   isCertified: boolean = false
-): Promise<number> {
+): Promise<any> {
   let extraParams = ''
 
   if (staffPayment) {
@@ -270,7 +270,7 @@ export async function submitSelectedMhr (
   return axios
     .post(`search-results/${searchId}${extraParams}`, selected, getDefaultConfig())
     .then(response => {
-      return response.status
+      return response
     })
     .catch(error => {
       return error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR

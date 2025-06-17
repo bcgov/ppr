@@ -148,25 +148,25 @@ export const searchHistoryTableHeaders: Array<BaseHeaderIF> = [
     value: 'searchQuery.clientReferenceId'
   },
   {
-    class: 'column-sm',
+    class: 'column-sm text-center',
     sortable: false,
     text: 'Matches Found',
     value: 'totalResultsSize'
   },
   {
-    class: 'column-sm',
+    class: 'column-sm text-center',
     sortable: false,
     text: 'Exact Matches',
     value: 'exactResultsSize'
   },
   {
-    class: 'column-sm',
+    class: 'column-sm text-center',
     sortable: false,
     text: 'Matches Selected',
     value: 'selectedResultsSize'
   },
   {
-    class: 'column-mds',
+    class: 'column-mds text-center',
     sortable: false,
     text: 'Download Report',
     value: 'pdf'
@@ -205,25 +205,25 @@ export const searchHistoryTableHeadersStaff: Array<BaseHeaderIF> = [
     value: 'username'
   },
   {
-    class: 'column-sm',
+    class: 'column-sm text-center',
     sortable: false,
     text: 'Matches Found',
     value: 'totalResultsSize'
   },
   {
-    class: 'column-sm',
+    class: 'column-sm text-center',
     sortable: false,
     text: 'Exact Matches',
     value: 'exactResultsSize'
   },
   {
-    class: 'column-sm',
+    class: 'column-sm text-center',
     sortable: false,
     text: 'Matches Selected',
     value: 'selectedResultsSize'
   },
   {
-    class: 'column-mds',
+    class: 'column-mds text-center',
     sortable: false,
     text: 'Download Report',
     value: 'pdf'

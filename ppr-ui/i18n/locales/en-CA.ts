@@ -11,7 +11,14 @@ export default {
         PLACEHOLDER: '-',
         TEST: 'This is test entry',
         undefined: '-',
-        new_mhr: 'Manufactured Home Registration'
+        new_mhr: 'Manufactured Home Registration',
+        mhr_public_amendment: 'Public Amendment',
+        mhr_staff_correction: 'Registry Correction',
+        mhr_client_correction: 'Registry Correction'
+      },
+      feeDesc: {
+        mhr_staff_correction: 'Staff Error or Omission',
+        mhr_client_correction: 'Client Error or Omission'
       }
     },
     paymentMethod: {

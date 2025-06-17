@@ -134,6 +134,9 @@ const getFeeItemLabelTooltip = (typeCode: string) => {
                   </template>
                 </UPopover>
               </p>
+              <p v-if="feeItem.showFeeDesc" class="pt-1 text-gray-600">
+                {{ $t(`ConnectFeeWidget.feeSummary.feeDesc.${feeItem.filingTypeCode}`) }}
+              </p>
               <p v-if="feeItem.quantity !== undefined && feeItem.quantityDesc" class="pl-4 text-gray-600">
                 x {{ feeItem.quantity }} {{ feeItem.quantityDesc }}
               </p>

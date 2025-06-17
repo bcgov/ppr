@@ -89,7 +89,7 @@
             cols="2"
           >
             <aside>
-              <ConnectFeeWidget class="" />
+              <ConnectFeeWidget />
             </aside>
           </v-col>
         </v-row>
@@ -119,7 +119,7 @@ import { computed, defineComponent, nextTick, onBeforeUnmount, onMounted, reacti
 import { useStore } from '@/store/store'
 import { useConnectFeeStore } from '@/store/connectFee'
 import { storeToRefs } from 'pinia'
-import { APIRegistrationTypes, ConnectPaymentMethod, type UIRegistrationTypes } from '@/enums'
+import { ConnectPaymentMethod, type UIRegistrationTypes } from '@/enums'
 import { APIMhrTypes, ErrorCategories, RegistrationFlowType, RouteNames } from '@/enums'
 import { getFeatureFlag } from '@/utils'
 import { getMhrDraft, submitAdminRegistration, submitMhrRegistration } from '@/utils/mhr-api-helper'
@@ -271,7 +271,7 @@ export default defineComponent({
       }
 
       // Set Fees
-      setRegistrationFees(FeeSummaryTypes.NEW_MHR)
+      setRegistrationFees(localState.feeType)
 
       context.emit('emitHaveData', true)
       localState.dataLoaded = true
