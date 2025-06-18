@@ -13,6 +13,7 @@
 # limitations under the License.
 """Test Suite to ensure the model utility functions are working as expected."""
 import copy
+import json
 from http import HTTPStatus
 
 import pytest
@@ -24,6 +25,9 @@ from mhr_api.models.type_tables import MhrDocumentTypes
 from mhr_api.resources.v1.registrations import get_batch_noc_location_report
 from tests.unit.api.test_registrations import MANUFACTURER_VALID
 
+
+BCA_TEST_DATAFILE_IN = 'tests/unit/models/mhr-batch-bca.json'
+BCA_TEST_DATAFILE_OUT = 'tests/unit/models/mhr-batch-bca-out.json'
 
 # testdata pattern is ({start_ts}, {end_ts})
 TEST_DATA_NOC_LOCATION = [
@@ -149,6 +153,22 @@ def test_get_batch_registration_data(session, start_ts, end_ts):
                 assert result.get('ownerGroups')
     else:
         current_app.logger.debug('No batch registration results within the specified timestamp range.')
+
+
+def test_bca_remove_quotes(session):
+    """Assert that removing double quotation marks from BCA JSON works as expected."""
+    text_data = None
+    with open(BCA_TEST_DATAFILE_IN, 'r') as data_file:
+        text_data = data_file.read()
+        data_file.close()
+    # print(text_data)
+    test_json = json.loads(text_data)
+    new_json: list = []
+    for reg_json in test_json:
+        new_json.append(batch_utils.remove_all_quotes(reg_json))
+    with open(BCA_TEST_DATAFILE_OUT, "w") as out_file:
+        out_file.write(json.dumps(new_json))
+        out_file.close()
 
 
 def is_ci_testing() -> bool:

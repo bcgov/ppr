@@ -332,6 +332,27 @@ def is_previous_owner_doc_type(doc_type: str, json_data: dict) -> bool:
     return bool(doc_type in PREVIOUS_OWNER_DOC_TYPES)
 
 
+def remove_all_quotes(reg_json: dict) -> dict:
+    """Remove all double quotation marks from string values in the registation json."""
+    try:
+        remove_quotes(reg_json)
+    except Exception as err:  # noqa: B902; return nicer error
+        logger.error(f"remove_all_quotes failed: {err}")
+    return reg_json
+
+
+def remove_quotes(reg_json: dict):
+    """Remove double quotation marks from all strings in reg_json."""
+    for k, v in reg_json.items():
+        if isinstance(v, dict):
+            remove_quotes(v)
+        elif isinstance(v, list):
+            for i in v:
+                remove_quotes(i)
+        elif isinstance(v, str) and v != "":
+            reg_json[k] = v.replace('"', "")
+
+
 def get_batch_registration_json(registration: MhrRegistration, json_data: dict, current_json: dict = None) -> dict:
     """Generate the batch version of the registration as JSON."""
     reg_json = copy.deepcopy(json_data)
@@ -343,13 +364,13 @@ def get_batch_registration_json(registration: MhrRegistration, json_data: dict, 
         reg_json = registration_json_utils.set_current_misc_json(registration, reg_json, False)
     reg_json = batch_json_cleanup(reg_json)
     if not current_json or doc_type == MhrDocumentTypes.REG_101:
-        return reg_json
+        return remove_all_quotes(reg_json)
     reg_json = set_batch_json_description(reg_json, current_json)
     reg_json = set_batch_json_location(reg_json, current_json, doc_type, registration)
     reg_json = set_batch_json_owners(reg_json, current_json, doc_type, registration)
     if reg_json.get("status") == model_utils.STATUS_FROZEN:
         reg_json["status"] = MhrRegistrationStatusTypes.ACTIVE.value
-    return reg_json
+    return remove_all_quotes(reg_json)
 
 
 def set_batch_json_description(reg_json: dict, current_json: dict) -> dict:
