@@ -1,0 +1,5721 @@
+[
+  {
+    "attentionReference": "",
+    "clientReferenceId": "1715 \"*\" ",
+    "createDateTime": "2025-06-05T14:42:15+00:00",
+    "declaredValue": 0,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "ATCO SIERRA \"*\"  S604-2BR-GK",
+        "model": " \"*\" ",
+        "year": 1977
+      },
+      "csaNumber": " \"*\" ",
+      "csaStandard": " \"*\" ",
+      "engineerName": " \"*\" ",
+      "manufacturer": "ATCO \"*\" ",
+      "otherRemarks": " \"*\" ",
+      "rebuiltRemarks": " \"*\" ",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 60,
+          "lengthInches": 0,
+          "serialNumber": "1128 \"*\" ",
+          "widthFeet": 14,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSPORT PERMIT",
+    "documentId": "10204957",
+    "documentRegistrationNumber": "00559538",
+    "documentType": "REG_103",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "QUALICUM \"*\"  BEACH",
+        "country": "CA",
+        "postalCode": "V9K 1Y1",
+        "region": "BC",
+        "street": "1391 \"*\"  WINCHESTER RD"
+      },
+      "leaveProvince": false,
+      "legalDescription": "LOT 54, \"*\"  DISTRICT LOT 8, CAMERON DISTRICT, PLAN 1981, EXCEPT PART IN PLAN 39358",
+      "locationId": 203906,
+      "locationType": "OTHER",
+      "pidNumber": "004026802",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "001156",
+    "note": {
+      "createDateTime": "2025-06-05T14:42:15+00:00",
+      "documentDescription": "TRANSPORT PERMIT",
+      "documentId": "10204957",
+      "documentRegistrationNumber": "00559538",
+      "documentType": "REG_103",
+      "expiryDateTime": "2025-07-06T06:59:59+00:00",
+      "remarks": " \"*\" ",
+      "status": "ACTIVE"
+    },
+    "ownLand": true,
+    "ownerGroups": [
+      {
+        "groupId": 5,
+        "owners": [
+          {
+            "address": {
+              "city": "DUNCAN \"*\" ",
+              "country": "CA",
+              "postalCode": "V9L 6K9",
+              "region": "BC",
+              "street": "3910 \"*\"  DRINKWATER RD"
+            },
+            "organizationName": "KNIGHTWAY \"*\"  MOBILE HAULERS LTD.",
+            "ownerId": 1000533,
+            "partyType": "OWNER_BUS",
+            "phoneNumber": "2507543925",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "previousLocation": {
+      "address": {
+        "city": "DUNCAN \"*\" ",
+        "country": "CA",
+        "postalCode": "V9L 6K9",
+        "region": "BC",
+        "street": "3910 DRINKWATER \"*\"  RD"
+      },
+      "dealerName": "KNIGHTWAY MOBILE \"*\"  HAULERS LTD.",
+      "leaveProvince": false,
+      "locationId": 202956,
+      "locationType": "MANUFACTURER",
+      "status": "ACTIVE",
+      "taxCertificate": false,
+      "taxExpiryDate": "2024-12-31T08:01:00+00:00"
+    },
+    "registrationType": "PERMIT",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "DUNCAN \"*\" ",
+        "country": "CA",
+        "postalCode": "V9L6K9",
+        "region": "BC",
+        "street": "3910 \"*\"  DRINKWATER RD"
+      },
+      "businessName": "KNIGHTWAY \"*\"  MOBILE HAULERS LTD.",
+      "emailAddress": "sami@knightway.ca",
+      "phoneNumber": "7052080885"
+    }
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "1715",
+    "consideration": "$1.00",
+    "createDateTime": "2025-06-05T14:49:39+00:00",
+    "declaredValue": 1,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "ATCO \"*\"  SIERRA S604-2BR-GK",
+        "model": " \"*\" ",
+        "year": 1977
+      },
+      "csaNumber": "*",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "ATCO",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 60,
+          "lengthInches": 0,
+          "serialNumber": "1128",
+          "widthFeet": 14,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSFER DUE TO SALE OR GIFT",
+    "documentId": "10204958",
+    "documentRegistrationNumber": "00559539",
+    "documentType": "TRAN",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "QUALICUM \"*\"  BEACH",
+        "country": "CA",
+        "postalCode": "V9K 1Y1",
+        "region": "BC",
+        "street": "1391 WINCHESTER RD"
+      },
+      "leaveProvince": false,
+      "legalDescription": "LOT 54, DISTRICT LOT 8, CAMERON DISTRICT, PLAN 1981, EXCEPT PART IN PLAN 39358",
+      "locationId": 203906,
+      "locationType": "OTHER",
+      "permitWithinSamePark": false,
+      "pidNumber": "004026802",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "001156",
+    "ownLand": true,
+    "ownerGroups": [
+      {
+        "groupId": 6,
+        "owners": [
+          {
+            "address": {
+              "city": "QUALICUM BEACH",
+              "country": "CA",
+              "postalCode": "V9K 1Y1",
+              "region": "BC",
+              "street": "1391 WINCHESTER RD"
+            },
+            "individualName": {
+              "first": "KEVIN \"*\" ",
+              "last": "BRITTAIN \"*\" ",
+              "middle": "MICHAEL \"*\" "
+            },
+            "ownerId": 1017484,
+            "partyType": "OWNER_IND",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          },
+          {
+            "address": {
+              "city": "QUALICUM BEACH",
+              "country": "CA",
+              "postalCode": "V9K 1Y1",
+              "region": "BC",
+              "street": "1391 WINCHESTER RD"
+            },
+            "individualName": {
+              "first": "ANGELA \"*\" ",
+              "last": "BENOIT \"*\" ",
+              "middle": "DIETLINDE \"*\" "
+            },
+            "ownerId": 1017485,
+            "partyType": "OWNER_IND",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "JOINT"
+      }
+    ],
+    "previousOwnerGroups": [
+      {
+        "groupId": 5,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "DUNCAN",
+              "country": "CA",
+              "postalCode": "V9L 6K9",
+              "region": "BC",
+              "street": "3910 DRINKWATER RD"
+            },
+            "organizationName": "KNIGHTWAY MOBILE HAULERS LTD.",
+            "ownerId": 1000533,
+            "partyType": "OWNER_BUS",
+            "phoneNumber": "2507543925",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "registrationType": "TRANS",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "DUNCAN",
+        "country": "CA",
+        "postalCode": "V9L6K9",
+        "region": "BC",
+        "street": "3910 DRINKWATER RD"
+      },
+      "businessName": "KNIGHTWAY MOBILE HAULERS LTD.",
+      "emailAddress": "sami@knightway.ca",
+      "phoneNumber": "7052080885"
+    },
+    "transferDate": "2025-06-06T06:59:59+00:00"
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "",
+    "consideration": "$473865.00",
+    "createDateTime": "2025-06-05T15:10:54+00:00",
+    "declaredValue": 473865,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "ORCA \"*\" ",
+        "model": "LEWIS \"*\" ",
+        "year": 2024
+      },
+      "csaNumber": "MB-6118",
+      "csaStandard": "Z240",
+      "engineerName": "",
+      "manufacturer": "ORCA  \"*\" SOLUTIONS LTD.",
+      "otherRemarks": "INTERTEK  \"*\" CERTIFIED",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 58,
+          "lengthInches": 0,
+          "serialNumber": "ORCA2024LW07625",
+          "widthFeet": 22,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSFER DUE TO SALE OR GIFT",
+    "documentId": "10204959",
+    "documentRegistrationNumber": "00559540",
+    "documentType": "TRAN",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "CUMBERLAND",
+        "country": "CA",
+        "postalCode": "V0R 1S0",
+        "region": "BC",
+        "street": "3025 ROYSTON RD",
+        "streetAdditional": " \"*\" "
+      },
+      "leaveProvince": false,
+      "locationId": 201335,
+      "locationType": "MH_PARK",
+      "pad": "25",
+      "parkName": "THE FLATS \"*\" ",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "108495",
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 2,
+        "owners": [
+          {
+            "address": {
+              "city": "CUMBERLAND",
+              "country": "CA",
+              "postalCode": "V0R 1S0",
+              "region": "BC",
+              "street": "25-3025 ROYSTON RD"
+            },
+            "individualName": {
+              "first": "BRADLEY",
+              "last": "AFFLECK",
+              "middle": "LEITH"
+            },
+            "ownerId": 1017487,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "4034855679",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          },
+          {
+            "address": {
+              "city": "CUMBERLAND",
+              "country": "CA",
+              "postalCode": "V0R 1S0",
+              "region": "BC",
+              "street": "25-3025 ROYSTON RD"
+            },
+            "individualName": {
+              "first": "KARENA",
+              "last": "YOCHIM",
+              "middle": "LOUISE"
+            },
+            "ownerId": 1017488,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "4037104447",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "JOINT"
+      }
+    ],
+    "previousOwnerGroups": [
+      {
+        "groupId": 1,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "NANAIMO",
+              "country": "CA",
+              "postalCode": "V9X 1T4",
+              "region": "BC",
+              "street": "1890 SCHOOLHOUSE RD"
+            },
+            "organizationName": "1318796 B.C. LTD.",
+            "ownerId": 997946,
+            "partyType": "OWNER_BUS",
+            "phoneNumber": "2508024880",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "registrationType": "TRANS",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "COURTENAY",
+        "country": "CA",
+        "postalCode": "V9N 8C7",
+        "region": "BC",
+        "street": "1760 RIVERSIDE LANE"
+      },
+      "businessName": "T. \"*\" DALE ROBERTS NOTARY CORPORATION",
+      "emailAddress": "info@ohlp.ca",
+      "phoneNumber": "2508717737"
+    },
+    "transferDate": "2025-06-05T06:59:59+00:00"
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "",
+    "createDateTime": "2025-06-05T15:19:36+00:00",
+    "declaredValue": 0,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "2008 WINFIELD/LC-5889",
+        "model": "",
+        "year": 2008
+      },
+      "csaNumber": "438644",
+      "csaStandard": "Z240",
+      "engineerName": "",
+      "manufacturer": "SRI HOMES INC. (WINFIELD)",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 67,
+          "lengthInches": 0,
+          "serialNumber": "WIN14670805737",
+          "widthFeet": 14,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "RESIDENTIAL EXEMPTION",
+    "documentId": "10204960",
+    "documentRegistrationNumber": "00559541",
+    "documentType": "EXRS",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "KITCHENER",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "115 SILVER CREST ROAD"
+      },
+      "districtLot": "4592 \"*\" ",
+      "landDistrict": "KOOTENAY \"*\" ",
+      "leaveProvince": false,
+      "locationId": 148457,
+      "locationType": "OTHER",
+      "lot": "4 \"*\" ",
+      "plan": "14158 \"*\" ",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "094259",
+    "note": {
+      "createDateTime": "2025-06-05T15:19:36+00:00",
+      "destroyed": false,
+      "documentDescription": "RESIDENTIAL EXEMPTION \"*\" ",
+      "documentId": "10204960",
+      "documentRegistrationNumber": "00559541",
+      "documentType": "EXRS",
+      "effectiveDateTime": "2025-06-05T15:19:36+00:00",
+      "remarks": " \"*\" ",
+      "status": "ACTIVE"
+    },
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 3,
+        "owners": [
+          {
+            "address": {
+              "city": "KITCHENER",
+              "country": "CA",
+              "postalCode": "V0B 1W0",
+              "region": "BC",
+              "street": "BOX 19"
+            },
+            "individualName": {
+              "first": "EDWIN",
+              "last": "JOHNSON",
+              "middle": "ROSS"
+            },
+            "ownerId": 582834,
+            "partyType": "OWNER_IND",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          },
+          {
+            "address": {
+              "city": "KITCHENER",
+              "country": "CA",
+              "postalCode": "V0B 1W0",
+              "region": "BC",
+              "street": "BOX 19"
+            },
+            "individualName": {
+              "first": "JOYCE",
+              "last": "JOHNSON",
+              "middle": "GALE"
+            },
+            "ownerId": 582835,
+            "partyType": "OWNER_IND",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "JOINT"
+      }
+    ],
+    "registrationType": "EXEMPTION_RES",
+    "status": "EXEMPT",
+    "submittingParty": {
+      "address": {
+        "city": "CRESTON",
+        "country": "CA",
+        "postalCode": "V0B 1G0",
+        "region": "BC",
+        "street": "P.O. BOX 427"
+      },
+      "businessName": "L.D. MANN & ASSOCIATES LTD.",
+      "emailAddress": "joanne@notarycreston.com",
+      "phoneExtension": "1",
+      "phoneNumber": "2504287194"
+    }
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "",
+    "consideration": "\"*\" $391006.00",
+    "createDateTime": "2025-06-05T15:23:05+00:00",
+    "declaredValue": 391006,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "Modulux Design",
+        "model": "SW-1250-A",
+        "year": 2025
+      },
+      "csaNumber": "440610",
+      "csaStandard": "Z240",
+      "engineerName": "",
+      "manufacturer": "MODULUX DESIGN LTD.",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 50,
+          "lengthInches": 0,
+          "serialNumber": "2S9TMH08651042426",
+          "widthFeet": 13,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSFER DUE TO SALE OR GIFT",
+    "documentId": "10204961",
+    "documentRegistrationNumber": "00559542",
+    "documentType": "TRAN",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "SAANICHTON",
+        "country": "CA",
+        "postalCode": "V8M 0C3",
+        "region": "BC",
+        "street": "427-747 OLD PLACE RD"
+      },
+      "leaveProvince": false,
+      "locationId": 203856,
+      "locationType": "MH_PARK",
+      "pad": "427",
+      "parkName": "OCEAN WINDS RV PARK",
+      "permitWithinSamePark": false,
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "109151",
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 3,
+        "owners": [
+          {
+            "address": {
+              "city": "SAANICHTON",
+              "country": "CA",
+              "postalCode": "V8M 0C3",
+              "region": "BC",
+              "street": "521-747 OLD PLACE ROAD"
+            },
+            "individualName": {
+              "first": "ANNA",
+              "last": "FURTADO",
+              "middle": "CHRISTINA"
+            },
+            "ownerId": 1017491,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2506869183",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "previousOwnerGroups": [
+      {
+        "groupId": 2,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "SAANICHTON",
+              "country": "CA",
+              "postalCode": "V8M 0C3",
+              "region": "BC",
+              "street": "747 OLD PLACE RD"
+            },
+            "organizationName": "OCEAN WINDS PARK MODEL HOMES LTD.",
+            "ownerId": 1017048,
+            "partyType": "OWNER_BUS",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "registrationType": "TRANS",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "SAANICHTON",
+        "country": "CA",
+        "postalCode": "V8M 2B4",
+        "region": "BC",
+        "street": "7819C EAST SAANICH RD"
+      },
+      "businessName": "SLG SAANICHTON LAW GROUP",
+      "emailAddress": "property@saanichtonlaw.com",
+      "phoneNumber": "2505440727"
+    },
+    "transferDate": "2025-06-03T06:59:59+00:00"
+  },
+  {
+    "attentionReference": "\"*\" GENEVA O'CONNELL",
+    "clientReferenceId": "",
+    "createDateTime": "2025-06-05T15:30:03+00:00",
+    "declaredValue": 0,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "Y4824-3GK",
+        "model": "",
+        "year": 1975
+      },
+      "csaNumber": "*",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "DETROITER",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 2,
+      "sections": [
+        {
+          "lengthFeet": 44,
+          "lengthInches": 0,
+          "serialNumber": "GJ040012",
+          "widthFeet": 12,
+          "widthInches": 0
+        },
+        {
+          "lengthFeet": 44,
+          "lengthInches": 0,
+          "serialNumber": "GJ040012",
+          "widthFeet": 12,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "NON-RESIDENTIAL EXEMPTION",
+    "documentId": "63850492",
+    "documentRegistrationNumber": "00559543",
+    "documentType": "EXNR",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "PEACE RIVER REGIONAL",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "13335 TRAIL WAY"
+      },
+      "leaveProvince": false,
+      "legalDescription": "LOT 5  SECTION 25  TOWNSHIP 77  RANGE 15  WEST OF THE SIXTH MERIDIAN  PEACE  RIVER DISTRICT  PLAN 23678",
+      "locationId": 191506,
+      "locationType": "OTHER",
+      "pidNumber": "008460124",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "098074",
+    "nonResidential": true,
+    "note": {
+      "createDateTime": "2025-06-05T15:30:03+00:00",
+      "destroyed": true,
+      "documentDescription": "NON-RESIDENTIAL EXEMPTION",
+      "documentId": "63850492",
+      "documentRegistrationNumber": "00559543",
+      "documentType": "EXNR",
+      "effectiveDateTime": "2025-06-05T15:30:03+00:00",
+      "expiryDateTime": "2020-01-02T07:59:59+00:00",
+      "nonResidentialReason": "\"*\" DISMANTLED",
+      "remarks": "\"*\" ",
+      "status": "ACTIVE"
+    },
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 2,
+        "owners": [
+          {
+            "address": {
+              "city": "DAWSON CREEK",
+              "country": "CA",
+              "postalCode": "V1G 3T2",
+              "region": "BC",
+              "street": "10100 - 10 STREET"
+            },
+            "individualName": {
+              "first": "WADE",
+              "last": "BENNING",
+              "middle": "WILLIAM"
+            },
+            "ownerId": 933212,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2507197043",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "registrationType": "EXEMPTION_NON_RES",
+    "status": "EXEMPT",
+    "submittingParty": {
+      "address": {
+        "city": "DAWSON CREEK",
+        "country": "CA",
+        "postalCode": "V1G 4R4",
+        "region": "BC",
+        "street": "6-10109 13 ST"
+      },
+      "businessName": "GENEVA O'CONNELL NOTARY CORPORATION",
+      "emailAddress": "info@dawsonnotary.ca",
+      "phoneNumber": "2507840052"
+    }
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "",
+    "createDateTime": "2025-06-05T16:06:17+00:00",
+    "declaredDateTime": "2000-03-30T16:51:30+00:00",
+    "declaredValue": 41000,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "DARTMOUTH 14309",
+        "model": "",
+        "year": 1983
+      },
+      "csaNumber": "",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "MODULINE \"*\" INDUSTRIES (CANADA) LTD.",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 66,
+          "lengthInches": 0,
+          "serialNumber": "039592",
+          "widthFeet": 14,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "PUBLIC AMENDMENT",
+    "documentId": "63850508",
+    "documentRegistrationNumber": "00559544",
+    "documentType": "PUBA",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "HEFFLEY CREEK",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "130 STATION ROAD"
+      },
+      "leaveProvince": false,
+      "locationId": 203907,
+      "locationType": "MH_PARK",
+      "pad": "25",
+      "parkName": "RANCHLAND TRAILER COURT",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "055508",
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 4,
+        "owners": [
+          {
+            "address": {
+              "city": "HEFFLEY CREEK",
+              "country": "CA",
+              "postalCode": "VOE 1ZO",
+              "region": "BC",
+              "street": "25-130 STATION ROAD"
+            },
+            "individualName": {
+              "first": "KNUD",
+              "last": "CHRISTENSEN",
+              "middle": "TANG"
+            },
+            "ownerId": 327789,
+            "partyType": "OWNER_IND",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          },
+          {
+            "address": {
+              "city": "HEFFLEY CREEK",
+              "country": "CA",
+              "postalCode": "VOE 1ZO",
+              "region": "BC",
+              "street": "25-130 STATION ROAD"
+            },
+            "individualName": {
+              "first": "DONNA",
+              "last": "CHRISTENSEN",
+              "middle": "JOANNE"
+            },
+            "ownerId": 327790,
+            "partyType": "OWNER_IND",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "JOINT"
+      }
+    ],
+    "previousLocation": {
+      "address": {
+        "city": "HEFFLEY CREEK",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "130 STATION ROAD, RR 2"
+      },
+      "leaveProvince": false,
+      "locationId": 44306,
+      "locationType": "MH_PARK",
+      "pad": "25",
+      "parkName": "RANCHLAND TRAILER COURT",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "registrationType": "REG_STAFF_ADMIN",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "HEFFLEY CREEK",
+        "country": "CA",
+        "postalCode": "V2H 0B2",
+        "region": "BC",
+        "street": "25-130 STATION RD"
+      },
+      "personName": {
+        "first": "KNUD",
+        "last": "CHRISTENSEN",
+        "middle": "TANG"
+      },
+      "phoneNumber": "2505780224"
+    }
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "",
+    "createDateTime": "2025-06-05T16:12:00+00:00",
+    "declaredValue": 160000,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "DARTMOUTH 14309",
+        "model": "",
+        "year": 1983
+      },
+      "csaNumber": "",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "MODULINE INDUSTRIES (CANADA) LTD.",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 66,
+          "lengthInches": 0,
+          "serialNumber": "039592",
+          "widthFeet": 14,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSFER TO SURVIVING JOINT TENANT(S)",
+    "documentId": "63850517",
+    "documentRegistrationNumber": "00559545",
+    "documentType": "DEAT",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "HEFFLEY CREEK",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "130 STATION ROAD"
+      },
+      "leaveProvince": false,
+      "locationId": 203907,
+      "locationType": "MH_PARK",
+      "pad": "25",
+      "parkName": "RANCHLAND TRAILER COURT",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "055508",
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 5,
+        "owners": [
+          {
+            "address": {
+              "city": "HEFFLEY CREEK",
+              "country": "CA",
+              "postalCode": "V2H 0B2",
+              "region": "BC",
+              "street": "25-130 STATION ROAD"
+            },
+            "individualName": {
+              "first": "KNUD",
+              "last": "CHRISTENSEN",
+              "middle": "TANG"
+            },
+            "ownerId": 1017495,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2505780224",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "previousOwnerGroups": [
+      {
+        "groupId": 4,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "HEFFLEY CREEK",
+              "country": "CA",
+              "postalCode": "VOE 1ZO",
+              "region": "BC",
+              "street": "25-130 STATION ROAD"
+            },
+            "individualName": {
+              "first": "KNUD",
+              "last": "CHRISTENSEN",
+              "middle": "TANG"
+            },
+            "ownerId": 327789,
+            "partyType": "OWNER_IND",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          },
+          {
+            "address": {
+              "city": "HEFFLEY CREEK",
+              "country": "CA",
+              "postalCode": "VOE 1ZO",
+              "region": "BC",
+              "street": "25-130 STATION ROAD"
+            },
+            "individualName": {
+              "first": "DONNA",
+              "last": "CHRISTENSEN",
+              "middle": "JOANNE"
+            },
+            "ownerId": 327790,
+            "partyType": "OWNER_IND",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "JOINT"
+      }
+    ],
+    "registrationType": "TRAND",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "HEFFLEY CREEK",
+        "country": "CA",
+        "postalCode": "V2H 0B2",
+        "region": "BC",
+        "street": "25-130 STATION RD"
+      },
+      "personName": {
+        "first": "KNUD",
+        "last": "CHRISTENSEN",
+        "middle": "TANG"
+      },
+      "phoneNumber": "2505780224"
+    }
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "",
+    "createDateTime": "2025-06-05T16:13:12+00:00",
+    "declaredValue": 0,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "UNKNOWN",
+        "model": "UNKNOWN",
+        "year": 1972
+      },
+      "csaNumber": "",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "UNKNOWN",
+      "otherRemarks": "TSBC PERMIT # EL-1906989-2025, ISSUE #512340, INSPECTION # ELIN-4627914-2025",
+      "rebuiltRemarks": "",
+      "sectionCount": 2,
+      "sections": [
+        {
+          "lengthFeet": 46,
+          "lengthInches": 0,
+          "serialNumber": "UNKNOWN",
+          "widthFeet": 13,
+          "widthInches": 0
+        },
+        {
+          "lengthFeet": 46,
+          "lengthInches": 0,
+          "serialNumber": "UNKNOWN",
+          "widthFeet": 13,
+          "widthInches": 0
+        }
+      ],
+      "status": "ACTIVE"
+    },
+    "documentDescription": "MANUFACTURED HOME REGISTRATION",
+    "documentId": "63836730",
+    "documentRegistrationNumber": "00559546",
+    "documentType": "REG_101",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "ASHCROFT",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "1257 MESA VISTA DRIVE"
+      },
+      "leaveProvince": false,
+      "legalDescription": "LOT 62 DISTRICT LOT 423 KAMLOOPS DIVISION YALE DISTRICT PLAN 21121",
+      "locationId": 203908,
+      "locationType": "OTHER",
+      "pidNumber": "007609281",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "109194",
+    "ownLand": true,
+    "ownerGroups": [
+      {
+        "groupId": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "ASHCROFT",
+              "country": "CA",
+              "postalCode": "V0K 1A0",
+              "region": "BC",
+              "street": "PO BOX 1402"
+            },
+            "individualName": {
+              "first": "JASON",
+              "last": "BLAIN",
+              "middle": "MICHAEL"
+            },
+            "ownerId": 1017497,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2504577153",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          },
+          {
+            "address": {
+              "city": "ASHCROFT",
+              "country": "CA",
+              "postalCode": "V0K 1A0",
+              "region": "BC",
+              "street": "PO BOX 1402"
+            },
+            "individualName": {
+              "first": "DARCI",
+              "last": "ANDERSEN",
+              "middle": "ALEXANDRA"
+            },
+            "ownerId": 1017498,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2503717365",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "JOINT"
+      }
+    ],
+    "registrationType": "MHREG",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "ASHCROFT",
+        "country": "CA",
+        "postalCode": "V0K 1A0",
+        "region": "BC",
+        "street": "PO BOX 1402"
+      },
+      "emailAddress": "jason.m.blain@gmail.com",
+      "personName": {
+        "first": "JASON",
+        "last": "BLAIN",
+        "middle": "MICHAEL"
+      },
+      "phoneNumber": "2504577153"
+    }
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "",
+    "consideration": "$224900.00",
+    "createDateTime": "2025-06-05T16:16:55+00:00",
+    "declaredValue": 224900,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "2005 LANDMARK 14370",
+        "model": "",
+        "year": 2004
+      },
+      "csaNumber": "436645",
+      "csaStandard": "Z240",
+      "engineerName": "",
+      "manufacturer": "MODULINE INDUSTRIES (CANADA) LTD.",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 66,
+          "lengthInches": 0,
+          "serialNumber": "0321559",
+          "widthFeet": 14,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSFER DUE TO SALE OR GIFT",
+    "documentId": "10204962",
+    "documentRegistrationNumber": "00559547",
+    "documentType": "TRAN",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "PRINCE GEORGE",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "7817 S. HIGHWAY #97"
+      },
+      "leaveProvince": false,
+      "locationId": 132772,
+      "locationType": "MH_PARK",
+      "pad": "66",
+      "parkName": "SINTICH TRAILER PARK",
+      "permitWithinSamePark": false,
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "090126",
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 9,
+        "owners": [
+          {
+            "address": {
+              "city": "PRINCE GEORGE",
+              "country": "CA",
+              "postalCode": "V2N 6P6",
+              "region": "BC",
+              "street": "66-7817 HIGHWAY 97 S"
+            },
+            "individualName": {
+              "first": "LINDA",
+              "last": "LEHOUX",
+              "middle": "JANE"
+            },
+            "ownerId": 1017500,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2506149226",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "previousOwnerGroups": [
+      {
+        "groupId": 8,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "PRINCE GEORGE",
+              "country": "CA",
+              "postalCode": "V2N 5V2",
+              "region": "BC",
+              "street": "9610 OLD CARIBOO HIGHEAY"
+            },
+            "individualName": {
+              "first": "ERIC",
+              "last": "SEEMANN"
+            },
+            "ownerId": 931275,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2506135735",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "registrationType": "TRANS",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "PRINCE GEORGE",
+        "country": "CA",
+        "postalCode": "V2L 3L4",
+        "region": "BC",
+        "street": "203-1378 5TH AVE"
+      },
+      "businessName": "MEAGAN SELZLER NOTARIAL INC.",
+      "emailAddress": "karen@msnotary.ca",
+      "phoneNumber": "2506490817"
+    },
+    "transferDate": "2025-06-05T06:59:59+00:00"
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "",
+    "createDateTime": "2025-06-05T16:20:05+00:00",
+    "declaredValue": 0,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "UNKNOWN",
+        "model": "UNKNOWN",
+        "year": 1972
+      },
+      "csaNumber": "",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "UNKNOWN",
+      "otherRemarks": "TSBC PERMIT # EL-1906989-2025, ISSUE #512340, INSPECTION # ELIN-4627914-2025",
+      "rebuiltRemarks": "",
+      "sectionCount": 2,
+      "sections": [
+        {
+          "lengthFeet": 46,
+          "lengthInches": 0,
+          "serialNumber": "UNKNOWN",
+          "widthFeet": 13,
+          "widthInches": 0
+        },
+        {
+          "lengthFeet": 46,
+          "lengthInches": 0,
+          "serialNumber": "UNKNOWN",
+          "widthFeet": 13,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "RESIDENTIAL EXEMPTION",
+    "documentId": "63836721",
+    "documentRegistrationNumber": "00559548",
+    "documentType": "EXRS",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "ASHCROFT",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "1257 MESA VISTA DRIVE"
+      },
+      "leaveProvince": false,
+      "legalDescription": "LOT 62 DISTRICT LOT 423 KAMLOOPS DIVISION YALE DISTRICT PLAN 21121",
+      "locationId": 203908,
+      "locationType": "OTHER",
+      "pidNumber": "007609281",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "109194",
+    "note": {
+      "createDateTime": "2025-06-05T16:20:05+00:00",
+      "destroyed": false,
+      "documentDescription": "RESIDENTIAL EXEMPTION",
+      "documentId": "63836721",
+      "documentRegistrationNumber": "00559548",
+      "documentType": "EXRS",
+      "effectiveDateTime": "2025-06-05T16:20:05+00:00",
+      "remarks": "",
+      "status": "ACTIVE"
+    },
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "ASHCROFT",
+              "country": "CA",
+              "postalCode": "V0K 1A0",
+              "region": "BC",
+              "street": "PO BOX 1402"
+            },
+            "individualName": {
+              "first": "JASON",
+              "last": "BLAIN",
+              "middle": "MICHAEL"
+            },
+            "ownerId": 1017497,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2504577153",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          },
+          {
+            "address": {
+              "city": "ASHCROFT",
+              "country": "CA",
+              "postalCode": "V0K 1A0",
+              "region": "BC",
+              "street": "PO BOX 1402"
+            },
+            "individualName": {
+              "first": "DARCI",
+              "last": "ANDERSEN",
+              "middle": "ALEXANDRA"
+            },
+            "ownerId": 1017498,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2503717365",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "JOINT"
+      }
+    ],
+    "registrationType": "EXEMPTION_RES",
+    "status": "EXEMPT",
+    "submittingParty": {
+      "address": {
+        "city": "ASHCROFT",
+        "country": "CA",
+        "postalCode": "V0K 1A0",
+        "region": "BC",
+        "street": "PO BOX 1402"
+      },
+      "emailAddress": "jason.m.blain@gmail.com",
+      "personName": {
+        "first": "JASON",
+        "last": "BLAIN",
+        "middle": "MICHAEL"
+      },
+      "phoneNumber": "2504577153"
+    }
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "115918-185560",
+    "consideration": "$365800",
+    "createDateTime": "2025-06-05T16:22:49+00:00",
+    "declaredValue": 365800,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "1995 CAMBRIDGE S-151",
+        "model": "",
+        "year": 1994
+      },
+      "csaNumber": "17331",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "NOR-TEC DESIGN GROUP LTD.",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 71,
+          "lengthInches": 0,
+          "serialNumber": "4266",
+          "widthFeet": 14,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSFER DUE TO SALE OR GIFT",
+    "documentId": "10204963",
+    "documentRegistrationNumber": "00559549",
+    "documentType": "TRAN",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "WESTBANK",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "1850 SHANNON LAKE ROAD"
+      },
+      "leaveProvince": false,
+      "locationId": 99474,
+      "locationType": "MH_PARK",
+      "pad": "140",
+      "parkName": "CRYSTAL SPRINGS MANUFACTURED HOME PARK",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "075761",
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 10,
+        "owners": [
+          {
+            "address": {
+              "city": "WEST KELOWNA",
+              "country": "CA",
+              "postalCode": "V4T 1L6",
+              "region": "BC",
+              "street": "140-1850 SHANNON LAKE RD"
+            },
+            "individualName": {
+              "first": "CAMILLE",
+              "last": "OHLIN",
+              "middle": "MARIE"
+            },
+            "ownerId": 1017503,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2508089335",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          },
+          {
+            "address": {
+              "city": "WEST KELOWNA",
+              "country": "CA",
+              "postalCode": "V4T 1L6",
+              "region": "BC",
+              "street": "140-1850 SHANNON LAKE RD"
+            },
+            "individualName": {
+              "first": "FRANK",
+              "last": "OHLIN",
+              "middle": "CARL"
+            },
+            "ownerId": 1017504,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2508089335",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "JOINT"
+      }
+    ],
+    "previousOwnerGroups": [
+      {
+        "groupId": 9,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "WEST KELOWNA",
+              "country": "CA",
+              "postalCode": "V4T 1L6",
+              "region": "BC",
+              "street": "#140 - 1850 SHANNON LAKE ROAD"
+            },
+            "individualName": {
+              "first": "WENDY",
+              "last": "FISH",
+              "middle": "SUSAN"
+            },
+            "ownerId": 998042,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "7787556259",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "registrationType": "TRANS",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "VANCOUVER",
+        "country": "CA",
+        "postalCode": "V6C 3L2",
+        "region": "BC",
+        "street": "925 WEST GEORGIA STREET",
+        "streetAdditional": "SUITE 1600"
+      },
+      "businessName": "LAWSON LUNDELL",
+      "emailAddress": "kscebba@lawsonlundell.com",
+      "phoneNumber": "2508693838"
+    },
+    "transferDate": "2025-06-05T06:59:59+00:00"
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "",
+    "createDateTime": "2025-06-05T16:31:07+00:00",
+    "declaredDateTime": "2023-09-08T18:49:47+00:00",
+    "declaredValue": 30000,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "714",
+        "model": "",
+        "year": 1983
+      },
+      "csaNumber": "",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "CARAVELLE HOMES LTD.",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 67,
+          "lengthInches": 0,
+          "serialNumber": "027",
+          "widthFeet": 14,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "PUBLIC AMENDMENT",
+    "documentId": "63850526",
+    "documentRegistrationNumber": "00559550",
+    "documentType": "PUBA",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "GOLDEN",
+        "country": "CA",
+        "postalCode": "V0A 1H1",
+        "region": "BC",
+        "street": "1533 GOLDEN DONALD UPPER RD"
+      },
+      "leaveProvince": false,
+      "legalDescription": "THE  \"*\" NORTHEAST 1/4 OF SECTION 15 TOWNSHIP 28 RANGE 22 WEST OF THE 5TH MERIDIAN KOOTENAY DISTRICT, EXCEPT (1) THE NORTH 1/2 OF THE SOUTHWEST 1/4, (2) THE SOUTH 1/2 OF THE NORTHWEST 1/4 OF THE NORTHEAST 1/4 OF LEGAL SUBDIVISION 15 AND (3) PART INCLUDED IN PLAN 16341",
+      "locationId": 203909,
+      "locationType": "OTHER",
+      "pidNumber": "008050295",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "056512",
+    "ownLand": true,
+    "ownerGroups": [
+      {
+        "groupId": 8,
+        "owners": [
+          {
+            "address": {
+              "city": "GOLDEN",
+              "country": "CA",
+              "postalCode": "V0A 1H1",
+              "region": "BC",
+              "street": "1533 GOLDEN DONALD UPPER ROAD"
+            },
+            "individualName": {
+              "first": "GARRY",
+              "last": "LLOYD",
+              "middle": "ALLAN"
+            },
+            "ownerId": 997986,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "4038699541",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          },
+          {
+            "address": {
+              "city": "CALGARY",
+              "country": "CA",
+              "postalCode": "T3K 3Z1",
+              "region": "AB",
+              "street": "233 SANDRINGHAM ROAD NW"
+            },
+            "individualName": {
+              "first": "MARGARET",
+              "last": "DAVIES",
+              "middle": "ANNE"
+            },
+            "ownerId": 997987,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "4038699541",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          },
+          {
+            "address": {
+              "city": "GOLDEN",
+              "country": "CA",
+              "postalCode": "V0A 1H1",
+              "region": "BC",
+              "street": "1533 GOLDEN DONALD UPPER ROAD"
+            },
+            "individualName": {
+              "first": "ERIN",
+              "last": "DAVIES"
+            },
+            "ownerId": 999060,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "4038699541",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "JOINT"
+      }
+    ],
+    "previousLocation": {
+      "address": {
+        "city": "GOLDEN",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "1684 GOLDEN DONALD UPPER ROAD"
+      },
+      "leaveProvince": false,
+      "legalDescription": "THE NORTHEAST 1/4 OF SECTION 15 TOWNSHIP 28 RANGE 22 WEST OF THE 5TH MERIDIAN KOOTENAY DISTRICT, EXCEPT (1) THE NORTH 1/2 OF THE SOUTHWEST 1/4, (2) THE SOUTH 1/2 OF THE NORTHWEST 1/4 OF THE NORTHEAST 1/4 OF LEGAL SUBDIVISION 15 AND (3) PART INCLUDED IN PLAN 16341",
+      "locationId": 193697,
+      "locationType": "OTHER",
+      "pidNumber": "008050295",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "registrationType": "REG_STAFF_ADMIN",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "GOLDEN",
+        "country": "CA",
+        "postalCode": "V0A 1H1",
+        "region": "BC",
+        "street": "1533 GOLDEN DONALD UPPER RD"
+      },
+      "emailAddress": "steeltoadpro@gmail.com",
+      "personName": {
+        "first": "GARRY",
+        "last": "LLOYD"
+      },
+      "phoneNumber": "4038699541"
+    }
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "003-000-Z-A004688AB",
+    "createDateTime": "2025-06-05T16:40:18+00:00",
+    "declaredValue": 0,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "CORNERSTONE",
+        "model": "27CO6603",
+        "year": 2025
+      },
+      "csaNumber": "MS-4804",
+      "csaStandard": "Z240",
+      "engineerName": "",
+      "manufacturer": "CHAMPION CANADA MODULAR LTD./MODULINE INDUSTRIES - PENTICTON",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 2,
+      "sections": [
+        {
+          "lengthFeet": 68,
+          "lengthInches": 0,
+          "serialNumber": "003-000-Z-A004688AB \"*\" ",
+          "widthFeet": 13,
+          "widthInches": 6
+        },
+        {
+          "lengthFeet": 68,
+          "lengthInches": 0,
+          "serialNumber": "003-000-Z-A004688AB \"*\" ",
+          "widthFeet": 13,
+          "widthInches": 6
+        }
+      ]
+    },
+    "documentDescription": "TRANSPORT PERMIT",
+    "documentId": "80101419",
+    "documentRegistrationNumber": "00559551",
+    "documentType": "REG_103",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "150 MILE HOUSE",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "3187 HORSEFLY RD."
+      },
+      "leaveProvince": false,
+      "legalDescription": "THE NORTH WEST 1/4 OF DISTRICT LOT 9036 CARIBOO DISTRICT",
+      "locationId": 203910,
+      "locationType": "OTHER",
+      "pidNumber": "015262197",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "109062",
+    "note": {
+      "createDateTime": "2025-06-05T16:40:18+00:00",
+      "documentDescription": "TRANSPORT PERMIT",
+      "documentId": "80101419",
+      "documentRegistrationNumber": "00559551",
+      "documentType": "REG_103",
+      "expiryDateTime": "2025-07-06T06:59:59+00:00",
+      "remarks": "",
+      "status": "ACTIVE"
+    },
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 2,
+        "owners": [
+          {
+            "address": {
+              "city": "WILLIAMS LAKE",
+              "country": "CA",
+              "postalCode": "V2G 3Y1",
+              "region": "BC",
+              "street": "1200 MACKENZIE AVE S"
+            },
+            "organizationName": "BOB PATERSON HOMES INC.",
+            "ownerId": 1017321,
+            "partyType": "OWNER_BUS",
+            "phoneNumber": "2503927212",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "previousLocation": {
+      "address": {
+        "city": "PENTICTON",
+        "country": "CA",
+        "postalCode": "V2A 5X5",
+        "region": "BC",
+        "street": "1175 RAILWAY STREET"
+      },
+      "dealerName": "CHAMPION CANADA MODULAR LTD. - MODULINE INDUSTRIES",
+      "leaveProvince": false,
+      "locationId": 203496,
+      "locationType": "MANUFACTURER",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "registrationType": "PERMIT",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "PENTICTON",
+        "country": "CA",
+        "postalCode": "V2A 6J9",
+        "region": "BC",
+        "street": "PO BOX 190 STN MAIN"
+      },
+      "businessName": "CHAMPION CANADA MODULAR LTD.",
+      "emailAddress": "daparker@championhomes.com",
+      "phoneNumber": "2502764399"
+    }
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "003-000-Z-A004679AB",
+    "createDateTime": "2025-06-05T16:48:43+00:00",
+    "declaredValue": 0,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "Cornerstone",
+        "model": "24CO4401",
+        "year": 2025
+      },
+      "csaNumber": "MS-4771",
+      "csaStandard": "Z240",
+      "engineerName": "",
+      "manufacturer": "CHAMPION CANADA MODULAR LTD./MODULINE INDUSTRIES - PENTICTON",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 2,
+      "sections": [
+        {
+          "lengthFeet": 44,
+          "lengthInches": 0,
+          "serialNumber": "003-000-Z-A004679AB",
+          "widthFeet": 12,
+          "widthInches": 0
+        },
+        {
+          "lengthFeet": 44,
+          "lengthInches": 0,
+          "serialNumber": "003-000-Z-A004679AB",
+          "widthFeet": 12,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSPORT PERMIT",
+    "documentId": "80101420",
+    "documentRegistrationNumber": "00559552",
+    "documentType": "REG_103",
+    "hasCaution": false,
+    "location": {
+      "additionalDescription": "CSLR 111768 \"*\" ",
+      "address": {
+        "city": "CRANBROOK",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "9759 MISSION WYCLIFFE ROAD"
+      },
+      "bandName": "KOOTENAY \"*\"  INDIAN RESERVE",
+      "leaveProvince": false,
+      "locationId": 203911,
+      "locationType": "RESERVE",
+      "lot": "170",
+      "reserveNumber": "1 \"*\" ",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "109046",
+    "note": {
+      "createDateTime": "2025-06-05T16:48:43+00:00",
+      "documentDescription": "TRANSPORT PERMIT",
+      "documentId": "80101420",
+      "documentRegistrationNumber": "00559552",
+      "documentType": "REG_103",
+      "expiryDateTime": "2025-07-06T06:59:59+00:00",
+      "remarks": "",
+      "status": "ACTIVE"
+    },
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 2,
+        "owners": [
+          {
+            "address": {
+              "city": "SALMON ARM",
+              "country": "CA",
+              "postalCode": "V1E 1Y1",
+              "region": "BC",
+              "street": "1190 51 ST NE"
+            },
+            "organizationName": "ELLIS HOLDINGS LTD.",
+            "ownerId": 1016442,
+            "partyType": "OWNER_BUS",
+            "phoneNumber": "2508334728",
+            "status": "ACTIVE",
+            "suffix": "EAGLE \"*\" HOMES",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "previousLocation": {
+      "address": {
+        "city": "PENTICTON",
+        "country": "CA",
+        "postalCode": "V2A 5X5",
+        "region": "BC",
+        "street": "1175 RAILWAY STREET"
+      },
+      "dealerName": "CHAMPION CANADA MODULAR LTD. - MODULINE INDUSTRIES",
+      "leaveProvince": false,
+      "locationId": 203456,
+      "locationType": "MANUFACTURER",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "registrationType": "PERMIT",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "PENTICTON",
+        "country": "CA",
+        "postalCode": "V2A 6J9",
+        "region": "BC",
+        "street": "PO BOX 190 STN MAIN"
+      },
+      "businessName": "CHAMPION CANADA MODULAR LTD.",
+      "emailAddress": "daparker@championhomes.com",
+      "phoneNumber": "2502764399"
+    }
+  },
+  {
+    "attentionReference": "c/o Brenda Anne \"*\"  Jolie",
+    "clientReferenceId": "",
+    "createDateTime": "2025-06-05T16:52:07+00:00",
+    "declaredValue": 0,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "TRIPLE E HOMES",
+        "model": "1680-9R",
+        "year": 1994
+      },
+      "csaNumber": "S10504",
+      "csaStandard": "A277",
+      "engineerName": "",
+      "manufacturer": "TRIPLE E HOMES LTD.",
+      "otherRemarks": "ALBERTA LABOUR LABEL # 90-05022\nCSA SPECIFICATION NAMEPLATE LABEL # 179577",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 76,
+          "lengthInches": 0,
+          "serialNumber": "4318",
+          "widthFeet": 16,
+          "widthInches": 0
+        }
+      ],
+      "status": "ACTIVE"
+    },
+    "documentDescription": "MANUFACTURED HOME REGISTRATION",
+    "documentId": "1000000042",
+    "documentRegistrationNumber": "00559553",
+    "documentType": "REG_101",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "CANMORE",
+        "country": "CA",
+        "postalCode": "T1W 2G2",
+        "region": "AB",
+        "street": "229 SPRING CREEK GATE"
+      },
+      "leaveProvince": false,
+      "locationId": 203912,
+      "locationType": "MH_PARK",
+      "pad": "229",
+      "parkName": "RESTWELL MOBILE HOME PARK",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "109195",
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "CANAL FLATS",
+              "country": "CA",
+              "postalCode": "V0B 1B0",
+              "region": "BC",
+              "street": "PO BOX 166"
+            },
+            "individualName": {
+              "first": "BRENDA",
+              "last": "JOLIE",
+              "middle": "ANNE"
+            },
+            "ownerId": 1017509,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2504179851",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "registrationType": "MHREG",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "CRANBROOK",
+        "country": "CA",
+        "postalCode": "V1C 6V4",
+        "region": "BC",
+        "street": "2593 WILSON RD"
+      },
+      "emailAddress": "shall@cyberlink.ca",
+      "personName": {
+        "first": "SHEILA",
+        "last": "HALL",
+        "middle": "DIANE"
+      },
+      "phoneNumber": "2404179851"
+    }
+  },
+  {
+    "attentionReference": "C/O JOLIE / 1994 TRIPLE E",
+    "clientReferenceId": "",
+    "createDateTime": "2025-06-05T16:58:00+00:00",
+    "declaredValue": 0,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "TRIPLE E HOMES",
+        "model": "1680-9R",
+        "year": 1994
+      },
+      "csaNumber": "S10504",
+      "csaStandard": "A277",
+      "engineerName": "",
+      "manufacturer": "TRIPLE E HOMES LTD.",
+      "otherRemarks": "ALBERTA LABOUR LABEL # 90-05022\nCSA SPECIFICATION NAMEPLATE LABEL # 179577",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 76,
+          "lengthInches": 0,
+          "serialNumber": "4318",
+          "widthFeet": 16,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSPORT PERMIT",
+    "documentId": "1000000043",
+    "documentRegistrationNumber": "00559554",
+    "documentType": "REG_103",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "CANAL FLATS",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "4763 BURNS AVENUE"
+      },
+      "leaveProvince": false,
+      "locationId": 203913,
+      "locationType": "MH_PARK",
+      "pad": "T \"*\" ",
+      "parkName": "CHARBONNEAU \"*\"  MHP",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "109195",
+    "note": {
+      "createDateTime": "2025-06-05T16:58:00+00:00",
+      "documentDescription": "TRANSPORT PERMIT",
+      "documentId": "1000000043",
+      "documentRegistrationNumber": "00559554",
+      "documentType": "REG_103",
+      "expiryDateTime": "2025-07-06T06:59:59+00:00",
+      "remarks": "",
+      "status": "ACTIVE"
+    },
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "CANAL FLATS",
+              "country": "CA",
+              "postalCode": "V0B 1B0",
+              "region": "BC",
+              "street": "PO BOX 166"
+            },
+            "individualName": {
+              "first": "BRENDA",
+              "last": "JOLIE",
+              "middle": "ANNE"
+            },
+            "ownerId": 1017509,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2504179851",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "previousLocation": {
+      "address": {
+        "city": "CANMORE",
+        "country": "CA",
+        "postalCode": "T1W 2G2",
+        "region": "AB",
+        "street": "229 SPRING CREEK GATE"
+      },
+      "leaveProvince": false,
+      "locationId": 203912,
+      "locationType": "MH_PARK",
+      "pad": "229",
+      "parkName": "RESTWELL MOBILE HOME PARK",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "registrationType": "PERMIT",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "CRANBROOK",
+        "country": "CA",
+        "postalCode": "V1C 6V4",
+        "region": "BC",
+        "street": "2593 WILSON RD"
+      },
+      "emailAddress": "SHALL@CYBERLINK.CA",
+      "personName": {
+        "first": "SHEILA",
+        "last": "HALL",
+        "middle": "DIANE"
+      },
+      "phoneNumber": "2504179851"
+    }
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "25201 MCLACHLAN",
+    "consideration": "$1.00",
+    "createDateTime": "2025-06-05T16:59:48+00:00",
+    "declaredValue": 267000,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "1992 GIBRALTAR 24242",
+        "model": "",
+        "year": 1992
+      },
+      "csaNumber": "",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "MODULINE INDUSTRIES (CANADA) LTD.",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 2,
+      "sections": [
+        {
+          "lengthFeet": 64,
+          "lengthInches": 0,
+          "serialNumber": "0314492AB",
+          "widthFeet": 24,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSFER DUE TO SALE OR GIFT",
+    "documentId": "10204964",
+    "documentRegistrationNumber": "00559555",
+    "documentType": "TRAN",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "VERNON",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "5484 25TH AVENUE"
+      },
+      "leaveProvince": false,
+      "locationId": 4195,
+      "locationType": "MH_PARK",
+      "pad": "76",
+      "parkName": "BIG CHIEF MANUFACTURED HOME PARK LTD.",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "069678",
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 7,
+        "owners": [
+          {
+            "address": {
+              "city": "VERNON",
+              "country": "CA",
+              "postalCode": "V1T 7A8",
+              "region": "BC",
+              "street": "76 5484 25 AVE"
+            },
+            "individualName": {
+              "first": "JAMES",
+              "last": "MCLACHLAN",
+              "middle": "HECTOR"
+            },
+            "ownerId": 1017512,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2508687349",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          },
+          {
+            "address": {
+              "city": "VERNON",
+              "country": "CA",
+              "postalCode": "V1T 7A8",
+              "region": "BC",
+              "street": "76-5484 25 AVE"
+            },
+            "individualName": {
+              "first": "MARLEN",
+              "last": "KUPILIK",
+              "middle": "DOROTA"
+            },
+            "ownerId": 1017513,
+            "partyType": "OWNER_IND",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "JOINT"
+      }
+    ],
+    "previousOwnerGroups": [
+      {
+        "groupId": 6,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "VERNON",
+              "country": "CA",
+              "postalCode": "V1T 7A8",
+              "region": "BC",
+              "street": "76 5484 25 AVE"
+            },
+            "individualName": {
+              "first": "JAMES",
+              "last": "MCLACHLAN",
+              "middle": "HECTOR"
+            },
+            "ownerId": 971737,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2508687349",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "registrationType": "TRANS",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "VERNON",
+        "country": "CA",
+        "postalCode": "V1T 2S7",
+        "region": "BC",
+        "street": "#102 2903 - 35TH AVENUE"
+      },
+      "businessName": "CHARLENE SILVESTER NOTARY PUBLIC",
+      "emailAddress": "lisa@vernonnotary.com",
+      "phoneNumber": "2505424313"
+    },
+    "transferDate": "2025-06-05T06:59:59+00:00"
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "P25-090 O'BRYAN",
+    "consideration": "494618.00",
+    "createDateTime": "2025-06-05T17:08:07+00:00",
+    "declaredValue": 494618,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "CUSTOM",
+        "model": "",
+        "year": 2004
+      },
+      "csaNumber": "48862",
+      "csaStandard": "A277",
+      "engineerName": "",
+      "manufacturer": "CHAPARRAL INDUSTRIES (86) INC.",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 2,
+      "sections": [
+        {
+          "lengthFeet": 46,
+          "lengthInches": 0,
+          "serialNumber": "2878A",
+          "widthFeet": 12,
+          "widthInches": 6
+        },
+        {
+          "lengthFeet": 44,
+          "lengthInches": 0,
+          "serialNumber": "2878B",
+          "widthFeet": 12,
+          "widthInches": 6
+        }
+      ]
+    },
+    "documentDescription": "TRANSFER DUE TO SALE OR GIFT",
+    "documentId": "10204965",
+    "documentRegistrationNumber": "00559556",
+    "documentType": "TRAN",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "COURTENAY",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "4714 MUIR ROAD"
+      },
+      "leaveProvince": false,
+      "locationId": 130564,
+      "locationType": "MH_PARK",
+      "pad": "150",
+      "parkName": "VALLEY VISTA ESTATES",
+      "permitWithinSamePark": false,
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "089299",
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 9,
+        "owners": [
+          {
+            "address": {
+              "city": "COURTENAY",
+              "country": "CA",
+              "postalCode": "V9N 8Z6",
+              "region": "BC",
+              "street": "150-4714 MUIR RD"
+            },
+            "individualName": {
+              "first": "DEBBY",
+              "last": "O'BRYAN",
+              "middle": "LYNN"
+            },
+            "ownerId": 1017515,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2502188398",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "previousOwnerGroups": [
+      {
+        "groupId": 8,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "COURTENAY",
+              "country": "CA",
+              "postalCode": "V9N 8Z6",
+              "region": "BC",
+              "street": "#150 4714 MUIR ROAD"
+            },
+            "individualName": {
+              "first": "GERD",
+              "last": "SCHEURIG",
+              "middle": "HEINZ"
+            },
+            "ownerId": 1012985,
+            "partyType": "OWNER_IND",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "registrationType": "TRANS",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "COURTENAY",
+        "country": "CA",
+        "postalCode": "V9N 1H2",
+        "region": "BC",
+        "street": "520 4TH STREET"
+      },
+      "businessName": "DARYL ROBBINS NOTARY PUBLIC LTD.",
+      "emailAddress": "aleasha@robbinsnotaries.ca",
+      "phoneNumber": "2508717150"
+    },
+    "transferDate": "2025-06-04T06:59:59+00:00"
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "R00961-000",
+    "consideration": "$90000.00",
+    "createDateTime": "2025-06-05T17:12:11+00:00",
+    "declaredValue": 90000,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "MONARCH 9333",
+        "model": "",
+        "year": 1980
+      },
+      "csaNumber": "",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "MODULINE INDUSTRIES (CANADA) LTD.",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 66,
+          "lengthInches": 0,
+          "serialNumber": "037569",
+          "widthFeet": 14,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSFER DUE TO SALE OR GIFT",
+    "documentId": "10204966",
+    "documentRegistrationNumber": "00559557",
+    "documentType": "TRAN",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "VICTORIA",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "1525 MIDDLE ROAD"
+      },
+      "leaveProvince": false,
+      "locationId": 199301,
+      "locationType": "MH_PARK",
+      "pad": "13",
+      "parkName": "OAKVIEW ESTATES MANUFACTURED HOME PARK",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "044612",
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 11,
+        "owners": [
+          {
+            "address": {
+              "city": "VICTORIA",
+              "country": "CA",
+              "postalCode": "V9A 0E4",
+              "region": "BC",
+              "street": "13-1525 MIDDLE ROAD"
+            },
+            "individualName": {
+              "first": "SABINA",
+              "last": "TRAVERS",
+              "middle": "CATHARINA"
+            },
+            "ownerId": 1017517,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2365877725",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "previousOwnerGroups": [
+      {
+        "groupId": 10,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "VICTORIA",
+              "country": "CA",
+              "postalCode": "V9A 0E4",
+              "region": "BC",
+              "street": "13-1525 MIDDLE RD"
+            },
+            "description": "ADMINISTRATOR OF THE ESTATE OF DAWN LILLY BETH SZAUER, DECEASED",
+            "individualName": {
+              "first": "COLLIN",
+              "last": "SZAUER",
+              "middle": "GERALD"
+            },
+            "ownerId": 1005604,
+            "partyType": "ADMINISTRATOR",
+            "phoneNumber": "2506610515",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "registrationType": "TRANS",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "VICTORIA",
+        "country": "CA",
+        "postalCode": "V8P 4V1",
+        "region": "BC",
+        "street": "3451 CARTER DRIVE"
+      },
+      "businessName": "FOX LEGAL",
+      "emailAddress": "craig@foxlegal.ca",
+      "phoneNumber": "2508914690"
+    },
+    "transferDate": "2025-06-06T06:59:59+00:00"
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "OLSON 25-5554",
+    "consideration": "$115,000.00",
+    "createDateTime": "2025-06-05T17:14:56+00:00",
+    "declaredValue": 115000,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "1996 GIBRALTAR 14353",
+        "model": "",
+        "year": 1996
+      },
+      "csaNumber": "429837",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "MODULINE INDUSTRIES (CANADA) LTD.",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 66,
+          "lengthInches": 0,
+          "serialNumber": "0317134",
+          "widthFeet": 14,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSFER DUE TO SALE OR GIFT",
+    "documentId": "10204967",
+    "documentRegistrationNumber": "00559558",
+    "documentType": "TRAN",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "QUESNEL",
+        "country": "CA",
+        "postalCode": "V2J 5G9",
+        "region": "BC",
+        "street": "704 RACING RD"
+      },
+      "block": "A",
+      "districtLot": "6684",
+      "landDistrict": "CARIBOO",
+      "leaveProvince": false,
+      "locationId": 203075,
+      "locationType": "OTHER",
+      "permitWithinSamePark": false,
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "079425",
+    "ownLand": true,
+    "ownerGroups": [
+      {
+        "groupId": 8,
+        "owners": [
+          {
+            "address": {
+              "city": "QUESNEL",
+              "country": "CA",
+              "postalCode": "V2J 6C2",
+              "region": "BC",
+              "street": "2482 RED BLUFF RD"
+            },
+            "individualName": {
+              "first": "DAVID",
+              "last": "OLSON",
+              "middle": "LLOYD"
+            },
+            "ownerId": 1017519,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2509911771",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          },
+          {
+            "address": {
+              "city": "QUESNEL",
+              "country": "CA",
+              "postalCode": "V2J 6C2",
+              "region": "BC",
+              "street": "2482 RED BLUFF RD"
+            },
+            "individualName": {
+              "first": "COURTNEY",
+              "last": "OLSON",
+              "middle": "ANN"
+            },
+            "ownerId": 1017520,
+            "partyType": "OWNER_IND",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "JOINT"
+      }
+    ],
+    "previousOwnerGroups": [
+      {
+        "groupId": 7,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "QUESNEL",
+              "country": "CA",
+              "postalCode": "V2J 6J6",
+              "region": "BC",
+              "street": "1892 HIGDON RD"
+            },
+            "individualName": {
+              "first": "THERESA",
+              "last": "BEAULIEU",
+              "middle": "LYNN"
+            },
+            "ownerId": 1015958,
+            "partyType": "OWNER_IND",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          },
+          {
+            "address": {
+              "city": "WILLIAMS LAKE",
+              "country": "CA",
+              "postalCode": "V2G 1A4",
+              "region": "BC",
+              "street": "1213 LAKEVIEW CRES"
+            },
+            "individualName": {
+              "first": "MARK",
+              "last": "FARNSWORTH",
+              "middle": "FRANK"
+            },
+            "ownerId": 1015959,
+            "partyType": "OWNER_IND",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          },
+          {
+            "address": {
+              "city": "WILLIAMS LAKE",
+              "country": "CA",
+              "postalCode": "V2G 5H5",
+              "region": "BC",
+              "street": "4663 SPRINGFIELD RD"
+            },
+            "individualName": {
+              "first": "SHANE",
+              "last": "FARNSWORTH",
+              "middle": "DANIEL"
+            },
+            "ownerId": 1015960,
+            "partyType": "OWNER_IND",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "JOINT"
+      }
+    ],
+    "registrationType": "TRANS",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "WILLIAMS LAKE",
+        "country": "CA",
+        "postalCode": "V2G 1Z5",
+        "region": "BC",
+        "street": "206-197 2ND AVENUE NORTH"
+      },
+      "businessName": "GINA CALABRESE LAW OFFICE",
+      "emailAddress": "bonnieandrews@shaw.ca",
+      "phoneNumber": "2503927917"
+    },
+    "transferDate": "2025-06-05T06:59:59+00:00"
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "",
+    "createDateTime": "2025-06-05T17:19:43+00:00",
+    "declaredValue": 0,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "MESA 2064-128",
+        "model": "",
+        "year": 2013
+      },
+      "csaNumber": "004734",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "TRIPLE M HOUSING LTD",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 64,
+          "lengthInches": 0,
+          "serialNumber": "G131679",
+          "widthFeet": 20,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSPORT PERMIT",
+    "documentId": "90051597",
+    "documentRegistrationNumber": "00559559",
+    "documentType": "REG_103",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "WONOWON",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "20633 UPPER HALFWAY RD 117"
+      },
+      "leaveProvince": false,
+      "legalDescription": "THE FRACTIONAL EAST 1/2 OF DISTRICT LOT 1301 PEACE RIVER DISTRICT EXCEPT PLAN PGP37245 AND PART DEDICATED ROAD ON PLAN BCP25508",
+      "locationId": 203914,
+      "locationType": "OTHER",
+      "pidNumber": "014826356",
+      "status": "ACTIVE",
+      "taxCertificate": true,
+      "taxExpiryDate": "2025-12-30T07:01:00+00:00"
+    },
+    "mhrNumber": "098597",
+    "note": {
+      "createDateTime": "2025-06-05T17:19:43+00:00",
+      "documentDescription": "TRANSPORT PERMIT",
+      "documentId": "90051597",
+      "documentRegistrationNumber": "00559559",
+      "documentType": "REG_103",
+      "expiryDateTime": "2025-07-06T06:59:59+00:00",
+      "remarks": "",
+      "status": "ACTIVE"
+    },
+    "ownLand": true,
+    "ownerGroups": [
+      {
+        "groupId": 5,
+        "owners": [
+          {
+            "address": {
+              "city": "FORT ST JOHN",
+              "country": "CA",
+              "postalCode": "V1J 4H6",
+              "region": "BC",
+              "street": "PO BOX 6057"
+            },
+            "organizationName": "PEACELAND FARM LTD.",
+            "ownerId": 1015962,
+            "partyType": "OWNER_BUS",
+            "phoneNumber": "2502618646",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "previousLocation": {
+      "address": {
+        "city": "BUICK CREEK",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "13400 BUICK CREEK ROAD"
+      },
+      "leaveProvince": false,
+      "legalDescription": "THE NORTH EAST 1/4 OF SECTION 9 TOWNSHIP 110 PEACE RIVER DISTRICT",
+      "locationId": 167421,
+      "locationType": "OTHER",
+      "pidNumber": "010601031",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "registrationType": "PERMIT",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "FORT ST JOHN",
+        "country": "CA",
+        "postalCode": "V1J 4H6",
+        "region": "BC",
+        "street": "PO BOX 6051"
+      },
+      "emailAddress": "billst75@yahoo.com",
+      "personName": {
+        "first": "WILHELM",
+        "last": "STADLER"
+      },
+      "phoneNumber": "2502618646"
+    }
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "",
+    "consideration": "1.00 and natural love and affection",
+    "createDateTime": "2025-06-05T17:28:05+00:00",
+    "declaredValue": 70000,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "PARAMOUNT",
+        "model": "",
+        "year": 1974
+      },
+      "csaNumber": "",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "BENDIX",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 60,
+          "lengthInches": 0,
+          "serialNumber": "GDSCEYMP60X125462",
+          "widthFeet": 12,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSFER DUE TO SALE OR GIFT",
+    "documentId": "10204968",
+    "documentRegistrationNumber": "00559560",
+    "documentType": "TRAN",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "WILLIAMS LAKE",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "895 OTTOMAN DRIVE"
+      },
+      "leaveProvince": false,
+      "legalDescription": "DISTRICT LOT 1237 CARIBOO  DISTRICT",
+      "locationId": 127449,
+      "locationType": "OTHER",
+      "pidNumber": "004596391",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "024979",
+    "ownLand": true,
+    "ownerGroups": [
+      {
+        "groupId": 3,
+        "owners": [
+          {
+            "address": {
+              "city": "WILLIAMS LAKE",
+              "country": "CA",
+              "postalCode": "V2G 4P9",
+              "region": "BC",
+              "street": "322 WOODLAND DR"
+            },
+            "individualName": {
+              "first": "GERALD",
+              "last": "TENNING",
+              "middle": "DOUGLAS"
+            },
+            "ownerId": 1017523,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2502679451",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          },
+          {
+            "address": {
+              "city": "WILLIAMS LAKE",
+              "country": "CA",
+              "postalCode": "V2G 4P9",
+              "region": "BC",
+              "street": "322 WOODLAND DR"
+            },
+            "individualName": {
+              "first": "MICHELE",
+              "last": "TENNING",
+              "middle": "LOUISE"
+            },
+            "ownerId": 1017524,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2502679451",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "JOINT"
+      }
+    ],
+    "previousOwnerGroups": [
+      {
+        "groupId": 2,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "WILLIAMS LAKE",
+              "country": "CA",
+              "postalCode": "V2G 2P1",
+              "region": "BC",
+              "street": "OTTOMAN ROAD, COMP 22, RR #1"
+            },
+            "individualName": {
+              "first": "ELIZABETH",
+              "last": "NODDIN",
+              "middle": "LOUISE"
+            },
+            "ownerId": 429921,
+            "partyType": "OWNER_IND",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "registrationType": "TRANS",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "100 MILE HOUSE",
+        "country": "CA",
+        "postalCode": "V0K 2E0",
+        "region": "BC",
+        "street": "PO BOX 2105",
+        "streetAdditional": "8 - 575B ALDER AVEUNE"
+      },
+      "businessName": "STEPHEN PELLIZZARI NOTARY PUBLIC",
+      "emailAddress": "spellizzari@telus.net",
+      "phoneNumber": "2503954545"
+    },
+    "transferDate": "2025-06-04T06:59:59+00:00"
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "5663.25P",
+    "consideration": "$275,000",
+    "createDateTime": "2025-06-05T18:00:22+00:00",
+    "declaredValue": 275000,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "1990 DARTMOUTH 14312",
+        "model": "",
+        "year": 1990
+      },
+      "csaNumber": "",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "MODULINE INDUSTRIES (CANADA) LTD.",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 66,
+          "lengthInches": 0,
+          "serialNumber": "0312874",
+          "widthFeet": 14,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSFER DUE TO SALE OR GIFT",
+    "documentId": "10204969",
+    "documentRegistrationNumber": "00559561",
+    "documentType": "TRAN",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "PARKSVILLE",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "CRAIG STREET"
+      },
+      "leaveProvince": false,
+      "locationId": 76460,
+      "locationType": "MH_PARK",
+      "pad": "394-D",
+      "parkName": "MERIDIAN GARDENS CO-OP ASSOCIATION MHP",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "063446",
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 3,
+        "owners": [
+          {
+            "address": {
+              "city": "PARKSVILLE",
+              "country": "CA",
+              "postalCode": "V9P 1L4",
+              "region": "BC",
+              "street": "D-394 CRAIG ST"
+            },
+            "individualName": {
+              "first": "LYNNDIE",
+              "last": "DZURIS",
+              "middle": "MARILYN"
+            },
+            "ownerId": 1017526,
+            "partyType": "OWNER_IND",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "previousOwnerGroups": [
+      {
+        "groupId": 2,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "PARKSVILLE",
+              "country": "CA",
+              "postalCode": "V9P 1L4",
+              "region": "BC",
+              "street": "394 D GRAIG STREET"
+            },
+            "individualName": {
+              "first": "HEINZ",
+              "last": "RIEGER",
+              "middle": "FRITZ"
+            },
+            "ownerId": 953798,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2502482349",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "registrationType": "TRANS",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "NANAIMO",
+        "country": "CA",
+        "postalCode": "V9X 1B3",
+        "region": "BC",
+        "street": "1972 CINNABAR DR"
+      },
+      "businessName": "MARY NICHOL NOTARY CORPORATION",
+      "emailAddress": "nicholnotary@shaw.ca",
+      "phoneNumber": "2507166498"
+    },
+    "transferDate": "2025-06-04T06:59:59+00:00"
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "890511",
+    "createDateTime": "2025-06-05T18:04:00+00:00",
+    "declaredValue": 62000,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "MONARCH MODEL NO. 2512",
+        "model": "",
+        "year": 1976
+      },
+      "csaNumber": "",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "MONARCH INDUSTRIES (CANADA) LTD. PENTICTON, B.C.",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 2,
+      "sections": [
+        {
+          "lengthFeet": 48,
+          "lengthInches": 0,
+          "serialNumber": "3G6078",
+          "widthFeet": 24,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSFER TO SURVIVING JOINT TENANT(S)",
+    "documentId": "10204970",
+    "documentRegistrationNumber": "00559562",
+    "documentType": "DEAT",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "VICTORIA",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "1375 CRAIGFLOWER ROAD"
+      },
+      "leaveProvince": false,
+      "locationId": 5987,
+      "locationType": "MH_PARK",
+      "pad": "28",
+      "parkName": "GEORGE ESTATES",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "023870",
+    "ownLand": true,
+    "ownerGroups": [
+      {
+        "groupId": 4,
+        "owners": [
+          {
+            "address": {
+              "city": "VICTORIA",
+              "country": "CA",
+              "postalCode": "V9A 2X9",
+              "region": "BC",
+              "street": "28 - 1375 CRAIGFLOWER ROAD"
+            },
+            "individualName": {
+              "first": "JAMES",
+              "last": "HUMPHREYS",
+              "middle": "MURRAY"
+            },
+            "ownerId": 1017528,
+            "partyType": "OWNER_IND",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "previousOwnerGroups": [
+      {
+        "groupId": 3,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "VICTORIA",
+              "country": "CA",
+              "postalCode": "V9A 2X9",
+              "region": "BC",
+              "street": "28 - 1375 CRAIGFLOWER ROAD"
+            },
+            "individualName": {
+              "first": "MARY",
+              "last": "HUMPHREYS"
+            },
+            "ownerId": 653408,
+            "partyType": "OWNER_IND",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          },
+          {
+            "address": {
+              "city": "VICTORIA",
+              "country": "CA",
+              "postalCode": "V9A 2X9",
+              "region": "BC",
+              "street": "28 - 1375 CRAIGFLOWER ROAD"
+            },
+            "individualName": {
+              "first": "JAMES",
+              "last": "HUMPHREYS",
+              "middle": "MURRAY"
+            },
+            "ownerId": 653413,
+            "partyType": "OWNER_IND",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "JOINT"
+      }
+    ],
+    "registrationType": "TRAND",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "VICTORIA",
+        "country": "CA",
+        "postalCode": "V9B 2X8",
+        "region": "BC",
+        "street": "813 GOLDSTREAM AVE"
+      },
+      "businessName": "DINNING HUNTER JACKSON LAW",
+      "emailAddress": "anna@dinninghunter.com",
+      "phoneNumber": "2504781731"
+    }
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "25-1702-T",
+    "consideration": "1.00",
+    "createDateTime": "2025-06-05T18:17:02+00:00",
+    "declaredValue": 219000,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "2010 WINFIELD/CS-6421",
+        "model": "",
+        "year": 2009
+      },
+      "csaNumber": "MB-1336",
+      "csaStandard": "Z240",
+      "engineerName": "",
+      "manufacturer": "SRI HOMES INC. (WINFIELD)",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 67,
+          "lengthInches": 0,
+          "serialNumber": "WIN14670906237",
+          "widthFeet": 13,
+          "widthInches": 8
+        }
+      ]
+    },
+    "documentDescription": "TRANSFER DUE TO SALE OR GIFT",
+    "documentId": "10204971",
+    "documentRegistrationNumber": "00559563",
+    "documentType": "TRAN",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "ROSSLAND",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "891 MONTE VISTA DRIVE"
+      },
+      "leaveProvince": false,
+      "locationId": 156092,
+      "locationType": "MH_PARK",
+      "pad": "16",
+      "parkName": "ROSSLAND PARADISE MHP",
+      "permitWithinSamePark": false,
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "095997",
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 5,
+        "owners": [
+          {
+            "address": {
+              "city": "ROSSLAND",
+              "country": "CA",
+              "postalCode": "V0G 1Y0",
+              "region": "BC",
+              "street": "BOX 232"
+            },
+            "individualName": {
+              "first": "LAWRENCE",
+              "last": "ZANUSSI",
+              "middle": "JOSEPH"
+            },
+            "ownerId": 1017530,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2502327776",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          },
+          {
+            "address": {
+              "city": "TRAIL",
+              "country": "CA",
+              "postalCode": "V1R 4T9",
+              "region": "BC",
+              "street": "460 WHITMAN WAY"
+            },
+            "individualName": {
+              "first": "JAY",
+              "last": "ZANUSSI",
+              "middle": "JOSEPH IGINO"
+            },
+            "ownerId": 1017531,
+            "partyType": "OWNER_IND",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "JOINT"
+      }
+    ],
+    "previousOwnerGroups": [
+      {
+        "groupId": 4,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "ROSSLAND",
+              "country": "CA",
+              "postalCode": "V0G 1Y0",
+              "region": "BC",
+              "street": "BOX 232"
+            },
+            "individualName": {
+              "first": "LAWRENCE",
+              "last": "ZANUSSI",
+              "middle": "JOSEPH"
+            },
+            "ownerId": 775024,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2502327776",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "registrationType": "TRANS",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "TRAIL",
+        "country": "CA",
+        "postalCode": "V1R 4B8",
+        "region": "BC",
+        "street": "302 1199 CEDAR AVENUE"
+      },
+      "businessName": "THOMPSON LEROSE & BROWN (TRAIL)",
+      "emailAddress": "treena@tlb.bc.ca",
+      "phoneNumber": "2503683327"
+    },
+    "transferDate": "2025-06-06T06:59:59+00:00"
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "",
+    "createDateTime": "2025-06-05T18:18:00+00:00",
+    "declaredDateTime": "2018-02-01T20:19:46+00:00",
+    "declaredValue": 110000,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "1996 GIBRALTAR 14374",
+        "model": "",
+        "year": 1995
+      },
+      "csaNumber": "468508",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "MODULINE INDUSTRIES (CANADA) LTD.",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 66,
+          "lengthInches": 0,
+          "serialNumber": "0316941",
+          "widthFeet": 14,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "PUBLIC AMENDMENT",
+    "documentId": "63850535",
+    "documentRegistrationNumber": "00559564",
+    "documentType": "PUBA",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "KAMLOOPS",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "2400 OAKDALE WAY"
+      },
+      "leaveProvince": false,
+      "locationId": 93651,
+      "locationType": "MH_PARK",
+      "pad": "6",
+      "parkName": "OAKDALE TRAILER PARK",
+      "permitWithinSamePark": false,
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "078870",
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 9,
+        "owners": [
+          {
+            "address": {
+              "city": "KAMLOOPS",
+              "country": "CA",
+              "postalCode": "V2B 6W7",
+              "region": "BC",
+              "street": "#6 2400 OAKDALE WAY"
+            },
+            "individualName": {
+              "first": "GARY",
+              "last": "MASSON",
+              "middle": "RENE"
+            },
+            "ownerId": 1017533,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2503193197",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          },
+          {
+            "address": {
+              "city": "KAMLOOPS",
+              "country": "CA",
+              "postalCode": "V2B 6W7",
+              "region": "BC",
+              "street": "6-2400 OAKDALE WAY"
+            },
+            "individualName": {
+              "first": "SHARON",
+              "last": "MASSON",
+              "middle": "LOUISE"
+            },
+            "ownerId": 1017534,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2503193197",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "JOINT"
+      }
+    ],
+    "permitExtended": false,
+    "permitLandStatusConfirmation": false,
+    "previousLocation": {
+      "address": {
+        "city": "KAMLOOPS",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "936 YELLOWHEAD HIGHWAY"
+      },
+      "dealerName": "METRO HOMES (KAMLOOPS) LTD.",
+      "leaveProvince": false,
+      "locationId": 77219,
+      "locationType": "MANUFACTURER",
+      "status": "HISTORICAL",
+      "taxCertificate": false
+    },
+    "previousOwnerGroups": [
+      {
+        "groupId": 8,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "KAMLOOPS",
+              "country": "CA",
+              "postalCode": "V2B 6W7",
+              "region": "BC",
+              "street": "#6 2400 OAKDALE WAY"
+            },
+            "individualName": {
+              "first": "GARY",
+              "last": "MASSON",
+              "middle": "RENE"
+            },
+            "ownerId": 848902,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2503193197",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          },
+          {
+            "address": {
+              "city": "KAMLOOPS",
+              "country": "CA",
+              "postalCode": "V2B 6W7",
+              "region": "BC",
+              "street": "#6 2400 OAKDALE WAY"
+            },
+            "individualName": {
+              "first": "SHARON",
+              "last": "MASSON",
+              "middle": "LOUSE"
+            },
+            "ownerId": 848903,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2503193197",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "JOINT"
+      }
+    ],
+    "registrationType": "REG_STAFF_ADMIN",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "KAMLOOPS",
+        "country": "CA",
+        "postalCode": "V2B 6W7",
+        "region": "BC",
+        "street": "6-2400 OAKDALE WAY"
+      },
+      "emailAddress": "lisaevanoff84@gmail.com",
+      "personName": {
+        "first": "SHARON",
+        "last": "MASSON",
+        "middle": "LOUISE"
+      },
+      "phoneNumber": "2503193197"
+    }
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "",
+    "createDateTime": "2025-06-05T18:21:36+00:00",
+    "declaredValue": 186000,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "1996 GIBRALTAR 14374",
+        "model": "",
+        "year": 1995
+      },
+      "csaNumber": "468508",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "MODULINE INDUSTRIES (CANADA) LTD.",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 66,
+          "lengthInches": 0,
+          "serialNumber": "0316941",
+          "widthFeet": 14,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSFER TO SURVIVING JOINT TENANT(S)",
+    "documentId": "63850544",
+    "documentRegistrationNumber": "00559565",
+    "documentType": "DEAT",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "KAMLOOPS",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "2400 OAKDALE WAY"
+      },
+      "leaveProvince": false,
+      "locationId": 93651,
+      "locationType": "MH_PARK",
+      "pad": "6",
+      "parkName": "OAKDALE TRAILER PARK",
+      "permitWithinSamePark": false,
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "078870",
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 10,
+        "owners": [
+          {
+            "address": {
+              "city": "KAMLOOPS",
+              "country": "CA",
+              "postalCode": "V2B 6W7",
+              "region": "BC",
+              "street": "6-2400 OAKDALE WAY"
+            },
+            "individualName": {
+              "first": "SHARON",
+              "last": "MASSON",
+              "middle": "LOUISE"
+            },
+            "ownerId": 1017536,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2503193197",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "previousOwnerGroups": [
+      {
+        "groupId": 9,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "KAMLOOPS",
+              "country": "CA",
+              "postalCode": "V2B 6W7",
+              "region": "BC",
+              "street": "#6 2400 OAKDALE WAY"
+            },
+            "individualName": {
+              "first": "GARY",
+              "last": "MASSON",
+              "middle": "RENE"
+            },
+            "ownerId": 1017533,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2503193197",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          },
+          {
+            "address": {
+              "city": "KAMLOOPS",
+              "country": "CA",
+              "postalCode": "V2B 6W7",
+              "region": "BC",
+              "street": "6-2400 OAKDALE WAY"
+            },
+            "individualName": {
+              "first": "SHARON",
+              "last": "MASSON",
+              "middle": "LOUISE"
+            },
+            "ownerId": 1017534,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2503193197",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "JOINT"
+      }
+    ],
+    "registrationType": "TRAND",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "KAMLOOPS",
+        "country": "CA",
+        "postalCode": "V2B 6W7",
+        "region": "BC",
+        "street": "6-2400 OAKDALE WAY"
+      },
+      "emailAddress": "lisaevanoff84@gmail.com",
+      "personName": {
+        "first": "SHARON",
+        "last": "MASSON",
+        "middle": "LOUISE"
+      },
+      "phoneNumber": "2503193197"
+    }
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "",
+    "createDateTime": "2025-06-05T18:29:49+00:00",
+    "declaredValue": 245000,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "1990 DARTMOUTH 24078",
+        "model": "",
+        "year": 1989
+      },
+      "csaNumber": "",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "MODULINE INDUSTRIES (CANADA) LTD.",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 2,
+      "sections": [
+        {
+          "lengthFeet": 44,
+          "lengthInches": 0,
+          "serialNumber": "0312442AB",
+          "widthFeet": 24,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSFER TO EXECUTOR - GRANT OF PROBATE WITH WILL",
+    "documentId": "63836712",
+    "documentRegistrationNumber": "00559566",
+    "documentType": "WILL",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "NANAIMO",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "80 FIFTH STREET"
+      },
+      "leaveProvince": false,
+      "locationId": 134381,
+      "locationType": "MH_PARK",
+      "pad": "32",
+      "parkName": "MOUNTAIN VIEW MHP",
+      "permitWithinSamePark": false,
+      "status": "ACTIVE",
+      "taxCertificate": true,
+      "taxExpiryDate": "2005-01-01T07:59:59+00:00"
+    },
+    "mhrNumber": "066358",
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 14,
+        "owners": [
+          {
+            "address": {
+              "city": "NANAIMO",
+              "country": "CA",
+              "postalCode": "V9R 6N1",
+              "region": "BC",
+              "street": "1904 VALLEY OAK DR"
+            },
+            "description": "EXECUTOR OF THE WILL OF SHEINA ISABELL PATTERSON, DECEASED",
+            "individualName": {
+              "first": "STEPHANIE",
+              "last": "DIDSBURY",
+              "middle": "GRACE"
+            },
+            "ownerId": 1017538,
+            "partyType": "EXECUTOR",
+            "phoneNumber": "2507390613",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "previousOwnerGroups": [
+      {
+        "groupId": 13,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "NANAIMO",
+              "country": "CA",
+              "postalCode": "V9R 1N1",
+              "region": "BC",
+              "street": "32-80 FIFTH STREET"
+            },
+            "individualName": {
+              "first": "SHEINA",
+              "last": "PATTERSON",
+              "middle": "ISABELL"
+            },
+            "ownerId": 909891,
+            "partyType": "OWNER_IND",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "registrationType": "TRANS_WILL",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "NANAIMO",
+        "country": "CA",
+        "postalCode": "V9R 6N1",
+        "region": "BC",
+        "street": "1904 VALLEY OAK DR"
+      },
+      "emailAddress": "stephdids@hotmail.com",
+      "personName": {
+        "first": "STEPHANIE",
+        "last": "DIDSBURY",
+        "middle": "GRACE"
+      },
+      "phoneNumber": "2507390613"
+    }
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "1719",
+    "consideration": "$170000.00",
+    "createDateTime": "2025-06-05T18:52:49+00:00",
+    "declaredValue": 170000,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "ROADCRAFT",
+        "model": "",
+        "year": 1955
+      },
+      "csaNumber": "",
+      "csaStandard": "",
+      "engineerDate": "2012-04-17T07:00:01+00:00",
+      "engineerName": "SOTOLA ENGINEERING INC.",
+      "manufacturer": "*",
+      "otherRemarks": "",
+      "rebuiltRemarks": "REBUILT IN 1996                                                       REBUILT AS A CUSTOM                                                   REBUILT AS 38'L X 28'W",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 35,
+          "lengthInches": 0,
+          "serialNumber": "RDC35551298",
+          "widthFeet": 8,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSFER DUE TO SALE OR GIFT",
+    "documentId": "10204972",
+    "documentRegistrationNumber": "00559567",
+    "documentType": "TRAN",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "VICTORIA",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "1201 CRAIGFLOWER ROAD"
+      },
+      "leaveProvince": false,
+      "locationId": 167903,
+      "locationType": "MH_PARK",
+      "pad": "23",
+      "parkName": "WILDWOOD PARK",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "001824",
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 8,
+        "owners": [
+          {
+            "address": {
+              "city": "VICTORIA",
+              "country": "CA",
+              "postalCode": "V9A 2X9",
+              "region": "BC",
+              "street": "23-1201 CRAIGFLOWER RD"
+            },
+            "individualName": {
+              "first": "JESSICA",
+              "last": "REWERS",
+              "middle": "BROOKE"
+            },
+            "ownerId": 1017540,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2502133222",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "previousOwnerGroups": [
+      {
+        "groupId": 7,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "VICTORIA",
+              "country": "CA",
+              "postalCode": "V9A 2X9",
+              "region": "BC",
+              "street": "23-1201 CRAIGFLOWER RD"
+            },
+            "individualName": {
+              "first": "PAMELA",
+              "last": "MAGEE",
+              "middle": "ANN"
+            },
+            "ownerId": 995484,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "6049898921",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          },
+          {
+            "address": {
+              "city": "VICTORIA",
+              "country": "CA",
+              "postalCode": "V9A 2X9",
+              "region": "BC",
+              "street": "23-1201 CRAIGFLOWER RD"
+            },
+            "individualName": {
+              "first": "EMILIA",
+              "last": "ROSSI",
+              "middle": "RIN"
+            },
+            "ownerId": 995485,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "6049898921",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "JOINT"
+      }
+    ],
+    "registrationType": "TRANS",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "VICTORIA",
+        "country": "CA",
+        "postalCode": "V8R 1B1",
+        "region": "BC",
+        "street": "307 - 1625 OAK BAY AVENUE"
+      },
+      "businessName": "ISLAND LAW OFFICE",
+      "emailAddress": "amy@islandlawoffice.ca",
+      "phoneNumber": "7783505564"
+    },
+    "transferDate": "2025-06-05T06:59:59+00:00"
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "",
+    "consideration": "$141,800.00",
+    "createDateTime": "2025-06-05T19:30:47+00:00",
+    "declaredValue": 141800,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "Rover Tiny Homes",
+        "model": "Woodside",
+        "year": 2025
+      },
+      "csaNumber": "MD-15418",
+      "csaStandard": "A277",
+      "engineerName": "",
+      "manufacturer": "ROVER TINY HOMES LTD.",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 32,
+          "lengthInches": 0,
+          "serialNumber": "MH045",
+          "widthFeet": 12,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSFER DUE TO SALE OR GIFT",
+    "documentId": "80101421",
+    "documentRegistrationNumber": "00559568",
+    "documentType": "TRAN",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "CHILLIWACK",
+        "country": "CA",
+        "postalCode": "V2R 5P5",
+        "region": "BC",
+        "street": "BOX 338 SUITE 8 6014 VEDDER RD"
+      },
+      "dealerName": "ROVER TINY HOMES LTD.",
+      "leaveProvince": false,
+      "locationId": 203608,
+      "locationType": "MANUFACTURER",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "109103",
+    "ownLand": true,
+    "ownerGroups": [
+      {
+        "groupId": 2,
+        "owners": [
+          {
+            "address": {
+              "city": "CENTRAL KOOTENAY",
+              "country": "CA",
+              "postalCode": "V0G 1N0",
+              "region": "BC",
+              "street": "1429 SALISBURY LANE"
+            },
+            "individualName": {
+              "first": "ZACH",
+              "last": "UNRAU"
+            },
+            "ownerId": 1017542,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "1250919421",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "previousOwnerGroups": [
+      {
+        "groupId": 1,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "CHILLIWACK",
+              "country": "CA",
+              "postalCode": "V2R 5P5",
+              "region": "BC",
+              "street": "BOX 338 SUITE 8 6014 VEDDER RD"
+            },
+            "organizationName": "ROVER TINY HOMES LTD.",
+            "ownerId": 1015274,
+            "partyType": "OWNER_BUS",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "registrationType": "TRANS",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "ROSEDALE",
+        "country": "CA",
+        "postalCode": "V0X 0A5",
+        "region": "BC",
+        "street": "51310 YALE RD",
+        "streetAdditional": "PO BOX 36"
+      },
+      "businessName": "ROVER TINY HOMES LTD.",
+      "emailAddress": "david@rovertinyhomes.ca",
+      "phoneNumber": "6047987897"
+    },
+    "transferDate": "2025-06-06T06:59:59+00:00"
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "",
+    "createDateTime": "2025-06-05T19:33:42+00:00",
+    "declaredValue": 0,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "Rover Tiny Homes",
+        "model": "Woodside",
+        "year": 2025
+      },
+      "csaNumber": "MD-15418",
+      "csaStandard": "A277",
+      "engineerName": "",
+      "manufacturer": "ROVER TINY HOMES LTD.",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 32,
+          "lengthInches": 0,
+          "serialNumber": "MH045",
+          "widthFeet": 12,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSPORT PERMIT",
+    "documentId": "80101422",
+    "documentRegistrationNumber": "00559569",
+    "documentType": "REG_103",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "CENTRAL KOOTENAY",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "1429 SALISBURY LN"
+      },
+      "leaveProvince": false,
+      "legalDescription": "STRATA LOT 23 DISTRICT LOT 7827 KOOTENAY DISTRICT STRATA PLAN NES3603  TOGETHER WITH AN INTEREST IN THE COMMON PROPERTY IN PROPORTION TO THE UNIT  ENTITLEMENT OF THE STRATA LOT AS SHOWN ON FORM V",
+      "locationId": 203915,
+      "locationType": "OTHER",
+      "pidNumber": "027793087",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "109103",
+    "note": {
+      "createDateTime": "2025-06-05T19:33:42+00:00",
+      "documentDescription": "TRANSPORT PERMIT",
+      "documentId": "80101422",
+      "documentRegistrationNumber": "00559569",
+      "documentType": "REG_103",
+      "expiryDateTime": "2025-07-06T06:59:59+00:00",
+      "remarks": "",
+      "status": "ACTIVE"
+    },
+    "ownLand": true,
+    "ownerGroups": [
+      {
+        "groupId": 2,
+        "owners": [
+          {
+            "address": {
+              "city": "CENTRAL KOOTENAY",
+              "country": "CA",
+              "postalCode": "V0G 1N0",
+              "region": "BC",
+              "street": "1429 SALISBURY LANE"
+            },
+            "individualName": {
+              "first": "ZACH",
+              "last": "UNRAU"
+            },
+            "ownerId": 1017542,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "1250919421",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "previousLocation": {
+      "address": {
+        "city": "CHILLIWACK",
+        "country": "CA",
+        "postalCode": "V2R 5P5",
+        "region": "BC",
+        "street": "BOX 338 SUITE 8 6014 VEDDER RD"
+      },
+      "dealerName": "ROVER TINY HOMES LTD.",
+      "leaveProvince": false,
+      "locationId": 203608,
+      "locationType": "MANUFACTURER",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "registrationType": "PERMIT",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "ROSEDALE",
+        "country": "CA",
+        "postalCode": "V0X 0A5",
+        "region": "BC",
+        "street": "51310 YALE RD",
+        "streetAdditional": "PO BOX 36"
+      },
+      "businessName": "ROVER TINY HOMES LTD.",
+      "emailAddress": "david@rovertinyhomes.ca",
+      "phoneNumber": "6047987897"
+    }
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "10696",
+    "consideration": "$185647.00",
+    "createDateTime": "2025-06-05T19:50:03+00:00",
+    "declaredValue": 185647,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "Lake Country",
+        "model": "LC-6680",
+        "year": 2025
+      },
+      "csaNumber": "MB-7092",
+      "csaStandard": "Z240",
+      "engineerName": "",
+      "manufacturer": "CHAMPION CANADA MODULAR LTD. / SRI HOMES - KELOWNA DIVISION",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 68,
+          "lengthInches": 0,
+          "serialNumber": "313000Z010696A",
+          "widthFeet": 15,
+          "widthInches": 8
+        }
+      ]
+    },
+    "documentDescription": "TRANSFER DUE TO SALE OR GIFT",
+    "documentId": "80101423",
+    "documentRegistrationNumber": "00559570",
+    "documentType": "TRAN",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "KELOWNA",
+        "country": "CA",
+        "postalCode": "V4V 1S5",
+        "region": "BC",
+        "street": "9500 JIM BAILEY ROAD"
+      },
+      "dealerName": "CHAMPION CANADA MODULAR LTD. / SRI HOMES - KELOWNA DIVISION",
+      "leaveProvince": false,
+      "locationId": 203379,
+      "locationType": "MANUFACTURER",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "109011",
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 2,
+        "owners": [
+          {
+            "address": {
+              "city": "BURNS LAKE",
+              "country": "CA",
+              "postalCode": "V0J 1E0",
+              "region": "BC",
+              "street": "800 RICHMOND LOOP ROAD",
+              "streetAdditional": "PO BOX 420"
+            },
+            "organizationName": "PINE RIDGE MODULAR LTD.",
+            "ownerId": 1017545,
+            "partyType": "OWNER_BUS",
+            "phoneNumber": "2506923375",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "previousOwnerGroups": [
+      {
+        "groupId": 1,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "KELOWNA",
+              "country": "CA",
+              "postalCode": "V4V 1S5",
+              "region": "BC",
+              "street": "9500 JIM BAILEY ROAD"
+            },
+            "organizationName": "CHAMPION CANADA MODULAR LTD.",
+            "ownerId": 1013544,
+            "partyType": "OWNER_BUS",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "registrationType": "TRANS",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "KELOWNA",
+        "country": "CA",
+        "postalCode": "V4V 1S5",
+        "region": "BC",
+        "street": "SRI HOMES - KELOWNA DIVISION",
+        "streetAdditional": "9500 JIM BAILEY ROAD"
+      },
+      "businessName": "CHAMPION CANADA MODULAR LTD.",
+      "emailAddress": "mpeterson@championhomes.com",
+      "phoneExtension": "3122",
+      "phoneNumber": "7786992129"
+    },
+    "transferDate": "2025-06-06T06:59:59+00:00"
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "9682231-5",
+    "consideration": "$41475.00",
+    "createDateTime": "2025-06-05T20:01:14+00:00",
+    "declaredValue": 119000,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "MONARCH",
+        "model": "",
+        "year": 1977
+      },
+      "csaNumber": "",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "MODULINE",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 2,
+      "sections": [
+        {
+          "lengthFeet": 48,
+          "lengthInches": 0,
+          "serialNumber": "6360",
+          "widthFeet": 24,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSFER DUE TO SALE OR GIFT",
+    "documentId": "10204973",
+    "documentRegistrationNumber": "00559571",
+    "documentType": "TRAN",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "ROSEDALE",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "10704 HIGHWAY 9 FRONTAGE ROAD"
+      },
+      "dealerName": "Yellowbird Storage-Popkum Yard",
+      "leaveProvince": false,
+      "locationId": 202559,
+      "locationType": "MANUFACTURER",
+      "permitWithinSamePark": false,
+      "status": "ACTIVE",
+      "taxCertificate": true,
+      "taxExpiryDate": "2024-12-31T08:01:00+00:00"
+    },
+    "mhrNumber": "025944",
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 8,
+        "owners": [
+          {
+            "address": {
+              "city": "QUESNEL",
+              "country": "CA",
+              "postalCode": "V2J 6H3",
+              "region": "BC",
+              "street": "1163 MARSH ROAD"
+            },
+            "individualName": {
+              "first": "DAVID",
+              "last": "ENTWISTLE"
+            },
+            "ownerId": 1017547,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "6048322513",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          },
+          {
+            "address": {
+              "city": "QUESNEL",
+              "country": "CA",
+              "postalCode": "V2J 6H3",
+              "region": "BC",
+              "street": "1163 MARSH ROAD"
+            },
+            "individualName": {
+              "first": "AMBER",
+              "last": "ENTWISTLE"
+            },
+            "ownerId": 1017548,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "6048322513",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "JOINT"
+      }
+    ],
+    "previousOwnerGroups": [
+      {
+        "groupId": 7,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "CHILLIWACK",
+              "country": "CA",
+              "postalCode": "V2R 3E5",
+              "region": "BC",
+              "street": "5920 WILKINS DR"
+            },
+            "organizationName": "YELLOWBIRD MOBILE HOMES INC.",
+            "ownerId": 1007740,
+            "partyType": "OWNER_BUS",
+            "phoneNumber": "6048194471",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "registrationType": "TRANS",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "VANCOUVER",
+        "country": "CA",
+        "postalCode": "V6C 1J9",
+        "region": "BC",
+        "street": "200 890 WEST PENDER STREET"
+      },
+      "businessName": "DYE & DURHAM",
+      "emailAddress": "cyndy.cox@dyedurham.com",
+      "phoneExtension": "2211",
+      "phoneNumber": "8662852200"
+    },
+    "transferDate": "2025-06-06T06:59:59+00:00"
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "32943",
+    "createDateTime": "2025-06-05T20:18:36+00:00",
+    "declaredValue": 0,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "SAFEWAY",
+        "model": "",
+        "year": 1972
+      },
+      "csaNumber": "",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "SAFEWAY",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 64,
+          "lengthInches": 0,
+          "serialNumber": "685721309",
+          "widthFeet": 12,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "RESIDENTIAL EXEMPTION",
+    "documentId": "10204974",
+    "documentRegistrationNumber": "00559572",
+    "documentType": "EXRS",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "ELKFORD",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "503 BLACK DIAMOND CRESCENT"
+      },
+      "districtLot": "3512",
+      "landDistrict": "KOOTENAY",
+      "leaveProvince": false,
+      "locationId": 16418,
+      "locationType": "OTHER",
+      "lot": "20",
+      "plan": "13132",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "023758",
+    "note": {
+      "createDateTime": "2025-06-05T20:18:36+00:00",
+      "destroyed": false,
+      "documentDescription": "RESIDENTIAL EXEMPTION",
+      "documentId": "10204974",
+      "documentRegistrationNumber": "00559572",
+      "documentType": "EXRS",
+      "effectiveDateTime": "2025-06-05T20:18:36+00:00",
+      "remarks": "",
+      "status": "ACTIVE"
+    },
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "SPARWOOD",
+              "country": "CA",
+              "postalCode": "V0B 2G0",
+              "region": "BC",
+              "street": "PO BOX 663"
+            },
+            "individualName": {
+              "first": "ROBERT",
+              "last": "MACRAE",
+              "middle": "NORMAN"
+            },
+            "ownerId": 24479,
+            "partyType": "OWNER_IND",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "registrationType": "EXEMPTION_RES",
+    "status": "EXEMPT",
+    "submittingParty": {
+      "address": {
+        "city": "CRANBROOK",
+        "country": "CA",
+        "postalCode": "V1C 1A4",
+        "region": "BC",
+        "street": "SUITE 201-907 BAKER STREET"
+      },
+      "businessName": "ROCKIES LAW CORPORATION",
+      "emailAddress": "lhaarstad@rockieslaw.com",
+      "phoneNumber": "2504336241"
+    }
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "349370-1",
+    "consideration": "$165000.00",
+    "createDateTime": "2025-06-05T20:26:17+00:00",
+    "declaredValue": 165000,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "1992 GIBRALTAR 14350",
+        "model": "",
+        "year": 1991
+      },
+      "csaNumber": "",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "MODULINE INDUSTRIES (CANADA) LTD.",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 66,
+          "lengthInches": 0,
+          "serialNumber": "0314124",
+          "widthFeet": 14,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSFER DUE TO SALE OR GIFT",
+    "documentId": "10204975",
+    "documentRegistrationNumber": "00559573",
+    "documentType": "TRAN",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "WILLIAMS LAKE",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "1322 DOG CREEK ROAD"
+      },
+      "leaveProvince": false,
+      "locationId": 101202,
+      "locationType": "MH_PARK",
+      "pad": "7",
+      "parkName": "MOUNTVIEW MANUFACTURED HOME PARK",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "068406",
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 9,
+        "owners": [
+          {
+            "address": {
+              "city": "WILLIAMS LAKE",
+              "country": "CA",
+              "postalCode": "V2G 3C2",
+              "region": "BC",
+              "street": "1607 JUNIPER ST"
+            },
+            "individualName": {
+              "first": "NIKI",
+              "last": "LYONS",
+              "middle": "ANN"
+            },
+            "ownerId": 1017551,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2503058505",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          },
+          {
+            "address": {
+              "city": "WILLIAMS LAKE",
+              "country": "CA",
+              "postalCode": "V2G 3G9",
+              "region": "BC",
+              "street": "7-1322 DOG CREEK RD"
+            },
+            "individualName": {
+              "first": "HAYDEN",
+              "last": "LYONS",
+              "middle": "CHRISTOPHER"
+            },
+            "ownerId": 1017552,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2503920974",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "JOINT"
+      }
+    ],
+    "previousOwnerGroups": [
+      {
+        "groupId": 8,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "WILLIAMS LAKE",
+              "country": "CA",
+              "postalCode": "V2G 3G9",
+              "region": "BC",
+              "street": "#7-1322 DOG CREEK ROAD"
+            },
+            "individualName": {
+              "first": "RONALD",
+              "last": "NADIN",
+              "middle": "STEVEN"
+            },
+            "ownerId": 991716,
+            "partyType": "OWNER_IND",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          },
+          {
+            "address": {
+              "city": "WILLIAMS LAKE",
+              "country": "CA",
+              "postalCode": "V2G 3G9",
+              "region": "BC",
+              "street": "#7-1322 DOG CREEK ROAD"
+            },
+            "individualName": {
+              "first": "TERRY-LYNNE",
+              "last": "NADIN"
+            },
+            "ownerId": 992309,
+            "partyType": "OWNER_IND",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "JOINT"
+      }
+    ],
+    "registrationType": "TRANS",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "WILLIAMS LAKE",
+        "country": "CA",
+        "postalCode": "V2G 1R1",
+        "region": "BC",
+        "street": "SUITE #5 123 BORLAND STREET"
+      },
+      "businessName": "VANDERBURGH & COMPANY",
+      "emailAddress": "michelle@cariboolaw.com",
+      "phoneNumber": "2503927161"
+    },
+    "transferDate": "2025-06-05T06:59:59+00:00"
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "",
+    "createDateTime": "2025-06-05T20:47:40+00:00",
+    "declaredValue": 0,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "",
+        "model": "BC1658-101-CSP2-4",
+        "year": 2025
+      },
+      "csaNumber": "002742",
+      "csaStandard": "Z240",
+      "engineerName": "",
+      "manufacturer": "TRIPLE M HOUSING LTD.",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 58,
+          "lengthInches": 0,
+          "serialNumber": "S60012933",
+          "widthFeet": 15,
+          "widthInches": 6
+        }
+      ]
+    },
+    "documentDescription": "TRANSPORT PERMIT",
+    "documentId": "10204976",
+    "documentRegistrationNumber": "00559574",
+    "documentType": "REG_103",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "KAMLOOPS",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "2659 QU'APPELLE BOULEVARD"
+      },
+      "dealerName": "Halston Modular Homes Ltd",
+      "leaveProvince": false,
+      "locationId": 203916,
+      "locationType": "MANUFACTURER",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "108976",
+    "note": {
+      "createDateTime": "2025-06-05T20:47:40+00:00",
+      "documentDescription": "TRANSPORT PERMIT",
+      "documentId": "10204976",
+      "documentRegistrationNumber": "00559574",
+      "documentType": "REG_103",
+      "expiryDateTime": "2025-07-06T06:59:59+00:00",
+      "remarks": "",
+      "status": "ACTIVE"
+    },
+    "ownLand": true,
+    "ownerGroups": [
+      {
+        "groupId": 2,
+        "owners": [
+          {
+            "address": {
+              "city": "KAMLOOPS",
+              "country": "CA",
+              "postalCode": "V2C 0C6",
+              "region": "BC",
+              "street": "6767 DALLAS DR"
+            },
+            "organizationName": "HALSTON HOMES LIMITED",
+            "ownerId": 1016814,
+            "partyType": "OWNER_BUS",
+            "phoneNumber": "2505731006",
+            "status": "ACTIVE",
+            "suffix": "1018076BC",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "previousLocation": {
+      "address": {
+        "city": "LETHBRIDGE",
+        "country": "CA",
+        "postalCode": "T1H 0E8",
+        "region": "AB",
+        "street": "3501 GIFFEN RD N"
+      },
+      "dealerName": "TRIPLE M HOUSING LTD.",
+      "leaveProvince": false,
+      "locationId": 203274,
+      "locationType": "MANUFACTURER",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "registrationType": "PERMIT",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "KAMLOOPS",
+        "country": "CA",
+        "postalCode": "V2C 0C6",
+        "region": "BC",
+        "street": "6767 DALLAS DRIVE"
+      },
+      "businessName": "HALSTON MODULAR HOMES LTD.",
+      "emailAddress": "tamara@halstonhomes.com",
+      "phoneNumber": "2505741694"
+    }
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "2025MCCALLUM",
+    "consideration": "$1000.00",
+    "createDateTime": "2025-06-05T21:24:25+00:00",
+    "declaredValue": 1000,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "MEADOWBROOK",
+        "model": "",
+        "year": 1979
+      },
+      "csaNumber": "",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "MANCO HOME SYSTEMS",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 66,
+          "lengthInches": 0,
+          "serialNumber": "A3686",
+          "widthFeet": 14,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSFER DUE TO SALE OR GIFT",
+    "documentId": "10204977",
+    "documentRegistrationNumber": "00559575",
+    "documentType": "TRAN",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "FORT NELSON",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "NAHANNI DRIVE"
+      },
+      "leaveProvince": false,
+      "locationId": 13024,
+      "locationType": "MH_PARK",
+      "pad": "22",
+      "parkName": "VILLERS TRAILER PARK",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "037965",
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 11,
+        "owners": [
+          {
+            "address": {
+              "city": "FORT NELSON",
+              "country": "CA",
+              "postalCode": "V0C 1R0",
+              "region": "BC",
+              "street": "D3 7555 HWY 42 RR1"
+            },
+            "individualName": {
+              "first": "LEONARD",
+              "last": "MCCALLUM",
+              "middle": "ALEXANDER"
+            },
+            "ownerId": 1017555,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2505200970",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "previousOwnerGroups": [
+      {
+        "groupId": 10,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "FORT NELSON",
+              "country": "CA",
+              "postalCode": "V0C 1R0",
+              "region": "BC",
+              "street": "BOX 1656"
+            },
+            "individualName": {
+              "first": "MARTY",
+              "last": "BUCHANAN",
+              "middle": "JAMES"
+            },
+            "ownerId": 977739,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "2502332472",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "registrationType": "TRANS",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "FORT NELSON",
+        "country": "CA",
+        "postalCode": "V0C 1R0",
+        "region": "BC",
+        "street": "BOX 1420",
+        "streetAdditional": "2 5024 50TH AVE. NORTH"
+      },
+      "businessName": "OLIVE MCLEAN NOTARY CORPORATION",
+      "emailAddress": "olive@fnnotary.com",
+      "phoneNumber": "2507742240"
+    },
+    "transferDate": "2025-06-05T06:59:59+00:00"
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "29623",
+    "consideration": "$1.00",
+    "createDateTime": "2025-06-05T21:32:38+00:00",
+    "declaredValue": 228000,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "VELMONT",
+        "model": "",
+        "year": 1975
+      },
+      "csaNumber": "",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "ATCO",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 60,
+          "lengthInches": 0,
+          "serialNumber": "T60254680",
+          "widthFeet": 12,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSFER DUE TO SALE OR GIFT",
+    "documentId": "10204978",
+    "documentRegistrationNumber": "00559576",
+    "documentType": "TRAN",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "PITT MEADOWS",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "19643 PINYON LANE"
+      },
+      "leaveProvince": false,
+      "locationId": 18603,
+      "locationType": "MH_PARK",
+      "pad": "86",
+      "parkName": "MEADOW HIGHLANDS MOBILE HOME CO-OP PARK",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "014059",
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 11,
+        "owners": [
+          {
+            "address": {
+              "city": "EDMONTON",
+              "country": "CA",
+              "postalCode": "T5R 5E3",
+              "region": "AB",
+              "street": "14331 92A AVE NW"
+            },
+            "individualName": {
+              "first": "ROBERT",
+              "last": "SPILLER",
+              "middle": "JAMES"
+            },
+            "ownerId": 1017557,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "7788617365",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "previousOwnerGroups": [
+      {
+        "groupId": 10,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "VERNON",
+              "country": "CA",
+              "postalCode": "V1T 8V4",
+              "region": "BC",
+              "street": "4325 CRYSTAL DR"
+            },
+            "description": "EXECUTOR OF THE WILL OF KENNETH GEORGE SPILLER, DECEASED",
+            "individualName": {
+              "first": "ALBERT",
+              "last": "SPILLER",
+              "middle": "GEORGE"
+            },
+            "ownerId": 1005765,
+            "partyType": "EXECUTOR",
+            "phoneNumber": "6046035371",
+            "status": "ACTIVE",
+            "type": "NA"
+          },
+          {
+            "address": {
+              "city": "EDMONTON",
+              "country": "CA",
+              "postalCode": "T5R 5E3",
+              "region": "AB",
+              "street": "14331 92A AVE NW"
+            },
+            "description": "EXECUTOR OF THE WILL OF KENNETH GEORGE SPILLER, DECEASED",
+            "individualName": {
+              "first": "ROBERT",
+              "last": "SPILLER",
+              "middle": "JAMES"
+            },
+            "ownerId": 1005766,
+            "partyType": "EXECUTOR",
+            "phoneNumber": "7788617365",
+            "status": "ACTIVE",
+            "type": "NA"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "NA"
+      }
+    ],
+    "registrationType": "TRANS",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "PITT MEADOWS",
+        "country": "CA",
+        "postalCode": "V3Y 2P8",
+        "region": "BC",
+        "street": "202-19141 FORD RD"
+      },
+      "businessName": "PEAK LAW GROUP LLP",
+      "emailAddress": "dlytwyn@peaklaw.ca",
+      "phoneNumber": "6044659993"
+    },
+    "transferDate": "2025-05-27T06:59:59+00:00"
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "29623",
+    "consideration": "1",
+    "createDateTime": "2025-06-05T21:43:55+00:00",
+    "declaredValue": 228000,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "VELMONT",
+        "model": "",
+        "year": 1975
+      },
+      "csaNumber": "",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "ATCO",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 1,
+      "sections": [
+        {
+          "lengthFeet": 60,
+          "lengthInches": 0,
+          "serialNumber": "T60254680",
+          "widthFeet": 12,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSFER DUE TO SALE OR GIFT",
+    "documentId": "10204979",
+    "documentRegistrationNumber": "00559577",
+    "documentType": "TRAN",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "PITT MEADOWS",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "19643 PINYON LANE"
+      },
+      "leaveProvince": false,
+      "locationId": 18603,
+      "locationType": "MH_PARK",
+      "pad": "86",
+      "parkName": "MEADOW HIGHLANDS MOBILE HOME CO-OP PARK",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "014059",
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 12,
+        "interest": "Undivided",
+        "interestDenominator": 100,
+        "interestNumerator": 99,
+        "owners": [
+          {
+            "address": {
+              "city": "EDMONTON",
+              "country": "CA",
+              "postalCode": "T5R 5E3",
+              "region": "AB",
+              "street": "14331 92A AVE NW"
+            },
+            "individualName": {
+              "first": "ROBERT",
+              "last": "SPILLER",
+              "middle": "JAMES"
+            },
+            "ownerId": 1017559,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "7788617365",
+            "status": "ACTIVE",
+            "type": "NA"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "NA"
+      },
+      {
+        "groupId": 13,
+        "interest": "Undivided",
+        "interestDenominator": 100,
+        "interestNumerator": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "PITT MEADOWS",
+              "country": "CA",
+              "postalCode": "V3Y 1Z3",
+              "region": "BC",
+              "street": "19643 PINYON LANE"
+            },
+            "individualName": {
+              "first": "JEAN",
+              "last": "SELNES",
+              "middle": "MARIE"
+            },
+            "ownerId": 1017560,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "6047603874",
+            "status": "ACTIVE",
+            "type": "NA"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "NA"
+      }
+    ],
+    "previousOwnerGroups": [
+      {
+        "groupId": 11,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "EDMONTON",
+              "country": "CA",
+              "postalCode": "T5R 5E3",
+              "region": "AB",
+              "street": "14331 92A AVE NW"
+            },
+            "individualName": {
+              "first": "ROBERT",
+              "last": "SPILLER",
+              "middle": "JAMES"
+            },
+            "ownerId": 1017557,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "7788617365",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "registrationType": "TRANS",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "PITT MEADOWS",
+        "country": "CA",
+        "postalCode": "V3Y 2P8",
+        "region": "BC",
+        "street": "202-19141 FORD RD"
+      },
+      "businessName": "PEAK LAW GROUP LLP",
+      "emailAddress": "dlytwyn@peaklaw.ca",
+      "phoneNumber": "6044659993"
+    },
+    "transferDate": "2025-06-05T06:59:59+00:00"
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "256023",
+    "consideration": "1",
+    "createDateTime": "2025-06-05T23:12:37+00:00",
+    "declaredValue": 222100,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "PARKWOOD D-262",
+        "model": "",
+        "year": 1981
+      },
+      "csaNumber": "",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "GENERAL HOME SYSTEMS LTD.",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 2,
+      "sections": [
+        {
+          "lengthFeet": 60,
+          "lengthInches": 0,
+          "serialNumber": "XF2040AB",
+          "widthFeet": 24,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSFER DUE TO SALE OR GIFT",
+    "documentId": "10204980",
+    "documentRegistrationNumber": "00559578",
+    "documentType": "TRAN",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "KELOWNA",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "1929 HIGHWAY 97 SOUTH"
+      },
+      "leaveProvince": false,
+      "locationId": 10839,
+      "locationType": "MH_PARK",
+      "pad": "88",
+      "parkName": "MCDOUGALL CREEK ESTATES",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "053299",
+    "ownLand": false,
+    "ownerGroups": [
+      {
+        "groupId": 12,
+        "owners": [
+          {
+            "address": {
+              "city": "KELOWNA",
+              "country": "CA",
+              "postalCode": "V1Z 2Z1",
+              "region": "BC",
+              "street": "88-1929 HIGHWAY 97 S"
+            },
+            "individualName": {
+              "first": "COLLEEN",
+              "last": "BUDINSKI",
+              "middle": "FRANCES"
+            },
+            "ownerId": 1017562,
+            "partyType": "OWNER_IND",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "previousOwnerGroups": [
+      {
+        "groupId": 11,
+        "groupSequenceNumber": 1,
+        "owners": [
+          {
+            "address": {
+              "city": "KELOWNA",
+              "country": "CA",
+              "postalCode": "V1Z 2Z1",
+              "region": "BC",
+              "street": "88-1929 HIGHWAY 97 S"
+            },
+            "individualName": {
+              "first": "MABEL",
+              "last": "SACKNEY"
+            },
+            "ownerId": 970314,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "7787555722",
+            "status": "ACTIVE",
+            "type": "SOLE"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "SOLE"
+      }
+    ],
+    "registrationType": "TRANS",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "KELOWNA",
+        "country": "CA",
+        "postalCode": "V1Y 6J6",
+        "region": "BC",
+        "street": "101-554 LEON AVE"
+      },
+      "businessName": "ROTHWELL NOTARY CORPORATION",
+      "emailAddress": "kelly@rothwellnotary.com",
+      "phoneExtension": "204",
+      "phoneNumber": "2508614452"
+    },
+    "transferDate": "2025-06-03T06:59:59+00:00"
+  },
+  {
+    "attentionReference": "",
+    "clientReferenceId": "",
+    "createDateTime": "2025-06-05T23:20:50+00:00",
+    "declaredValue": 0,
+    "description": {
+      "baseInformation": {
+        "circa": false,
+        "make": "MONARCH",
+        "model": "",
+        "year": 1977
+      },
+      "csaNumber": "",
+      "csaStandard": "",
+      "engineerName": "",
+      "manufacturer": "MODULINE",
+      "otherRemarks": "",
+      "rebuiltRemarks": "",
+      "sectionCount": 2,
+      "sections": [
+        {
+          "lengthFeet": 48,
+          "lengthInches": 0,
+          "serialNumber": "6360",
+          "widthFeet": 24,
+          "widthInches": 0
+        }
+      ]
+    },
+    "documentDescription": "TRANSPORT PERMIT",
+    "documentId": "90051598",
+    "documentRegistrationNumber": "00559579",
+    "documentType": "REG_103",
+    "hasCaution": false,
+    "location": {
+      "address": {
+        "city": "QUESNEL",
+        "country": "CA",
+        "postalCode": "V2J 1C9",
+        "region": "BC",
+        "street": "577 WILLIS ST"
+      },
+      "leaveProvince": false,
+      "legalDescription": "LOT 20 BLOCK 1 DISTRICT LOT 704 CARIBOO DISTRICT PLAN 5363",
+      "locationId": 203917,
+      "locationType": "OTHER",
+      "pidNumber": "013648063",
+      "status": "ACTIVE",
+      "taxCertificate": false
+    },
+    "mhrNumber": "025944",
+    "note": {
+      "createDateTime": "2025-06-05T23:20:50+00:00",
+      "documentDescription": "TRANSPORT PERMIT",
+      "documentId": "90051598",
+      "documentRegistrationNumber": "00559579",
+      "documentType": "REG_103",
+      "expiryDateTime": "2025-07-06T06:59:59+00:00",
+      "remarks": "",
+      "status": "ACTIVE"
+    },
+    "ownLand": true,
+    "ownerGroups": [
+      {
+        "groupId": 8,
+        "owners": [
+          {
+            "address": {
+              "city": "QUESNEL",
+              "country": "CA",
+              "postalCode": "V2J 6H3",
+              "region": "BC",
+              "street": "1163 MARSH ROAD"
+            },
+            "individualName": {
+              "first": "DAVID",
+              "last": "ENTWISTLE"
+            },
+            "ownerId": 1017547,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "6048322513",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          },
+          {
+            "address": {
+              "city": "QUESNEL",
+              "country": "CA",
+              "postalCode": "V2J 6H3",
+              "region": "BC",
+              "street": "1163 MARSH ROAD"
+            },
+            "individualName": {
+              "first": "AMBER",
+              "last": "ENTWISTLE"
+            },
+            "ownerId": 1017548,
+            "partyType": "OWNER_IND",
+            "phoneNumber": "6048322513",
+            "status": "ACTIVE",
+            "type": "JOINT"
+          }
+        ],
+        "status": "ACTIVE",
+        "tenancySpecified": true,
+        "type": "JOINT"
+      }
+    ],
+    "previousLocation": {
+      "address": {
+        "city": "ROSEDALE",
+        "country": "CA",
+        "postalCode": "",
+        "region": "BC",
+        "street": "10704 HIGHWAY 9 FRONTAGE ROAD"
+      },
+      "dealerName": "Yellowbird Storage-Popkum Yard",
+      "leaveProvince": false,
+      "locationId": 202559,
+      "locationType": "MANUFACTURER",
+      "status": "ACTIVE",
+      "taxCertificate": true,
+      "taxExpiryDate": "2024-12-31T08:01:00+00:00"
+    },
+    "registrationType": "PERMIT",
+    "status": "ACTIVE",
+    "submittingParty": {
+      "address": {
+        "city": "QUESNEL",
+        "country": "CA",
+        "postalCode": "V2J 6H3",
+        "region": "BC",
+        "street": "1168 MARSH RD"
+      },
+      "emailAddress": "daventwistle@gmail.com",
+      "personName": {
+        "first": "DAVID",
+        "last": "ENTWISTLE"
+      },
+      "phoneNumber": "2502558791"
+    }
+  }
+]
