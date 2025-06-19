@@ -370,6 +370,46 @@ export async function searchHistory (): Promise<SearchHistoryResponseIF> {
     })
 }
 
+export async function getPprSearchHistoryById (searchId: string): Promise<SearchHistoryResponseIF> {
+  const url = sessionStorage.getItem('PPR_API_URL')
+  const config = { baseURL: url, headers: { Accept: 'application/json' } }
+  return axios
+    .get<Array<SearchResponseIF>>(`searches/${searchId}`, config)
+    .then(response => {
+      const data = response?.data
+      if (!data) {
+        throw new Error('Invalid API response')
+      }
+      return { searches: data }
+    })
+    .catch(error => {
+      if (error?.response?.data) {
+        try {
+          error.response.data.rootCause = error.response.data.rootCause
+            .replace('detail:', '"detail":"')
+            .replace('type:', '"type":"')
+            .replace('message:', '"message":"')
+            .replace('status_code:', '"statusCode":"')
+            .replaceAll(',', '",')
+          error.response.data.rootCause = `{${error.response.data.rootCause}"}`
+          error.response.data.rootCause = JSON.parse(error.response.data.rootCause)
+        } catch (error) {
+          // continue
+        }
+      }
+      return {
+        searches: null,
+        error: {
+          category: ErrorCategories.HISTORY_SEARCHES,
+          statusCode: error?.response?.status || StatusCodes.INTERNAL_SERVER_ERROR,
+          message: error?.response?.data?.message,
+          detail: error?.response?.data?.rootCause?.detail,
+          type: error?.response?.data?.rootCause?.type?.trim() as ErrorCodes
+        }
+      }
+    })
+}
+
 // Get current user settings (404 if user not created in PPR yet)
 export async function getPPRUserSettings (): Promise<UserSettingsIF> {
   const url = sessionStorage.getItem('PPR_API_URL')

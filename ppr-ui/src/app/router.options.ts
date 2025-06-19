@@ -192,7 +192,7 @@ export default <RouterConfig> {
       ]
     },
     {
-      path: '/ppr/search',
+      path: '/ppr/search/:searchId?',
       name: RouteNames.SEARCH,
       component: Search,
       meta: {

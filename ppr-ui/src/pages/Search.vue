@@ -117,7 +117,7 @@ import {
   saveSelectionsError
 } from '@/resources/dialogOptions'
 import { getFeatureFlag, pacificDate } from '@/utils'
-import { submitSelected, successfulPPRResponses, updateSelected } from '@/utils/ppr-api-helper'
+import { getPprSearchHistoryById, submitSelected, successfulPPRResponses, updateSelected } from '@/utils/ppr-api-helper'
 import type { SearchResultIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
 import { useAuth, useNavigation } from '@/composables'
@@ -148,6 +148,7 @@ export default defineComponent({
     const router = useRouter()
     const { goToDash, navigateToUrl } = useNavigation()
     const { isAuthenticated } = useAuth()
+    const { setSearchResults } = useStore()
     const {
       getSearchedType,
       getUserSettings,
@@ -239,11 +240,11 @@ export default defineComponent({
       })
     })
 
-    onBeforeMount((): void => {
+    onBeforeMount(async (): Promise<void> => {
       window.onbeforeunload = (event) => {
         // unsaved selections if app is ready, search results exist, and on the search page
         const isSearchReportUnsaved = (
-          router.currentRoute.name === RouteNames.SEARCH &&
+          router.currentRoute.value.name === RouteNames.SEARCH &&
           props.appReady &&
           !!getSearchResults
         )
@@ -253,6 +254,22 @@ export default defineComponent({
           // the event.returnValue is now only treated as a flag (added text in case this ever changes)
           event.returnValue = 'You have not saved your search result report. Are you sure you want to leave?'
         }
+      }
+
+      // When a SearchId is present in the url, extract it and load the search results.
+      const currentUrl = router.currentRoute.value.fullPath.split('/')
+      if (!getSearchResults.value?.length && currentUrl.length >= 4) {
+        const searchId = currentUrl[currentUrl.length - 1].split('?')[0]
+        localState.loading = true
+        const { searches } = await getPprSearchHistoryById(searchId)
+        console.log('PPR Search History:', searches)
+        if (searches) {
+          searches.results.forEach((item, index) => {
+            item.id = index + 1
+          })
+        }
+        setSearchResults(searches)
+        localState.loading = false
       }
     })
 

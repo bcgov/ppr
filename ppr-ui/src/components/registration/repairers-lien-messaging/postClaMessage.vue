@@ -37,23 +37,23 @@ const { rlTransitionDate } = storeToRefs(useStore())
         </p>
       </v-col>
 
-      <v-col
-        cols="12"
-        class="mt-4"
-      >
-        <p>
-          <b>Need help?</b> For step-by-step instructions, refer to our
-          <a
-            class="font-weight-regular"
-            href="https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/22009"
-            target="_blank"
-          >
-            Commercial Liens User Guide
-          </a>
-        </p>
+<!--      <v-col-->
+<!--        cols="12"-->
+<!--        class="mt-4"-->
+<!--      >-->
+<!--        <p>-->
+<!--          <b>Need help?</b> For step-by-step instructions, refer to our-->
+<!--          <a-->
+<!--            class="font-weight-regular"-->
+<!--            href="https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/22009"-->
+<!--            target="_blank"-->
+<!--          >-->
+<!--            Commercial Liens User Guide-->
+<!--          </a>-->
+<!--        </p>-->
 
-        <v-divider class="mt-3" />
-      </v-col>
+<!--        <v-divider class="mt-3" />-->
+<!--      </v-col>-->
 
       <v-col
         cols="12"
@@ -70,7 +70,7 @@ const { rlTransitionDate } = storeToRefs(useStore())
         cols="12"
         class="mt-4"
       >
-        <p>Commercial Liens differ from Repairers Liens in the following ways::</p>
+        <p>Commercial Liens differ from Repairers Liens in the following ways:</p>
         <ul class="ml-5 mt-4">
           <li>
             Registration length may be from 1 to 25 years or infinity instead of being a fixed 180 day period

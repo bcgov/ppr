@@ -1,4 +1,10 @@
-import type { ErrorIF, ManufacturedHomeSearchResultIF, SearchCriteriaIF, SearchResultIF } from '@/interfaces'
+import type {
+  ErrorIF,
+  ManufacturedHomeSearchResultIF,
+  PaymentIF,
+  SearchCriteriaIF,
+  SearchResultIF
+} from '@/interfaces'
 
 // Search Query response (search step 1) interface.
 export interface SearchResponseIF {
@@ -16,7 +22,9 @@ export interface SearchResponseIF {
   isPending?: boolean,
   loadingPDF?: boolean,
   userId?: string,
-  username?: string
+  username?: string,
+  payment: PaymentIF,
+  paymentPending?: boolean
 }
 
 export interface ManufacturedHomeSearchResponseIF {
@@ -30,5 +38,7 @@ export interface ManufacturedHomeSearchResponseIF {
   inProgress?: boolean,
   loadingPDF?: boolean,
   userId?: string,
-  username?: string
+  username?: string,
+  payment: PaymentIF,
+  paymentPending?: boolean
 }
