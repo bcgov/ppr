@@ -120,7 +120,7 @@
             v-if="!debtorValid"
             class="pt-4"
           >
-            <span class="fs-14">
+            <span class="fs-14 error-text">
               Your registration must include at least one Debtor
             </span>
           </div>
@@ -139,7 +139,7 @@
             v-if="!collateralValid"
             class="pt-4"
           >
-            <span class="fs-14">
+            <span class="fs-14 error-text">
               Your registration must include at least one form of Collateral
             </span>
           </div>

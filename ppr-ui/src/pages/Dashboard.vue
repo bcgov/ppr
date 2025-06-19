@@ -295,7 +295,7 @@ export default defineComponent({
   emits: ['error', 'haveData'],
   setup (props, context) {
     const router = useRouter()
-    const { navigateToUrl } = useNavigation()
+    const { goToPay, navigateToUrl } = useNavigation()
     const { isAuthenticated } = useAuth()
     const { fetchIsAccountAdmin, qsMsgContent, hideStatusMsg, updateUserMiscSettings } = useUserAccess()
     const {
@@ -424,7 +424,7 @@ export default defineComponent({
       }
     }
 
-    const saveResults = (results: SearchResponseIF | ManufacturedHomeSearchResponseIF) => {
+    const saveResults = async (results: SearchResponseIF | ManufacturedHomeSearchResponseIF) => {
       if (results) {
         if (localState.isMHRSearchType(results.searchQuery.type)) {
           setManufacturedHomeSearchResults(results)
@@ -432,10 +432,15 @@ export default defineComponent({
             name: RouteNames.MHRSEARCH
           })
         } else {
-          setSearchResults(results)
-          router.replace({
-            name: RouteNames.SEARCH
-          })
+          if (results.paymentPending && results.searchId) {
+            await goToPay(results.payment?.invoiceId, results.searchId)
+          }
+          else {
+            setSearchResults(results)
+            router.replace({
+              name: RouteNames.SEARCH
+            })
+          }
         }
       }
     }

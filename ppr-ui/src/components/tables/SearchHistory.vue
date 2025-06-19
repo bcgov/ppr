@@ -433,7 +433,7 @@ export default defineComponent({
                   color="primary"
                   aria-label="Resume Pay Button"
                   variant="outlined"
-                  @click="goToPay(item.invoiceId)"
+                  @click="goToPay(item.invoiceId, item.searchId)"
                 >
                   <span class="fs-14 leading-none">Resume<br>Payment</span>
                 </v-btn>

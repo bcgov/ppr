@@ -263,7 +263,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
     if (!showGroups.value && homeOwnerGroups.length) dropDownItems.shift()
 
     // Handle Edit Defaults
-    if (!dropDownItems.length) return [{ title: 'Group 1 (New Group)', value: DEFAULT_GROUP_ID + 1 }]
+    if (!dropDownItems.length) return [{ title: 'Group 1 (New Group)', value: DEFAULT_GROUP_ID }]
 
     // Only return groups that have NOT been REMOVED
     return dropDownItems.filter(item => {
@@ -564,8 +564,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
   watch([
       hasEmptyGroup,
       showGroups,
-      getMhrRegistrationHomeOwners,
-      getMhrRegistrationHomeOwnerGroups,
+      getTotalOwnershipAllocationStatus,
       isGlobalEditingMode
     ],
     () => {

@@ -187,6 +187,7 @@
 }
 
 .v-table > .v-table__wrapper {
+  overflow: hidden;
   .actions {
     padding-right: 30px;
     width: 100%;
