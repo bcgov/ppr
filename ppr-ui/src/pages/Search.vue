@@ -262,7 +262,6 @@ export default defineComponent({
         const searchId = currentUrl[currentUrl.length - 1].split('?')[0]
         localState.loading = true
         const { searches } = await getPprSearchHistoryById(searchId)
-        console.log('PPR Search History:', searches)
         if (searches) {
           searches.results.forEach((item, index) => {
             item.id = index + 1
