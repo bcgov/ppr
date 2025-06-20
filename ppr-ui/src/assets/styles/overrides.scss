@@ -186,8 +186,8 @@
   padding-bottom: 16px;
 }
 
-.v-table > .v-table__wrapper {
-  overflow: hidden;
+.v-table:not(#registration-table) > .v-table__wrapper {
+  overflow-x: hidden;
   .actions {
     padding-right: 30px;
     width: 100%;
