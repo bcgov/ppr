@@ -409,6 +409,7 @@ def test_find_all_by_account_id_filter(session, reg_num, reg_type, client_ref, r
         assert statement['baseRegistrationNumber']
         if reg_num == 'TEST0018A':
             assert len(statement['changes']) > 0
+        assert statement.get("draftNumber")
         if 'changes' in statement:
             for change in statement['changes']:
                 # current_app.logger.info('reg_num=' + change.get('registrationNumber'))
@@ -430,6 +431,7 @@ def test_find_all_by_account_id_filter(session, reg_num, reg_type, client_ref, r
                     assert change.get('accountId')
                 else:
                     assert 'accountId' not in change
+                assert change.get("draftNumber")
                 #if change['baseRegistrationNumber'] in ('TEST0019', 'TEST0021'):
                 #    assert not change['path']
                 #elif change.get('registrationNumber', '') in ('TEST00D4', 'TEST00R5', 'TEST0007'):
@@ -478,6 +480,7 @@ def test_find_all_by_account_id_api_filter(session, reg_num, client_ref, start_t
         elif not is_ci_testing():
             assert statement['path']
         assert statement['baseRegistrationNumber']
+        assert statement.get("draftNumber")
         if reg_num == 'TEST0018A':
             assert len(statement['changes']) > 0
         if 'changes' in statement:
@@ -496,6 +499,7 @@ def test_find_all_by_account_id_api_filter(session, reg_num, client_ref, start_t
                 if not is_ci_testing():
                     assert 'path' in change
                 assert 'legacy' in change
+                assert change.get("draftNumber")
                 # if change['baseRegistrationNumber'] in ('TEST0019', 'TEST0021'):
                 #    assert not change['path']
                 # elif change.get('registrationNumber', '') == 'TEST00D4':

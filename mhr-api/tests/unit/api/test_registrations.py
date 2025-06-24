@@ -178,9 +178,6 @@ TEST_BATCH_MANUFACTURER_MHREG_DATA = [
     ('Valid default interval may have data', None, None, HTTPStatus.OK, True, False)
 ]
 # testdata pattern is ({desc}, {roles}, {status}, {sort_criteria}, {sort_direction})
-TEST_GET_ACCOUNT_DATA_SORT2 = [
-    ('Sort mhr number', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.MHR_NUMBER_PARAM, None)
-]
 TEST_GET_ACCOUNT_DATA_SORT = [
     ('Sort mhr number', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.MHR_NUMBER_PARAM, None),
     ('Sort reg type asc', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, reg_utils.REG_TYPE_PARAM, reg_utils.SORT_ASCENDING),
@@ -300,6 +297,7 @@ def test_get_account_registrations(session, client, jwt, desc, roles, status, ha
             assert registration['path'] is not None
             if registration['registrationDescription'] == 'REGISTER NEW UNIT':
                 assert 'lienRegistrationType' in registration
+            assert registration.get("draftNumber")
 
 
 @pytest.mark.parametrize('desc,has_submitting,roles,status,has_account,mhr_num', TEST_CREATE_DATA)
@@ -484,6 +482,7 @@ def test_get_account_registrations_sort(session, client, jwt, desc, roles, statu
         assert registration['clientReferenceId'] is not None
         assert registration['ownerNames'] is not None
         assert registration['path'] is not None
+        assert registration.get("draftNumber")
 
 
 @pytest.mark.parametrize('desc,account_id,roles,status,filter_name,filter_value', TEST_GET_ACCOUNT_DATA_FILTER)
@@ -509,6 +508,7 @@ def test_get_account_registrations_filter(session, client, jwt, desc, account_id
         assert registration['clientReferenceId'] is not None
         assert registration['ownerNames'] is not None
         assert registration['path'] is not None
+        assert registration.get("draftNumber")
 
 
 @pytest.mark.parametrize('desc,account_id,roles,status,collapse,filter_start,filter_end',
@@ -540,6 +540,7 @@ def test_get_account_registrations_filter_date(session, client, jwt, desc, accou
         assert registration['clientReferenceId'] is not None
         assert registration['ownerNames'] is not None
         assert registration['path'] is not None
+        assert registration.get("draftNumber")
 
 
 @pytest.mark.parametrize('desc,start_ts,end_ts,status,has_key,download_link',TEST_BATCH_MANUFACTURER_MHREG_DATA)

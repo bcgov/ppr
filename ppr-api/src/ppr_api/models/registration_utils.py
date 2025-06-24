@@ -207,7 +207,12 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
                    WHERE r.user_id = u.username
                 ORDER BY u.id DESC
                 FETCH FIRST 1 ROWS ONLY)
-            ELSE NULL END staff_account_id
+            ELSE NULL END staff_account_id,
+       CASE WHEN r.account_id != '0'
+            THEN (SELECT d.document_number
+                   FROM drafts d
+                  WHERE r.draft_id = d.id)
+            ELSE NULL END draft_number
   FROM registrations r
     INNER JOIN registration_types rt
     ON r.registration_type = rt.registration_type
@@ -629,6 +634,7 @@ def __build_account_reg_result(
         "securedParties": str(row[11]),
         "clientReferenceId": str(row[12]),
         "registeringName": str(row[13]) if row[13] else "",
+        "draftNumber": str(row[18]) if row[18] else "",
     }
     if not api_filter:
         result["vehicleCount"] = int(row[16])
@@ -636,7 +642,7 @@ def __build_account_reg_result(
     if model_utils.is_financing(reg_class) and not api_filter:
         result["expand"] = False
         if params.from_ui:
-            status: str = str(row[18])
+            status: str = str(row[19])
             if status and status == "L":
                 result["paymentPending"] = True
     result = set_path(params, result, reg_num, base_reg_num, int(row[15]))
@@ -674,6 +680,7 @@ def build_add_reg_result(row, account_id: str, base_reg_num: str, reg_num: str) 
         "registeringName": str(row[13]) if row[13] else "",
         "accountId": str(row[14]),
         "vehicleCount": int(row[16]),
+        "draftNumber": str(row[19]) if row[19] else "",
     }
     result["legacy"] = result.get("accountId") == "0"
     if not row[7]:  # Report not generated
