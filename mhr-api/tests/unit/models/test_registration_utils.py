@@ -340,6 +340,7 @@ def test_find_account_sort_order(session, account_id, sort_criteria, sort_order,
         assert registration['path'] is not None
         assert registration['documentId'] is not None
         assert not registration.get('inUserList')
+        assert registration.get("draftNumber")
 
 
 @pytest.mark.parametrize('account_id,collapse,filter_name,filter_value,mhr_numbers,expected_clause',
@@ -489,3 +490,4 @@ def test_find_account_filter(session, account_id, collapse, filter_name, filter_
             assert registration.get("accountId")
         else:
             assert not registration.get("accountId")
+        assert registration.get("draftNumber")

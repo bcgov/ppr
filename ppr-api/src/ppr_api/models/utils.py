@@ -301,6 +301,12 @@ SELECT registration_number, registration_ts, registration_type, registration_typ
                  ORDER BY u.id DESC
                  FETCH FIRST 1 ROWS ONLY)
             ELSE NULL END staff_account_id,
+       CASE WHEN arv.account_id != '0'
+            THEN (SELECT d.document_number
+                   FROM drafts d, registrations r
+                  WHERE arv.registration_id = r.id
+                    AND r.draft_id = d.id)
+            ELSE NULL END draft_number,
        (SELECT r.ver_bypassed FROM registrations r WHERE r.id = arv.registration_id) as locked_status
   FROM account_registration_vw arv
  WHERE arv.account_id = :query_account
@@ -325,7 +331,14 @@ SELECT registration_number, registration_ts, registration_type, registration_typ
                     AND r.user_id = u.username
                  ORDER BY u.id DESC
                  FETCH FIRST 1 ROWS ONLY)
-            ELSE NULL END staff_account_id
+            ELSE NULL END staff_account_id,
+       CASE WHEN arv1.account_id != '0'
+            THEN (SELECT d.document_number
+                   FROM drafts d, registrations r
+                  WHERE arv1.registration_id = r.id
+                    AND r.draft_id = d.id)
+            ELSE NULL END draft_number,
+       (SELECT r.ver_bypassed FROM registrations r WHERE r.id = arv1.registration_id) as locked_status
   FROM account_registration_vw arv1
  WHERE arv1.account_id = :query_account
    AND arv1.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
@@ -372,7 +385,13 @@ SELECT registration_number, registration_ts, registration_type, registration_typ
                     AND r.user_id = u.username
                  ORDER BY u.id DESC
                  FETCH FIRST 1 ROWS ONLY)
-            ELSE NULL END staff_account_id
+            ELSE NULL END staff_account_id,
+       CASE WHEN account_id != '0'
+            THEN (SELECT d.document_number
+                   FROM drafts d, registrations r
+                  WHERE registration_id = r.id
+                    AND r.draft_id = d.id)
+            ELSE NULL END draft_number
   FROM account_registration_vw
  WHERE registration_type_cl NOT IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
    AND (account_id = :query_account OR base_account_id = :query_account)

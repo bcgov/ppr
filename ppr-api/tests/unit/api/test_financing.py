@@ -591,11 +591,15 @@ def test_get_account_registrations_list(session, client, jwt, desc, roles, statu
         headers = create_header(jwt, roles)
 
     # test
-    response = client.get('/api/v1/financing-statements/registrations',
+    response = client.get('/api/v1/financing-statements/registrations?fromUI=true',
                           headers=headers)
 
     # check
     assert response.status_code == status
+    if status == HTTPStatus.OK:
+        json_data = response.json
+        for reg in json_data:
+            assert reg.get("draftNumber")
 
 
 @pytest.mark.parametrize('desc,roles,status,account_id,reg_num', TEST_USER_LIST)
@@ -616,6 +620,8 @@ def test_account_add_registration(session, client, jwt, desc, roles, status, acc
     # check
     assert response.status_code == status
     if desc == 'Valid Request User':
+        json_data = response.json
+        assert json_data.get("draftNumber")
         registration: Registration = Registration.find_by_registration_number(reg_num, account_id, True)
         assert registration.account_id == account_id
 
@@ -658,7 +664,9 @@ def test_account_get_registration(session, client, jwt, desc, roles, status, acc
     # check
     assert response.status_code == status
     if status == HTTPStatus.OK:
-        assert response.json['baseRegistrationNumber']
+        json_data = response.json
+        assert json_data.get("baseRegistrationNumber")
+        assert json_data.get("draftNumber")
 
 
 @pytest.mark.parametrize('desc,roles,status,has_account, reg_num', TEST_GET_STATEMENT)
@@ -695,7 +703,7 @@ def test_get_account_registrations_collapsed(session, client, jwt):
     # setup
 
     # test
-    response = client.get('/api/v1/financing-statements/registrations?collapse=true',
+    response = client.get('/api/v1/financing-statements/registrations?collapse=true&fromUI=true',
                           headers=create_header_account(jwt, [PPR_ROLE]))
 
     # check
@@ -706,11 +714,13 @@ def test_get_account_registrations_collapsed(session, client, jwt):
     assert len(json_data) > 0
     for statement in json_data:
         assert statement['registrationClass'] in ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
+        assert statement.get("draftNumber")
         if statement['registrationNumber'] == 'TEST0001':
             assert statement['changes']
             for change in statement['changes']:
                 assert change['baseRegistrationNumber'] == 'TEST0001'
                 assert change['registrationClass'] not in ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
+                assert change.get("draftNumber")
 
 
 @pytest.mark.parametrize('desc,reg_number,current_state,param_value', TEST_CURRENT_STATE)

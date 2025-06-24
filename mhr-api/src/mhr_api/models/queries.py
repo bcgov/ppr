@@ -120,7 +120,13 @@ SELECT mhr_number, status_type, registration_ts, submitting_name, client_referen
                     AND r.user_id = u.username
                  ORDER BY u.id DESC
                  FETCH FIRST 1 ROWS ONLY)
-            ELSE NULL END staff_account_id
+            ELSE NULL END staff_account_id,
+       CASE WHEN arv.account_id != '0'
+            THEN (SELECT d.draft_number
+                   FROM mhr_drafts d, mhr_registrations r
+                  WHERE arv.registration_id = r.id
+                    AND r.draft_id = d.id)
+            ELSE NULL END draft_number
   FROM mhr_account_reg_vw arv
 """
 
