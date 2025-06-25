@@ -27,13 +27,15 @@
         </div>
         <v-divider class="mx-6" />
 
-        <HomeOwnersTable
-          :home-owner-groups="getMhrReRegistrationPreviousOwnerGroups"
-          is-readonly-table
-          hide-table-errors
-          :force-show-groups="getMhrReRegistrationPreviousTenancyType === HomeTenancyTypes.COMMON"
-          class="mx-6 mb-1"
-        />
+        <div class="mx-6">
+          <HomeOwnersTable
+            :home-owner-groups="getMhrReRegistrationPreviousOwnerGroups"
+            is-readonly-table
+            hide-table-errors
+            :force-show-groups="getMhrReRegistrationPreviousTenancyType === HomeTenancyTypes.COMMON"
+            class="mx-6 mb-1"
+          />
+        </div>
       </template>
     </CollapsibleCard>
   </div>

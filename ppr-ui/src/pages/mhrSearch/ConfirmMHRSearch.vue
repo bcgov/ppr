@@ -104,6 +104,7 @@
         >
           <aside>
             <StickyContainer
+              :show-connect-fees="true"
               :set-err-msg="stickyComponentErrMsg"
               :set-right-offset="true"
               :set-show-buttons="true"
@@ -130,17 +131,18 @@ import { computed, defineComponent, nextTick, onMounted, reactive, toRefs, watch
 import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { FolioNumberSummary, StickyContainer, StaffPayment } from '@/components/common'
-import { RouteNames, UIMHRSearchTypeValues, StaffPaymentOptions, ErrorCategories } from '@/enums'
+import { FolioNumberSummary, StaffPayment, StickyContainer } from '@/components/common'
+import { ConnectPaymentMethod, ErrorCategories, RouteNames, StaffPaymentOptions, UIMHRSearchTypeValues } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { notCompleteSearchDialog } from '@/resources/dialogOptions'
 import { getFeatureFlag } from '@/utils'
 import { submitSelectedMhr } from '@/utils/mhr-api-helper'
 import { uniqBy } from 'lodash'
 
-import type { DialogOptionsIF , StaffPaymentIF } from '@/interfaces'
+import type { DialogOptionsIF, StaffPaymentIF } from '@/interfaces'
 import type { AdditionalSearchFeeIF } from '@/composables/fees/interfaces'
-import { useAuth, useNavigation } from '@/composables'
+import { useAuth, useConnectFeesHandler, useNavigation } from '@/composables'
+import { useConnectFeeStore } from '@/store/connectFee'
 
 
 export default defineComponent({
@@ -161,6 +163,8 @@ export default defineComponent({
     const router = useRouter()
     const { goToDash, goToPay } = useNavigation()
     const { isAuthenticated } = useAuth()
+    const { feeOptions, fees, userSelectedPaymentMethod } = storeToRefs(useConnectFeeStore())
+    const { setRegistrationFees, setRegistrationComboFees, setFeeQuantity } = useConnectFeesHandler()
     const {
       // Actions
       setStaffPayment,
@@ -181,7 +185,7 @@ export default defineComponent({
     const localState = reactive({
       dataLoaded: false,
       dataLoadError: false,
-      feeType: FeeSummaryTypes.MHSEARCH,
+      feeType: FeeSummaryTypes.MHR_SEARCH,
       options: notCompleteSearchDialog as DialogOptionsIF,
       showCancelDialog: false,
       showErrors: false,
@@ -279,7 +283,8 @@ export default defineComponent({
         apiResponse = await submitSelectedMhr(
           getManufacturedHomeSearchResults.value.searchId,
           uniqBy(getSelectedManufacturedHomes.value, UIMHRSearchTypeValues.MHRMHR_NUMBER),
-          getFolioOrReferenceNumber.value
+          getFolioOrReferenceNumber.value,
+          null, null, userSelectedPaymentMethod.value === ConnectPaymentMethod.DIRECT_PAY
         )
       }
       localState.submitting = false
@@ -361,9 +366,10 @@ export default defineComponent({
         return
       }
 
-      // get registration data from api and load into store
-      localState.submitting = true
-      localState.submitting = false
+      // Set Fees
+      feeOptions.value.showServiceFees = true
+      setRegistrationFees(localState.feeType)
+      setFeeQuantity(FeeSummaryTypes.MHR_SEARCH, localState.feeQuantity)
 
       // page is ready to view
       emitHaveData(true)
@@ -377,6 +383,12 @@ export default defineComponent({
 
     watch(() => props.appReady, (val: boolean) => {
       onAppReady(val)
+    })
+    watch(() => localState.feeQuantity, (count: number) => {
+      setFeeQuantity(FeeSummaryTypes.MHR_SEARCH, count)
+    })
+    watch(() => localState.combinedSearchFees, (comboSearch: any) => {
+      setRegistrationComboFees(FeeSummaryTypes.MHR_COMBINED_SEARCH, comboSearch?.quantity)
     })
 
     return {

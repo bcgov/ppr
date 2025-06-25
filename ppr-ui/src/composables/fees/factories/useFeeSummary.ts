@@ -90,7 +90,7 @@ export function getFeeSummary (
     getMhrUnitNoteType
   } = storeToRefs(useStore())
 
-  if (feeType === FeeSummaryTypes.MHSEARCH) {
+  if (feeType === FeeSummaryTypes.MHR_SEARCH) {
     if (isStaff && isStaffClientPayment) return { ...defaultFeeSummaries[FeeSummaryDefaults.SEARCH_10] }
     if (isStaff) return { ...defaultFeeSummaries[FeeSummaryDefaults.NO_FEE] }
     return { ...defaultFeeSummaries[FeeSummaryDefaults.SEARCH_7] }

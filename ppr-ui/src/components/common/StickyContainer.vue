@@ -1,7 +1,8 @@
 <template :class="{ 'pl-15': leftOffset, 'pr-15': rightOffset }">
   <div id="sticky-container">
+    <ConnectFeeWidget v-if="showConnectFees" />
     <FeeSummary
-      v-if="showFeeSummary"
+      v-else-if="showFeeSummary"
       class="overlap"
       :set-fee-override="feeOverride"
       :set-fee-type="setFeeType"
@@ -18,6 +19,7 @@
     <ButtonsStacked
       v-if="showButtons"
       class="pt-4 buttons-stacked overlap"
+      :class="{ 'w-[320px]' : showConnectFees }"
       :set-back-btn="setBackBtn"
       :set-cancel-btn="cancelBtn"
       :set-submit-btn="setSubmitBtn"
@@ -137,6 +139,10 @@ export default defineComponent({
       default: ''
     },
     setIsLoading: {
+      type: Boolean,
+      default: false
+    },
+    showConnectFees: {
       type: Boolean,
       default: false
     }
