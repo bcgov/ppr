@@ -1244,7 +1244,7 @@ export default defineComponent({
                 data-test-id="rescind-exemption-btn"
                 @click="openExemption(UnitNoteDocTypes.RESCIND_EXEMPTION, item)"
               >
-                <v-list-item-subtitle>
+                <v-list-item-subtitle class="!inline-flex">
                   <img
                     alt="exemption-icon"
                     class="ml-0 icon-small"
@@ -1262,7 +1262,7 @@ export default defineComponent({
                   ? null
                   : openExemption(UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER, item)"
               >
-                <v-list-item-subtitle>
+                <v-list-item-subtitle class="!inline-flex">
                   <v-tooltip
                     v-if="hasLienForQS || hasLockedForQS"
                     location="left"
@@ -1305,7 +1305,7 @@ export default defineComponent({
                   item.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT"
                 @click="openExemption(UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION, item)"
               >
-                <v-list-item-subtitle>
+                <v-list-item-subtitle class="!inline-flex">
                   <img
                     alt="exemption-icon"
                     class="icon-small"

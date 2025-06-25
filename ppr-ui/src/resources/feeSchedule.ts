@@ -68,6 +68,23 @@ export const RegistrationFees = {
     waived: false,
     showFeeDesc: true
   },
+  [FeeSummaryTypes.MHR_RE_REGISTRATION]: {
+    filingFees: 50,
+    filingType: APIRegistrationTypes.MHR_RE_REGISTRATION,
+    filingTypeCode: FeeSummaryTypes.MHR_RE_REGISTRATION,
+    futureEffectiveFees: 0,
+    priorityFees: 0,
+    processingFees: 0,
+    serviceFees: 0,
+    quantity: 1,
+    tax: {
+      gst: 0,
+      pst: 0
+    },
+    total: 50,
+    waived: false,
+    showFeeDesc: false
+  },
   [FeeSummaryTypes.MHR_SEARCH]: {
     filingFees: 7,
     filingType: 'Manufactured Home Search',

@@ -16,7 +16,8 @@ export default {
         mhr_staff_correction: 'Registry Correction',
         mhr_client_correction: 'Registry Correction',
         manufactured_home_search: 'Manufactured Home Search',
-        combined_home_search: 'Combined Home and Lien Search'
+        combined_home_search: 'Combined Home and Lien Search',
+        mhr_re_registration: 'Re-Register Manufactured Home',
       },
       feeDesc: {
         mhr_staff_correction: 'Staff Error or Omission',
