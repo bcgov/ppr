@@ -1,4 +1,5 @@
 import { ConnectPaymentMethod } from '~/enums/connect-payment-method'
+import { getFeatureFlag } from '@/utils'
 
 export const useConnectFeeStore = defineStore('connect/fee', () => {
   const { $payApi } = useNuxtApp()
@@ -42,7 +43,7 @@ export const useConnectFeeStore = defineStore('connect/fee', () => {
         total += fees.value[key].tax[feeValue] * quantity
       } else if (fees.value[key][feeValue]) {
         if (feeValue === 'total') {
-          total += (fees.value[key].filingFees + totalPriorityFees.value + totalServiceFees.value)
+          total += (fees.value[key].filingFees * quantity)
         } else {
           total += fees.value[key][feeValue] * quantity
         }
@@ -68,7 +69,7 @@ export const useConnectFeeStore = defineStore('connect/fee', () => {
   const totalServiceFees = computed(() => getMaxFromFees('serviceFees'))
   const totalGst = computed(() => getTotalFromFees('gst', true))
   const totalPst = computed(() => getTotalFromFees('pst', true))
-  const total = computed(() => getTotalFromFees('total') + totalServiceFees.value + totalProcessingFees.value)
+  const total = computed(() => getTotalFromFees('total') + totalPriorityFees.value + totalServiceFees.value)
 
   /**
    * Fetches the Fee info for the given entity type / fee code combination.
@@ -164,7 +165,7 @@ export const useConnectFeeStore = defineStore('connect/fee', () => {
       userSelectedPaymentMethod.value = defaultMethod
 
       // only set allowed flag to true if previous steps didnt cause an error
-      allowAlternatePaymentMethod.value = true
+      allowAlternatePaymentMethod.value = getFeatureFlag('mhr-credit-card-enabled')
     } catch (e) {
       logFetchError(e, 'Error initializing user payment account')
     }

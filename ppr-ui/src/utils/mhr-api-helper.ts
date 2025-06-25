@@ -233,7 +233,8 @@ export async function submitSelectedMhr (
   selected: Array<ManufacturedHomeSearchResultIF>,
   folioOrReferenceNumber: string = null,
   staffPayment: StaffPaymentIF = null,
-  isCertified: boolean = false
+  isCertified: boolean = false,
+  isCcOverride: boolean = false
 ): Promise<any> {
   let extraParams = ''
 
@@ -265,6 +266,11 @@ export async function submitSelectedMhr (
   if (folioOrReferenceNumber) {
     extraParams += extraParams ? '&' : '?'
     extraParams += 'clientReferenceId=' + folioOrReferenceNumber
+  }
+
+  if (isCcOverride) {
+    extraParams += extraParams ? '&' : '?'
+    extraParams += 'ccPayment=true'
   }
 
   return axios

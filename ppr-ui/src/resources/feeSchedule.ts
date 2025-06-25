@@ -10,6 +10,7 @@ export const RegistrationFees = {
     priorityFees: 0,
     processingFees: 0,
     serviceFees: 0,
+    quantity: 1,
     tax: {
       gst: 0,
       pst: 0
@@ -25,6 +26,7 @@ export const RegistrationFees = {
     priorityFees: 0,
     processingFees: 0,
     serviceFees: 0,
+    quantity: 1,
     tax: {
       gst: 0,
       pst: 0
@@ -40,6 +42,7 @@ export const RegistrationFees = {
     priorityFees: 0,
     processingFees: 0,
     serviceFees: 0,
+    quantity: 1,
     tax: {
       gst: 0,
       pst: 0
@@ -56,6 +59,7 @@ export const RegistrationFees = {
     priorityFees: 0,
     processingFees: 0,
     serviceFees: 0,
+    quantity: 1,
     tax: {
       gst: 0,
       pst: 0
@@ -63,6 +67,42 @@ export const RegistrationFees = {
     total: 15,
     waived: false,
     showFeeDesc: true
+  },
+  [FeeSummaryTypes.MHR_SEARCH]: {
+    filingFees: 7,
+    filingType: 'Manufactured Home Search',
+    filingTypeCode: FeeSummaryTypes.MHR_SEARCH,
+    futureEffectiveFees: 0,
+    priorityFees: 0,
+    processingFees: 0,
+    serviceFees: 1.50,
+    tax: {
+      gst: 0,
+      pst: 0
+    },
+    total: 7,
+    quantity: 1,
+    quantityDesc: '$7.00 each',
+    waived: false,
+    showFeeDesc: false
+  },
+  [FeeSummaryTypes.MHR_COMBINED_SEARCH]: {
+    filingFees: 12,
+    filingType: 'Combined Home and Lien search',
+    filingTypeCode: FeeSummaryTypes.MHR_COMBINED_SEARCH,
+    futureEffectiveFees: 0,
+    priorityFees: 0,
+    processingFees: 0,
+    serviceFees: 1.50,
+    tax: {
+      gst: 0,
+      pst: 0
+    },
+    total: 12,
+    quantity: 1,
+    quantityDesc: '$12.00 each',
+    waived: false,
+    showFeeDesc: false
   },
   [FeeSummaryTypes.NO_FEE]: {
     filingFees: 0,

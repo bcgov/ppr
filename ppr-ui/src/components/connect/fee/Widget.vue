@@ -98,7 +98,7 @@ const getFeeItemLabelTooltip = (typeCode: string) => {
       <div v-if="!folded">
         <div class="divide-y divide-bcGovGray-300 px-4 pt-1 text-sm">
           <div
-            v-for="feeItem in feeItems"
+            v-for="feeItem in feeItems.filter(item => item.quantity)"
             :key="feeItem.filingTypeCode"
             class="flex justify-between py-3"
           >
@@ -137,8 +137,8 @@ const getFeeItemLabelTooltip = (typeCode: string) => {
               <p v-if="feeItem.showFeeDesc" class="pt-1 text-gray-600">
                 {{ $t(`ConnectFeeWidget.feeSummary.feeDesc.${feeItem.filingTypeCode}`) }}
               </p>
-              <p v-if="feeItem.quantity !== undefined && feeItem.quantityDesc" class="pl-4 text-gray-600">
-                x {{ feeItem.quantity }} {{ feeItem.quantityDesc }}
+              <p v-if="feeItem.quantity !== undefined && feeItem.quantityDesc" class="pt-1 text-gray-600">
+                {{ feeItem.quantity }} @ {{ feeItem.quantityDesc }}
               </p>
             </div>
             <p>{{ getItemFee(feeItem) }}</p>

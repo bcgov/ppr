@@ -329,7 +329,7 @@ export default defineComponent({
       registrationLength: computed((): RegistrationLengthI => props.setRegistrationLength),
       isValid: computed((): boolean => {
         return getLengthTrust.value.valid ||
-          [FeeSummaryTypes.MHSEARCH, FeeSummaryTypes.NEW_MHR, FeeSummaryTypes.MHR_TRANSFER,
+          [FeeSummaryTypes.MHR_SEARCH, FeeSummaryTypes.NEW_MHR, FeeSummaryTypes.MHR_TRANSFER,
             FeeSummaryTypes.MHR_UNIT_NOTE, FeeSummaryTypes.RESIDENTIAL_EXEMPTION,
             FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION, FeeSummaryTypes.MHR_TRANSPORT_PERMIT,
             FeeSummaryTypes.MHR_TRANSPORT_PERMIT_CANCEL,
@@ -462,7 +462,7 @@ export default defineComponent({
           return 'Registration Renewal'
         case FeeSummaryTypes.AMEND:
           return 'Registration Amendment'
-        case FeeSummaryTypes.MHSEARCH:
+        case FeeSummaryTypes.MHR_SEARCH:
           return 'Manufactured Home search'
         case FeeSummaryTypes.MHR_COMBINED_SEARCH:
           return 'Combined Home and Lien search'

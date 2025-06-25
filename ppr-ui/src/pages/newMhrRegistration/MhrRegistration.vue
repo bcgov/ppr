@@ -199,7 +199,7 @@ export default defineComponent({
       setShowGroups
     } = useHomeOwners(false, isMhrCorrection.value)
     const { setRegistrationFees } = useConnectFeesHandler()
-    const { userSelectedPaymentMethod } = storeToRefs(useConnectFeeStore())
+    const { feeOptions, userSelectedPaymentMethod } = storeToRefs(useConnectFeeStore())
 
     const localState = reactive({
       dataLoaded: false,
@@ -272,6 +272,7 @@ export default defineComponent({
       }
 
       // Set Fees
+      feeOptions.value.showServiceFees = false
       setRegistrationFees(localState.feeType)
 
       context.emit('emitHaveData', true)

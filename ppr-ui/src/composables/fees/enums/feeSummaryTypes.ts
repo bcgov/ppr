@@ -3,7 +3,7 @@ export enum FeeSummaryTypes {
   DISCHARGE = 'discharge',
   NEW = 'new',
   RENEW = 'renew',
-  MHSEARCH = 'manufactured_home_search',
+  MHR_SEARCH = 'manufactured_home_search',
   MHR_COMBINED_SEARCH = 'combined_home_search',
   NEW_MHR = 'new_mhr',
   MHR_RE_REGISTRATION = 'mhr_re_registration',

@@ -18,12 +18,39 @@ export const useConnectFeesHandler = () => {
     setFees({[registrationFeeType]: { ...RegistrationFees[registrationFeeType] }})
   }
 
+  /** Set the registration fees for combination charges */
+  const setRegistrationComboFees = (registrationFeeType: FeeSummaryTypes, quantity: number = null): void => {
+    setFees({
+      ...fees.value,
+      ...(registrationFeeType && {
+        [registrationFeeType]: {
+          ...RegistrationFees[registrationFeeType],
+          quantity: quantity,
+          total: RegistrationFees[registrationFeeType].filingFees * quantity
+        }
+      })
+    })
+  }
+
   /** Waive the fees (no fee) */
   const waiveFees = (registrationFeeType: FeeSummaryTypes, isNoFee: boolean): void => {
     setFees({
       [registrationFeeType]: {
         ...RegistrationFees[registrationFeeType],
         waived: isNoFee
+      }
+    })
+  }
+
+  /** Waive the fees (no fee) */
+  const setFeeQuantity = (registrationFeeType: FeeSummaryTypes, quantity: number): void => {
+    setFees({
+      ...fees.value,
+      [registrationFeeType]: {
+        ...RegistrationFees[registrationFeeType],
+        quantity: quantity,
+        total: RegistrationFees[registrationFeeType]?.filingFees * quantity +
+          RegistrationFees[registrationFeeType]?.serviceFees
       }
     })
   }
@@ -52,6 +79,8 @@ export const useConnectFeesHandler = () => {
   })
 
   return {
-    setRegistrationFees
+    setFeeQuantity,
+    setRegistrationFees,
+    setRegistrationComboFees
   }
 }
