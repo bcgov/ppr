@@ -42,7 +42,7 @@ export const useConnectFeesHandler = () => {
     })
   }
 
-  /** Waive the fees (no fee) */
+  /** Set the quantity of the specified fee type */
   const setFeeQuantity = (registrationFeeType: FeeSummaryTypes, quantity: number): void => {
     setFees({
       ...fees.value,
