@@ -194,7 +194,7 @@ def test_pay_callback(session, client, jwt, desc, status, draft_json, mhr_num, r
                         json=payload,
                         headers=headers,
                         content_type='application/json')
-        assert rv.status_code in (HTTPStatus.NOT_FOUND, HTTPStatus.BAD_REQUEST)
+        assert rv.status_code in (HTTPStatus.NOT_FOUND, HTTPStatus.BAD_REQUEST, HTTPStatus.OK)
 
 
 @pytest.mark.parametrize('desc,invoice_id,search_id', TEST_SEARCH_ID_DATA)

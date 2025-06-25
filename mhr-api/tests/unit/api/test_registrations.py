@@ -297,7 +297,7 @@ def test_get_account_registrations(session, client, jwt, desc, roles, status, ha
             assert registration['path'] is not None
             if registration['registrationDescription'] == 'REGISTER NEW UNIT':
                 assert 'lienRegistrationType' in registration
-            assert registration.get("draftNumber")
+            assert registration.get("consumedDraftNumber")
 
 
 @pytest.mark.parametrize('desc,has_submitting,roles,status,has_account,mhr_num', TEST_CREATE_DATA)
@@ -482,7 +482,7 @@ def test_get_account_registrations_sort(session, client, jwt, desc, roles, statu
         assert registration['clientReferenceId'] is not None
         assert registration['ownerNames'] is not None
         assert registration['path'] is not None
-        assert registration.get("draftNumber")
+        assert registration.get("consumedDraftNumber")
 
 
 @pytest.mark.parametrize('desc,account_id,roles,status,filter_name,filter_value', TEST_GET_ACCOUNT_DATA_FILTER)
@@ -508,7 +508,7 @@ def test_get_account_registrations_filter(session, client, jwt, desc, account_id
         assert registration['clientReferenceId'] is not None
         assert registration['ownerNames'] is not None
         assert registration['path'] is not None
-        assert registration.get("draftNumber")
+        assert registration.get("consumedDraftNumber")
 
 
 @pytest.mark.parametrize('desc,account_id,roles,status,collapse,filter_start,filter_end',
@@ -540,7 +540,7 @@ def test_get_account_registrations_filter_date(session, client, jwt, desc, accou
         assert registration['clientReferenceId'] is not None
         assert registration['ownerNames'] is not None
         assert registration['path'] is not None
-        assert registration.get("draftNumber")
+        assert registration.get("consumedDraftNumber")
 
 
 @pytest.mark.parametrize('desc,start_ts,end_ts,status,has_key,download_link',TEST_BATCH_MANUFACTURER_MHREG_DATA)

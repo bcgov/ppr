@@ -634,7 +634,7 @@ def __build_account_reg_result(
         "securedParties": str(row[11]),
         "clientReferenceId": str(row[12]),
         "registeringName": str(row[13]) if row[13] else "",
-        "draftNumber": str(row[18]) if row[18] else "",
+        "consumedDraftNumber": str(row[18]) if row[18] else "",
     }
     if not api_filter:
         result["vehicleCount"] = int(row[16])
@@ -680,7 +680,7 @@ def build_add_reg_result(row, account_id: str, base_reg_num: str, reg_num: str) 
         "registeringName": str(row[13]) if row[13] else "",
         "accountId": str(row[14]),
         "vehicleCount": int(row[16]),
-        "draftNumber": str(row[19]) if row[19] else "",
+        "consumedDraftNumber": str(row[19]) if row[19] else "",
     }
     result["legacy"] = result.get("accountId") == "0"
     if not row[7]:  # Report not generated

@@ -159,7 +159,9 @@ def post_payment_callback(invoice_id: str):  # pylint: disable=too-many-return-s
 
         draft: Draft = Draft.find_by_invoice_id(invoice_id)
         if not draft:
-            return pay_callback_error("03", invoice_id, HTTPStatus.NOT_FOUND)
+            # PAY API is sending notifications for other payment methods, just log as a warning.
+            logger.warning(f"No draft or search ID found matching invoice {invoice_id}, ignoring notification.")
+            return {}, HTTPStatus.OK
         statement: FinancingStatement = None
         if draft.registration_number:
             statement = FinancingStatement.find_by_registration_number(
