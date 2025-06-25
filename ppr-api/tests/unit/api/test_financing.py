@@ -599,7 +599,7 @@ def test_get_account_registrations_list(session, client, jwt, desc, roles, statu
     if status == HTTPStatus.OK:
         json_data = response.json
         for reg in json_data:
-            assert reg.get("draftNumber")
+            assert reg.get("consumedDraftNumber")
 
 
 @pytest.mark.parametrize('desc,roles,status,account_id,reg_num', TEST_USER_LIST)
@@ -621,7 +621,7 @@ def test_account_add_registration(session, client, jwt, desc, roles, status, acc
     assert response.status_code == status
     if desc == 'Valid Request User':
         json_data = response.json
-        assert json_data.get("draftNumber")
+        assert json_data.get("consumedDraftNumber")
         registration: Registration = Registration.find_by_registration_number(reg_num, account_id, True)
         assert registration.account_id == account_id
 
@@ -666,7 +666,7 @@ def test_account_get_registration(session, client, jwt, desc, roles, status, acc
     if status == HTTPStatus.OK:
         json_data = response.json
         assert json_data.get("baseRegistrationNumber")
-        assert json_data.get("draftNumber")
+        assert json_data.get("consumedDraftNumber")
 
 
 @pytest.mark.parametrize('desc,roles,status,has_account, reg_num', TEST_GET_STATEMENT)
@@ -714,13 +714,13 @@ def test_get_account_registrations_collapsed(session, client, jwt):
     assert len(json_data) > 0
     for statement in json_data:
         assert statement['registrationClass'] in ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
-        assert statement.get("draftNumber")
+        assert statement.get("consumedDraftNumber")
         if statement['registrationNumber'] == 'TEST0001':
             assert statement['changes']
             for change in statement['changes']:
                 assert change['baseRegistrationNumber'] == 'TEST0001'
                 assert change['registrationClass'] not in ('PPSALIEN', 'MISCLIEN', 'CROWNLIEN')
-                assert change.get("draftNumber")
+                assert change.get("consumedDraftNumber")
 
 
 @pytest.mark.parametrize('desc,reg_number,current_state,param_value', TEST_CURRENT_STATE)

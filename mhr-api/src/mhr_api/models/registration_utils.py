@@ -877,7 +877,7 @@ def __build_summary(row, account_id: str, staff: bool, add_in_user_list: bool = 
         "documentRegistrationNumber": str(row[9]),
         "registrationType": str(row[5]),
         "locationType": str(row[22]),
-        "draftNumber": str(row[26]) if row[26] else "",
+        "consumedDraftNumber": str(row[26]) if row[26] else "",
     }
     summary = __get_report_path(account_id, staff, summary, row, timestamp)
     if add_in_user_list and summary["registrationType"] in (
