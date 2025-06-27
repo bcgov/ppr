@@ -134,7 +134,7 @@
                     @click="toggleExtendTransportPermit(true)"
                   >
                     <v-list-item-subtitle
-                      class="pa-0"
+                      class="pa-0 !inline-flex"
                     >
                       <span class="pt-3">
                         <img
@@ -154,7 +154,7 @@
                     @click="state.showConfirmNewPermitDialog = true"
                   >
                     <v-list-item-subtitle
-                      class="pa-0"
+                      class="pa-0 !inline-flex"
                     >
                       <span class="pt-3">
                         <img

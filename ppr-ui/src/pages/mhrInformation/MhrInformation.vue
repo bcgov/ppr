@@ -594,6 +594,7 @@
           >
             <aside>
               <StickyContainer
+                :show-connect-fee="false"
                 :set-show-buttons="true"
                 :set-back-btn="showBackBtn"
                 :set-cancel-btn="'Cancel'"
@@ -778,6 +779,7 @@ export default defineComponent({
     const router = useRouter()
     const { goToDash, goToPay } = useNavigation()
     const { isAuthenticated } = useAuth()
+    const { setRegistrationFees } = useConnectFeesHandler()
     const {
       // Actions
       setMhrStatusType,
@@ -971,13 +973,18 @@ export default defineComponent({
       ),
       feeType: computed((): FeeSummaryTypes => {
         if (isAmendLocationActive.value && isChangeLocationActive.value) {
+          setRegistrationFees(FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT)
           return FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT
         } else if (isCancelChangeLocationActive.value) {
+          setRegistrationFees(FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT)
           return FeeSummaryTypes.MHR_TRANSPORT_PERMIT_CANCEL
         } else if (isExtendChangeLocationActive.value) {
+          setRegistrationFees(FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT)
           return FeeSummaryTypes.MHR_TRANSPORT_PERMIT
         } else {
-          return isChangeLocationActive.value ? FeeSummaryTypes.MHR_TRANSPORT_PERMIT : FeeSummaryTypes.MHR_TRANSFER
+          const defaultFeeType = isChangeLocationActive.value ? FeeSummaryTypes.MHR_TRANSPORT_PERMIT : FeeSummaryTypes.MHR_TRANSFER
+          setRegistrationFees(defaultFeeType)
+          return defaultFeeType
         }
       }
       ),

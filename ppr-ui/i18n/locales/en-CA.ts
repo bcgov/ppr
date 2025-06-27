@@ -18,10 +18,12 @@ export default {
         manufactured_home_search: 'Manufactured Home Search',
         combined_home_search: 'Combined Home and Lien Search',
         mhr_re_registration: 'Re-Register Manufactured Home',
+        mhr_transport_permit: 'Location Change'
       },
       feeDesc: {
         mhr_staff_correction: 'Staff Error or Omission',
-        mhr_client_correction: 'Client Error or Omission'
+        mhr_client_correction: 'Client Error or Omission',
+        mhr_transport_permit: 'Transport Permit'
       }
     },
     paymentMethod: {

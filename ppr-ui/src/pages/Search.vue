@@ -262,13 +262,16 @@ export default defineComponent({
         const searchId = currentUrl[currentUrl.length - 1].split('?')[0]
         localState.loading = true
         const { searches } = await getPprSearchHistoryById(searchId)
+        localState.loading = false
         if (searches) {
           searches.results.forEach((item, index) => {
             item.id = index + 1
           })
+          setSearchResults(searches)
+        } else {
+          console.error('No search results found for ID:', searchId)
+          goToDash()
         }
-        setSearchResults(searches)
-        localState.loading = false
       }
     })
 

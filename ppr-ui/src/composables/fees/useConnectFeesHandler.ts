@@ -36,7 +36,8 @@ export const useConnectFeesHandler = () => {
   const waiveFees = (registrationFeeType: FeeSummaryTypes, isNoFee: boolean): void => {
     setFees({
       [registrationFeeType]: {
-        ...RegistrationFees[registrationFeeType],
+        ...fees.value[registrationFeeType],
+        filingFees: isNoFee ? 0 : RegistrationFees[registrationFeeType].filingFees,
         waived: isNoFee
       }
     })

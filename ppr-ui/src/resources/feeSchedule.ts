@@ -121,6 +121,42 @@ export const RegistrationFees = {
     waived: false,
     showFeeDesc: false
   },
+  [FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT]: {
+    filingFees: 12,
+    filingType: 'Location Change',
+    filingTypeCode: FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT,
+    futureEffectiveFees: 0,
+    priorityFees: 0,
+    processingFees: 0,
+    serviceFees: 1.50,
+    tax: {
+      gst: 0,
+      pst: 0
+    },
+    total: 12,
+    quantity: 1,
+    quantityDesc: '$12.00 each',
+    waived: false,
+    showFeeDesc: false
+  },
+  [FeeSummaryTypes.MHR_TRANSPORT_PERMIT]: {
+    filingFees: 25,
+    filingType: 'Location Change',
+    filingTypeCode: FeeSummaryTypes.MHR_TRANSPORT_PERMIT,
+    futureEffectiveFees: 0,
+    priorityFees: 0,
+    processingFees: 0,
+    serviceFees: 0,
+    tax: {
+      gst: 0,
+      pst: 0
+    },
+    total: 25,
+    quantity: 1,
+    quantityDesc: '',
+    waived: false,
+    showFeeDesc: true
+  },
   [FeeSummaryTypes.NO_FEE]: {
     filingFees: 0,
     filingType: APIRegistrationTypes.MANUFACTURED_HOME_REGISTRATION,
