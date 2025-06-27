@@ -128,7 +128,7 @@ export const useConnectFeeStore = defineStore('connect/fee', () => {
 
   const $resetAlternatePayOptions = () => {
     userPaymentAccount.value = {} as ConnectPayAccount
-    userSelectedPaymentMethod.value = ConnectPaymentMethod.DIRECT_PAY
+    userSelectedPaymentMethod.value = null
     allowAlternatePaymentMethod.value = false
     allowedPaymentMethods.value = []
   }
