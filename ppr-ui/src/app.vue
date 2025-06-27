@@ -602,16 +602,16 @@ export default defineComponent({
       }
     }
 
-    // Set up a timer to refresh the token to session periodically
+    // Set up an interval to sync the session token
     setInterval(async () => {
       try {
         // Token was refreshed, update your session storage or state as needed
         sessionStorage.setItem('KEYCLOAK_TOKEN', await useKeycloak().getToken())
       } catch (err) {
         // Handle error, possibly force logout
-        console.error('Token refresh failed', err)
+        console.error('Token sync failed', err)
       }
-    }, 5 * 60 * 1000) // Check every 5 minutes
+    }, 2 * 60 * 1000) // every 2 minutes
 
     /** Called when profile is ready -- we can now init app. */
     watch(() => localState.profileReady, async (val: boolean) => {
