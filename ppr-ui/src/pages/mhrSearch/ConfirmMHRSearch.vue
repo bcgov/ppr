@@ -104,7 +104,7 @@
         >
           <aside>
             <StickyContainer
-              :show-connect-fees="true"
+              :show-connect-fees="!isRoleStaffReg"
               :set-err-msg="stickyComponentErrMsg"
               :set-right-offset="true"
               :set-show-buttons="true"
@@ -395,6 +395,7 @@ export default defineComponent({
       submit,
       showDialog,
       setFolioValid,
+      isRoleStaffReg,
       isRoleStaffSbc,
       handleDialogResp,
       goToSearchResult,

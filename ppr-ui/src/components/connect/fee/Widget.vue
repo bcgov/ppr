@@ -137,7 +137,10 @@ const getFeeItemLabelTooltip = (typeCode: string) => {
               <p v-if="feeItem.showFeeDesc" class="pt-1 text-gray-600">
                 {{ $t(`ConnectFeeWidget.feeSummary.feeDesc.${feeItem.filingTypeCode}`) }}
               </p>
-              <p v-if="feeItem.quantity !== undefined && feeItem.quantityDesc" class="pt-1 text-gray-600">
+              <p
+                v-if="!feeItem.waived && feeItem.quantity !== undefined && feeItem.quantityDesc"
+                class="pt-1 text-gray-600"
+              >
                 {{ feeItem.quantity }} @ {{ feeItem.quantityDesc }}
               </p>
             </div>

@@ -23,7 +23,7 @@ export interface SearchResponseIF {
   loadingPDF?: boolean,
   userId?: string,
   username?: string,
-  payment: PaymentIF,
+  payment?: PaymentIF,
   paymentPending?: boolean
 }
 
