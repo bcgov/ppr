@@ -31,7 +31,7 @@ from .db import db
 CLIENT_CODE_BRANCH_QUERY = """
 select LPAD(cc.id::text, 8, '0') as party_code, cc.id as branch_id, cc.head_id, cc.name, cc.contact_name,
        cc.contact_phone_number, cc.contact_area_cd, cc.email_address,
-       a.street, a.street_additional, a.city, a.region, a.postal_code, a.country
+       a.street, a.street_additional, a.city, a.region, a.postal_code, a.country, cc.account_id
   from client_codes cc, addresses a
  where LPAD(cc.id::text, 8, '0') like :query_val
    and a.id = cc.address_id
@@ -56,6 +56,7 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
     email_id = db.mapped_column("email_address", db.String(250), nullable=True)
     user_id = db.mapped_column("user_id", db.String(7), nullable=True)
     date_ts = db.mapped_column("date_ts", db.DateTime, nullable=True)
+    account_id = db.mapped_column("account_id", db.String(20), index=True, nullable=True)
 
     # parent keys
     address_id = db.mapped_column("address_id", db.Integer, db.ForeignKey("addresses.id"), nullable=False, index=True)
@@ -73,6 +74,7 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return the client party branch as a json object."""
         party = {
             "code": self.format_party_code(),
+            "accountId": self.account_id if self.account_id else "",
             "businessName": self.name,
             "contact": {
                 "name": self.contact_name if self.contact_name else "",
@@ -160,6 +162,25 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
             party_codes.append(party.json)
 
         return party_codes
+
+    @classmethod
+    def find_by_bcrs_account(cls, account_id: str) -> list:
+        """Return a client code JSON list of party codes that match the account ID."""
+        party_codes = []
+        if not account_id:
+            return party_codes
+        try:
+            party_list = (
+                db.session.query(ClientCode).filter(ClientCode.account_id == account_id).order_by(ClientCode.id).all()
+            )
+            if not party_list:
+                return party_codes
+            for party in party_list:
+                party_codes.append(party.json)
+            return party_codes
+        except Exception as db_exception:  # noqa: B902; return nicer error
+            logger.error(f"DB find_by_bcrs_account exception: {db_exception}")
+            raise DatabaseException(db_exception) from db_exception
 
     @classmethod
     def find_by_account_id(cls, account_id: str, crown_charge: bool = True, securities_act: bool = False):
@@ -281,6 +302,7 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
                 for row in rows:
                     client_code = {
                         "code": str(row[0]),
+                        "accountId": str(row[14]) if row[14] else "",
                         "businessName": str(row[3]),
                         "contact": {
                             "name": str(row[4]) if row[4] else "",

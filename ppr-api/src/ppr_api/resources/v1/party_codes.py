@@ -30,6 +30,7 @@ from ppr_api.utils.logging import logger
 bp = Blueprint("PARTY_CODES1", __name__, url_prefix="/api/v1/party-codes")  # pylint: disable=invalid-name
 FUZZY_NAME_SEARCH_PARAM = "fuzzyNameSearch"
 SECURITIES_ACT_PARAM = "securitiesActCodes"
+QUERY_ACCOUNT_PARAM = "searchAccountId"  # Used by staff when looking up codes by BCRS account ID.
 
 
 @bp.route("/<string:code>", methods=["GET", "OPTIONS"])
@@ -116,14 +117,20 @@ def get_account_codes():
             return resource_utils.unauthorized_error_response(account_id)
 
         # Try to fetch client parties: no results is an empty list.
-        logger.debug(f"Getting {account_id}  party codes.")
+        if request.args.get(QUERY_ACCOUNT_PARAM):
+            search_account_id: str = request.args.get(QUERY_ACCOUNT_PARAM)
+            logger.info(f"Account {account_id} getting all party codes for {search_account_id}.")
+            parties = ClientCode.find_by_bcrs_account(search_account_id)
+            logger.info(f"Found {len(parties)} party codes for account {search_account_id}.")
+            return jsonify(parties), HTTPStatus.OK
         # Default filter is crown charge account party codes.
+        logger.info(f"Getting {account_id} party codes.")
         is_crown_charge: bool = True
         is_securities_act: bool = False
         securities_act_param = request.args.get(SECURITIES_ACT_PARAM)
         if securities_act_param:
-            is_crown_charge: bool = False
-            is_securities_act: bool = True
+            is_crown_charge = False
+            is_securities_act = True
         parties = ClientCode.find_by_account_id(account_id, is_crown_charge, is_securities_act)
         return jsonify(parties), HTTPStatus.OK
 
