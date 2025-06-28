@@ -41,16 +41,18 @@ TEST_DATA_HEAD_OFFICE = [
     ('Staff missing account ID', True, False, HTTPStatus.OK, PPR_ROLE, 'RBC Royal Bank'),
     ('Valid data but unauthorized', False, True, HTTPStatus.UNAUTHORIZED, COLIN_ROLE, '9999')
 ]
-# testdata pattern is ({description}, {is staff}, {response status}, {role}, {account_id}, {has_data}, {sec_act})
+# testdata pattern is ({description}, {is staff}, {response status}, {role}, {account_id}, {has_data}, {sec_act}, {search_id})
 TEST_DATA_ACCOUNT = [
-    ('Valid non-staff non-existent', False, HTTPStatus.OK, PPR_ROLE, 'PS1234X', False, False),
-    ('Valid non-staff CC exists', False, HTTPStatus.OK, PPR_ROLE, 'PS12345', True, False),
-    ('Valid non-staff Securities Act exists', False, HTTPStatus.OK, PPR_ROLE, 'PS00002', True, True),
-    ('Valid non-staff Securities Act non-existent', False, HTTPStatus.OK, PPR_ROLE, 'PS12345', False, True),
-    ('Valid non-staff non CC exists', False, HTTPStatus.OK, PPR_ROLE, 'PS00001', False, False),
-    ('Non-staff missing account ID', False, HTTPStatus.BAD_REQUEST, PPR_ROLE, None, False, False),
-    ('Staff missing account ID', True, HTTPStatus.BAD_REQUEST, PPR_ROLE, None, False, False),
-    ('Unauthorized role', False, HTTPStatus.UNAUTHORIZED, COLIN_ROLE, 'PS12345', False, False)
+    ('Valid non-staff non-existent', False, HTTPStatus.OK, PPR_ROLE, 'PS1234X', False, False, None),
+    ('Valid non-staff CC exists', False, HTTPStatus.OK, PPR_ROLE, 'PS12345', True, False, None),
+    ('Valid non-staff Securities Act exists', False, HTTPStatus.OK, PPR_ROLE, 'PS00002', True, True, None),
+    ('Valid non-staff Securities Act non-existent', False, HTTPStatus.OK, PPR_ROLE, 'PS12345', False, True, None),
+    ('Valid non-staff non CC exists', False, HTTPStatus.OK, PPR_ROLE, 'PS00001', False, False, None),
+    ('Non-staff missing account ID', False, HTTPStatus.BAD_REQUEST, PPR_ROLE, None, False, False, None),
+    ('Staff missing account ID', True, HTTPStatus.BAD_REQUEST, PPR_ROLE, None, False, False, None),
+    ('Unauthorized role', False, HTTPStatus.UNAUTHORIZED, COLIN_ROLE, 'PS12345', False, False, None),
+    ('Valid search id exists', False, HTTPStatus.OK, PPR_ROLE, 'PS12', True, False, 'UT0005'),
+    ('Valid search id non-existent', False, HTTPStatus.OK, PPR_ROLE, 'PS12', False, False, 'UT00XX'),
 ]
 
 
@@ -109,8 +111,8 @@ def test_get_head_office_codes(session, client, jwt, desc, staff, include_accoun
             assert not rv.json
 
 
-@pytest.mark.parametrize('desc,staff,status,role,account_id,has_data,sec_act', TEST_DATA_ACCOUNT)
-def test_get_account_codes(session, client, jwt, desc, staff, status, role, account_id, has_data, sec_act):
+@pytest.mark.parametrize('desc,staff,status,role,account_id,has_data,sec_act,search_id', TEST_DATA_ACCOUNT)
+def test_get_account_codes(session, client, jwt, desc, staff, status, role, account_id, has_data, sec_act, search_id):
     """Assert that a get party code information by account ID returns the expected response code and data."""
     # setup
     headers = None
@@ -127,6 +129,8 @@ def test_get_account_codes(session, client, jwt, desc, staff, status, role, acco
     path: str = '/api/v1/party-codes/accounts'
     if sec_act:
         path += '?securitiesActCodes=true'
+    elif search_id:
+        path += f'?searchAccountId={search_id}'
     # test
     rv = client.get(path, headers=headers)
     # check

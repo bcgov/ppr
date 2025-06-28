@@ -41,6 +41,7 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
     email_id = db.mapped_column("email_address", db.String(250), nullable=True)
     user_id = db.mapped_column("user_id", db.String(7), nullable=True)
     date_ts = db.mapped_column("date_ts", db.DateTime, nullable=True)
+    account_id = db.mapped_column("account_id", db.String(20), index=True, nullable=True)
 
     # parent keys
     address_id = db.mapped_column("address_id", db.Integer, db.ForeignKey("addresses.id"), nullable=False, index=True)
