@@ -21,10 +21,10 @@ import pytest
 from ppr_api.models import ClientCode
 
 
-# testdata pattern is ({description}, {exists}, {search_value})
+# testdata pattern is ({description}, {exists}, {search_value}, {account_id})
 TEST_DATA_PARTY_CODE = [
-    ('Exists', True, '200000000'),
-    ('Does not exist', False, '12345')
+    ('Exists', True, '200000000', 'PS12345'),
+    ('Does not exist', False, '12345', 'UT0001')
 ]
 # testdata pattern is ({description}, {account_id}, {results_size}, {crown_charge}, {securities_act})
 TEST_DATA_ACCOUNT_NUMBER = [
@@ -32,6 +32,13 @@ TEST_DATA_ACCOUNT_NUMBER = [
     ('Non CC account with bcol number mapping', 'PS00001', 1, False, False),
     ('Securities Act account with bcol number mapping', 'PS00002', 1, False, True),
     ('Account with no bcol number mapping', 'PS1234X', 0, False, False)
+]
+# testdata pattern is ({description}, {account_id}, {results_size})
+TEST_DATA_BCRS_ACCOUNT = [
+    ('Securities Act account with bcol number mapping', 'PS00002', 1),
+    ('Regular account single', 'PS00001', 1),
+    ('Regular account multiple', 'UT0005', 4),
+    ('No Results', 'PS1234X', 0)
 ]
 # testdata pattern is ({description}, {results_size}, {search_value})
 TEST_DATA_BRANCH_CODE = [
@@ -70,8 +77,8 @@ TEST_DATA_FORMAT_CODE = [
 ]
 
 
-@pytest.mark.parametrize('desc,exists,search_value', TEST_DATA_PARTY_CODE)
-def test_find_by_code(session, desc, exists, search_value):
+@pytest.mark.parametrize('desc,exists,search_value,account_id', TEST_DATA_PARTY_CODE)
+def test_find_by_code(session, desc, exists, search_value, account_id):
     """Assert that find client party by code contains all expected elements."""
     party = ClientCode.find_by_code(search_value)
     if exists:
@@ -88,6 +95,7 @@ def test_find_by_code(session, desc, exists, search_value):
         assert party['contact']['phoneNumber']
         assert party['businessName']
         assert party['emailAddress']
+        assert party.get("accountId") == account_id
     else:
         assert not party
 
@@ -164,6 +172,31 @@ def test_find_by_account_id(session, desc, account_id, results_size, crown_charg
         assert not parties
 
 
+@pytest.mark.parametrize('desc,account_id,results_size', TEST_DATA_BCRS_ACCOUNT)
+def test_find_by_bcrs_account(session, desc, account_id, results_size):
+    """Assert that find client parties by BCRS account id contains all expected elements."""
+    parties = ClientCode.find_by_bcrs_account(account_id)
+    if results_size > 0:
+        assert parties
+        assert len(parties) >= results_size
+        for party in parties:
+            assert len(party['code']) >= 5
+            assert party['businessName']
+            assert party['address']
+            assert party['address']['street']
+            assert party['address']['city']
+            assert party['address']['region']
+            assert party['address']['postalCode']
+            assert party['contact']
+            assert party['contact']['name']
+            assert party['contact']['areaCode']
+            assert party['contact']['phoneNumber']
+            assert party['emailAddress']
+            assert party.get("accountId") == account_id
+    else:
+        assert not parties
+
+
 @pytest.mark.parametrize('desc,results_size,search_value,fuzzy_search', TEST_DATA_HEAD_OFFICE)
 def test_find_by_head_office(session, desc, results_size, search_value, fuzzy_search):
     """Assert that find client party by head office contains all expected elements."""
@@ -184,6 +217,7 @@ def test_find_by_head_office(session, desc, results_size, search_value, fuzzy_se
             assert party['contact']['areaCode']
             assert party['contact']['phoneNumber']
             assert party['emailAddress']
+            assert 'accountId' in party
     else:
         assert not parties
 
@@ -203,11 +237,13 @@ def test_client_party_json(session):
         contact_name='CONTACT',
         contact_area_cd='250',
         contact_phone_number='1234567',
-        email_id='test@gmail.com'
+        email_id='test@gmail.com',
+        account_id='1234'
     )
 
     party_json = {
         'code': party.format_party_code(),
+        'accountId': '1234',
         'businessName': party.name,
         'contact': {
             'name': party.contact_name,
