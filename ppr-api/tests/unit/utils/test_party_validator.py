@@ -19,6 +19,7 @@ import pytest
 from flask import current_app
 
 from ppr_api.models import FinancingStatement
+from ppr_api.models.type_tables import ClientCodeTypes
 from ppr_api.utils.validators import party_validator as validator
 
 
@@ -605,8 +606,56 @@ FINANCING_INVALID_NAMES = {
         }
     ]
 }
-
-
+TEST_CODE_NEW1 =   {
+    "businessName": "PETERBILT TRUCKS PACIFIC INC.",
+    "address": {
+      "street": "1079 DOUGLAS ST",
+      "city": "VICTORIA",
+      "region": "BC",
+      "country": "CA",
+      "postalCode": "V8W 2C5"
+    },
+    "emailAddress": "test-1@test-ptc.com",
+    "contact": {
+      "name": "Example Contact 1",
+      "areaCode": "250",
+      "phoneNumber": "3564500"
+    }
+}
+TEST_CODE_NEW2 =   {
+    "accountId": "1234",
+    "businessName": "PETERBILT TRUCKS PACIFIC INC.",
+    "address": {
+      "street": "1079 DOUGLAS ST",
+      "city": "VICTORIA",
+      "region": "BC",
+      "country": "CA",
+      "postalCode": "V8W 2C5"
+    },
+    "emailAddress": "test-1@test-ptc.com",
+    "contact": {
+      "name": "Example Contact 1",
+      "areaCode": "250",
+      "phoneNumber": "3564500"
+    }
+}
+TEST_CODE_NEW3 =   {
+    "accountId": "1234",
+    "businessName": "CC \U0001d5c4\U0001d5c6/\U0001d5c1",
+    "address": {
+      "street": "1079 DOUGLAS ST",
+      "city": "VICTORIA",
+      "region": "BC",
+      "country": "CA",
+      "postalCode": "V8W 2C5"
+    },
+    "emailAddress": "test-1@test-ptc.com",
+    "contact": {
+      "name": "Example Contact 1",
+      "areaCode": "250",
+      "phoneNumber": "3564500"
+    }
+}
 # testdata pattern is ({description}, {financing statement data}, {valid}, {message contents})
 TEST_CODE_FS_DATA = [
     ('Valid party codes', FINANCING_VALID, True, None),
@@ -704,6 +753,35 @@ TEST_PARTIES_FS_DUPLICATES = [
     ('Duplicate party person', FINANCING_DUPLICATE_PARTIES_PERSON, False,
      validator.DUPLICATE_SECURED_PARTY_PERSON)
 ]
+# testdata pattern is ({description}, {valid}, {json_data}, {staff}, {account_id}, {message contents}, {head_code})
+TEST_NEW_CLIENT_CODE = [
+    ('Valid not staff', True, TEST_CODE_NEW1, False, 'PS12345', None, None),
+    ('Valid not staff head office code', True, TEST_CODE_NEW1, False, 'UT0005', None, "9999"),
+    ('Valid staff', True, TEST_CODE_NEW2, True, 'PS12345', None, None),
+    ('Invalid staff no account', False, TEST_CODE_NEW1, True, 'PS12345', validator.CLIENT_CODE_STAFF_ACCOUNT_MISSING, None),
+    ('Invalid head office', False, TEST_CODE_NEW1, False, 'PS12345', 
+     validator.CLIENT_CODE_INVALID_HEAD_OFFICE.format(head_code="9990"), "9990"),
+    ('Invalid name', False, TEST_CODE_NEW3, False, 'PS12345', 
+      validator.CHARACTER_SET_UNSUPPORTED.format('CC \U0001d5c4\U0001d5c6/\U0001d5c1'), None),
+    ('Invalid head office account', False, TEST_CODE_NEW1, False, 'PS12345', 
+     validator.CLIENT_CODE_INVALID_ACCOUNT.format(head_code="9999"), "9999"),
+    ('Invalid staff head office account', False, TEST_CODE_NEW2, False, 'PS12345', 
+     validator.CLIENT_CODE_INVALID_ACCOUNT.format(head_code="9999"), "9999"),
+]
+
+
+@pytest.mark.parametrize('desc,valid,json_data,staff,account_id,message_content,head_code', TEST_NEW_CLIENT_CODE)
+def test_validate_new_client_codes(session, desc, valid, json_data, staff, account_id, message_content, head_code):
+    """Assert that financing statement client party code validation works as expected."""
+    test_data = copy.deepcopy(json_data)
+    if head_code:
+        test_data["headOfficeCode"] = head_code
+    error_msg = validator.validate_client_code_registration(test_data, ClientCodeTypes.CREATE_CODE, account_id, staff)
+    if valid:
+        assert error_msg == ''
+    elif message_content:
+        assert error_msg != ''
+        assert error_msg.find(message_content) != -1
 
 
 @pytest.mark.parametrize('desc,json_data,valid,message_content', TEST_CODE_FS_DATA)

@@ -17,15 +17,19 @@
 
 from http import HTTPStatus
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, g, jsonify, request
 from flask_cors import cross_origin
+from registry_schemas import utils as schema_utils
 
 from ppr_api.exceptions import BusinessException, DatabaseException
-from ppr_api.models import ClientCode
+from ppr_api.models import ClientCode, ClientCodeRegistration
+from ppr_api.models.type_tables import ClientCodeTypes
+from ppr_api.resources import financing_utils as fs_utils
 from ppr_api.resources import utils as resource_utils
 from ppr_api.services.authz import authorized, is_staff
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.logging import logger
+from ppr_api.utils.validators import party_validator
 
 bp = Blueprint("PARTY_CODES1", __name__, url_prefix="/api/v1/party-codes")  # pylint: disable=invalid-name
 FUZZY_NAME_SEARCH_PARAM = "fuzzyNameSearch"
@@ -138,6 +142,52 @@ def get_account_codes():
         return resource_utils.db_exception_response(
             db_exception, account_id, "GET account client party codes account=" + account_id
         )
+    except BusinessException as exception:
+        return resource_utils.business_exception_response(exception)
+    except Exception as default_exception:  # noqa: B902; return nicer default error
+        return resource_utils.default_exception_response(default_exception)
+
+
+@bp.route("/accounts", methods=["POST", "OPTIONS"])
+@cross_origin(origin="*")
+@jwt.requires_auth
+def post_account_codes():
+    """Create a new client party code as either a new head office and branch or as a new branch."""
+    try:
+        # Quick check: must be staff or provide an account ID.
+        account_id = resource_utils.get_account_id(request)
+        if account_id is None:
+            return resource_utils.account_required_response()
+        # Verify request JWT and account ID
+        if not authorized(account_id, jwt):
+            return resource_utils.unauthorized_error_response(account_id)
+        request_json = request.get_json(silent=True)
+        # Validate request data against the schema.
+        valid_format, errors = schema_utils.validate(request_json, "clientParty", "ppr")
+        if not valid_format:
+            return resource_utils.validation_error_response(errors, fs_utils.VAL_ERROR)
+        staff: bool = is_staff(jwt)
+        if not request_json.get("headOfficeCode") and not staff:
+            codes = ClientCode.find_by_bcrs_account(account_id)
+            if codes:
+                head_office = codes[0].get("headOfficeCode")
+                logger.info(f"Account {account_id} found existing head office code {head_office}, creating branch")
+                request_json["headOfficeCode"] = head_office
+        extra_validation_msg = party_validator.validate_client_code_registration(
+            request_json, ClientCodeTypes.CREATE_CODE, account_id, staff
+        )
+        if extra_validation_msg != "":
+            return resource_utils.validation_error_response(errors, fs_utils.VAL_ERROR, extra_validation_msg)
+        req_account_id = account_id if not staff else request_json.get("accountId")
+        logger.info(f"New client party code request staff={staff} account ID={req_account_id}")
+        token: dict = g.jwt_oidc_token_info
+        reg: ClientCodeRegistration = ClientCodeRegistration.create_new_from_json(
+            request_json, req_account_id, token.get("username")
+        )
+        reg.save()
+        return jsonify(reg.client_code.json), HTTPStatus.CREATED
+    except DatabaseException as db_exception:
+        return resource_utils.db_exception_response(db_exception, account_id, "POST account client party code")
     except BusinessException as exception:
         return resource_utils.business_exception_response(exception)
     except Exception as default_exception:  # noqa: B902; return nicer default error

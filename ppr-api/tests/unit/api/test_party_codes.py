@@ -23,7 +23,56 @@ import pytest
 from ppr_api.services.authz import STAFF_ROLE, PPR_ROLE, COLIN_ROLE
 from tests.unit.services.utils import create_header_account, create_header
 
-
+TEST_CODE_NEW1 =   {
+    "businessName": "PETERBILT TRUCKS PACIFIC INC.",
+    "address": {
+      "street": "1079 DOUGLAS ST",
+      "city": "VICTORIA",
+      "region": "BC",
+      "country": "CA",
+      "postalCode": "V8W 2C5"
+    },
+    "emailAddress": "test-1@test-ptc.com",
+    "contact": {
+      "name": "Example Contact 1",
+      "areaCode": "250",
+      "phoneNumber": "3564500"
+    }
+}
+TEST_CODE_NEW2 =   {
+    "accountId": "1234",
+    "businessName": "PETERBILT TRUCKS PACIFIC INC.",
+    "address": {
+      "street": "1079 DOUGLAS ST",
+      "city": "VICTORIA",
+      "region": "BC",
+      "country": "CA",
+      "postalCode": "V8W 2C5"
+    },
+    "emailAddress": "test-1@test-ptc.com",
+    "contact": {
+      "name": "Example Contact 1",
+      "areaCode": "250",
+      "phoneNumber": "3564500"
+    }
+}
+TEST_CODE_NEW3 =   {
+    "address": {
+      "street": "1079 DOUGLAS ST",
+      "city": "VICTORIA",
+      "region": "BC",
+      "country": "CA",
+      "postalCode": "V8W 2C5"
+    },
+    "contact": {
+      "name": "Example Contact 1",
+      "areaCode": "250",
+      "phoneNumber": "3564500"
+    }
+}
+ROLES_STAFF = [PPR_ROLE, STAFF_ROLE]
+ROLES_PPR = [PPR_ROLE]
+ROLES_INVALID = [COLIN_ROLE]
 # testdata pattern is ({description}, {is staff}, {include account}, {response status}, {role}, {search_value})
 TEST_DATA_PARTY_CODE = [
     ('Valid non-staff non-existent', False, True, HTTPStatus.NOT_FOUND, PPR_ROLE, '12345'),
@@ -54,6 +103,44 @@ TEST_DATA_ACCOUNT = [
     ('Valid search id exists', False, HTTPStatus.OK, PPR_ROLE, 'PS12', True, False, 'UT0005'),
     ('Valid search id non-existent', False, HTTPStatus.OK, PPR_ROLE, 'PS12', False, False, 'UT00XX'),
 ]
+# testdata pattern is ({description}, {include account}, {response status}, {roles}, {payload})
+TEST_DATA_CREATE_CODE = [
+    ('Valid non-staff', True, HTTPStatus.CREATED, ROLES_PPR, TEST_CODE_NEW1),
+    ('Valid staff', True, HTTPStatus.CREATED, ROLES_STAFF, TEST_CODE_NEW2),
+    ('Non-staff missing account ID', False, HTTPStatus.BAD_REQUEST, ROLES_PPR, TEST_CODE_NEW1),
+    ('Staff missing account ID', False, HTTPStatus.BAD_REQUEST, ROLES_STAFF, TEST_CODE_NEW2),
+    ('Unauthorized', True, HTTPStatus.UNAUTHORIZED, ROLES_INVALID, TEST_CODE_NEW1),
+    ('Extra validation error', True, HTTPStatus.BAD_REQUEST, ROLES_STAFF, TEST_CODE_NEW1),
+    ('Schema validation error', True, HTTPStatus.BAD_REQUEST, ROLES_PPR, TEST_CODE_NEW3),
+]
+
+
+@pytest.mark.parametrize('desc,include_account,status,roles,payload', TEST_DATA_CREATE_CODE)
+def test_create_party_code(session, client, jwt, desc, include_account, status, roles, payload):
+    """Assert that a create party code request returns the expected response code and data."""
+    # setup
+    headers = None
+    if include_account:
+        headers = create_header_account(jwt, roles, account_id='UT-12345')
+    else:
+        headers = create_header(jwt, roles)
+
+    # test
+    rv = client.post('/api/v1/party-codes/accounts',
+                     json=payload,
+                     headers=headers,
+                     content_type='application/json')
+    # check
+    assert rv.status_code == status
+    if rv.status_code == HTTPStatus.CREATED:
+        assert rv.json
+        response_json = rv.json
+        assert response_json.get('code')
+        assert response_json.get('headOfficeCode')
+        assert response_json.get('accountId')
+        assert response_json.get('contact')
+        assert response_json.get('address')
+        assert response_json.get('businessName')
 
 
 @pytest.mark.parametrize('desc,staff,include_account,status,role,search_value', TEST_DATA_PARTY_CODE)

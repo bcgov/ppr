@@ -18,7 +18,7 @@ Test-Suite to ensure that the PPR Type Table Models are working as expected.
 """
 
 from ppr_api.models import type_tables
-from ppr_api.models.type_tables import RegistrationTypes
+from ppr_api.models.type_tables import ClientCodeTypes, RegistrationTypes
 
 import pytest
 
@@ -32,6 +32,14 @@ TEST_REG_TYPES = [
     (RegistrationTypes.SA.value, True),
     (RegistrationTypes.CL.value, True),
 ]
+# testdata pattern is ({client_code_type}, {exists})
+TEST_CLIENT_CODE_TYPES = [
+    ('XX', False),
+    (ClientCodeTypes.CREATE_CODE.value, True),
+    (ClientCodeTypes.CHANGE_ADDRESS.value, True),
+    (ClientCodeTypes.CHANGE_NAME.value, True),
+    (ClientCodeTypes.CHANGE_NAME_ADDRESS.value, True),
+]
 
 
 def test_registration_type_find_all(session):
@@ -44,6 +52,18 @@ def test_registration_type_find_all(session):
         assert result.registration_desc
         assert result.registration_type_cl
         assert result.registration_act
+
+
+@pytest.mark.parametrize('client_code_type, exists', TEST_CLIENT_CODE_TYPES)
+def test_client_code_type_find_all(session, client_code_type, exists):
+    """Assert that ClientCodeType.find_all() contains all expected elements."""
+    results = type_tables.ClientCodeType.find_all()
+    assert results
+    assert len(results) >= 4
+    if exists:
+        assert client_code_type in ClientCodeTypes
+    else:
+        assert client_code_type not in ClientCodeTypes
 
 
 @pytest.mark.parametrize('reg_type, exists', TEST_REG_TYPES)

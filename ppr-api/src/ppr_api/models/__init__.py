@@ -17,6 +17,7 @@ from .account_bcol_id import AccountBcolId
 from .address import Address
 from .client_code import ClientCode
 from .client_code_historical import ClientCodeHistorical
+from .client_code_registration import ClientCodeRegistration
 from .court_order import CourtOrder
 
 # flake8: noqa I001
@@ -36,6 +37,7 @@ from .securities_act_notice import SecuritiesActNotice
 from .securities_act_order import SecuritiesActOrder
 from .trust_indenture import TrustIndenture
 from .type_tables import (
+    ClientCodeType,
     CountryType,
     EventTrackingType,
     PartyType,
@@ -59,9 +61,12 @@ __all__ = (
     "Address",
     "ClientCode",
     "ClientCodeHistorical",
+    "ClientCodeRegistration",
+    "ClientCodeType",
     "CountryType",
     "CourtOrder",
     "Draft",
+    "EventTracking",
     "EventTrackingType",
     "FinancingStatement",
     "GeneralCollateral",
