@@ -18,6 +18,14 @@ export const useConnectFeesHandler = () => {
     setFees({[registrationFeeType]: { ...RegistrationFees[registrationFeeType] }})
   }
 
+  /** Set the registration fees */
+  const setRegistrationFeeDesc = (registrationFeeType: FeeSummaryTypes, filingType: string): void => {
+    setFees({[registrationFeeType]: {
+      ...RegistrationFees[registrationFeeType],
+        filingTypeCode: filingType
+    }})
+  }
+
   /** Set the registration fees for combination charges */
   const setRegistrationComboFees = (registrationFeeType: FeeSummaryTypes, quantity: number = null): void => {
     setFees({
@@ -82,6 +90,7 @@ export const useConnectFeesHandler = () => {
   return {
     setFeeQuantity,
     setRegistrationFees,
+    setRegistrationFeeDesc,
     setRegistrationComboFees
   }
 }

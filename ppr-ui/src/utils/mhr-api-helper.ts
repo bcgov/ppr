@@ -435,9 +435,11 @@ export async function validateDocumentID (documentId: string) {
 export async function submitMhrTransfer (
   payloadData: MhrTransferApiIF,
   mhrNumber: string,
-  staffPayment: StaffPaymentIF
+  staffPayment: StaffPaymentIF,
+  isCcOverride = false
 ) {
-  const paymentParams = mhrStaffPaymentParameters(staffPayment)
+  let paymentParams = mhrStaffPaymentParameters(staffPayment)
+  if (isCcOverride) paymentParams += 'ccPayment=true'
   const url = `transfers/${mhrNumber}?${paymentParams}`
 
   try {
@@ -464,10 +466,13 @@ export async function submitMhrTransfer (
 export async function submitAdminRegistration (
   mhrNumber: string,
   payloadData: AdminRegistrationIF,
-  staffPayment: StaffPaymentIF
+  staffPayment: StaffPaymentIF,
+  isCcOverride = false
 ): Promise<any> {
   try {
-    const paymentParams = mhrStaffPaymentParameters(staffPayment)
+    let paymentParams = mhrStaffPaymentParameters(staffPayment)
+    if (isCcOverride) paymentParams += 'ccPayment=true'
+
     const result = await axios.post(
       `admin-registrations/${mhrNumber}?${paymentParams}`,
       payloadData,
@@ -520,10 +525,12 @@ export async function submitMhrUnitNote (mhrNumber, payloadData, isAdminRegistra
 export async function submitMhrTransportPermit (
   mhrNumber: string,
   payloadData: MhrTransportPermitIF,
-  staffPayment: StaffPaymentIF
+  staffPayment: StaffPaymentIF,
+  isCcOverride = false
 ) {
   try {
-    const paymentParams = mhrStaffPaymentParameters(staffPayment)
+    let paymentParams = mhrStaffPaymentParameters(staffPayment)
+    if (isCcOverride) paymentParams += 'ccPayment=true'
     const url = `permits/${mhrNumber}?${paymentParams}`
 
     const result = await axios.post(url, payloadData, getDefaultConfig())

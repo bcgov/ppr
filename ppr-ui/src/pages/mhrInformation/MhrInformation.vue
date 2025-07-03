@@ -594,7 +594,7 @@
           >
             <aside>
               <StickyContainer
-                :show-connect-fee="false"
+                :show-connect-fees="true"
                 :set-show-buttons="true"
                 :set-back-btn="showBackBtn"
                 :set-cancel-btn="'Cancel'"
@@ -604,9 +604,7 @@
                 :set-show-fee-summary="true"
                 :set-fee-type="feeType"
                 :set-err-msg="transferErrorMsg"
-                :transfer-type="(isChangeLocationActive || isCancelChangeLocationActive || isExtendChangeLocationActive)
-                  ? getUiFeeSummaryLocationType(transportPermitLocationType)
-                  : getUiTransferType()"
+                :transfer-type="selectedChangeType"
                 :set-is-loading="submitBtnLoading"
                 data-test-id="fee-summary"
                 @cancel="goToDashboard()"
@@ -623,36 +621,36 @@
 </template>
 
 <script lang="ts">
-import type { Component } from 'vue';
+import type { Component } from 'vue'
 import { computed, defineComponent, nextTick, onMounted, reactive, ref, toRefs, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import {
-  StaffPayment,
   Attention,
   CautionBox,
   CertifyInformation,
-  FolioOrReferenceNumber,
   ContactInformation,
-  StickyContainer,
   DocumentId,
+  FolioOrReferenceNumber,
   LienAlert,
-  SimpleHelpToggle
+  SimpleHelpToggle,
+  StaffPayment,
+  StickyContainer
 } from '@/components/common'
 import {
-  StaffPaymentOptions,
   APIMHRMapSearchTypes,
+  APIMhrTypes,
   APISearchTypes,
-  ApiTransferTypes,
+  ApiTransferTypes, ConnectPaymentMethod,
+  ErrorCategories,
+  LocationChangeTypes,
+  MhApiFrozenDocumentTypes,
   MhApiStatusTypes,
   RouteNames,
+  StaffPaymentOptions,
   UIMHRSearchTypes,
-  LocationChangeTypes,
-  ErrorCategories,
-  UnitNoteDocTypes,
-  MhApiFrozenDocumentTypes,
-  APIMhrTypes
+  UnitNoteDocTypes
 } from '@/enums'
 import {
   useAuth,
@@ -686,23 +684,23 @@ import {
   UnitNotesInfo
 } from '@/resources'
 import {
-  cancelOwnerChangeConfirm,
-  incompleteRegistrationDialog,
-  transferRequiredDialog,
-  unsavedChangesDialog,
-  cancelTransportPermitDialog,
   cancelAmendTransportPermitDialog,
+  cancelOwnerChangeConfirm,
+  cancelTransportPermitDialog,
   changeTransportPermitLocationTypeDialog,
-  outOfDateOwnersDialogOptions
+  incompleteRegistrationDialog,
+  outOfDateOwnersDialogOptions,
+  transferRequiredDialog,
+  unsavedChangesDialog
 } from '@/resources/dialogOptions'
 import AccountInfo from '@/components/common/AccountInfo.vue'
 import MhrTransportPermit from './MhrTransportPermit.vue'
 import { LocationChangeReview, TransportPermitDetails } from '@/components/mhrTransportPermits'
 import {
-  LocationChangeConfirmCompletion,
-  TransportPermitConfirmCompletion,
   AmendTransportPermitConfirmCompletion,
-  CancelTransportPermitConfirmCompletion
+  CancelTransportPermitConfirmCompletion,
+  LocationChangeConfirmCompletion,
+  TransportPermitConfirmCompletion
 } from '@/components/mhrTransportPermits/ConfirmCompletionContent'
 import type {
   AccountInfoIF,
@@ -710,15 +708,10 @@ import type {
   ErrorIF,
   MhrTransferApiIF,
   RegTableNewItemI,
-  TransferTypeSelectIF,
   StaffPaymentIF,
+  TransferTypeSelectIF
 } from '@/interfaces'
-import {
-  getAccountInfoFromAuth,
-  getFeatureFlag,
-  pacificDate,
-  scrollToTop
-} from '@/utils'
+import { getAccountInfoFromAuth, getFeatureFlag, pacificDate, scrollToTop } from '@/utils'
 import {
   createMhrDraft,
   getMhrDraft,
@@ -779,7 +772,8 @@ export default defineComponent({
     const router = useRouter()
     const { goToDash, goToPay } = useNavigation()
     const { isAuthenticated } = useAuth()
-    const { setRegistrationFees } = useConnectFeesHandler()
+    const { setRegistrationFees, setRegistrationFeeDesc } = useConnectFeesHandler()
+    const { userSelectedPaymentMethod } = storeToRefs(useConnectFeeStore())
     const {
       // Actions
       setMhrStatusType,
@@ -976,18 +970,27 @@ export default defineComponent({
           setRegistrationFees(FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT)
           return FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT
         } else if (isCancelChangeLocationActive.value) {
-          setRegistrationFees(FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT)
+          setRegistrationFees(FeeSummaryTypes.MHR_TRANSPORT_PERMIT_CANCEL)
           return FeeSummaryTypes.MHR_TRANSPORT_PERMIT_CANCEL
         } else if (isExtendChangeLocationActive.value) {
-          setRegistrationFees(FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT)
+          setRegistrationFees(FeeSummaryTypes.MHR_TRANSPORT_PERMIT_EXTEND)
           return FeeSummaryTypes.MHR_TRANSPORT_PERMIT
         } else {
-          const defaultFeeType = isChangeLocationActive.value ? FeeSummaryTypes.MHR_TRANSPORT_PERMIT : FeeSummaryTypes.MHR_TRANSFER
-          setRegistrationFees(defaultFeeType)
-          return defaultFeeType
+          if (isChangeLocationActive.value) {
+            setRegistrationFees(FeeSummaryTypes.MHR_PERMIT_DEFAULT)
+            return FeeSummaryTypes.MHR_TRANSPORT_PERMIT
+          } else {
+            setRegistrationFees(FeeSummaryTypes.MHR_OWNER_DEFAULT)
+            return FeeSummaryTypes.MHR_TRANSFER
+          }
         }
-      }
-      ),
+      }),
+      selectedChangeType: computed(() => {
+        return (isChangeLocationActive.value || isCancelChangeLocationActive.value ||
+          isExtendChangeLocationActive.value)
+            ? getUiFeeSummaryLocationType(localState.transportPermitLocationType)
+            : getUiTransferType()
+      }),
       hasActiveExemption: computed((): boolean => !!getActiveExemption() ||
         getMhrInformation.value.statusType === MhApiStatusTypes.EXEMPT),
       transferRequiredDialogOptions: computed((): DialogOptionsIF => {
@@ -1262,7 +1265,8 @@ export default defineComponent({
           const locationChangeFiling = await submitAdminRegistration(
             getMhrInformation.value.mhrNumber,
             buildLocationChange(),
-            localState.staffPayment
+            localState.staffPayment,
+            userSelectedPaymentMethod.value === ConnectPaymentMethod.DIRECT_PAY
           )
 
           if (!locationChangeFiling?.error) {
@@ -1291,7 +1295,7 @@ export default defineComponent({
             await buildAndSubmitTransportPermit(
               getMhrInformation.value.mhrNumber,
               localState.staffPayment,
-              isCreditCardPreferredPayment.value
+              userSelectedPaymentMethod.value === ConnectPaymentMethod.DIRECT_PAY
             )
 
           if(transportPermitFilingResp?.paymentPending) {
@@ -1323,7 +1327,8 @@ export default defineComponent({
         const mhrTransferFiling = await submitMhrTransfer(
             apiData,
             getMhrInformation.value.mhrNumber,
-            localState.staffPayment
+            localState.staffPayment,
+          userSelectedPaymentMethod.value === ConnectPaymentMethod.DIRECT_PAY
           )
 
         if(mhrTransferFiling?.paymentPending) {
@@ -1605,10 +1610,23 @@ export default defineComponent({
     })
 
     watch(() => localState.transportPermitLocationType, val => {
-      if (val === LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK) {
-        populateLocationInfoForSamePark(getMhrRegistrationLocation.value)
-        setUnsavedChanges(false)
+      switch (val) {
+        case LocationChangeTypes.EXTEND_PERMIT:
+          setRegistrationFees(FeeSummaryTypes.MHR_TRANSPORT_PERMIT_EXTEND)
+          break
+        case LocationChangeTypes.REGISTERED_LOCATION:
+          setRegistrationFees(FeeSummaryTypes.MHR_LOCATION_CHANGE)
+          break
+        case LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK:
+          populateLocationInfoForSamePark(getMhrRegistrationLocation.value)
+          setUnsavedChanges(false)
+        default:
+          setRegistrationFees(localState.feeType)
       }
+    })
+
+    watch(()=> localState.selectedChangeType, val => {
+      setRegistrationFeeDesc(FeeSummaryTypes.MHR_TRANSFER, getMhrTransferType.value?.transferType)
     })
 
     /** Inform root level components when there is an MHR action in Progress **/
@@ -1619,6 +1637,7 @@ export default defineComponent({
     }, { immediate: true })
 
     return {
+      userSelectedPaymentMethod,
       isNewPermitActive,
       isRoleStaffSbc,
       isRoleStaffReg,

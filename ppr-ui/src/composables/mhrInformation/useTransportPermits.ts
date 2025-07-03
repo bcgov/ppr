@@ -221,8 +221,8 @@ export const useTransportPermits = () => {
     await nextTick()
   }
 
-  const buildAndSubmitTransportPermit = (mhrNumber: string, staffPayment: StaffPaymentIF) => {
-    return submitMhrTransportPermit(mhrNumber, buildPayload(), staffPayment)
+  const buildAndSubmitTransportPermit = (mhrNumber: string, staffPayment: StaffPaymentIF, isCcOverride = false) => {
+    return submitMhrTransportPermit(mhrNumber, buildPayload(), staffPayment, isCcOverride)
   }
 
   const buildPayload = (): MhrTransportPermitIF => {
