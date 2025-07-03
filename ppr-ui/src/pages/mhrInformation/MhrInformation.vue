@@ -1620,6 +1620,8 @@ export default defineComponent({
         case LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK:
           populateLocationInfoForSamePark(getMhrRegistrationLocation.value)
           setUnsavedChanges(false)
+          setRegistrationFees(localState.feeType)
+          break
         default:
           setRegistrationFees(localState.feeType)
       }

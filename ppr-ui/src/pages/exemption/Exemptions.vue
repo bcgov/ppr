@@ -48,14 +48,13 @@
             class="pl-6 pt-5"
             cols="3"
           >
-            <aside>
+            <aside>{{userSelectedPaymentMethod}}
               <StickyContainer
+                :show-connect-fees="true"
                 :set-show-buttons="false"
                 :set-right-offset="true"
                 :set-show-fee-summary="true"
-                :set-fee-type="isNonResExemption
-                  ? FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION
-                  : FeeSummaryTypes.RESIDENTIAL_EXEMPTION"
+                :set-fee-type="feeType"
                 data-test-id="exemption-fee-summary"
               />
             </aside>
@@ -95,7 +94,7 @@ import { useAuth, useExemptions, useMhrInformation, useNavigation } from '@/comp
 import type { ErrorIF, RegTableNewItemI } from '@/interfaces'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { notCompleteDialog } from '@/resources/dialogOptions'
-import { RouteNames } from '@/enums'
+import { ConnectPaymentMethod, RouteNames } from '@/enums'
 
 export default defineComponent({
   name: 'Exemptions',
@@ -113,9 +112,11 @@ export default defineComponent({
   emits: ['emitHaveData', 'error'],
   setup (props, { emit }) {
     const { isAuthenticated } = useAuth()
-    const { isRouteName, goToDash, route } = useNavigation()
+    const { isRouteName, goToDash, goToPay, route } = useNavigation()
     const { parseMhrInformation } = useMhrInformation()
     const { buildExemptionPayload, exemptionLabel, isNonResExemption } = useExemptions()
+    const { setRegistrationFees } = useConnectFeesHandler()
+    const { userSelectedPaymentMethod } = storeToRefs(useConnectFeeStore())
     const { setRegTableNewItem, setUnsavedChanges } = useStore()
     const {
       getMhrExemptionSteps,
@@ -128,7 +129,12 @@ export default defineComponent({
     const localState = reactive({
       dataLoaded: false,
       loading: false,
-      validate: false
+      validate: false,
+      feeType: computed(() => {
+        return isNonResExemption.value
+          ? FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION
+          : FeeSummaryTypes.RESIDENTIAL_EXEMPTION
+      })
     })
 
     onMounted(async (): Promise<void> => {
@@ -167,7 +173,16 @@ export default defineComponent({
 
           // Submit Filing
           const exemptionFiling =
-            await createExemption(payload, getMhrInformation.value.mhrNumber, getStaffPayment.value) as any
+            await createExemption(
+              payload,
+              getMhrInformation.value.mhrNumber,
+              getStaffPayment.value,
+              userSelectedPaymentMethod.value === ConnectPaymentMethod.DIRECT_PAY
+            ) as any
+
+          if(exemptionFiling?.paymentPending) {
+            goToPay(exemptionFiling.payment?.invoiceId)
+          }
 
           // Add new reg action for table scroll and go to dash
           if (!exemptionFiling?.error) {
@@ -187,12 +202,17 @@ export default defineComponent({
       }
     }
 
+    watch(() => localState.feeType, async (val: FeeSummaryTypes) => {
+      setRegistrationFees(val)
+    }, { immediate: true })
+
     watch(() => route.name, async () => {
       await nextTick()
       localState.validate && await scrollToFirstVisibleErrorComponent()
     })
 
     return {
+      userSelectedPaymentMethod,
       submit,
       emitError,
       isRouteName,

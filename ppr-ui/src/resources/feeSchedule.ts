@@ -262,6 +262,42 @@ export const RegistrationFees = {
     waived: false,
     showFeeDesc: true
   },
+  [FeeSummaryTypes.RESIDENTIAL_EXEMPTION]: {
+    filingFees: 50,
+    filingType: 'Residential Exemption',
+    filingTypeCode: FeeSummaryTypes.RESIDENTIAL_EXEMPTION,
+    futureEffectiveFees: 0,
+    priorityFees: 0,
+    processingFees: 0,
+    serviceFees: 0,
+    tax: {
+      gst: 0,
+      pst: 0
+    },
+    total: 50,
+    quantity: 1,
+    quantityDesc: '',
+    waived: false,
+    showFeeDesc: false
+  },
+  [FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION]: {
+    filingFees: 50,
+    filingType: 'Non Residential Exemption',
+    filingTypeCode: FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION,
+    futureEffectiveFees: 0,
+    priorityFees: 0,
+    processingFees: 0,
+    serviceFees: 0,
+    tax: {
+      gst: 0,
+      pst: 0
+    },
+    total: 50,
+    quantity: 1,
+    quantityDesc: '',
+    waived: false,
+    showFeeDesc: false
+  },
   [FeeSummaryTypes.NO_FEE]: {
     filingFees: 0,
     filingType: APIRegistrationTypes.MANUFACTURED_HOME_REGISTRATION,

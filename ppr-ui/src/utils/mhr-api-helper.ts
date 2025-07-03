@@ -986,18 +986,22 @@ export async function getQsServiceAgreements (): Promise<any> {
  * @param payload The request payload containing the exemption information
  * @param mhrNumber The specified Mhr number
  * @param staffPayment The staff payment data
+ * @param isCcOverride Indicates if the credit card override is applied
  */
 // Function Definition
 export async function createExemption (
   payload: ExemptionIF,
   mhrNumber: string,
-  staffPayment: StaffPaymentIF
+  staffPayment: StaffPaymentIF,
+  isCcOverride: boolean = false
 ): Promise<ExemptionIF | ErrorDetailIF> {
   try {
-    const paymentParams = `?${mhrStaffPaymentParameters(staffPayment)}`
+    let paymentParams = `${mhrStaffPaymentParameters(staffPayment)}`
+    if (isCcOverride) paymentParams += 'ccPayment=true'
+    const url = `exemptions/${mhrNumber}?${paymentParams}`
 
     const response = await axios.post<ExemptionIF>(
-      `exemptions/${mhrNumber}${paymentParams}`,
+      url,
       payload,
       getDefaultConfig()
     )

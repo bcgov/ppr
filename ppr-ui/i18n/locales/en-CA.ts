@@ -53,6 +53,10 @@ export default {
         SZL: 'Ownership Transfer or Change',
         TAXS: 'Ownership Transfer or Change',
         VEST: 'Ownership Transfer or Change',
+
+        // Exemptions
+        residential_exemption: 'Residential Exemption',
+        non_residential_exemption: 'Non-Residential Exemption',
       },
       feeDesc: {
         mhr_staff_correction: 'Staff Error or Omission',
