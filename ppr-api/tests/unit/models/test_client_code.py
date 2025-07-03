@@ -16,10 +16,47 @@
 
 Test-Suite to ensure that the ClientCode Model is working as expected.
 """
+import copy
 import pytest
 
-from ppr_api.models import ClientCode
+from ppr_api.models import Address, ClientCode
+from ppr_api.utils.logging import logger
 
+
+TEST_CODE_NEW =   {
+    "accountId": "1234",
+    "businessName": "PETERBILT TRUCKS PACIFIC INC.",
+    "address": {
+      "street": "1079 DOUGLAS ST",
+      "city": "VICTORIA",
+      "region": "BC",
+      "country": "CA",
+      "postalCode": "V8W 2C5"
+    },
+    "emailAddress": "test-1@test-ptc.com",
+    "contact": {
+      "name": "Example Contact 1",
+      "areaCode": "250",
+      "phoneNumber": "3564500"
+    }
+}
+TEST_CODE_NEW_BRANCH =   {
+    "accountId": "1234",
+    "businessName": "PETERBILT TRUCKS PACIFIC INC. - Branch 1",
+    "address": {
+      "street": "1234 JAMES ST",
+      "city": "SAANICH",
+      "region": "BC",
+      "country": "CA",
+      "postalCode": "V8X 1D3"
+    },
+    "emailAddress": "test-2@test-ptc.com",
+    "contact": {
+      "name": "Example Contact 2",
+      "areaCode": "250",
+      "phoneNumber": "3564501"
+    }
+}
 
 # testdata pattern is ({description}, {exists}, {search_value}, {account_id})
 TEST_DATA_PARTY_CODE = [
@@ -233,6 +270,7 @@ def test_client_party_json(session):
     """Assert that the client party model renders to a json format correctly."""
     party = ClientCode(
         id=10001,
+        head_id=1,
         name='BUSINESS NAME',
         contact_name='CONTACT',
         contact_area_cd='250',
@@ -243,6 +281,7 @@ def test_client_party_json(session):
 
     party_json = {
         'code': party.format_party_code(),
+        'headOfficeCode': party.format_head_office_code(),
         'accountId': '1234',
         'businessName': party.name,
         'contact': {
@@ -253,3 +292,47 @@ def test_client_party_json(session):
         'emailAddress': party.email_id
     }
     assert party.json == party_json
+
+
+def test_create_new_from_json(session):
+    """Assert that creating a new client party from json is working correctly."""
+    code: ClientCode = ClientCode.create_new_from_json(TEST_CODE_NEW, TEST_CODE_NEW.get("accountId"))
+    code.save()
+    address: Address = code.address
+    # logger.info(f"saved address {address.json}")
+    assert code.id
+    assert code.head_id
+    assert code.account_id == TEST_CODE_NEW.get("accountId")
+    assert code.name == TEST_CODE_NEW.get("businessName")
+    assert code.email_id == TEST_CODE_NEW.get("emailAddress")
+    assert code.contact_name == TEST_CODE_NEW["contact"].get("name")
+    assert code.contact_phone_number == TEST_CODE_NEW["contact"].get("phoneNumber")
+    assert code.contact_area_cd == TEST_CODE_NEW["contact"].get("areaCode")
+    assert address
+    request_address = TEST_CODE_NEW.get("address")
+    logger.debug(f"request address {request_address}")
+    assert request_address == address.json
+
+
+def test_create_branch_from_json(session):
+    """Assert that creating a new client party branch from json is working correctly."""
+    code: ClientCode = ClientCode.create_new_from_json(TEST_CODE_NEW, TEST_CODE_NEW.get("accountId"))
+    code.save()
+    code_json = copy.deepcopy(TEST_CODE_NEW_BRANCH)
+    code_json["headOfficeCode"] = code.format_head_office_code()
+    branch: ClientCode = ClientCode.create_new_branch_from_json(code_json, code_json.get("accountId"))
+    branch.save()
+    address: Address = branch.address
+    # logger.info(f"saved address {address.json}")
+    assert branch.id > code.id
+    assert code.head_id == branch.head_id
+    assert branch.account_id == TEST_CODE_NEW_BRANCH.get("accountId")
+    assert branch.name == TEST_CODE_NEW_BRANCH.get("businessName")
+    assert branch.email_id == TEST_CODE_NEW_BRANCH.get("emailAddress")
+    assert branch.contact_name == TEST_CODE_NEW_BRANCH["contact"].get("name")
+    assert branch.contact_phone_number == TEST_CODE_NEW_BRANCH["contact"].get("phoneNumber")
+    assert branch.contact_area_cd == TEST_CODE_NEW_BRANCH["contact"].get("areaCode")
+    assert address
+    request_address = TEST_CODE_NEW_BRANCH.get("address")
+    logger.debug(f"request address {request_address}")
+    assert request_address == address.json

@@ -20,12 +20,10 @@ from __future__ import annotations
 from sqlalchemy.sql import text
 
 from ppr_api.exceptions import DatabaseException
+from ppr_api.models import AccountBcolId, Address
+from ppr_api.models import utils as model_utils
 from ppr_api.utils.logging import logger
 
-from .account_bcol_id import AccountBcolId  # noqa: F401 pylint: disable=unused-import
-
-# Needed by the SQLAlchemy relationship
-from .address import Address  # noqa: F401 pylint: disable=unused-import
 from .db import db
 
 CLIENT_CODE_BRANCH_QUERY = """
@@ -36,6 +34,9 @@ select LPAD(cc.id::text, 8, '0') as party_code, cc.id as branch_id, cc.head_id, 
  where LPAD(cc.id::text, 8, '0') like :query_val
    and a.id = cc.address_id
 order by cc.id
+"""
+GENERATED_ID_QUERY = """
+select nextval('code_branch_id_seq') AS next_head_id
 """
 
 
@@ -59,10 +60,24 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
     account_id = db.mapped_column("account_id", db.String(20), index=True, nullable=True)
 
     # parent keys
+    client_code_registration_id = db.mapped_column(
+        "client_code_registration_id",
+        db.Integer,
+        db.ForeignKey("client_code_registrations.id"),
+        nullable=True,
+        index=True,
+    )
     address_id = db.mapped_column("address_id", db.Integer, db.ForeignKey("addresses.id"), nullable=False, index=True)
     users_id = db.mapped_column("users_id", db.Integer, db.ForeignKey("users.id"), nullable=True, index=True)
 
     # Relationships
+    client_code_registration = db.relationship(
+        "ClientCodeRegistration",
+        foreign_keys=[client_code_registration_id],
+        back_populates="client_code",
+        cascade="all, delete",
+        uselist=False,
+    )
     address = db.relationship(
         "Address", foreign_keys=[address_id], uselist=False, back_populates="client_code", cascade="all, delete"
     )
@@ -74,6 +89,7 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return the client party branch as a json object."""
         party = {
             "code": self.format_party_code(),
+            "headOfficeCode": self.format_head_office_code(),
             "accountId": self.account_id if self.account_id else "",
             "businessName": self.name,
             "contact": {
@@ -81,6 +97,8 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
                 "phoneNumber": self.contact_phone_number if self.contact_phone_number else "",
             },
         }
+        # if self.bconline_account:  # Verify no access issue.
+        #    party["bconlineAccount"] = self.bconline_account
         if self.contact_area_cd:
             party["contact"]["areaCode"] = self.contact_area_cd
         if self.email_id:
@@ -91,9 +109,18 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
 
         return party
 
+    def save(self):
+        """Save the object to the database immediately. Only used for unit testing."""
+        db.session.add(self)
+        db.session.commit()
+
     def format_party_code(self) -> str:
         """Return the client party code in the 8 character format padded with leading zeroes."""
         return str(self.id).strip().rjust(8, "0")
+
+    def format_head_office_code(self) -> str:
+        """Return the client party head office code in the 4 character format padded with leading zeroes."""
+        return str(self.head_id).strip().rjust(4, "0")
 
     @classmethod
     def find_by_code(cls, code: str = None):
@@ -327,3 +354,87 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
             raise DatabaseException(db_exception) from db_exception
 
         return client_codes
+
+    @staticmethod
+    def get_next_head_code():
+        """Get the next available head office code.
+
+        A new head office code is used create the first branch - a new party code with a branch code of 1.
+        """
+        result = db.session.execute(text(GENERATED_ID_QUERY))
+        row = result.first()
+        head_id = int(row[0])
+        logger.info(f"Next client party head office code={head_id}")
+        return head_id
+
+    @staticmethod
+    def get_next_branch_code(head_office_code: str) -> int:
+        """Return the next branch code for a the head office."""
+        try:
+            head_code: int = int(head_office_code.strip())
+            party_list = (
+                db.session.query(ClientCode)
+                .filter(ClientCode.head_id == int(head_code))
+                .order_by(ClientCode.id.desc())
+                .all()
+            )
+            if not party_list:  # Request for a new head office and branch
+                branch_id: int = head_code * 10000 + 1
+                logger.info(f"No existing branch for head office {head_office_code}: returning {branch_id}")
+                return branch_id
+            else:
+                branch_id: int = party_list[0].id + 1
+                logger.info(f"Head office {head_office_code}: returning new branch code {branch_id}")
+                return branch_id
+        except Exception as db_exception:  # noqa: B902; return nicer error
+            logger.error(f"Head office {head_office_code} get_next_branch_code exception: {db_exception}")
+            raise DatabaseException(db_exception) from db_exception
+
+    @staticmethod
+    def create_new_from_json(json_data: dict, account_id: str):
+        """Create a client party code object from dict/json as new head office and first branch."""
+        code: ClientCode = ClientCode(
+            head_id=ClientCode.get_next_head_code(),
+            date_ts=model_utils.now_ts(),
+            account_id=account_id,
+            name=json_data.get("businessName"),
+            email_id=json_data.get("emailAddress"),
+        )
+        branch_code: str = code.format_head_office_code() + "0001"
+        code.id = int(branch_code)
+        code.address = Address.create_from_json(json_data["address"])
+        if json_data.get("contact"):
+            if json_data["contact"].get("name"):
+                code.contact_name = json_data["contact"].get("name")
+            if json_data["contact"].get("phoneNumber"):
+                code.contact_phone_number = json_data["contact"].get("phoneNumber")
+            if json_data["contact"].get("areaCode"):
+                code.contact_area_cd = json_data["contact"].get("areaCode")
+        if json_data.get("bconlineAccount"):  # Retain for audit, not used with new codes.
+            code.bconline_account = json_data.get("bconlineAccount")
+        return code
+
+    @staticmethod
+    def create_new_branch_from_json(json_data: dict, account_id: str):
+        """Create a client party code object from dict/json as new branch for an existing head office."""
+        head_code: str = str(json_data.get("headOfficeCode").strip())
+        head_id: int = int(head_code)
+        code: ClientCode = ClientCode(
+            head_id=head_id,
+            date_ts=model_utils.now_ts(),
+            account_id=account_id,
+            name=json_data.get("businessName"),
+            email_id=json_data.get("emailAddress"),
+        )
+        code.id = ClientCode.get_next_branch_code(head_code)
+        code.address = Address.create_from_json(json_data["address"])
+        if json_data.get("contact"):
+            if json_data["contact"].get("name"):
+                code.contact_name = json_data["contact"].get("name")
+            if json_data["contact"].get("phoneNumber"):
+                code.contact_phone_number = json_data["contact"].get("phoneNumber")
+            if json_data["contact"].get("areaCode"):
+                code.contact_area_cd = json_data["contact"].get("areaCode")
+        if json_data.get("bconlineAccount"):  # Retain for audit, not used with new codes.
+            code.bconline_account = json_data.get("bconlineAccount")
+        return code

@@ -98,6 +98,15 @@ class SecuritiesActTypes(BaseEnum):
     PRESERVATION = "PRESERVATION"
 
 
+class ClientCodeTypes(BaseEnum):
+    """Render an Enum of the client party code registration types."""
+
+    CREATE_CODE = "CREATE_CODE"
+    CHANGE_ADDRESS = "CHANGE_ADDRESS"
+    CHANGE_NAME = "CHANGE_NAME"
+    CHANGE_NAME_ADDRESS = "CHANGE_NAME_ADDRESS"
+
+
 class CountryType(db.Model):  # pylint: disable=too-few-public-methods
     """This class defines the model for the country_type table."""
 
@@ -268,3 +277,22 @@ class SecuritiesActType(db.Model):  # pylint: disable=too-few-public-methods
     def find_all(cls):
         """Return all the type records."""
         return db.session.query(SecuritiesActType).all()
+
+
+class ClientCodeType(db.Model):  # pylint: disable=too-few-public-methods
+    """This class defines the model for the client_code_types table."""
+
+    __tablename__ = "client_code_types"
+
+    client_code_type = db.mapped_column(
+        "client_code_type", PG_ENUM(ClientCodeTypes, name="client_code_type"), primary_key=True
+    )
+    client_code_type_desc = db.mapped_column("client_code_type_desc", db.String(100), nullable=False)
+
+    # Relationships -
+    client_code_registration = db.relationship("ClientCodeRegistration", back_populates="registration_code_type")
+
+    @classmethod
+    def find_all(cls):
+        """Return all the type records."""
+        return db.session.query(ClientCodeType).all()

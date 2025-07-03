@@ -17,8 +17,10 @@ Validation includes verifying party codes and address region and country codes.
 """
 import pycountry
 
-from ppr_api.models import Party
+from ppr_api.models import ClientCode, ClientCodeType, Party
 from ppr_api.models import utils as model_utils
+
+# from ppr_api.models.type_tables import ClientCodeTypes
 from ppr_api.utils.validators import valid_charset
 
 REGISTERING_CODE_MSG = "No registering party client party found for code {}. "
@@ -38,6 +40,13 @@ DUPLICATE_SECURED_PARTY_BUSINESS = "Duplicate Secured Party Business. "
 DUPLICATE_SECURED_PARTY_PERSON = "Duplicate Secured Party Person. "
 INVALID_AMEND_PARTY_ID_SECURED = "Invalid amendPartyId {} in add Secured Parties. "
 INVALID_AMEND_PARTY_ID_DEBTOR = "Invalid amendPartyId {} in add Debtors. "
+INVALID_COUNTRY_CLIENT_CODE = "Client party code address country {} is invalid. "
+INVALID_REGION_CLIENT_CODE = "Client party code region {} is invalid. "
+CLIENT_CODE_STAFF_ACCOUNT_MISSING = "Invalid staff client code request: client account ID missing in payload. "
+CLIENT_CODE_INVALID_HEAD_OFFICE = "Invalid client code request: head office code {head_code} not found. "
+CLIENT_CODE_INVALID_ACCOUNT = (
+    "Invalid client code request: existing head office code {head_code} belongs to another account. "
+)
 
 
 def validate_financing_parties(json_data):
@@ -55,6 +64,28 @@ def validate_registration_parties(json_data, financing_statement=None):
     error_msg += validate_party_names(json_data)
     error_msg += validate_party_ids(json_data, financing_statement)
 
+    return error_msg
+
+
+def validate_client_code_registration(json_data, reg_type: ClientCodeType, account_id: str, staff: bool) -> str:
+    """Verify new client party code registration request JSON."""
+    error_msg: str = ""
+    if not json_data or not reg_type:
+        return error_msg
+    if staff and not json_data.get("accountId"):
+        error_msg += CLIENT_CODE_STAFF_ACCOUNT_MISSING
+    if json_data.get("headOfficeCode"):
+        head_code = json_data.get("headOfficeCode")
+        codes = ClientCode.find_by_head_office_code(head_code)
+        if not codes:
+            error_msg += CLIENT_CODE_INVALID_HEAD_OFFICE.format(head_code=head_code)
+        elif not staff and codes[0].get("accountId") and codes[0].get("accountId") != account_id:
+            error_msg += CLIENT_CODE_INVALID_ACCOUNT.format(head_code=head_code)
+        elif staff and codes[0].get("accountId") and codes[0].get("accountId") != json_data.get("accountId"):
+            error_msg += CLIENT_CODE_INVALID_ACCOUNT.format(head_code=head_code)
+    if json_data.get("businessName"):
+        error_msg += validate_party_name(json_data)
+    error_msg += validate_address(json_data, INVALID_COUNTRY_CLIENT_CODE, INVALID_REGION_CLIENT_CODE)
     return error_msg
 
 
