@@ -1626,7 +1626,9 @@ export default defineComponent({
     })
 
     watch(()=> localState.selectedChangeType, val => {
-      setRegistrationFeeDesc(FeeSummaryTypes.MHR_TRANSFER, getMhrTransferType.value?.transferType)
+      if (getMhrTransferType.value?.transferType) {
+        setRegistrationFeeDesc(FeeSummaryTypes.MHR_TRANSFER, getMhrTransferType.value?.transferType)
+      }
     })
 
     /** Inform root level components when there is an MHR action in Progress **/
