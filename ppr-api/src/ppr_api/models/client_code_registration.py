@@ -104,3 +104,15 @@ class ClientCodeRegistration(db.Model):
         )
         reg.client_code = code
         return reg
+
+    @staticmethod
+    def create_name_change_from_json(json_data: dict, user_id: str, code: ClientCode):
+        """Create a client party code name change registration from dict/json."""
+        reg: ClientCodeRegistration = ClientCodeRegistration(
+            create_ts=model_utils.now_ts(),
+            request_data=json_data,
+            user_id=user_id,
+            client_code_type=ClientCodeTypes.CHANGE_NAME,
+        )
+        reg.client_code = code
+        return reg

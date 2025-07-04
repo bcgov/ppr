@@ -16,6 +16,7 @@
 
 Test-Suite to ensure that the /party-codes endpoint is working as expected.
 """
+import copy
 from http import HTTPStatus
 
 import pytest
@@ -70,6 +71,18 @@ TEST_CODE_NEW3 =   {
       "phoneNumber": "3564500"
     }
 }
+TEST_CODE_NAME1 =   {
+    "businessName": "PETERBILT TRUCKS PACIFIC INC.",
+}
+TEST_CODE_NAME2 =   {
+    "accountId": "PS00002",
+    "businessName": "PETERBILT TRUCKS PACIFIC INC.",
+}
+TEST_CODE_NAME3 =   {
+    "accountId": "PS00002",
+    "businessName": "CC \U0001d5c4\U0001d5c6/\U0001d5c1",
+}
+
 ROLES_STAFF = [PPR_ROLE, STAFF_ROLE]
 ROLES_PPR = [PPR_ROLE]
 ROLES_INVALID = [COLIN_ROLE]
@@ -113,6 +126,50 @@ TEST_DATA_CREATE_CODE = [
     ('Extra validation error', True, HTTPStatus.BAD_REQUEST, ROLES_STAFF, TEST_CODE_NEW1),
     ('Schema validation error', True, HTTPStatus.BAD_REQUEST, ROLES_PPR, TEST_CODE_NEW3),
 ]
+# testdata pattern is ({description}, {include account}, {response status}, {roles}, {payload}, {head_code}, {branch_code})
+TEST_DATA_CHANGE_NAME = [
+    ('Valid non-staff branch', True, HTTPStatus.OK, ROLES_PPR, TEST_CODE_NAME1, None, "99980001"),
+    ('Valid staff head', True, HTTPStatus.OK, ROLES_STAFF, TEST_CODE_NAME2, "9998", None),
+    ('Non-staff missing account ID', False, HTTPStatus.BAD_REQUEST, ROLES_PPR, TEST_CODE_NAME1, None, "99980001"),
+    ('Staff missing account ID', False, HTTPStatus.BAD_REQUEST, ROLES_STAFF, TEST_CODE_NAME2, None, "99980001"),
+    ('Unauthorized', True, HTTPStatus.UNAUTHORIZED, ROLES_INVALID, TEST_CODE_NAME1, None, "99980001"),
+    ('Extra validation error', True, HTTPStatus.BAD_REQUEST, ROLES_STAFF, TEST_CODE_NAME3, None, "99980001"),
+    ('Invalid branch code', True, HTTPStatus.NOT_FOUND, ROLES_PPR, TEST_CODE_NAME1, None, "99989901"),
+    ('Invalid head code', True, HTTPStatus.NOT_FOUND, ROLES_PPR, TEST_CODE_NAME1, "9910", None),
+]
+
+
+@pytest.mark.parametrize('desc,include_account,status,roles,payload,head_code,branch_code', TEST_DATA_CHANGE_NAME)
+def test_party_code_change_name(session, client, jwt, desc, include_account, status, roles, payload, head_code, branch_code):
+    """Assert that a create party code request returns the expected response code and data."""
+    # setup
+    headers = None
+    if include_account:
+        headers = create_header_account(jwt, roles, account_id='PS00002')
+    else:
+        headers = create_header(jwt, roles)
+    test_data = copy.deepcopy(payload)
+    if head_code:
+        test_data["headOfficeCode"] = head_code
+    if branch_code:
+        test_data["code"] = branch_code
+
+    # test
+    rv = client.patch('/api/v1/party-codes/accounts/names',
+                     json=test_data,
+                     headers=headers,
+                     content_type='application/json')
+    # check
+    assert rv.status_code == status
+    if rv.status_code == HTTPStatus.OK:
+        assert rv.json
+        response_json = rv.json
+        assert response_json.get('code')
+        assert response_json.get('headOfficeCode')
+        assert response_json.get('accountId')
+        assert response_json.get('contact')
+        assert response_json.get('address')
+        assert response_json.get('businessName')
 
 
 @pytest.mark.parametrize('desc,include_account,status,roles,payload', TEST_DATA_CREATE_CODE)

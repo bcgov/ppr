@@ -22,7 +22,7 @@ from flask_cors import cross_origin
 from registry_schemas import utils as schema_utils
 
 from ppr_api.exceptions import BusinessException, DatabaseException
-from ppr_api.models import ClientCode, ClientCodeRegistration
+from ppr_api.models import ClientCode, ClientCodeHistorical, ClientCodeRegistration, db
 from ppr_api.models.type_tables import ClientCodeTypes
 from ppr_api.resources import financing_utils as fs_utils
 from ppr_api.resources import utils as resource_utils
@@ -192,3 +192,67 @@ def post_account_codes():
         return resource_utils.business_exception_response(exception)
     except Exception as default_exception:  # noqa: B902; return nicer default error
         return resource_utils.default_exception_response(default_exception)
+
+
+@bp.route("/accounts/names", methods=["PATCH", "OPTIONS"])
+@cross_origin(origin="*")
+@jwt.requires_auth
+def change_account_code_name():
+    """Change a client party code name either at the head office level or at the branch level."""
+    try:
+        # Quick check: must be staff or provide an account ID.
+        account_id = resource_utils.get_account_id(request)
+        if account_id is None:
+            return resource_utils.account_required_response()
+        # Verify request JWT and account ID
+        if not authorized(account_id, jwt):
+            return resource_utils.unauthorized_error_response(account_id)
+        request_json = request.get_json(silent=True)
+        codes = []
+        head_code: str = request_json.get("headOfficeCode")
+        branch_code: str = request_json.get("code")
+        if head_code:
+            codes = ClientCode.find_by_head_office_code(head_code, False)
+            if not codes:
+                return resource_utils.not_found_error_response("client party head office code", head_code)
+        elif branch_code:
+            code = ClientCode.find_by_code(branch_code, False)
+            if not code:
+                return resource_utils.not_found_error_response("client party code", branch_code)
+            else:
+                codes.append(code)
+        # Validate request data against the schema.
+        staff: bool = is_staff(jwt)
+        extra_validation_msg = party_validator.validate_client_code_registration(
+            request_json, ClientCodeTypes.CREATE_CODE, account_id, staff
+        )
+        if extra_validation_msg != "":
+            return resource_utils.validation_error_response("", fs_utils.VAL_ERROR, extra_validation_msg)
+        req_account_id = account_id if not staff else request_json.get("accountId")
+        logger.info(f"New client party code name change request staff={staff} account ID={req_account_id}")
+        token: dict = g.jwt_oidc_token_info
+        reg: ClientCodeRegistration = ClientCodeRegistration.create_name_change_from_json(
+            request_json, token.get("username"), codes[0]
+        )
+        save_name_change(request_json, codes)
+        reg.save()
+        return jsonify(reg.client_code.json), HTTPStatus.OK
+    except DatabaseException as db_exception:
+        return resource_utils.db_exception_response(db_exception, account_id, "POST account client party code")
+    except BusinessException as exception:
+        return resource_utils.business_exception_response(exception)
+    except Exception as default_exception:  # noqa: B902; return nicer default error
+        return resource_utils.default_exception_response(default_exception)
+
+
+def save_name_change(request_json: dict, codes: list):
+    """Save name change registration data."""
+    new_name: str = str(request_json.get("businessName")).strip().upper()
+    head_name: str = codes[0].name
+    hist_type: str = ClientCodeHistorical.HistoricalTypes.NAME.value
+    for code in codes:
+        hist_code: ClientCodeHistorical = ClientCodeHistorical.create_from_client_code(code, hist_type)
+        hist_code.save()
+        code.name = str(code.name).replace(head_name, new_name)  # May be changed to code.name = new_name.
+        db.session.add(code)
+        logger.info(f"Code {code.id} updating name from {hist_code.name} to {code.name}")

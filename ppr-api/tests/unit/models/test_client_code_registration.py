@@ -36,14 +36,14 @@ TEST_CODE_NEW =   {
     },
     "emailAddress": "test-1@test-ptc.com",
     "contact": {
-      "name": "Example Contact 1",
+      "name": "EXAMPLE CONTACT 1",
       "areaCode": "250",
       "phoneNumber": "3564500"
     }
 }
 TEST_CODE_NEW_BRANCH =   {
     "accountId": "1234",
-    "businessName": "PETERBILT TRUCKS PACIFIC INC. - Branch 1",
+    "businessName": "PETERBILT TRUCKS PACIFIC INC. - BRANCH 1",
     "address": {
       "street": "1234 JAMES ST",
       "city": "SAANICH",
@@ -53,7 +53,7 @@ TEST_CODE_NEW_BRANCH =   {
     },
     "emailAddress": "test-2@test-ptc.com",
     "contact": {
-      "name": "Example Contact 2",
+      "name": "EXAMPLE CONTACT 2",
       "areaCode": "250",
       "phoneNumber": "3564501"
     }
@@ -63,6 +63,10 @@ TEST_CODE_NEW_BRANCH =   {
 TEST_DATA_REG_ID = [
     ('Exists', True, 200000100),
     ('Does not exist', False, 300012345)
+]
+# testdata pattern is ({code}, {head_code}, {reg_id}, {new_name})
+TEST_DATA_NAME_CHANGE = [
+    ('99990001', '9999', 200000101, 'TEST NAME CHANGE'),
 ]
 
 
@@ -195,3 +199,27 @@ def test_create_branch_from_json(session):
     request_address = TEST_CODE_NEW_BRANCH.get("address")
     assert request_address == branch.address.json
     assert branch.client_code_registration_id == reg2.id
+
+
+@pytest.mark.parametrize('code,head_code,reg_id,new_name', TEST_DATA_NAME_CHANGE)
+def test_create_name_change_from_json(session, code, head_code, reg_id, new_name):
+    """Assert that creating a client party code name changeregistration from json is working correctly."""
+    user_id: str = "TEST-USER"
+    client_code: ClientCode = ClientCode.find_by_code(code, False)
+    test_json = {
+        "code": code,
+        "headOfficeCode": head_code,
+        "businessName": new_name
+    }
+    reg: ClientCodeRegistration = ClientCodeRegistration.create_name_change_from_json(test_json, user_id, client_code)
+    reg.id = reg_id
+    reg.save()
+    assert reg.id
+    assert reg.create_ts
+    assert reg.client_code_type == ClientCodeTypes.CHANGE_NAME
+    assert reg.user_id == user_id
+    assert reg.request_data
+    assert not reg.pay_invoice_id
+    assert not reg.pay_path
+    assert not reg.previous_registration_id
+    assert reg.client_code

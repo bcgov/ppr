@@ -19,8 +19,7 @@ import pycountry
 
 from ppr_api.models import ClientCode, ClientCodeType, Party
 from ppr_api.models import utils as model_utils
-
-# from ppr_api.models.type_tables import ClientCodeTypes
+from ppr_api.models.type_tables import ClientCodeTypes
 from ppr_api.utils.validators import valid_charset
 
 REGISTERING_CODE_MSG = "No registering party client party found for code {}. "
@@ -47,6 +46,13 @@ CLIENT_CODE_INVALID_HEAD_OFFICE = "Invalid client code request: head office code
 CLIENT_CODE_INVALID_ACCOUNT = (
     "Invalid client code request: existing head office code {head_code} belongs to another account. "
 )
+CLIENT_CODE_INVALID_BRANCH = "Invalid client code request: party code {branch_code} not found. "
+CLIENT_CODE_INVALID_ACCOUNT_BRANCH = (
+    "Invalid client code request: existing party code {branch_code} belongs to another account. "
+)
+CLIENT_CODE_CHANGE_INVALID = "Invalid client code change request: no code or valid headOfficeCode in payload. "
+CLIENT_CODE_NAME_MISSING = "Invalid client code change name request: required businessName missing in payload. "
+CLIENT_CODE_NAME_IDENTICAL = "Invalid client code change name request: businessName identical to existing name. "
 
 
 def validate_financing_parties(json_data):
@@ -67,25 +73,55 @@ def validate_registration_parties(json_data, financing_statement=None):
     return error_msg
 
 
-def validate_client_code_registration(json_data, reg_type: ClientCodeType, account_id: str, staff: bool) -> str:
+def validate_client_code_registration(json_data: dict, reg_type: ClientCodeType, account_id: str, staff: bool) -> str:
     """Verify new client party code registration request JSON."""
     error_msg: str = ""
     if not json_data or not reg_type:
         return error_msg
     if staff and not json_data.get("accountId"):
         error_msg += CLIENT_CODE_STAFF_ACCOUNT_MISSING
+    code: ClientCode = None
     if json_data.get("headOfficeCode"):
         head_code = json_data.get("headOfficeCode")
         codes = ClientCode.find_by_head_office_code(head_code)
         if not codes:
             error_msg += CLIENT_CODE_INVALID_HEAD_OFFICE.format(head_code=head_code)
-        elif not staff and codes[0].get("accountId") and codes[0].get("accountId") != account_id:
-            error_msg += CLIENT_CODE_INVALID_ACCOUNT.format(head_code=head_code)
-        elif staff and codes[0].get("accountId") and codes[0].get("accountId") != json_data.get("accountId"):
-            error_msg += CLIENT_CODE_INVALID_ACCOUNT.format(head_code=head_code)
+        else:
+            code = codes[0]
+            if not staff and code.get("accountId") and code.get("accountId") != account_id:
+                error_msg += CLIENT_CODE_INVALID_ACCOUNT.format(head_code=head_code)
+            elif staff and code.get("accountId") and code.get("accountId") != json_data.get("accountId"):
+                error_msg += CLIENT_CODE_INVALID_ACCOUNT.format(head_code=head_code)
+    error_msg += validate_client_code_change(json_data, reg_type, code, staff, account_id)
     if json_data.get("businessName"):
         error_msg += validate_party_name(json_data)
     error_msg += validate_address(json_data, INVALID_COUNTRY_CLIENT_CODE, INVALID_REGION_CLIENT_CODE)
+    return error_msg
+
+
+def validate_client_code_change(
+    json_data: dict, reg_type: ClientCodeType, code: ClientCode, staff: bool, account_id: str
+) -> str:
+    """Verify new client party code change request JSON."""
+    error_msg: str = ""
+    if reg_type == ClientCodeTypes.CREATE_CODE:
+        return error_msg
+    if not code and not json_data.get("code"):
+        error_msg += CLIENT_CODE_CHANGE_INVALID
+    elif not code:
+        branch_code: str = json_data.get("code")
+        code = ClientCode.find_by_code(branch_code)
+        if not code:
+            error_msg += CLIENT_CODE_INVALID_BRANCH.format(branch_code=branch_code)
+        elif not staff and code.get("accountId") and code.get("accountId") != account_id:
+            error_msg += CLIENT_CODE_INVALID_ACCOUNT_BRANCH.format(branch_code=branch_code)
+        elif staff and code.get("accountId") and code.get("accountId") != json_data.get("accountId"):
+            error_msg += CLIENT_CODE_INVALID_ACCOUNT_BRANCH.format(branch_code=branch_code)
+    if reg_type in (ClientCodeTypes.CHANGE_NAME, ClientCodeTypes.CHANGE_NAME_ADDRESS):
+        if not json_data.get("businessName"):
+            error_msg += CLIENT_CODE_NAME_MISSING
+        elif code and str(json_data.get("businessName")).strip().upper() == code.get("businessName"):
+            error_msg += CLIENT_CODE_NAME_IDENTICAL
     return error_msg
 
 

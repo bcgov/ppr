@@ -123,23 +123,23 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
         return str(self.head_id).strip().rjust(4, "0")
 
     @classmethod
-    def find_by_code(cls, code: str = None):
+    def find_by_code(cls, code: str = None, return_json: bool = True):
         """Return a client party branch json object by client code."""
         party = None
         if code:
             try:
                 party = db.session.query(ClientCode).filter(ClientCode.id == int(code)).one_or_none()
             except Exception as db_exception:  # noqa: B902; return nicer error
-                logger.error("DB find_by_code exception: " + str(db_exception))
+                logger.error(f"DB find_by_code exception: {db_exception}")
                 raise DatabaseException(db_exception) from db_exception
 
-        if party:
+        if party and return_json:
             return party.json
 
         return party
 
     @classmethod
-    def find_by_head_office_code(cls, head_office_id: str):
+    def find_by_head_office_code(cls, head_office_id: str, return_json: bool = True):
         """Return a list of client parties belonging to a head office searching by code."""
         party_codes = []
         if head_office_id and len(head_office_id) <= 4 and head_office_id.strip().isdigit():
@@ -152,14 +152,14 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
                     .all()
                 )
             except Exception as db_exception:  # noqa: B902; return nicer error
-                logger.error("DB find_by_head_office_code exception: " + str(db_exception))
+                logger.error(f"DB find_by_head_office_code exception: {db_exception}")
                 raise DatabaseException(db_exception) from db_exception
-
             if not party_list:
                 return party_codes
+            if not return_json:
+                return party_list
             for party in party_list:
                 party_codes.append(party.json)
-
         return party_codes
 
     @classmethod
@@ -180,7 +180,7 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
                 .all()
             )
         except Exception as db_exception:  # noqa: B902; return nicer error
-            logger.error("DB find_by_head_office_start exception: " + str(db_exception))
+            logger.error(f"DB find_by_head_office_start exception: {db_exception}")
             raise DatabaseException(db_exception) from db_exception
 
         if not party_list:
@@ -247,7 +247,7 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
                 for party in party_list:
                     party_codes.append(party.json)
         except Exception as db_exception:  # noqa: B902; return nicer error
-            logger.error("DB find_by_account_id exception: " + str(db_exception))
+            logger.error(f"DB find_by_account_id exception: {db_exception}")
             raise DatabaseException(db_exception) from db_exception
         return party_codes
 
@@ -272,7 +272,7 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
             for party in party_list:
                 party_codes.append(party.json)
         except Exception as db_exception:  # noqa: B902; return nicer error
-            logger.error("DB find_by_branch_start exception: " + str(db_exception))
+            logger.error(f"DB find_by_branch_start exception: {db_exception}")
             raise DatabaseException(db_exception) from db_exception
 
         return party_codes
@@ -296,7 +296,7 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
                 for party in party_list:
                     party_codes.append(party.json)
             except Exception as db_exception:  # noqa: B902; return nicer error
-                logger.error("DB find_by_head_office_name exception: " + str(db_exception))
+                logger.error(f"DB find_by_head_office_name exception: {db_exception}")
                 raise DatabaseException(db_exception) from db_exception
         return party_codes
 
@@ -350,7 +350,7 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
                         client_code["emailAddress"] = str(row[7])
                     client_codes.append(client_code)
         except Exception as db_exception:  # noqa: B902; return nicer error
-            logger.error("DB find_by_code_start exception: " + str(db_exception))
+            logger.error(f"DB find_by_code_start exception: {db_exception}")
             raise DatabaseException(db_exception) from db_exception
 
         return client_codes
@@ -397,7 +397,7 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
             head_id=ClientCode.get_next_head_code(),
             date_ts=model_utils.now_ts(),
             account_id=account_id,
-            name=json_data.get("businessName"),
+            name=str(json_data.get("businessName")).upper(),
             email_id=json_data.get("emailAddress"),
         )
         branch_code: str = code.format_head_office_code() + "0001"
@@ -405,7 +405,7 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
         code.address = Address.create_from_json(json_data["address"])
         if json_data.get("contact"):
             if json_data["contact"].get("name"):
-                code.contact_name = json_data["contact"].get("name")
+                code.contact_name = str(json_data["contact"].get("name")).upper()
             if json_data["contact"].get("phoneNumber"):
                 code.contact_phone_number = json_data["contact"].get("phoneNumber")
             if json_data["contact"].get("areaCode"):
@@ -423,14 +423,14 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
             head_id=head_id,
             date_ts=model_utils.now_ts(),
             account_id=account_id,
-            name=json_data.get("businessName"),
+            name=str(json_data.get("businessName")).upper(),
             email_id=json_data.get("emailAddress"),
         )
         code.id = ClientCode.get_next_branch_code(head_code)
         code.address = Address.create_from_json(json_data["address"])
         if json_data.get("contact"):
             if json_data["contact"].get("name"):
-                code.contact_name = json_data["contact"].get("name")
+                code.contact_name = str(json_data["contact"].get("name")).upper()
             if json_data["contact"].get("phoneNumber"):
                 code.contact_phone_number = json_data["contact"].get("phoneNumber")
             if json_data["contact"].get("areaCode"):

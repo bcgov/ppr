@@ -2051,6 +2051,100 @@
 					"response": []
 				},
 				{
+					"name": "Change party code name staff branch",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Account-Id",
+								"value": "{{account_id}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"accountId\": \"5731\",\n    \"code\": \"71630001\",\n    \"businessName\": \"TEST BUSINESS NAME CHANGE 1\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url_ppr}}/api/v1/party-codes/accounts/names",
+							"host": [
+								"{{base_url_ppr}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"party-codes",
+								"accounts",
+								"names"
+							]
+						},
+						"description": "Get party by code example"
+					},
+					"response": []
+				},
+				{
+					"name": "Change party code name staff head office",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Account-Id",
+								"value": "{{account_id}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"accountId\": \"5731\",\n    \"headOfficeCode\": \"7163\",\n    \"businessName\": \"TEST BUSINESS NAME CHANGE 2\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url_ppr}}/api/v1/party-codes/accounts/names",
+							"host": [
+								"{{base_url_ppr}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"party-codes",
+								"accounts",
+								"names"
+							]
+						},
+						"description": "Get party by code example"
+					},
+					"response": []
+				},
+				{
 					"name": "Get party code by securities act account",
 					"request": {
 						"method": "GET",

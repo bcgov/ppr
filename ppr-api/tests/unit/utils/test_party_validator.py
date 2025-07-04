@@ -656,6 +656,23 @@ TEST_CODE_NEW3 =   {
       "phoneNumber": "3564500"
     }
 }
+TEST_CODE_NAME1 =   {
+    "businessName": "PETERBILT TRUCKS PACIFIC INC.",
+}
+TEST_CODE_NAME2 =   {
+    "accountId": "UT0005",
+    "businessName": "PETERBILT TRUCKS PACIFIC INC.",
+}
+TEST_CODE_NAME3 =   {
+    "accountId": "1234",
+}
+TEST_CODE_NAME4 =   {
+    "accountId": "1234",
+    "businessName": "CC \U0001d5c4\U0001d5c6/\U0001d5c1",
+}
+TEST_CODE_NAME5 =   {
+    "businessName": "RBC ROYAL BANK",
+}
 # testdata pattern is ({description}, {financing statement data}, {valid}, {message contents})
 TEST_CODE_FS_DATA = [
     ('Valid party codes', FINANCING_VALID, True, None),
@@ -768,6 +785,43 @@ TEST_NEW_CLIENT_CODE = [
     ('Invalid staff head office account', False, TEST_CODE_NEW2, False, 'PS12345', 
      validator.CLIENT_CODE_INVALID_ACCOUNT.format(head_code="9999"), "9999"),
 ]
+# testdata pattern is ({description}, {valid}, {json_data}, {staff}, {account_id}, {message contents}, {head_code}, {branch_code})
+TEST_CLIENT_CODE_NAME_CHANGE = [
+    ('Valid not staff branch', True, TEST_CODE_NAME1, False, 'UT0005', None, None, "99990001"),
+    ('Valid not staff head office', True, TEST_CODE_NAME1, False, 'UT0005', None, "9999", None),
+    ('Valid staff branch', True, TEST_CODE_NAME2, True, 'UT0005', None, None, "99990001"),
+    ('Valid staff head office', True, TEST_CODE_NAME2, True, 'UT0005', None, "9999", None),
+    ('Invalid staff no account', False, TEST_CODE_NAME1, True, 'PS12345', validator.CLIENT_CODE_STAFF_ACCOUNT_MISSING, None, None),
+    ('Invalid no code', False, TEST_CODE_NAME1, False, 'UT0005', validator.CLIENT_CODE_CHANGE_INVALID, None, None),
+    ('Invalid head office', False, TEST_CODE_NAME1, False, 'PS12345', 
+     validator.CLIENT_CODE_INVALID_HEAD_OFFICE.format(head_code="9990"), "9990", None),
+    ('Invalid branch', False, TEST_CODE_NAME1, False, 'PS12345', 
+     validator.CLIENT_CODE_INVALID_BRANCH.format(branch_code="99909001"), None, "99909001"),
+    ('Invalid no name', False, TEST_CODE_NAME3, False, 'UT0005', validator.CLIENT_CODE_NAME_MISSING, None, None),
+    ('Invalid name identical', False, TEST_CODE_NAME5, False, 'UT0005', validator.CLIENT_CODE_NAME_IDENTICAL, None, "99990001"),
+    ('Invalid name', False, TEST_CODE_NAME4, False, 'PS12345',
+      validator.CHARACTER_SET_UNSUPPORTED.format('CC \U0001d5c4\U0001d5c6/\U0001d5c1'), None, None),
+    ('Invalid head office account', False, TEST_CODE_NEW1, False, 'PS12345', 
+     validator.CLIENT_CODE_INVALID_ACCOUNT.format(head_code="9999"), "9999", None),
+    ('Invalid branch account', False, TEST_CODE_NEW1, False, 'PS12345', 
+     validator.CLIENT_CODE_INVALID_ACCOUNT_BRANCH.format(branch_code="99990001"), None, "99990001"),
+]
+
+
+@pytest.mark.parametrize('desc,valid,json_data,staff,account_id,message_content,head_code,branch_code', TEST_CLIENT_CODE_NAME_CHANGE)
+def test_validate_client_code_name(session, desc, valid, json_data, staff, account_id, message_content, head_code, branch_code):
+    """Assert that financing statement client party code validation works as expected."""
+    test_data = copy.deepcopy(json_data)
+    if head_code:
+        test_data["headOfficeCode"] = head_code
+    if branch_code:
+        test_data["code"] = branch_code
+    error_msg = validator.validate_client_code_registration(test_data, ClientCodeTypes.CHANGE_NAME, account_id, staff)
+    if valid:
+        assert error_msg == ''
+    elif message_content:
+        assert error_msg != ''
+        assert error_msg.find(message_content) != -1
 
 
 @pytest.mark.parametrize('desc,valid,json_data,staff,account_id,message_content,head_code', TEST_NEW_CLIENT_CODE)
