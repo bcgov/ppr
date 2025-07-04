@@ -1258,7 +1258,7 @@ export default defineComponent({
                   ![HomeLocationTypes.HOME_PARK, HomeLocationTypes.LOT].includes(item.locationType)"
                 data-test-id="res-exemption-btn"
                 :disabled="item.frozenDocumentType === MhApiFrozenDocumentTypes.TRANS_AFFIDAVIT"
-                @click="hasLienForQS || hasLockedForQS
+                @click="(hasLienForQS || hasLockedForQS)
                   ? null
                   : openExemption(UnitNoteDocTypes.RESIDENTIAL_EXEMPTION_ORDER, item)"
               >
@@ -1271,7 +1271,7 @@ export default defineComponent({
                   >
                     <template #activator="{ props }">
                       <span
-                        class="disabled-text"
+                        class="disabled-text !inline-flex"
                         v-bind="props"
                       >
                         <img
@@ -1288,7 +1288,7 @@ export default defineComponent({
                       If you require further information please contact BC Registries staff.`
                     }}
                   </v-tooltip>
-                  <span v-else>
+                  <span v-else class="!inline-flex">
                     <img
                       alt="exemption-icon"
                       class="ml-0 icon-small"

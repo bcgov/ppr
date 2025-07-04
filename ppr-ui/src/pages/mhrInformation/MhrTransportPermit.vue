@@ -136,7 +136,7 @@
                     <v-list-item-subtitle
                       class="pa-0 !inline-flex"
                     >
-                      <span class="pt-3">
+                      <span>
                         <img
                           alt="extend-icon"
                           class="icon-small"
@@ -156,7 +156,7 @@
                     <v-list-item-subtitle
                       class="pa-0 !inline-flex"
                     >
-                      <span class="pt-3">
+                      <span>
                         <img
                           alt="extend-icon"
                           class="icon-small"

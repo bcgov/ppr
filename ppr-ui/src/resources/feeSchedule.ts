@@ -121,23 +121,23 @@ export const RegistrationFees = {
     waived: false,
     showFeeDesc: false
   },
-  [FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT]: {
-    filingFees: 12,
+  [FeeSummaryTypes.MHR_PERMIT_DEFAULT]: {
+    filingFees: 0,
     filingType: 'Location Change',
-    filingTypeCode: FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT,
+    filingTypeCode: FeeSummaryTypes.MHR_PERMIT_DEFAULT,
     futureEffectiveFees: 0,
     priorityFees: 0,
     processingFees: 0,
-    serviceFees: 1.50,
+    serviceFees: 0,
     tax: {
       gst: 0,
       pst: 0
     },
-    total: 12,
+    total: 0,
     quantity: 1,
-    quantityDesc: '$12.00 each',
+    quantityDesc: '',
     waived: false,
-    showFeeDesc: false
+    showFeeDesc: true
   },
   [FeeSummaryTypes.MHR_TRANSPORT_PERMIT]: {
     filingFees: 25,
@@ -156,6 +156,147 @@ export const RegistrationFees = {
     quantityDesc: '',
     waived: false,
     showFeeDesc: true
+  },
+  [FeeSummaryTypes.MHR_TRANSPORT_PERMIT_EXTEND]: {
+    filingFees: 25,
+    filingType: 'Extend Transport Permit',
+    filingTypeCode: FeeSummaryTypes.MHR_TRANSPORT_PERMIT_EXTEND,
+    futureEffectiveFees: 0,
+    priorityFees: 0,
+    processingFees: 0,
+    serviceFees: 0,
+    tax: {
+      gst: 0,
+      pst: 0
+    },
+    total: 25,
+    quantity: 1,
+    quantityDesc: '',
+    waived: false,
+    showFeeDesc: true
+  },
+  [FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT]: {
+    filingFees: 15,
+    filingType: 'Amend Transport Permit',
+    filingTypeCode: FeeSummaryTypes.MHR_AMEND_TRANSPORT_PERMIT,
+    futureEffectiveFees: 0,
+    priorityFees: 0,
+    processingFees: 0,
+    serviceFees: 0,
+    tax: {
+      gst: 0,
+      pst: 0
+    },
+    total: 15,
+    quantity: 1,
+    waived: false,
+    showFeeDesc: false
+  },
+  [FeeSummaryTypes.MHR_TRANSPORT_PERMIT_CANCEL]: {
+    filingFees: 15,
+    filingType: 'Cancel Transport Permit',
+    filingTypeCode: FeeSummaryTypes.MHR_TRANSPORT_PERMIT_CANCEL,
+    futureEffectiveFees: 0,
+    priorityFees: 0,
+    processingFees: 0,
+    serviceFees: 0,
+    tax: {
+      gst: 0,
+      pst: 0
+    },
+    total: 15,
+    quantity: 1,
+    waived: false,
+    showFeeDesc: false
+  },
+  [FeeSummaryTypes.MHR_LOCATION_CHANGE]: {
+    filingFees: 25,
+    filingType: 'Registered Location Change',
+    filingTypeCode: FeeSummaryTypes.MHR_LOCATION_CHANGE,
+    futureEffectiveFees: 0,
+    priorityFees: 0,
+    processingFees: 0,
+    serviceFees: 0,
+    tax: {
+      gst: 0,
+      pst: 0
+    },
+    total: 25,
+    quantity: 1,
+    waived: false,
+    showFeeDesc: true
+  },
+  [FeeSummaryTypes.MHR_OWNER_DEFAULT]: {
+    filingFees: 0,
+    filingType: 'Ownership Transfer or Change',
+    filingTypeCode: FeeSummaryTypes.MHR_OWNER_DEFAULT,
+    futureEffectiveFees: 0,
+    priorityFees: 0,
+    processingFees: 0,
+    serviceFees: 0,
+    tax: {
+      gst: 0,
+      pst: 0
+    },
+    total: 0,
+    quantity: 1,
+    quantityDesc: '',
+    waived: false,
+    showFeeDesc: true
+  },
+  [FeeSummaryTypes.MHR_TRANSFER]: {
+    filingFees: 50,
+    filingType: 'Ownership Transfer or Change',
+    filingTypeCode: FeeSummaryTypes.MHR_TRANSFER,
+    futureEffectiveFees: 0,
+    priorityFees: 0,
+    processingFees: 0,
+    serviceFees: 0,
+    tax: {
+      gst: 0,
+      pst: 0
+    },
+    total: 50,
+    quantity: 1,
+    quantityDesc: '',
+    waived: false,
+    showFeeDesc: true
+  },
+  [FeeSummaryTypes.RESIDENTIAL_EXEMPTION]: {
+    filingFees: 50,
+    filingType: 'Residential Exemption',
+    filingTypeCode: FeeSummaryTypes.RESIDENTIAL_EXEMPTION,
+    futureEffectiveFees: 0,
+    priorityFees: 0,
+    processingFees: 0,
+    serviceFees: 0,
+    tax: {
+      gst: 0,
+      pst: 0
+    },
+    total: 50,
+    quantity: 1,
+    quantityDesc: '',
+    waived: false,
+    showFeeDesc: false
+  },
+  [FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION]: {
+    filingFees: 50,
+    filingType: 'Non Residential Exemption',
+    filingTypeCode: FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION,
+    futureEffectiveFees: 0,
+    priorityFees: 0,
+    processingFees: 0,
+    serviceFees: 0,
+    tax: {
+      gst: 0,
+      pst: 0
+    },
+    total: 50,
+    quantity: 1,
+    quantityDesc: '',
+    waived: false,
+    showFeeDesc: false
   },
   [FeeSummaryTypes.NO_FEE]: {
     filingFees: 0,
