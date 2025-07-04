@@ -19,7 +19,7 @@ Test-Suite to ensure that the ClientCode Model is working as expected.
 import copy
 import pytest
 
-from ppr_api.models import Address, ClientCode
+from ppr_api.models import Address, ClientCode, ClientCodeHistorical
 from ppr_api.utils.logging import logger
 
 
@@ -35,14 +35,14 @@ TEST_CODE_NEW =   {
     },
     "emailAddress": "test-1@test-ptc.com",
     "contact": {
-      "name": "Example Contact 1",
+      "name": "EXAMPLE CONTACT 1",
       "areaCode": "250",
       "phoneNumber": "3564500"
     }
 }
 TEST_CODE_NEW_BRANCH =   {
     "accountId": "1234",
-    "businessName": "PETERBILT TRUCKS PACIFIC INC. - Branch 1",
+    "businessName": "PETERBILT TRUCKS PACIFIC INC. - BRANCH 1",
     "address": {
       "street": "1234 JAMES ST",
       "city": "SAANICH",
@@ -52,7 +52,7 @@ TEST_CODE_NEW_BRANCH =   {
     },
     "emailAddress": "test-2@test-ptc.com",
     "contact": {
-      "name": "Example Contact 2",
+      "name": "EXAMPLE CONTACT 2",
       "areaCode": "250",
       "phoneNumber": "3564501"
     }
@@ -336,3 +336,31 @@ def test_create_branch_from_json(session):
     request_address = TEST_CODE_NEW_BRANCH.get("address")
     logger.debug(f"request address {request_address}")
     assert request_address == address.json
+
+
+def test_create_historical(session):
+    """Assert that creating a client code historical object from a client code works as expected."""
+    code: ClientCode = ClientCode(
+        id=10001,
+        head_id=1,
+        name='BUSINESS NAME',
+        contact_name='CONTACT',
+        contact_area_cd='250',
+        contact_phone_number='1234567',
+        email_id='test@gmail.com',
+        account_id='1234',
+        address_id=200000000,
+        bconline_account=123456
+    )
+    hist_type: str = ClientCodeHistorical.HistoricalTypes.NAME.value
+    hist_code: ClientCodeHistorical = ClientCodeHistorical.create_from_client_code(code, hist_type)
+    assert hist_code.branch_id == code.id
+    assert hist_code.head_id == code.head_id
+    assert hist_code.name == code.name
+    assert hist_code.contact_name == code.contact_name
+    assert hist_code.contact_area_cd == code.contact_area_cd
+    assert hist_code.contact_phone_number == code.contact_phone_number
+    assert hist_code.email_id == code.email_id
+    assert hist_code.bconline_account == code.bconline_account
+    assert hist_code.address_id == code.address_id
+    assert hist_code.historical_type == hist_type
