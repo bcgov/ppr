@@ -42,6 +42,10 @@ PAY_DETAILS_REGISTRATION = {
     'label': 'Reg Number',
     'value': '100468B'
 }
+PAY_DETAILS_CLIENT_CODE = {
+    'label': 'Client Party Code Change',
+    'value': '71340001'
+}
 PAY_DETAILS_CC = {
     'label': 'CC TEST',
     'value': 'UNIT TESTING',
@@ -105,6 +109,7 @@ TEST_PAY_TYPE_FILING_TYPE = [
     (TransactionTypes.FINANCING_INFINITE.value, 1, 'INFRG', True),
     (TransactionTypes.RENEWAL_INFINITE.value, 1, 'INFRN', True),
     (TransactionTypes.RENEWAL_LIFE_YEAR.value, 3, 'FSREN', True),
+    (TransactionTypes.CLIENT_CODE_CHANGE.value, 1, 'SPMUP', False),
  ]
 # testdata pattern is ({pay_trans_type}, {routingSlip}, {bcolNumber}, {datNUmber}, {waiveFees})
 TEST_PAY_STAFF_SEARCH = [
@@ -141,6 +146,78 @@ TEST_PAY_STAFF_REGISTRATION = [
     (TransactionTypes.RENEWAL_INFINITE.value, None, None, None, False, True),
     (TransactionTypes.AMENDMENT.value, None, None, None, False, True),
 ]
+# testdata pattern is ({pay_trans_type}, {routingSlip}, {bcolNumber}, {datNUmber}, {waiveFees})
+TEST_PAY_STAFF_CLIENT_CODE = [
+    (TransactionTypes.CLIENT_CODE_CHANGE.value, None, None, None, True),
+    (TransactionTypes.CLIENT_CODE_CHANGE.value, '12345', None, None, False),
+    (TransactionTypes.CLIENT_CODE_CHANGE.value, None, '62345', None, False),
+    (TransactionTypes.CLIENT_CODE_CHANGE.value, None, '62345', '72345', False),
+]
+
+
+@pytest.mark.parametrize('pay_trans_type,routing_slip,bcol_number,dat_number,waive_fees', TEST_PAY_STAFF_CLIENT_CODE)
+def test_payment_data_staff_client_code(client, jwt, pay_trans_type, routing_slip, bcol_number, dat_number, waive_fees):
+    """Assert that the staff payment payment-request body is as expected for a pay transaction type."""
+    transaction_info = {
+        'transactionType': pay_trans_type,
+        'accountId': '3040',
+        'feeQuantity': 1,
+    }
+    if waive_fees:
+        transaction_info['waiveFees'] = True
+    if routing_slip:
+        transaction_info['routingSlipNumber'] = routing_slip
+    if bcol_number:
+        transaction_info['bcolAccountNumber'] = bcol_number
+    if dat_number:
+        transaction_info['datNumber'] = dat_number
+
+    # test
+    data = SBCPaymentClient.create_payment_staff_client_code_data(transaction_info)
+    # check
+    assert data
+    assert len(data['filingInfo']['filingTypes']) == 1
+    if waive_fees:
+        assert data['filingInfo']['filingTypes'][0]['waiveFees']
+    else:
+        assert 'waiveFees' not in data['filingInfo']['filingTypes'][0]
+
+    if not routing_slip and not bcol_number:
+        assert 'accountInfo' not in data
+    elif routing_slip:
+        assert 'accountInfo' in data and data['accountInfo']['routingSlip'] == routing_slip
+    elif bcol_number:
+        assert 'accountInfo' in data and data['accountInfo']['bcolAccountNumber'] == bcol_number
+        if dat_number:
+            assert data['accountInfo']['datNumber'] == dat_number
+
+
+@pytest.mark.parametrize('pay_trans_type,routing_slip,bcol_number,dat_number,waive_fees', TEST_PAY_STAFF_CLIENT_CODE)
+def test_payment_staff_client_code_mock(client, jwt, pay_trans_type, routing_slip, bcol_number, dat_number, waive_fees):
+    """Assert that a pay-api staff client code payment request works as expected with the mock service endpoint."""
+    # setup
+    token = helper_create_jwt(jwt, [PPR_ROLE])
+    payment = Payment(jwt=token, account_id='PS12345', details=PAY_DETAILS_CLIENT_CODE)
+    payment.api_url = MOCK_URL_NO_KEY
+    transaction_info = {
+        'transactionType': pay_trans_type,
+        'accountId': '3040',
+        'feeQuantity': 1,
+    }
+    if routing_slip:
+        transaction_info['routingSlipNumber'] = routing_slip
+    if bcol_number:
+        transaction_info['bcolAccountNumber'] = bcol_number
+    if dat_number:
+        transaction_info['datNumber'] = dat_number
+
+    # test
+    pay_data = payment.create_payment_staff_client_code(transaction_info)
+    # print(pay_data)
+    # check
+    assert pay_data
+    assert pay_data['invoiceId']
+    assert pay_data['receipt']
 
 
 @pytest.mark.parametrize('pay_trans_type,routing_slip,bcol_number,dat_number,waive_fees', TEST_PAY_STAFF_SEARCH)
