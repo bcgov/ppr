@@ -52,6 +52,8 @@ TRANSACTION_TO_FILING_TYPE = {
     "SEARCH_STAFF_NO_FEE": "SSRCH",
     "SEARCH_STAFF_CERTIFIED": "PPRCD",
     "SEARCH_STAFF_CERTIFIED_NO_FEE": "PPRCD",
+    "CLIENT_CODE_CHANGE": "SPMUP",
+    "CLIENT_CODE_STAFF_NO_FEE": "SSRCH",
 }
 
 # Mapping from normal filing type to staff version of filing type
@@ -352,6 +354,31 @@ class SBCPaymentClient(BaseClient):
 
         return data
 
+    @staticmethod
+    def create_payment_staff_client_code_data(transaction_info):
+        """Build the payment-request body formatted as JSON."""
+        data = copy.deepcopy(PAYMENT_REQUEST_TEMPLATE)
+        filing_type = TRANSACTION_TO_FILING_TYPE[transaction_info["transactionType"]]
+        data["filingInfo"]["filingTypes"][0]["filingTypeCode"] = filing_type
+        if transaction_info["feeQuantity"] != 1:
+            data["filingInfo"]["filingTypes"][0]["quantity"] = transaction_info["feeQuantity"]
+        del data["filingInfo"]["filingIdentifier"]
+        del data["filingInfo"]["folioNumber"]
+
+        if "waiveFees" in transaction_info and transaction_info["waiveFees"]:
+            data["filingInfo"]["filingTypes"][0]["waiveFees"] = True
+        # set up FAS payment
+        elif "routingSlipNumber" in transaction_info:
+            account_info = {"routingSlip": transaction_info["routingSlipNumber"]}
+            data["accountInfo"] = account_info
+        # setup BCOL account payment
+        elif "bcolAccountNumber" in transaction_info:
+            account_info = {"bcolAccountNumber": transaction_info["bcolAccountNumber"]}
+            if "datNumber" in transaction_info:
+                account_info["datNumber"] = transaction_info["datNumber"]
+            data["accountInfo"] = account_info
+        return data
+
     def update_payload_data(self, data: dict) -> dict:
         """Explicitly set payment request as CC payment if requested."""
         if self.cc_payment:
@@ -394,6 +421,14 @@ class SBCPaymentClient(BaseClient):
         data = self.update_payload_data(data)
         logger.info("staff registration create payment payload: ")
         logger.info(json.dumps(data))
+        invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data, include_account=True)
+        return SBCPaymentClient.build_pay_reference(invoice_data, self.api_url)
+
+    def create_payment_staff_client_code(self, transaction_info):
+        """Submit a staff client party code payment request."""
+        data = SBCPaymentClient.create_payment_staff_client_code_data(transaction_info)
+        data = self.update_payload_data(data)
+        logger.info(f"staff create payment payload for account {self.account_id}: {data}")
         invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data, include_account=True)
         return SBCPaymentClient.build_pay_reference(invoice_data, self.api_url)
 
