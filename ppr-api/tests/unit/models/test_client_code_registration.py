@@ -58,7 +58,13 @@ TEST_CODE_NEW_BRANCH =   {
       "phoneNumber": "3564501"
     }
 }
-
+TEST_ADDRESS1 = {
+    "street": "1234 JAMES ST",
+    "city": "SAANICH",
+    "region": "BC",
+    "country": "CA",
+    "postalCode": "V8X 1D3"
+}
 # testdata pattern is ({description}, {exists}, {reg_id})
 TEST_DATA_REG_ID = [
     ('Exists', True, 200000100),
@@ -67,6 +73,10 @@ TEST_DATA_REG_ID = [
 # testdata pattern is ({code}, {head_code}, {reg_id}, {new_name})
 TEST_DATA_NAME_CHANGE = [
     ('99990001', '9999', 200000101, 'TEST NAME CHANGE'),
+]
+# testdata pattern is ({code}, {head_code}, {reg_id}, {new_name}, {new_address})
+TEST_DATA_CHANGE = [
+    ('99990001', '9999', 200000101, 'TEST NAME CHANGE', TEST_ADDRESS1),
 ]
 
 
@@ -217,6 +227,81 @@ def test_create_name_change_from_json(session, code, head_code, reg_id, new_name
     assert reg.id
     assert reg.create_ts
     assert reg.client_code_type == ClientCodeTypes.CHANGE_NAME
+    assert reg.user_id == user_id
+    assert reg.request_data
+    assert not reg.pay_invoice_id
+    assert not reg.pay_path
+    assert not reg.previous_registration_id
+    assert reg.client_code
+
+
+@pytest.mark.parametrize('code,head_code,reg_id,new_name,new_address', TEST_DATA_CHANGE)
+def test_create_address_change_from_json(session, code, head_code, reg_id, new_name, new_address):
+    """Assert that creating a client party code name change registration from json is working correctly."""
+    user_id: str = "TEST-USER"
+    client_code: ClientCode = ClientCode.find_by_code(code, False)
+    test_json = {
+        "code": code,
+        "headOfficeCode": head_code,
+        "businessName": new_name,
+        "address": new_address
+    }
+    reg: ClientCodeRegistration = ClientCodeRegistration.create_address_change_from_json(test_json, user_id, client_code)
+    reg.id = reg_id
+    reg.save()
+    assert reg.id
+    assert reg.create_ts
+    assert reg.client_code_type == ClientCodeTypes.CHANGE_ADDRESS
+    assert reg.user_id == user_id
+    assert reg.request_data
+    assert not reg.pay_invoice_id
+    assert not reg.pay_path
+    assert not reg.previous_registration_id
+    assert reg.client_code
+
+
+@pytest.mark.parametrize('code,head_code,reg_id,new_name,new_address', TEST_DATA_CHANGE)
+def test_create_address_change_from_json(session, code, head_code, reg_id, new_name, new_address):
+    """Assert that creating a client party code address change registration from json is working correctly."""
+    user_id: str = "TEST-USER"
+    client_code: ClientCode = ClientCode.find_by_code(code, False)
+    test_json = {
+        "code": code,
+        "headOfficeCode": head_code,
+        "businessName": new_name,
+        "address": new_address
+    }
+    reg: ClientCodeRegistration = ClientCodeRegistration.create_address_change_from_json(test_json, user_id, client_code)
+    reg.id = reg_id
+    reg.save()
+    assert reg.id
+    assert reg.create_ts
+    assert reg.client_code_type == ClientCodeTypes.CHANGE_ADDRESS
+    assert reg.user_id == user_id
+    assert reg.request_data
+    assert not reg.pay_invoice_id
+    assert not reg.pay_path
+    assert not reg.previous_registration_id
+    assert reg.client_code
+
+
+@pytest.mark.parametrize('code,head_code,reg_id,new_name,new_address', TEST_DATA_CHANGE)
+def test_create_change_from_json(session, code, head_code, reg_id, new_name, new_address):
+    """Assert that creating a client party code name and address change registration from json is working correctly."""
+    user_id: str = "TEST-USER"
+    client_code: ClientCode = ClientCode.find_by_code(code, False)
+    test_json = {
+        "code": code,
+        "headOfficeCode": head_code,
+        "businessName": new_name,
+        "address": new_address
+    }
+    reg: ClientCodeRegistration = ClientCodeRegistration.create_name_address_change_from_json(test_json, user_id, client_code)
+    reg.id = reg_id
+    reg.save()
+    assert reg.id
+    assert reg.create_ts
+    assert reg.client_code_type == ClientCodeTypes.CHANGE_NAME_ADDRESS
     assert reg.user_id == user_id
     assert reg.request_data
     assert not reg.pay_invoice_id

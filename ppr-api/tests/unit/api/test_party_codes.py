@@ -20,10 +20,14 @@ import copy
 from http import HTTPStatus
 
 import pytest
+from flask import current_app
 
 from ppr_api.services.authz import STAFF_ROLE, PPR_ROLE, COLIN_ROLE
 from tests.unit.services.utils import create_header_account, create_header
 
+
+MOCK_AUTH_URL = 'https://test.api.connect.gov.bc.ca/mockTarget/auth/api/v1/'
+MOCK_PAY_URL = 'https://test.api.connect.gov.bc.ca/mockTarget/pay/api/v1/'
 TEST_CODE_NEW1 =   {
     "businessName": "PETERBILT TRUCKS PACIFIC INC.",
     "address": {
@@ -82,7 +86,38 @@ TEST_CODE_NAME3 =   {
     "accountId": "PS00002",
     "businessName": "CC \U0001d5c4\U0001d5c6/\U0001d5c1",
 }
-
+TEST_CODE_ADDRESS1 =   {
+    "businessName": "PETERBILT TRUCKS PACIFIC INC.",
+    "address": {
+      "street": "102 DOUGLAS ST",
+      "city": "VICTORIA",
+      "region": "BC",
+      "country": "CA",
+      "postalCode": "V8W 2C8"
+    },
+}
+TEST_CODE_ADDRESS2 =   {
+    "accountId": "UT0005",
+    "businessName": "PETERBILT TRUCKS PACIFIC INC.",
+    "address": {
+      "street": "102 DOUGLAS ST",
+      "city": "VICTORIA",
+      "region": "BC",
+      "country": "CA",
+      "postalCode": "V8W 2C8"
+    },
+}
+TEST_CODE_ADDRESS3 =   {
+    "accountId": "UT0005",
+    "businessName": "RBC ROYAL BANK",
+    "address": {
+      "street": "1079 Douglas St",
+      "city": "Victoria",
+      "region": "BC",
+      "country": "CA",
+      "postalCode": "V8W2C5"
+    },
+}
 ROLES_STAFF = [PPR_ROLE, STAFF_ROLE]
 ROLES_PPR = [PPR_ROLE]
 ROLES_INVALID = [COLIN_ROLE]
@@ -137,12 +172,87 @@ TEST_DATA_CHANGE_NAME = [
     ('Invalid branch code', True, HTTPStatus.NOT_FOUND, ROLES_PPR, TEST_CODE_NAME1, None, "99989901"),
     ('Invalid head code', True, HTTPStatus.NOT_FOUND, ROLES_PPR, TEST_CODE_NAME1, "9910", None),
 ]
+# testdata pattern is ({description}, {include account}, {response status}, {roles}, {payload}, {branch_code})
+TEST_DATA_CHANGE = [
+    ('Valid non-staff branch', True, HTTPStatus.OK, ROLES_PPR, TEST_CODE_ADDRESS1, "99990001"),
+    ('Valid staff', True, HTTPStatus.OK, ROLES_STAFF, TEST_CODE_ADDRESS2, "99990001"),
+    ('Non-staff missing account ID', False, HTTPStatus.BAD_REQUEST, ROLES_PPR, TEST_CODE_ADDRESS1, "99990001"),
+    ('Staff missing account ID', False, HTTPStatus.BAD_REQUEST, ROLES_STAFF, TEST_CODE_ADDRESS2, "99990001"),
+    ('Unauthorized', True, HTTPStatus.UNAUTHORIZED, ROLES_INVALID, TEST_CODE_ADDRESS1, "99990001"),
+    ('Extra validation error', True, HTTPStatus.BAD_REQUEST, ROLES_STAFF, TEST_CODE_ADDRESS3, "99990001"),
+    ('Invalid branch code', True, HTTPStatus.NOT_FOUND, ROLES_PPR, TEST_CODE_ADDRESS1, "99989901"),
+]
+
+
+@pytest.mark.parametrize('desc,include_account,status,roles,payload,branch_code', TEST_DATA_CHANGE)
+def test_party_code_change(session, client, jwt, desc, include_account, status, roles, payload, branch_code):
+    """Assert that a change party code name and address request returns the expected response code and data."""
+    # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
+    headers = None
+    if include_account:
+        headers = create_header_account(jwt, roles, account_id='UT0005')
+    else:
+        headers = create_header(jwt, roles)
+    test_data = copy.deepcopy(payload)
+    if branch_code:
+        test_data["code"] = branch_code
+
+    # test
+    rv = client.patch('/api/v1/party-codes/accounts',
+                     json=test_data,
+                     headers=headers,
+                     content_type='application/json')
+    # check
+    assert rv.status_code == status
+    if rv.status_code == HTTPStatus.OK:
+        assert rv.json
+        response_json = rv.json
+        assert response_json.get('code')
+        assert response_json.get('headOfficeCode')
+        assert response_json.get('accountId')
+        assert response_json.get('contact')
+        assert response_json.get('address')
+        assert response_json.get('businessName')
+
+
+@pytest.mark.parametrize('desc,include_account,status,roles,payload,branch_code', TEST_DATA_CHANGE)
+def test_party_code_change_address(session, client, jwt, desc, include_account, status, roles, payload, branch_code):
+    """Assert that a change party code address request returns the expected response code and data."""
+    # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
+    headers = None
+    if include_account:
+        headers = create_header_account(jwt, roles, account_id='UT0005')
+    else:
+        headers = create_header(jwt, roles)
+    test_data = copy.deepcopy(payload)
+    if branch_code:
+        test_data["code"] = branch_code
+
+    # test
+    rv = client.patch('/api/v1/party-codes/accounts/addresses',
+                     json=test_data,
+                     headers=headers,
+                     content_type='application/json')
+    # check
+    assert rv.status_code == status
+    if rv.status_code == HTTPStatus.OK:
+        assert rv.json
+        response_json = rv.json
+        assert response_json.get('code')
+        assert response_json.get('headOfficeCode')
+        assert response_json.get('accountId')
+        assert response_json.get('contact')
+        assert response_json.get('address')
+        assert response_json.get('businessName')
 
 
 @pytest.mark.parametrize('desc,include_account,status,roles,payload,head_code,branch_code', TEST_DATA_CHANGE_NAME)
 def test_party_code_change_name(session, client, jwt, desc, include_account, status, roles, payload, head_code, branch_code):
-    """Assert that a create party code request returns the expected response code and data."""
+    """Assert that a change party code name request returns the expected response code and data."""
     # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     headers = None
     if include_account:
         headers = create_header_account(jwt, roles, account_id='PS00002')
