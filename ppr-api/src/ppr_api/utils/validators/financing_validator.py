@@ -21,7 +21,6 @@ https://docs.google.com/spreadsheets/d/18eTumnf5H6TG2qWXwXJ_iAA-Gc7iNMpnm0ly7ctc
 from ppr_api.models import ClientCode, VehicleCollateral
 from ppr_api.models import utils as model_utils
 from ppr_api.models.registration import MiscellaneousTypes, PPSATypes
-from ppr_api.models.type_tables import RegistrationTypes
 
 # Error messages
 AUTHORIZATION_INVALID = "Authorization Received indicator is required with this registration. "
@@ -109,8 +108,11 @@ def validate(json_data: dict, account_id: str) -> str:
         error_msg += validate_vehicle_collateral(json_data, reg_type)
         error_msg += validate_general_collateral(json_data, reg_type, reg_class)
         error_msg += validate_trust_indenture(json_data, reg_type)
-        error_msg += validate_rl(json_data, reg_type)
         error_msg += validate_other_description(json_data, reg_type)
+        if "lienAmount" in json_data and json_data["lienAmount"]:
+            error_msg = LA_NOT_ALLOWED
+        if "surrenderDate" in json_data and json_data["surrenderDate"]:
+            error_msg += SD_NOT_ALLOWED
         if reg_type == model_utils.REG_TYPE_SECURITIES_NOTICE:
             error_msg += validate_securities_act(json_data, account_id)
         return error_msg
@@ -159,17 +161,10 @@ def validate_life(json_data, reg_type: str, reg_class: str):
             error_msg = LY_NOT_ALLOWED
         if "lifeInfinite" in json_data and not json_data["lifeInfinite"]:
             error_msg += LI_INVALID
-    elif reg_type == model_utils.REG_TYPE_REPAIRER_LIEN and "lifeInfinite" in json_data and json_data["lifeInfinite"]:
-        error_msg += LI_NOT_ALLOWED
-    elif (
-        reg_type != model_utils.REG_TYPE_REPAIRER_LIEN
-        and "lifeYears" not in json_data
-        and "lifeInfinite" not in json_data
-    ):
+    elif "lifeYears" not in json_data and "lifeInfinite" not in json_data:
         error_msg += LIFE_MISSING
     elif json_data.get("lifeYears", -1) > 0 and json_data.get("lifeInfinite"):
         error_msg += LIFE_INVALID
-
     return error_msg
 
 
@@ -236,40 +231,8 @@ def validate_trust_indenture(json_data, reg_type: str):
     return ""
 
 
-def validate_rl(json_data, reg_type: str):
-    """Validate Repairer's Lien."""
-    error_msg = ""
-    if reg_type != model_utils.REG_TYPE_REPAIRER_LIEN:
-        if "lienAmount" in json_data and json_data["lienAmount"]:
-            error_msg = LA_NOT_ALLOWED
-        if "surrenderDate" in json_data and json_data["surrenderDate"]:
-            error_msg += SD_NOT_ALLOWED
-        return error_msg
-
-    if "lienAmount" not in json_data or str(json_data["lienAmount"]).strip() == "":
-        error_msg = RL_AMOUNT_REQUIRED
-    if "surrenderDate" not in json_data or str(json_data["surrenderDate"]).strip() == "":
-        error_msg += RL_DATE_REQUIRED
-    else:
-        try:
-            surrender_date = model_utils.ts_from_date_iso_format(json_data["surrenderDate"])
-            if surrender_date:
-                test_date = model_utils.today_ts_offset(21, False)
-                if surrender_date.timestamp() < test_date.timestamp():
-                    error_msg += RL_DATE_INVALID
-        except ValueError:
-            error_msg += RL_DATE_INVALID
-
-    return error_msg
-
-
 def validate_allowed_type(reg_type: str) -> str:
     """Check if the submitted type is allowed for new financing statements."""
-    if reg_type and reg_type in (RegistrationTypes.RL, RegistrationTypes.CL):
-        if reg_type == RegistrationTypes.RL.value and not model_utils.is_rl_enabled():
-            return RL_NOT_ALLOWED
-        if reg_type == RegistrationTypes.CL.value and not model_utils.is_cl_enabled():
-            return CL_NOT_ALLOWED
     try:
         test = model_utils.REG_TYPE_NEW_FINANCING_EXCLUDED[reg_type]
         if test:

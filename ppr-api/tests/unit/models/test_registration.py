@@ -226,7 +226,6 @@ TEST_ACCOUNT_ADD_REGISTRATION_DATA = [
 TEST_LIFE_EXPIRY_DATA = [
     ('SA', 5, False, 5),
     ('SA', None, True, 99),
-    ('RL', 1, False, model_utils.REPAIRER_LIEN_YEARS),
     ('MH', 1, False, model_utils.LIFE_INFINITE),
     ('LT', None, True, model_utils.LIFE_INFINITE),
     ('FR', 5, False, model_utils.LIFE_INFINITE),
@@ -238,7 +237,6 @@ TEST_EXPIRY_DATA = [
     ('TEST0016', 'SA', '2041-09-04T06:59:59+00:00'),
     ('TEST0016R1', 'RE', '2036-09-04T06:59:59+00:00'),
     ('TEST0016R2', 'RE', '2041-09-04T06:59:59+00:00')
-#    ('TEST0017', 'RL', '2023-02-23T07:59:59+00:00'),
 #    ('TEST0017R1', 'RE', '2022-08-27T06:59:59+00:00'),
 #    ('TEST0017R2', 'RE', '2023-02-23T07:59:59+00:00')
 ]
@@ -675,7 +673,7 @@ def test_save_discharge(session):
 
 
 def test_save_renewal(session):
-    """Assert that creating a renewal statement on a non-RL financing statement contains all expected elements."""
+    """Assert that creating a renewal registration on a financing statement contains all expected elements."""
     json_data = copy.deepcopy(RENEWAL_STATEMENT)
     del json_data['createDateTime']
     del json_data['renewalRegistrationNumber']
@@ -709,44 +707,8 @@ def test_save_renewal(session):
     assert result['registeringParty']
 
 
-def test_save_renewal_rl(session):
-    """Assert that creating a renewal statement on a RL financing statement contains all expected elements."""
-    json_data = copy.deepcopy(RENEWAL_STATEMENT)
-    del json_data['createDateTime']
-    del json_data['renewalRegistrationNumber']
-    del json_data['payment']
-    del json_data['expiryDate']
-
-    financing_statement = FinancingStatement.find_by_financing_id(200000001)
-    assert financing_statement
-
-    registration = Registration.create_from_json(json_data,
-                                                 'RENEWAL',
-                                                 financing_statement,
-                                                 'TEST0002',
-                                                 'PS12345')
-#    print(registration.financing_id)
-#    print(registration.json)
-    registration.save()
-    assert registration.financing_id == 200000001
-    assert registration.id
-    assert registration.registration_num
-    assert registration.registration_type
-    assert registration.registration_ts
-    assert registration.account_id
-    assert registration.client_reference_id
-
-    result = registration.json
-    assert result
-    assert result['baseRegistrationNumber']
-    assert result['renewalRegistrationNumber']
-    assert result['createDateTime']
-    assert result['registeringParty']
-    assert result['courtOrderInformation']
-
-
 def test_save_amendment(session):
-    """Assert that creating an amendment statement on a non-RL financing statement contains all expected elements."""
+    """Assert that creating an amendment statement on a financing statement contains all expected elements."""
     json_data = copy.deepcopy(AMENDMENT_STATEMENT)
     del json_data['createDateTime']
     del json_data['amendmentRegistrationNumber']
@@ -873,7 +835,7 @@ def test_save_amendment_trust(session):
 
 
 def test_save_amendment_from_draft(session):
-    """Assert that creating an amendment statement from a draft on a non-RL financing statement.
+    """Assert that creating an amendment statement from a draft on a financing statement.
 
     Verify it contains all expected elements.
     """

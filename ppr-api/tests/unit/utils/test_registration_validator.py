@@ -328,105 +328,6 @@ RENEWAL_SA_INVALID = {
       'effectOfOrder': 'Court Order to renew Repairers Lien.'
     }
 }
-RENEWAL_RL_VALID = {
-    'baseRegistrationNumber': 'TEST0017',
-    'clientReferenceId': 'A-00000402',
-    'authorizationReceived': True,
-    'debtorName': {
-        'businessName': 'TEST BUS 2 DEBTOR'
-    },
-    'registeringParty': {
-        'businessName': 'ABC SEARCHING COMPANY',
-        'address': {
-            'street': '222 SUMMER STREET',
-            'city': 'VICTORIA',
-            'region': 'BC',
-            'country': 'CA',
-            'postalCode': 'V8W 2V8'
-        },
-        'emailAddress': 'bsmith@abc-search.com'
-    },
-    'courtOrderInformation': {
-      'courtName': 'Supreme Court of British Columbia.',
-      'courtRegistry': 'VICTORIA',
-      'fileNumber': 'BC123495',
-      'orderDate': '2021-09-05T07:01:00+00:00',
-      'effectOfOrder': 'Court Order to renew Repairers Lien.'
-    }
-}
-RENEWAL_RL_MISSING = {
-    'baseRegistrationNumber': 'TEST0017',
-    'clientReferenceId': 'A-00000402',
-    'authorizationReceived': True,
-    'debtorName': {
-        'businessName': 'TEST BUS 2 DEBTOR'
-    },
-    'registeringParty': {
-        'businessName': 'ABC SEARCHING COMPANY',
-        'address': {
-            'street': '222 SUMMER STREET',
-            'city': 'VICTORIA',
-            'region': 'BC',
-            'country': 'CA',
-            'postalCode': 'V8W 2V8'
-        },
-        'emailAddress': 'bsmith@abc-search.com'
-    }
-}
-RENEWAL_RL_INVALID_DATE = {
-    'baseRegistrationNumber': 'TEST0017',
-    'clientReferenceId': 'A-00000402',
-    'authorizationReceived': True,
-    'debtorName': {
-        'businessName': 'TEST BUS 2 DEBTOR'
-    },
-    'registeringParty': {
-        'businessName': 'ABC SEARCHING COMPANY',
-        'address': {
-            'street': '222 SUMMER STREET',
-            'city': 'VICTORIA',
-            'region': 'BC',
-            'country': 'CA',
-            'postalCode': 'V8W 2V8'
-        },
-        'emailAddress': 'bsmith@abc-search.com'
-    },
-    'lifeYears': 5,
-    'courtOrderInformation': {
-      'courtName': 'Supreme Court of British Columbia.',
-      'courtRegistry': 'VICTORIA',
-      'fileNumber': 'BC123495',
-      'orderDate': '2021-08-05T07:01:00+00:00',
-      'effectOfOrder': 'Court Order to renew Repairers Lien.'
-    }
-}
-RENEWAL_RL_LIFE_INFINITE = {
-    'baseRegistrationNumber': 'TEST0017',
-    'clientReferenceId': 'A-00000402',
-    'authorizationReceived': True,
-    'debtorName': {
-        'businessName': 'TEST BUS 2 DEBTOR'
-    },
-    'registeringParty': {
-        'businessName': 'ABC SEARCHING COMPANY',
-        'address': {
-            'street': '222 SUMMER STREET',
-            'city': 'VICTORIA',
-            'region': 'BC',
-            'country': 'CA',
-            'postalCode': 'V8W 2V8'
-        },
-        'emailAddress': 'bsmith@abc-search.com'
-    },
-    'lifeInfinite': True,
-    'courtOrderInformation': {
-      'courtName': 'Supreme Court of British Columbia.',
-      'courtRegistry': 'VICTORIA',
-      'fileNumber': 'BC123495',
-      'orderDate': '2021-09-05T07:01:00+00:00',
-      'effectOfOrder': 'Court Order to renew Repairers Lien.'
-    }
-}
 ADD_SECURITIES_ACT_NOTICES = [
     {
         'securitiesActNoticeType': 'LIEN',
@@ -481,14 +382,10 @@ TEST_AUTHORIZATION_DATA = [
 TEST_RENEWAL_DATA = [
     ('TEST0001', RENEWAL_SA_VALID, True, None, None),
     ('TEST0001', RENEWAL_SA_INFINITE_VALID, True, None, None),
-    ('TEST0017', RENEWAL_RL_VALID, True, 1, None),
     ('TEST0001', RENEWAL_SA_INVALID, False, None, 'CourtOrderInformation is not allowed'),
     ('TEST0012', RENEWAL_SA_VALID, False, None, validator.RENEWAL_INVALID),
     ('TEST0001', RENEWAL_SA_LIFE_MISSING, False, None, validator.LIFE_MISSING),
     ('TEST0001', RENEWAL_SA_LIFE_INVALID, False, None, validator.LIFE_INVALID),
-    ('TEST0017', RENEWAL_RL_MISSING, False, 1, validator.COURT_ORDER_MISSING),
-    ('TEST0017', RENEWAL_RL_LIFE_INFINITE, False, 1, validator.LI_NOT_ALLOWED),
-    ('TEST0017', RENEWAL_RL_INVALID_DATE, False, 1, validator.COURT_ORDER_INVALID_DATE),
     ('TEST0017', RENEWAL_SA_VALID, True, -1, None),
     ('TEST0017', RENEWAL_SA_INFINITE_VALID, True, -1, None),
     ('TEST0017', RENEWAL_SA_INVALID, False, -1, 'CourtOrderInformation is not allowed'),

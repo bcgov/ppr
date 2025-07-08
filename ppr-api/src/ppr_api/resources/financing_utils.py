@@ -76,9 +76,6 @@ def save_rl_transition(registration_class: str, financing_statement: FinancingSt
     base_reg: Registration = financing_statement.registration[0]
     if not base_reg or base_reg.registration_type != RegistrationTypes.RL.value:
         return
-    if not model_utils.is_rl_transition():
-        logger.info(f"RL registration on {base_reg.registration_num} before CLA transition: reg type unchanged.")
-        return
     logger.info(f"RL registration on {base_reg.registration_num} after CLA transition: reg type changing to CL.")
     base_reg.registration_type = RegistrationTypes.CL.value
     try:

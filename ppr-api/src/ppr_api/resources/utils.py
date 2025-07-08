@@ -486,8 +486,6 @@ def get_payment_type_financing(registration):
     elif registration.registration_type == RegistrationTypes.FR.value:
         pay_trans_type = TransactionTypes.FINANCING_FR.value
         fee_quantity = 1
-    elif registration.registration_type == RegistrationTypes.RL.value:
-        fee_quantity = 1
     elif registration.registration_type == RegistrationTypes.CL.value:
         if registration.life != model_utils.LIFE_INFINITE:
             pay_trans_type = TransactionTypes.FINANCING_CL.value

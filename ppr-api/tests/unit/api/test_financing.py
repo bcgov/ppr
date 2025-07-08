@@ -415,7 +415,6 @@ TEST_PAY_DETAILS_REGISTRATION = [
 # testdata pattern is ({reg_type}, {registration_number}, {detail_desc}, {life})
 TEST_PAY_DETAILS_FINANCING = [
     ('SA', 'TEST0001', 'PPSA SECURITY AGREEMENT Length: 2 years', 2),
-    ('RL', 'TEST0002', 'REPAIRERS LIEN Length: 180 days', 0)
 ]
 # testdata pattern is ({reg_type}, {life_years}, {quantity}, {pay_trans_type})
 TEST_PAY_TYPE_FINANCING = [
@@ -425,7 +424,6 @@ TEST_PAY_TYPE_FINANCING = [
     ('FS', 2, 2, TransactionTypes.FINANCING_LIFE_YEAR.value),
     ('LT', 1, 1, TransactionTypes.FINANCING_NO_FEE.value),
     ('MH', 1, 1, TransactionTypes.FINANCING_NO_FEE.value),
-    ('RL', 0, 1, TransactionTypes.FINANCING_LIFE_YEAR.value),
     ('SG', 3, 3, TransactionTypes.FINANCING_LIFE_YEAR.value),
     ('SA', 5, 5, TransactionTypes.FINANCING_LIFE_YEAR.value),
     ('SA', 99, 1, TransactionTypes.FINANCING_INFINITE.value),
