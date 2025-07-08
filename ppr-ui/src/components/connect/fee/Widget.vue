@@ -103,7 +103,7 @@ const getFeeItemLabelTooltip = (typeCode: string) => {
             class="flex justify-between py-3"
           >
             <div>
-              <p class="flex items-center gap-1 font-bold">
+              <p class="flex items-center gap-1 font-bold pr-1">
                 <span>{{ $t(`ConnectFeeWidget.feeSummary.itemLabels.${feeItem.filingTypeCode}`) }}</span>
                 <UPopover
                   v-if="getFeeItemLabelTooltip(feeItem.filingTypeCode)"
@@ -135,7 +135,7 @@ const getFeeItemLabelTooltip = (typeCode: string) => {
                 </UPopover>
               </p>
               <p v-if="feeItem.showFeeDesc" class="pt-1 text-gray-600">
-                {{ $t(`ConnectFeeWidget.feeSummary.feeDesc.${feeItem.filingTypeCode}`) }}
+                {{ feeItem.feeDescOverride || $t(`ConnectFeeWidget.feeSummary.feeDesc.${feeItem.filingTypeCode}`) }}
               </p>
               <p
                 v-if="!feeItem.waived && feeItem.quantity !== undefined && feeItem.quantityDesc"
@@ -144,7 +144,7 @@ const getFeeItemLabelTooltip = (typeCode: string) => {
                 {{ feeItem.quantity }} @ {{ feeItem.quantityDesc }}
               </p>
             </div>
-            <p>{{ getItemFee(feeItem) }}</p>
+            <p  class="min-w-[50px]">{{ getItemFee(feeItem) }}</p>
           </div>
           <ConnectFeeExtraFee
             v-if="feeOptions.showFutureEffectiveFees"
@@ -162,7 +162,7 @@ const getFeeItemLabelTooltip = (typeCode: string) => {
             v-if="feeOptions.showProcessingFees"
             :description="$t('ConnectFeeWidget.feeSummary.processingFees')"
             :fee="totalProcessingFees"
-            :show-fee-value="isPlaceholderActive"
+            show-fee-value
           />
           <ConnectFeeExtraFee
             v-if="feeOptions.showServiceFees"
@@ -184,7 +184,7 @@ const getFeeItemLabelTooltip = (typeCode: string) => {
           />
         </div>
 
-        <div class="flex flex-row items-end justify-between border-y border-gray-300 p-3">
+        <div class="flex flex-row items-end justify-between border-y border-gray-300 py-3 px-4">
           <p class="mb-1 font-bold">
             {{ $t("ConnectFeeWidget.feeSummary.total") }}
           </p>

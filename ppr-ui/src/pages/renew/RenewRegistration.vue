@@ -173,6 +173,7 @@ import {
   RegisteringPartySummary,
   SecuredPartySummary
 } from '@/components/parties/summaries'
+import { RegistrationFees } from '@/resources'
 import { notCompleteDialog } from '@/resources/dialogOptions'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { getFinancingStatement } from '@/utils/ppr-api-helper'
@@ -192,6 +193,8 @@ import type {
 import type { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { storeToRefs } from 'pinia'
 import { useAuth, useNavigation, usePprRegistration } from '@/composables'
+import { useConnectFeeStore } from '@/store/connectFee'
+import { hasNoCharge } from '@/composables/fees/factories'
 
 export default defineComponent({
   name: 'RenewRegistrations',
@@ -216,9 +219,12 @@ export default defineComponent({
     const { goToDash, goToRoute } = useNavigation()
     const { isAuthenticated } = useAuth()
     const { initPprUpdateFilling } = usePprRegistration()
+    const { setFees } = useConnectFeeStore()
+    const { fees, feeOptions } = storeToRefs(useConnectFeeStore())
 
     const {
       // Getters
+      isRoleStaffReg,
       isRlTransition,
       rlTransitionDate,
       getLengthTrust,
@@ -396,6 +402,55 @@ export default defineComponent({
 
     watch(() => props.appReady, (val: boolean) => {
       onAppReady(val)
+    })
+
+    watch(() => localState.registrationTypeUI, (val: UIRegistrationTypes) => {
+      // set the registration amendment fees
+      if (!!val && hasNoCharge(localState.registrationTypeUI)) {
+        // set the registration type for the fees
+        setFees({[FeeSummaryTypes.RENEW]: {
+            ...RegistrationFees[FeeSummaryTypes.RENEW],
+            waived: hasNoCharge(localState.registrationTypeUI)
+          }})
+      } else {
+        // set the registration type for the fees
+        setFees({[FeeSummaryTypes.RENEW]: {
+            ...RegistrationFees[FeeSummaryTypes.RENEW],
+            serviceFees: isRoleStaffReg.value ? 0 : 1.50,
+            processingFees: isRoleStaffReg.value ? 5 : 0
+          }})
+      }
+      feeOptions.value.showProcessingFees = isRoleStaffReg.value
+      feeOptions.value.showServiceFees = !isRoleStaffReg.value
+    }, { immediate: true})
+
+    watch(() => localState.registrationLength, (val: RegistrationLengthI) => {
+      // if (localState.registrationType === APIRegistrationTypes.MARRIAGE_MH) return
+      if (val.lifeInfinite && val.lifeYears < 1) {
+        setFees({[FeeSummaryTypes.RENEW]: {
+            ...fees.value[FeeSummaryTypes.RENEW],
+            filingFees: 500,
+            quantity: 1,
+            feeDescOverride: 'Infinite Registration',
+            waived: hasNoCharge(localState.registrationTypeUI)
+          }})
+      } else if (!val.lifeInfinite && val.lifeYears >= 1 && val.lifeYears <= 25) {
+        setFees({[FeeSummaryTypes.RENEW]: {
+            ...fees.value[FeeSummaryTypes.RENEW],
+            filingFees: 5,
+            quantity: val.lifeYears,
+            feeDescOverride: `${val.lifeYears} years @ $5.00/year`,
+            waived: hasNoCharge(localState.registrationTypeUI)
+          }})
+      } else {
+        setFees({[FeeSummaryTypes.RENEW]: {
+            ...fees.value[FeeSummaryTypes.RENEW],
+            filingFees: 0,
+            quantity: 1,
+            feeDescOverride: 'Select a valid registration length',
+            waived: hasNoCharge(localState.registrationTypeUI)
+          }})
+      }
     })
 
     return {

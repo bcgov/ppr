@@ -2,7 +2,7 @@
 defineProps<{ description: string, fee: number, showFeeValue: boolean }>()
 </script>
 <template>
-  <div class="flex justify-between border-bcGovGray-300 py-3 pl-4">
+  <div class="flex justify-between border-bcGovGray-300 py-3">
     <p class="font-bold">
       {{ description }}
     </p>

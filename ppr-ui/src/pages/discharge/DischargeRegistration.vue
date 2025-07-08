@@ -163,6 +163,7 @@
         >
           <aside>
             <StickyContainer
+              :show-connect-fees="true"
               :set-right-offset="true"
               :set-show-buttons="true"
               :set-show-fee-summary="true"
@@ -190,18 +191,13 @@ import { DebtorSummary, RegisteringPartySummary, SecuredPartySummary } from '@/c
 import { notCompleteDialog } from '@/resources/dialogOptions'
 import { convertDate, getFeatureFlag, pacificDate } from '@/utils'
 import { getFinancingStatement } from '@/utils/ppr-api-helper'
-import type {
-  APIRegistrationTypes
-} from '@/enums'
-import {
-  RouteNames,
-  RegistrationFlowType,
-  UIRegistrationTypes
-} from '@/enums'
+import type { APIRegistrationTypes } from '@/enums'
+import { RegistrationFlowType, RouteNames, UIRegistrationTypes } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
-import type { ErrorIF, DialogOptionsIF } from '@/interfaces'
+import type { DialogOptionsIF, ErrorIF } from '@/interfaces'
 import { useAuth, useNavigation, usePprRegistration } from '@/composables'
 import { CautionBox } from '@/components/common'
+import { useConnectFeeStore } from '@/store/connectFee'
 
 export default defineComponent({
   name: 'DischargeRegistration',
@@ -226,8 +222,12 @@ export default defineComponent({
     const { goToDash } = useNavigation()
     const { isAuthenticated } = useAuth()
     const { initPprUpdateFilling, isSecurityActNotice } = usePprRegistration()
+    const { setRegistrationFees } = useConnectFeesHandler()
+    const { fees, feeOptions, userSelectedPaymentMethod } = storeToRefs(useConnectFeeStore())
+
     const {
       // Getters
+      isRoleStaffReg,
       isRlTransition,
       getLengthTrust,
       rlTransitionDate,
@@ -286,6 +286,10 @@ export default defineComponent({
 
     onMounted(() => {
       onAppReady(props.appReady)
+
+      setRegistrationFees(FeeSummaryTypes.DISCHARGE)
+      feeOptions.value.showProcessingFees = isRoleStaffReg.value
+      feeOptions.value.showServiceFees = !isRoleStaffReg.value
     })
 
     const handleDialogResp = (val: boolean): void => {

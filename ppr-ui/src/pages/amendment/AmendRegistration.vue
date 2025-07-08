@@ -161,6 +161,7 @@
         >
           <aside>
             <StickyContainer
+              :show-connect-fees="true"
               :set-right-offset="true"
               :set-show-buttons="true"
               :set-show-fee-summary="true"
@@ -212,6 +213,9 @@ import type {
   FinancingStatementIF,
   RegTableNewItemI
 } from '@/interfaces'
+import { RegistrationFees } from '@/resources'
+import { useConnectFeeStore } from '@/store/connectFee'
+import { hasNoChargeAmendment } from '@/composables/fees/factories'
 
 export default defineComponent({
   name: 'AmendRegistration',
@@ -227,6 +231,8 @@ export default defineComponent({
     const { goToDash, goToRoute } = useNavigation()
     const { isAuthenticated } = useAuth()
     const { initPprUpdateFilling, isSecurityActNotice } = usePprRegistration()
+    const { setFees } = useConnectFeeStore()
+    const { feeOptions } = storeToRefs(useConnectFeeStore())
     const {
       // Actions
       setAddCollateral,
@@ -242,6 +248,7 @@ export default defineComponent({
       // Getters
       getStateModel,
       isRlTransition,
+      isRoleStaffReg,
       rlTransitionDate,
       getLengthTrust,
       getAddCollateral,
@@ -631,6 +638,25 @@ export default defineComponent({
     watch(() => props.appReady, (val: boolean) => {
       onAppReady(val)
     })
+
+    watch(() => localState.registrationTypeUI, (val: UIRegistrationTypes) => {
+      // set the registration amendment fees
+      if (!!val && hasNoChargeAmendment(localState.registrationTypeUI)) {
+        setFees({[FeeSummaryTypes.AMEND]: {
+            ...RegistrationFees[FeeSummaryTypes.AMEND],
+            processingFees: 0,
+            waived: true
+          }})
+      } else {
+        setFees({[FeeSummaryTypes.AMEND]: {
+            ...RegistrationFees[FeeSummaryTypes.AMEND],
+            serviceFees: isRoleStaffReg.value ? 0 : 1.50,
+            processingFees: isRoleStaffReg.value ? 5 : 0
+          }})
+      }
+      feeOptions.value.showProcessingFees = isRoleStaffReg.value
+      feeOptions.value.showServiceFees = !isRoleStaffReg.value
+    }, { immediate: true})
 
     watch(() => [
       localState.securedPartyOpen, localState.debtorOpen, localState.collateralOpen, localState.lengthTrustOpen

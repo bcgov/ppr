@@ -149,18 +149,20 @@ import { RegistrationLengthTrustSummary } from '@/components/registration'
 import { RegisteringPartyChange } from '@/components/parties/party'
 import { notCompleteDialog } from '@/resources/dialogOptions'
 import { getFeatureFlag, saveRenewal } from '@/utils'
-import type { UIRegistrationTypes } from '@/enums';
+import { ConnectPaymentMethod, type UIRegistrationTypes } from '@/enums'
 import { ActionTypes, APIRegistrationTypes, RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import type {
   RenewRegistrationIF,
   StateModelIF,
   DialogOptionsIF,
-  RegTableNewItemI
+  RegTableNewItemI, StaffPaymentIF
 } from '@/interfaces'
 import type { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { storeToRefs } from 'pinia'
 import { useAuth, useNavigation } from '@/composables'
+import { hasNoCharge } from '@/composables/fees/factories'
+import { useConnectFeeStore } from '@/store/connectFee'
 
 export default defineComponent({
   name: 'ConfirmRenewal',
@@ -186,12 +188,13 @@ export default defineComponent({
     const router = useRouter()
     const { goToDash, goToPay } = useNavigation()
     const { isAuthenticated } = useAuth()
-    const {
-      // Actions
-      setRegTableNewItem
-    } = useStore()
+    const { setFees } = useConnectFeeStore()
+    const { fees } = storeToRefs(useConnectFeeStore())
+    const { userSelectedPaymentMethod } = storeToRefs(useConnectFeeStore())
+    const { setRegTableNewItem } = useStore()
     const {
       // Getters
+      getStaffPayment,
       rlTransitionDate,
       isRlTransition,
       getStateModel,
@@ -268,10 +271,6 @@ export default defineComponent({
       }
     }
 
-    watch(() => props.appReady, (appReady: boolean) => {
-      if (appReady) onAppReady()
-    }, { immediate: true })
-
     const handleDialogResp = (val: boolean): void => {
       localState.showCancelDialog = false
       if (!val) goToDash()
@@ -307,7 +306,10 @@ export default defineComponent({
     const submitRenewal = async (): Promise<void> => {
       const stateModel: StateModelIF = getStateModel.value
       localState.submitting = true
-      const apiResponse: RenewRegistrationIF = await saveRenewal(stateModel)
+      const apiResponse: RenewRegistrationIF = await saveRenewal(
+        stateModel,
+        userSelectedPaymentMethod.value === ConnectPaymentMethod.DIRECT_PAY
+      )
       localState.submitting = false
       if (apiResponse === undefined || apiResponse?.error !== undefined) {
         emit('error', apiResponse?.error)
@@ -331,6 +333,18 @@ export default defineComponent({
       const parties = getAddSecuredPartiesAndDebtors.value
       localState.showRegMsg = parties.registeringParty?.action === ActionTypes.EDITED
     }
+
+    watch(() => props.appReady, (appReady: boolean) => {
+      if (appReady) onAppReady()
+    }, { immediate: true })
+
+    watch(() => getStaffPayment.value, (val: StaffPaymentIF) => {
+      // If staff payment is set to waived, set the fee summary accordingly
+      setFees({[FeeSummaryTypes.RENEW]: {
+          ...fees.value[FeeSummaryTypes.RENEW],
+          waived: val.option === 0
+        }})
+    })
 
     return {
       rlTransitionDate,

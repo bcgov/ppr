@@ -113,7 +113,7 @@ import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { throttle } from 'lodash'
 import { saveFinancingStatement, saveFinancingStatementDraft } from '@/utils'
-import { RouteNames } from '@/enums'
+import { ConnectPaymentMethod, RouteNames } from '@/enums'
 import StaffPaymentDialog from '@/components/dialogs/StaffPaymentDialog.vue'
 import type {
   ButtonConfigIF, DialogOptionsIF, DraftIF, ErrorIF, FinancingStatementIF, RegTableNewItemI, StateModelIF
@@ -121,6 +121,7 @@ import type {
 import { unsavedChangesDialog } from '@/resources/dialogOptions'
 import { useMhrCorrections, useNavigation, useNewMhrRegistration } from '@/composables'
 import { storeToRefs } from 'pinia'
+import { useConnectFeeStore } from '@/store/connectFee'
 
 export default defineComponent({
   components: {
@@ -177,6 +178,7 @@ export default defineComponent({
     const { goToDash, goToRoute, goToPay } = useNavigation()
     const { mhrDraftHandler } = useNewMhrRegistration()
     const { isMhrCorrection } = useMhrCorrections()
+    const { userSelectedPaymentMethod } = storeToRefs(useConnectFeeStore())
 
     const localState = reactive({
       options: props.baseDialogOptions as DialogOptionsIF || unsavedChangesDialog,
@@ -357,7 +359,10 @@ export default defineComponent({
     const throttleSubmitStatement = throttle(async (stateModel: StateModelIF): Promise<FinancingStatementIF> => {
       // Prevents multiple submits (i.e. double click)
       localState.submitting = true
-      const statement = await saveFinancingStatement(stateModel)
+      const statement = await saveFinancingStatement(
+        stateModel,
+        userSelectedPaymentMethod.value === ConnectPaymentMethod.DIRECT_PAY
+      )
       localState.submitting = false
       return statement
     }, 2000, { trailing: false })
