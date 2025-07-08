@@ -57,32 +57,6 @@ STATEMENT_VALID = {
         'invoiceId': '2199700'
     }
 }
-STATEMENT_RL_VALID = {
-    'baseRegistrationNumber': 'TEST0017',
-    'clientReferenceId': 'A-00000402',
-    'authorizationReceived': True,
-    'debtorName': {
-        'businessName': 'TEST BUS 2 DEBTOR'
-    },
-    'registeringParty': {
-        'businessName': 'ABC SEARCHING COMPANY',
-        'address': {
-            'street': '222 SUMMER STREET',
-            'city': 'VICTORIA',
-            'region': 'BC',
-            'country': 'CA',
-            'postalCode': 'V8W 2V8'
-        },
-        'emailAddress': 'bsmith@abc-search.com'
-    },
-    'courtOrderInformation': {
-      'courtName': 'Supreme Court of British Columbia.',
-      'courtRegistry': 'VICTORIA',
-      'fileNumber': 'BC123495',
-      'orderDate': '2021-09-05T07:01:00+00:00',
-      'effectOfOrder': 'Court Order to renew Repairers Lien.'
-    }
-}
 MISSING_BASE_DEBTOR = {
     'baseRegistrationNumber': 'TEST0001',
     'clientReferenceId': 'A-00000402',
@@ -215,32 +189,6 @@ INVALID_ADDRESS = {
         'invoiceId': '2199700'
     }
 }
-RL_INVALID_DATE = {
-    'baseRegistrationNumber': 'TEST0017',
-    'clientReferenceId': 'A-00000402',
-    'authorizationReceived': True,
-    'debtorName': {
-        'businessName': 'TEST BUS 2 DEBTOR'
-    },
-    'registeringParty': {
-        'businessName': 'ABC SEARCHING COMPANY',
-        'address': {
-            'street': '222 SUMMER STREET',
-            'city': 'VICTORIA',
-            'region': 'BC',
-            'country': 'CA',
-            'postalCode': 'V8W 2V8'
-        },
-        'emailAddress': 'bsmith@abc-search.com'
-    },
-    'courtOrderInformation': {
-      'courtName': 'Supreme Court of British Columbia.',
-      'courtRegistry': 'VICTORIA',
-      'fileNumber': 'BC123495',
-      'orderDate': '2021-08-05T07:01:00+00:00',
-      'effectOfOrder': 'Court Order to renew Repairers Lien.'
-    }
-}
 
 # testdata pattern is ({description}, {test data}, {roles}, {status}, {has_account}, {reg_num})
 TEST_CREATE_DATA = [
@@ -250,11 +198,9 @@ TEST_CREATE_DATA = [
     ('Invalid historical', INVALID_HISTORICAL, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0013'),
     ('Invalid party code extra validation', INVALID_CODE, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0001'),
     ('Invalid party address extra validation', INVALID_ADDRESS, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0001'),
-    ('Invalid RL CO date extra validation', RL_INVALID_DATE, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True, 'TEST0017'),
     ('Missing account', STATEMENT_VALID, [PPR_ROLE], HTTPStatus.BAD_REQUEST, False, 'TEST0001'),
     ('Invalid role', STATEMENT_VALID, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 'TEST0001'),
     ('BCOL helpdesk account', STATEMENT_VALID, [PPR_ROLE, BCOL_HELP], HTTPStatus.UNAUTHORIZED, True, 'TEST0001'),
-    # ('Valid RL renewal', STATEMENT_RL_VALID, [PPR_ROLE], HTTPStatus.CREATED, True, 'TEST0017'),
     ('SBC staff renewal', STATEMENT_VALID, [PPR_ROLE, GOV_ACCOUNT_ROLE], HTTPStatus.CREATED, True, 'TEST0001')
 ]
 # testdata pattern is ({role}, {routingSlip}, {bcolNumber}, {datNUmber}, {status})
@@ -283,7 +229,6 @@ TEST_GET_STATEMENT = [
 ]
 # testdata pattern is ({desc}, {test data}, {roles}, {status}, {after_cla}, {reg_num})
 TEST_CREATE_RL_DATA = [
-    ('Valid before CLA', STATEMENT_RL_VALID, [PPR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, False, 'TEST0017'),
     ('Valid after CLA', STATEMENT_VALID, [PPR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, True, 'TEST0017'),
 ]
 
@@ -320,10 +265,7 @@ def test_create_renewal_rl(session, client, jwt, desc, json_data, roles, status,
     if status == HTTPStatus.CREATED:
         statement: FinancingStatement = FinancingStatement.find_by_registration_number(reg_num, 'PS12345', True)
         reg_type: str = statement.registration[0].registration_type
-        if after_cla:
-            assert reg_type == RegistrationTypes.CL.value
-        else:
-            assert reg_type == RegistrationTypes.RL.value
+        assert reg_type == RegistrationTypes.CL.value
 
 
 @pytest.mark.parametrize('desc,json_data,roles,status,has_account,reg_num', TEST_CREATE_DATA)
@@ -504,13 +446,8 @@ def create_financing_test(session, client, jwt, type):
     del statement['documentId']
     del statement['lifeInfinite']
     del statement['generalCollateral']
-    if type != 'RL':
-        del statement['lienAmount']
-        del statement['surrenderDate']
-    else:
-        del statement['trustIndenture']
-        statement['lifeYears'] = 1
-        statement['surrenderDate'] = model_utils.format_ts(model_utils.now_ts())
+    del statement['lienAmount']
+    del statement['surrenderDate']
     current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
     return client.post('/api/v1/financing-statements',
                        json=statement,

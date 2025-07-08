@@ -101,6 +101,7 @@ REG_TYPE_NEW_FINANCING_EXCLUDED = {
     "TG": "TG",
     "TL": "TL",
     "TM": "TM",
+    "RL": "RL",
 }
 
 # Mapping from API draft type to DB registration class
@@ -821,22 +822,6 @@ def report_retry_elapsed(last_ts: _datetime):
     test_ts = (last_ts + timedelta(minutes=15)).replace(tzinfo=timezone.utc)
     # logger.info('Comparing now ' + now.isoformat() + ' with last ts ' + test_ts.isoformat())
     return now > test_ts
-
-
-def is_rl_enabled() -> bool:
-    """If a repairer's lien act timestamp exists, verify the current timestamp is before."""
-    reg_type: RegistrationType = RegistrationType.find_by_registration_type(RegistrationTypes.RL.value)
-    if reg_type and reg_type.act_ts:
-        return now_ts().timestamp() < reg_type.act_ts.timestamp()
-    return True
-
-
-def is_cl_enabled() -> bool:
-    """If a commercial liens act timestamp exists, verify the current timestamp is later."""
-    reg_type: RegistrationType = RegistrationType.find_by_registration_type(RegistrationTypes.CL.value)
-    if reg_type and reg_type.act_ts:
-        return now_ts().timestamp() > reg_type.act_ts.timestamp()
-    return True
 
 
 def is_rl_transition() -> bool:

@@ -427,7 +427,6 @@ TEST_CREATE_SE_DATA = [
 ]
 # testdata pattern is ({desc}, {test data}, {roles}, {status}, {after_cla}, {reg_num})
 TEST_CREATE_RL_DATA = [
-    ('Valid before CLA', STATEMENT_VALID, [PPR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, False, 'TEST0017'),
     ('Valid after CLA', STATEMENT_VALID, [PPR_ROLE, STAFF_ROLE], HTTPStatus.CREATED, True, 'TEST0017'),
 ]
 
@@ -461,10 +460,7 @@ def test_create_amendment_rl(session, client, jwt, desc, json_data, roles, statu
     if status == HTTPStatus.CREATED:
         statement: FinancingStatement = FinancingStatement.find_by_registration_number(reg_num, 'PS12345', True)
         reg_type: str = statement.registration[0].registration_type
-        if after_cla:
-            assert reg_type == RegistrationTypes.CL.value
-        else:
-            assert reg_type == RegistrationTypes.RL.value
+        assert reg_type == RegistrationTypes.CL.value
 
 
 @pytest.mark.parametrize('desc,json_data,reg_num,account_id,status', TEST_CREATE_SE_DATA)

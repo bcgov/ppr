@@ -915,35 +915,21 @@ def set_registration_basic_info(registration, json_data: dict, registration_type
 
 def set_renewal_life(registration, json_data: dict, reg_type: str):
     """New renewal registration set life from request JSON."""
-    if is_rl_renewal(reg_type):
-        registration.life = model_utils.REPAIRER_LIEN_YEARS
-        # Adding 180 days to existing expiry.
-        registration.financing_statement.expire_date = model_utils.expiry_dt_repairer_lien(
-            registration.financing_statement.expire_date
+    if "lifeInfinite" in json_data and json_data["lifeInfinite"]:
+        registration.life = model_utils.LIFE_INFINITE
+        registration.financing_statement.expire_date = None
+    if "lifeYears" in json_data:
+        registration.life = json_data["lifeYears"]
+        # registration.financing_statement.expire_date = model_utils.expiry_dt_from_years(registration.life)
+        # Replace above line with below: adding years to the existing expiry
+        registration.financing_statement.expire_date = model_utils.expiry_dt_add_years(
+            registration.financing_statement.expire_date, registration.life
         )
+    elif "expiryDate" in json_data:
+        new_expiry_date = model_utils.expiry_ts_from_iso_format(json_data["expiryDate"])
+        registration.life = new_expiry_date.year - registration.financing_statement.expire_date.year
+        registration.financing_statement.expire_date = new_expiry_date
+    if "lifeInfinite" in json_data and json_data["lifeInfinite"]:
+        registration.financing_statement.life = registration.life
     else:
-        if "lifeInfinite" in json_data and json_data["lifeInfinite"]:
-            registration.life = model_utils.LIFE_INFINITE
-            registration.financing_statement.expire_date = None
-        if "lifeYears" in json_data:
-            registration.life = json_data["lifeYears"]
-            # registration.financing_statement.expire_date = model_utils.expiry_dt_from_years(registration.life)
-            # Replace above line with below: adding years to the existing expiry
-            registration.financing_statement.expire_date = model_utils.expiry_dt_add_years(
-                registration.financing_statement.expire_date, registration.life
-            )
-        elif "expiryDate" in json_data:
-            new_expiry_date = model_utils.expiry_ts_from_iso_format(json_data["expiryDate"])
-            registration.life = new_expiry_date.year - registration.financing_statement.expire_date.year
-            registration.financing_statement.expire_date = new_expiry_date
-        if "lifeInfinite" in json_data and json_data["lifeInfinite"]:
-            registration.financing_statement.life = registration.life
-        else:
-            registration.financing_statement.life += registration.life
-
-
-def is_rl_renewal(reg_type: str) -> bool:
-    """RL renewal only if base registration type is RL and CLA is not enabled."""
-    if RegistrationTypes.RL.value != reg_type:
-        return False
-    return not model_utils.is_rl_transition()
+        registration.financing_statement.life += registration.life

@@ -98,49 +98,10 @@ TEST_DATA_EXPIRY = [
     ('2022-09-01T00:00:01-07:00', 16, '2038-09-02T06:59:59+00:00'),
     ('2022-09-01T00:00:01-07:00', 25, '2047-09-02T06:59:59+00:00')
 ]
-# testdata pattern is ({registration_ts}, {expiry_ts})
-TEST_DATA_EXPIRY_RL = [
-    ('2021-08-31T06:59:59+00:00', '2022-02-27T07:59:59+00:00'),
-    ('2021-09-01T06:59:59+00:00', '2022-02-28T07:59:59+00:00'),
-    ('2021-09-02T06:59:59+00:00', '2022-03-01T07:59:59+00:00'),
-    ('2021-09-13T06:59:59+00:00', '2022-03-12T07:59:59+00:00'),
-    ('2021-09-14T06:59:59+00:00', '2022-03-13T07:59:59+00:00'),
-    ('2021-09-30T06:59:59+00:00', '2022-03-29T06:59:59+00:00'),
-    ('2021-10-01T06:59:59+00:00', '2022-03-30T06:59:59+00:00'),
-    ('2021-10-31T06:59:59+00:00', '2022-04-29T06:59:59+00:00'),
-    ('2021-11-07T06:59:59+00:00', '2022-05-06T06:59:59+00:00'),
-    ('2021-11-08T07:59:59+00:00', '2022-05-07T06:59:59+00:00'),
-    ('2021-12-01T07:59:59+00:00', '2022-05-30T06:59:59+00:00'),
-    ('2022-01-01T07:59:59+00:00', '2022-06-30T06:59:59+00:00'),
-    ('2022-02-01T07:59:59+00:00', '2022-07-31T06:59:59+00:00'),
-    ('2022-03-01T07:59:59+00:00', '2022-08-28T06:59:59+00:00'),
-    ('2022-03-13T07:59:59+00:00', '2022-09-09T06:59:59+00:00'),
-    ('2022-03-14T06:59:59+00:00', '2022-09-10T06:59:59+00:00'),
-    ('2022-04-01T06:59:59+00:00', '2022-09-28T06:59:59+00:00'),
-    ('2022-05-01T06:59:59+00:00', '2022-10-28T06:59:59+00:00'),
-    ('2022-05-10T06:59:59+00:00', '2022-11-06T06:59:59+00:00'),
-    ('2022-05-11T06:59:59+00:00', '2022-11-07T07:59:59+00:00'),
-    ('2022-06-01T06:59:59+00:00', '2022-11-28T07:59:59+00:00'),
-    ('2022-07-01T06:59:59+00:00', '2022-12-28T07:59:59+00:00'),
-    ('2022-08-01T06:59:59+00:00', '2023-01-28T07:59:59+00:00')
-]
 # testdata pattern is ({registration_ts}, {add_1}, {add_2}, {add_3}, {expiry_ts})
 TEST_DATA_EXPIRY_ADD = [
     ('2021-08-31T00:00:01-07:00', 10, 5, 2, '2038-09-01T06:59:59+00:00'),
     ('2021-01-31T00:00:01-08:00', 2, 3, 5, '2031-02-01T07:59:59+00:00')
-]
-# testdata pattern is ({desc}, {registration_ts}, {renew_count}, {expiry_ts})
-TEST_DATA_EXPIRY_RENEW_RL = [
-    ('Registration', '2021-08-31T00:00:01-07:00', 0, '2022-02-27T07:59:59+00:00'),
-    ('1 renewal', '2021-08-31T00:00:01-07:00', 1, '2022-08-26T06:59:59+00:00'),
-    ('2 renewals', '2021-08-31T00:00:01-07:00', 2, '2023-02-22T07:59:59+00:00')
-]
-# testdata pattern is ({desc}, {renew_count}, {expiry_days})
-TEST_DATA_EXPIRY_RL_DAYS = [
-    ('Registration', 0, 180),
-    ('1 renewal', 1, 360),
-    ('2 renewals', 2, 540),
-    ('3 renewals', 3, 720)
 ]
 
 # testdata pattern is ({desc}, {registration_ts}, {life_years}, {hour}, {expiry_ts})
@@ -196,18 +157,6 @@ TEST_DATA_DOC_STORAGE_NAME = [
     ('Amendment', 'TEST0007', 'amendment-200000008-TEST0007.pdf')
 ]
 # testdata pattern is (today_offset, valid)
-TEST_DATA_VALID_RL = [
-    (None, True),
-    (1, True),
-    (-1, False),
-]
-# testdata pattern is (today_offset, valid)
-TEST_DATA_VALID_CL = [
-    (None, True),
-    (1, False),
-    (-1, True),
-]
-# testdata pattern is (today_offset, valid)
 TEST_DATA_TRANSITION_RL = [
     (None, False),
     (1, False),
@@ -220,16 +169,6 @@ def test_expiry_date(session, registration_ts, offset, expiry_ts):
     """Assert that computing expiry ts from registraton ts works as expected."""
     # reg_ts = model_utils.ts_from_iso_format(registration_ts)
     expiry_test = model_utils.expiry_dt_from_years(offset, registration_ts)
-    expiry_iso = model_utils.format_ts(expiry_test)
-    # print(registration_ts + ', ' + model_utils.format_ts(reg_ts) + ', '  + expiry_iso)
-    assert expiry_ts == expiry_iso
-
-
-@pytest.mark.parametrize('registration_ts,expiry_ts', TEST_DATA_EXPIRY_RL)
-def test_expiry_date_rl(session, registration_ts, expiry_ts):
-    """Assert that computing an RL expiry ts from registraton ts works as expected."""
-    reg_ts = model_utils.ts_from_iso_format(registration_ts)
-    expiry_test = model_utils.expiry_dt_repairer_lien(reg_ts)
     expiry_iso = model_utils.format_ts(expiry_test)
     # print(registration_ts + ', ' + model_utils.format_ts(reg_ts) + ', '  + expiry_iso)
     assert expiry_ts == expiry_iso
@@ -257,35 +196,6 @@ def test_expiry_date_add(session, registration_ts, add_1, add_2, add_3, expiry_t
     expiry_iso = model_utils.format_ts(expiry_add_3)
     # print(registration_ts + ', ' + model_utils.format_ts(reg_ts) + ', '  + expiry_iso)
     assert expiry_ts == expiry_iso
-
-
-@pytest.mark.parametrize('desc,registration_ts,renew_count,expiry_ts', TEST_DATA_EXPIRY_RENEW_RL)
-def test_expiry_date_renew_rl(session, desc, registration_ts, renew_count, expiry_ts):
-    """Assert that computing multiple RL renewal expiry ts from registration ts works as expected."""
-    reg_ts = model_utils.ts_from_iso_format(registration_ts)
-    expiry_test = model_utils.expiry_dt_repairer_lien(reg_ts)
-    # print(model_utils.format_ts(expiry_test))
-    if renew_count > 0:
-        for x in range(renew_count):
-            expiry_test = model_utils.expiry_dt_repairer_lien(expiry_test)
-            # print(model_utils.format_ts(expiry_test))
-
-    expiry_iso = model_utils.format_ts(expiry_test)
-    assert expiry_ts == expiry_iso
-
-
-@pytest.mark.parametrize('desc,renew_count,expiry_days', TEST_DATA_EXPIRY_RL_DAYS)
-def test_expiry_rl_days(session, desc, renew_count, expiry_days):
-    """Assert that computing multiple renewal days to expiry works as expected."""
-    expiry_test = model_utils.expiry_dt_repairer_lien()
-    now = model_utils.now_ts()
-    # print(model_utils.format_ts(expiry_test))
-    if renew_count > 0:
-        for x in range(renew_count):
-            expiry_test = model_utils.expiry_dt_repairer_lien(expiry_test)
-            # print(model_utils.format_ts(expiry_test))
-    ts_delta = expiry_test - now
-    assert ts_delta.days == expiry_days
 
 
 def test_expiry_dt_from_years():
@@ -564,32 +474,6 @@ def test_mail_doc_storage_name(session):
     search: SearchRequest = SearchRequest(id=2000, search_ts=model_utils.now_ts())
     name = model_utils.get_mail_doc_storage_name(reg_ts, 1000, 2000)
     assert test_name == name
-
-
-@pytest.mark.parametrize('today_offset,valid', TEST_DATA_VALID_RL)
-def test_rl_enabled(session, today_offset, valid):
-    """Assert that checking a RL act timestamp for type validity works as expected."""
-    if today_offset:
-        now_offset = model_utils.now_ts_offset(today_offset, True)
-        reg_type: RegistrationType = RegistrationType.find_by_registration_type(RegistrationTypes.RL.value)
-        reg_type.act_ts = now_offset
-        session.add(reg_type)
-        session.commit()
-    test_valid = model_utils.is_rl_enabled()
-    assert test_valid == valid
-
-
-@pytest.mark.parametrize('today_offset,valid', TEST_DATA_VALID_CL)
-def test_cl_enabled(session, today_offset, valid):
-    """Assert that checking a CL act timestamp for type validity works as expected."""
-    if today_offset:
-        now_offset = model_utils.now_ts_offset(today_offset, True)
-        reg_type: RegistrationType = RegistrationType.find_by_registration_type(RegistrationTypes.CL.value)
-        reg_type.act_ts = now_offset
-        session.add(reg_type)
-        session.commit()
-    test_valid = model_utils.is_cl_enabled()
-    assert test_valid == valid
 
 
 @pytest.mark.parametrize('today_offset,valid', TEST_DATA_TRANSITION_RL)

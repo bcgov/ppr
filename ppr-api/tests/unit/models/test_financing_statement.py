@@ -48,7 +48,6 @@ TEST_REGISTRATION_DATA = [
     ('SA', 'PS12345', False),
     ('SA', 'PS12345', True),
     ('SE', 'PS00002', True),
-    ('RL', 'PS12345', False),
     ('OT', 'PS12345', False),
     ('SA', None, False)
 ]
@@ -84,7 +83,6 @@ TEST_DEBTOR_NAMES_DATA = [
 TEST_LIFE_EXPIRY_DATA = [
     ('SA', 5, False, 5),
     ('SA', None, True, 99),
-    ('RL', 1, False, model_utils.REPAIRER_LIEN_YEARS),
     ('MH', 1, False, model_utils.LIFE_INFINITE),
     ('LT', None, True, model_utils.LIFE_INFINITE),
     ('FR', 5, False, model_utils.LIFE_INFINITE),
@@ -95,14 +93,11 @@ TEST_LIFE_EXPIRY_DATA = [
 TEST_VERIFICATION_EXPIRY_DATA = [
     ('TEST0016', 'SA', False, '2026-09-04T06:59:59+00:00', 5),
     ('TEST0016', 'SA', True, '2041-09-04T06:59:59+00:00', 20),
-    ('TEST0017', 'RL', False, '2022-02-27T07:59:59+00:00', 0),
-    ('TEST0017', 'RL', True, '2023-02-23T07:59:59+00:00', 0)
 ]
 
 # testdata pattern is ({reg_num}, {reg_type}, {expiry_ts}, {renewal2_ts}, {renewal1_ts})
 TEST_HISTORY_EXPIRY_DATA = [
     ('TEST0016', 'SA', '2041-09-04T06:59:59+00:00', '2036-09-04T06:59:59+00:00', '2041-09-04T06:59:59+00:00')
-#    ('TEST0017', 'RL', '2023-02-23T07:59:59+00:00', '2022-08-27T06:59:59+00:00', '2023-02-23T07:59:59+00:00')
 ]
 
 @pytest.mark.parametrize('reg_type,account_id,create_draft', TEST_REGISTRATION_DATA)

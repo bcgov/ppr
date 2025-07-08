@@ -672,13 +672,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         registration.registration_type = reg_type
         registration.ver_bypassed = "Y"
 
-        if reg_type == model_utils.REG_TYPE_REPAIRER_LIEN:
-            if "lienAmount" in json_data:
-                registration.lien_value = json_data["lienAmount"].strip()
-            if "surrenderDate" in json_data:
-                registration.surrender_date = model_utils.ts_from_date_iso_format(json_data["surrenderDate"])
-            registration.life = model_utils.REPAIRER_LIEN_YEARS
-        elif "lifeInfinite" in json_data and json_data["lifeInfinite"]:
+        if "lifeInfinite" in json_data and json_data["lifeInfinite"]:
             registration.life = model_utils.LIFE_INFINITE
         elif registration.registration_type_cl in (model_utils.REG_CLASS_CROWN, model_utils.REG_CLASS_MISC):
             registration.life = model_utils.LIFE_INFINITE

@@ -228,18 +228,6 @@ TEST_SE_DATA = [
     ('Invalid registering party code', False, 'PS00002', SE_RP_INVALID_2, None, SECURITIES_ACT_NOTICES,
      validator.SE_RP_INVALID_CODE)
 ]
-# testdata pattern is ({description}, {valid}, {lien_amount}, {surrender_date}, {message content})
-TEST_RL_DATA = [
-    (DESC_VALID, True, '1000', 'valid', None),
-    ('Missing lien amount', False, None, 'valid', validator.RL_AMOUNT_REQUIRED),
-    ('Missing surrender date', False, '1000', 'none', validator.RL_DATE_REQUIRED),
-    ('Invalid surrender date', False, '1000', 'junk', validator.RL_DATE_INVALID),
-    ('Too old surrender date', False, '1000', 'old', validator.RL_DATE_INVALID),
-    ('Almost too old surrender date', True, '1000', '21', None),
-    (DESC_INCLUDES_GC, False, '1000', 'valid', validator.GC_NOT_ALLOWED),
-    (DESC_MISSING_VC, False, '1000', 'valid', validator.VC_REQUIRED),
-    (DESC_VC_MH, False, '1000', 'valid', validator.VC_MH_NOT_ALLOWED)
-]
 # testdata pattern is ({description}, {valid}, {reg_type})
 TEST_EXCLUDED_TYPE_DATA = [
     ('Type not allowed', False, 'SS'),
@@ -247,7 +235,8 @@ TEST_EXCLUDED_TYPE_DATA = [
     ('Type not allowed', False, 'CC'),
     ('Type not allowed', False, 'DP'),
     ('Type not allowed', False, 'HR'),
-    ('Type not allowed', False, 'MI')
+    ('Type not allowed', False, 'MI'),
+    ('Type not allowed', False, 'RL'),
 ]
 # testdata pattern is ({description}, {valid}, {reg_type}, {message content})
 TEST_FR_LT_MH_MN_DATA = [
@@ -358,15 +347,6 @@ TEST_MISC_DATA = [
     (DESC_EXCLUDES_LY, False, 'SE', validator.LY_NOT_ALLOWED),
     (DESC_EXCLUDES_LY, False, 'WL', validator.LY_NOT_ALLOWED)
 ]
-# testdata pattern is ({description}, {valid}, {reg_type}, {today_offset}, {message content})
-TEST_DATA_TYPE_ENABLED = [
-    ("Valid RL no act TS", True, RegistrationTypes.RL.value, None, None),
-    ("Valid CL no act TS", True, RegistrationTypes.CL.value, None, None),
-    ("Valid CL act TS", True, RegistrationTypes.CL.value, -1, None),
-    ("Invalid CL act TS", False, RegistrationTypes.CL.value, 1, validator.CL_NOT_ALLOWED),
-    ("Valid RL act TS", True, RegistrationTypes.RL.value, 1, None),
-    ("Invalid RL act TS", False, RegistrationTypes.RL.value, -1, validator.RL_NOT_ALLOWED),
-]
 
 
 @pytest.mark.parametrize('desc,valid,account_id,registering,secured,notices,message_content', TEST_SE_DATA)
@@ -385,41 +365,6 @@ def test_validate_se(session, desc, valid, account_id, registering, secured, not
     if secured:
         json_data['securedParties'] = secured
     error_msg = validator.validate(json_data, account_id)
-    if valid:
-        assert error_msg == ''
-    elif message_content:
-        # print(error_msg)
-        assert error_msg != ''
-        assert error_msg.find(message_content) != -1
-
-
-@pytest.mark.parametrize('desc,valid,lien_amount,surrender_date,message_content', TEST_RL_DATA)
-def test_validate_rl(session, desc, valid, lien_amount, surrender_date, message_content):
-    """Assert that financing statement RL registration type validation works as expected."""
-    # setup
-    json_data = copy.deepcopy(FINANCING)
-    json_data['type'] = model_utils.REG_TYPE_REPAIRER_LIEN
-    del json_data['lifeYears']
-    del json_data['lifeInfinite']
-    del json_data['trustIndenture']
-    if lien_amount is not None:
-        json_data['lienAmount'] = lien_amount
-    if surrender_date == 'valid':
-        json_data['surrenderDate'] = model_utils.format_ts(model_utils.now_ts())
-    elif surrender_date == 'old':
-        json_data['surrenderDate'] = model_utils.format_ts(model_utils.today_ts_offset(22, False))
-    elif surrender_date == '21':
-        json_data['surrenderDate'] = model_utils.format_ts(model_utils.now_ts_offset(21, False))
-    elif surrender_date == 'junk':
-        json_data['surrenderDate'] = 'invalid date'
-    if desc != DESC_INCLUDES_GC:
-        del json_data['generalCollateral']
-    if desc == DESC_MISSING_VC:
-        del json_data['vehicleCollateral']
-    elif desc == DESC_VC_MH:
-        json_data['vehicleCollateral'][0]['type'] = 'MH'
-
-    error_msg = validator.validate(json_data, 'PS12345')
     if valid:
         assert error_msg == ''
     elif message_content:
@@ -657,35 +602,3 @@ def test_validate_sc_ap(session):
     # print(error_msg)
     assert error_msg != ''
     assert error_msg.find(validator.VC_AP_NOT_ALLOWED) != -1
-
-
-@pytest.mark.parametrize('desc,valid,reg_type,today_offset,message_content', TEST_DATA_TYPE_ENABLED)
-def test_validate_type_enabled(session, desc, valid, reg_type, today_offset, message_content):
-    """Assert that financing statement registration type enabled validation works as expected."""
-    if today_offset:
-        now_offset = model_utils.now_ts_offset(today_offset, True)
-        r_type: RegistrationType = RegistrationType.find_by_registration_type(reg_type)
-        r_type.act_ts = now_offset
-        session.add(r_type)
-        session.commit()
-        logger.info(r_type.act_ts)
-    json_data = copy.deepcopy(FINANCING)
-    json_data['type'] = reg_type
-    del json_data['trustIndenture']
-    if reg_type == RegistrationTypes.RL.value:
-        del json_data['lifeYears']
-        del json_data['lifeInfinite']
-        del json_data['generalCollateral']
-        json_data['lienAmount'] = 10000
-        json_data['surrenderDate'] = model_utils.format_ts(model_utils.now_ts())
-    else:
-        json_data['lifeYears'] = 5
-        del json_data['lifeInfinite']
-
-    # test
-    error_msg = validator.validate(json_data, 'PS12345')
-    if valid:
-        assert error_msg == ''
-    elif message_content:
-        assert error_msg != ''
-        assert error_msg.find(message_content) != -1
