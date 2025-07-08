@@ -143,6 +143,7 @@
         >
           <aside>
             <StickyContainer
+              :show-connect-fees="true"
               :set-right-offset="true"
               :set-show-buttons="true"
               :set-show-fee-summary="true"
