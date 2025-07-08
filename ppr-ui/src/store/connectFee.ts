@@ -69,7 +69,9 @@ export const useConnectFeeStore = defineStore('connect/fee', () => {
   const totalServiceFees = computed(() => getMaxFromFees('serviceFees'))
   const totalGst = computed(() => getTotalFromFees('gst', true))
   const totalPst = computed(() => getTotalFromFees('pst', true))
-  const total = computed(() => getTotalFromFees('total') + totalPriorityFees.value + totalServiceFees.value)
+  const total = computed(() => getTotalFromFees('total') +
+    totalPriorityFees.value + totalServiceFees.value + totalGst.value + totalPst.value + totalProcessingFees.value
+  )
 
   /**
    * Fetches the Fee info for the given entity type / fee code combination.
@@ -121,7 +123,8 @@ export const useConnectFeeStore = defineStore('connect/fee', () => {
   watch(userSelectedPaymentMethod, () => {
     // if pad in confirmation period then set selected payment to CC
     if (PAD_PENDING_STATES.includes(userPaymentAccount.value?.cfsAccount?.status)) {
-      userSelectedPaymentMethod.value = ConnectPaymentMethod.DIRECT_PAY
+      userSelectedPaymentMethod.value = null // ConnectPaymentMethod.DIRECT_PAY
+      allowAlternatePaymentMethod.value = getFeatureFlag('mhr-credit-card-enabled')
       // TODO: show modal for user
     }
   })

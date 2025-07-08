@@ -114,6 +114,7 @@
         >
           <aside>
             <StickyContainer
+              :show-connect-fees="true"
               :set-err-msg="stickyComponentErrMsg"
               :set-right-offset="true"
               :set-show-buttons="true"

@@ -235,6 +235,7 @@
         >
           <aside>
             <StickyContainer
+              :show-connect-fees="true"
               :set-err-msg="stickyComponentErrMsg"
               :set-right-offset="true"
               :set-show-buttons="true"
@@ -272,8 +273,9 @@ import {
   saveAmendmentStatementDraft
 } from '@/utils'
 
-import type {
-  APIRegistrationTypes} from '@/enums';
+import {
+  type APIRegistrationTypes, ConnectPaymentMethod
+} from '@/enums'
 import {
   ActionTypes,
   RouteNames,
@@ -289,12 +291,14 @@ import type {
   LengthTrustIF,
   DialogOptionsIF,
   DraftIF,
-  RegTableNewItemI
+  RegTableNewItemI, StaffPaymentIF
 } from '@/interfaces'
 import type { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { useAuth, useNavigation } from '@/composables'
 import { GenColSummary } from '@/components/collateral/general'
 import { AmendmentDescription } from '@/components/registration'
+import { hasNoCharge } from '@/composables/fees/factories'
+import { useConnectFeeStore } from '@/store/connectFee'
 
 export default defineComponent({
   name: 'ConfirmAmendment',
@@ -315,6 +319,9 @@ export default defineComponent({
     const router = useRouter()
     const { goToDash, goToPay } = useNavigation()
     const { isAuthenticated } = useAuth()
+    const { setFees } = useConnectFeeStore()
+    const { fees } = storeToRefs(useConnectFeeStore())
+    const { userSelectedPaymentMethod } = storeToRefs(useConnectFeeStore())
     const {
       // Actions
       setUnsavedChanges,
@@ -322,6 +329,7 @@ export default defineComponent({
     } = useStore()
     const {
       // Getters
+      getStaffPayment,
       rlTransitionDate,
       isRlTransition,
       getStateModel,
@@ -585,7 +593,10 @@ export default defineComponent({
       if (localState.collateralValid && localState.partiesValid && localState.courtOrderValid) {
         const stateModel: StateModelIF = getStateModel.value
         localState.submitting = true
-        const apiResponse: AmendmentStatementIF = await saveAmendmentStatement(stateModel)
+        const apiResponse: AmendmentStatementIF = await saveAmendmentStatement(
+          stateModel,
+          userSelectedPaymentMethod.value === ConnectPaymentMethod.DIRECT_PAY
+        )
         localState.submitting = false
         if (apiResponse === undefined || apiResponse?.error !== undefined) {
           emit('error', apiResponse?.error)
@@ -642,6 +653,14 @@ export default defineComponent({
 
     watch(() => props.saveDraftExit, () => {
       saveDraft()
+    })
+
+    watch(() => getStaffPayment.value, (val: StaffPaymentIF) => {
+      // If staff payment is set to waived, set the fee summary accordingly
+      setFees({[FeeSummaryTypes.AMEND]: {
+          ...fees.value[FeeSummaryTypes.AMEND],
+          waived: val.option === 0 || hasNoCharge(localState.registrationTypeUI)
+        }})
     })
 
     return {

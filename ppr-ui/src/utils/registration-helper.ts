@@ -350,7 +350,10 @@ export async function saveAmendmentStatementDraft (stateModel:StateModelIF): Pro
 }
 
 /** Save a new amendment. */
-export async function saveAmendmentStatement (stateModel:StateModelIF): Promise<AmendmentStatementIF> {
+export async function saveAmendmentStatement (
+  stateModel:StateModelIF,
+  isCcOverride: boolean = false
+): Promise<AmendmentStatementIF> {
   const statement:AmendmentStatementIF = setupAmendmentStatement(stateModel)
   // Now tidy up, deleting objects that are empty strings to pass validation.
   // For example, party.birthDate = '' will fail validation.
@@ -369,7 +372,7 @@ export async function saveAmendmentStatement (stateModel:StateModelIF): Promise<
   if (getIsStaff(stateModel)) {
     apiResponse = await staffAmendment(statement, stateModel.staffPayment)
   } else {
-    apiResponse = await createAmendmentStatement(statement, '')
+    apiResponse = await createAmendmentStatement(statement, isCcOverride ? '?ccPayment=true' : '')
   }
 
   if (apiResponse && apiResponse.error) {
@@ -474,7 +477,10 @@ const formatSecuritiesActNotices = (notices: Array<AddEditSaNoticeIF>): Array<Ad
 }
 
 /** Save new financing statement. Data to be saved is in the store state model. */
-export async function saveFinancingStatement (stateModel:StateModelIF): Promise<FinancingStatementIF> {
+export async function saveFinancingStatement (
+  stateModel:StateModelIF,
+  isCcOverride: boolean = false
+): Promise<FinancingStatementIF> {
   const draft:DraftIF = stateModel.registration.draft
   const trustLength = stateModel.registration.lengthTrust
   const parties:AddPartiesIF = stateModel.registration.parties
@@ -539,7 +545,7 @@ export async function saveFinancingStatement (stateModel:StateModelIF): Promise<
   if (isStaff) {
     apiResponse = await staffFinancingStatement(statement, stateModel.staffPayment)
   } else {
-    apiResponse = await createFinancingStatement(statement, '')
+    apiResponse = await createFinancingStatement(statement, isCcOverride ? '?ccPayment=true' : '')
   }
 
   if (apiResponse !== undefined && apiResponse.error !== undefined) {
@@ -753,7 +759,10 @@ export async function setupAmendmentStatementFromDraft (
 }
 
 /** Save new discharge registration. Data to be saved is in the store state model. */
-export async function saveRenewal (stateModel:StateModelIF): Promise<RenewRegistrationIF> {
+export async function saveRenewal (
+  stateModel:StateModelIF,
+  isCcOverride: boolean = false,
+): Promise<RenewRegistrationIF> {
   const trustLength = stateModel.registration.lengthTrust
 
   const registration:RenewRegistrationIF = {
@@ -799,7 +808,7 @@ export async function saveRenewal (stateModel:StateModelIF): Promise<RenewRegist
   if (getIsStaff(stateModel)) {
     apiResponse = await staffRenewal(registration, stateModel.staffPayment)
   } else {
-    apiResponse = await createRenewal(registration, '')
+    apiResponse = await createRenewal(registration, isCcOverride ? '?ccPayment=true' : '')
   }
 
   if (apiResponse.error) {

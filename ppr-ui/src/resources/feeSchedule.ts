@@ -2,6 +2,79 @@ import { APIRegistrationTypes } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 
 export const RegistrationFees = {
+  // PPR REGISTRATION FEES
+  [FeeSummaryTypes.NEW]: {
+    filingFees: 0,
+    filingType: 'New Registration',
+    filingTypeCode: FeeSummaryTypes.NEW,
+    futureEffectiveFees: 0,
+    priorityFees: 0,
+    processingFees: 10,
+    serviceFees: 0,
+    quantity: 1,
+    tax: {
+      gst: 0,
+      pst: 0
+    },
+    total: 15,
+    waived: false,
+    showFeeDesc: true,
+    feeDescOverride: 'Select registration length'
+  },
+  [FeeSummaryTypes.AMEND]: {
+    filingFees: 10,
+    filingType: 'Amend Registration',
+    filingTypeCode: FeeSummaryTypes.AMEND,
+    futureEffectiveFees: 0,
+    priorityFees: 0,
+    processingFees: 5,
+    serviceFees: 0,
+    quantity: 1,
+    tax: {
+      gst: 0,
+      pst: 0
+    },
+    total: 15,
+    waived: false,
+    showFeeDesc: false,
+  },
+  [FeeSummaryTypes.RENEW]: {
+    filingFees: 0,
+    filingType: 'Renew Registration',
+    filingTypeCode: FeeSummaryTypes.RENEW,
+    futureEffectiveFees: 0,
+    priorityFees: 0,
+    processingFees: 5,
+    serviceFees: 0,
+    quantity: 1,
+    tax: {
+      gst: 0,
+      pst: 0
+    },
+    total: 10,
+    waived: false,
+    showFeeDesc: true,
+    feeDescOverride: 'Select registration renewal length'
+  },
+  [FeeSummaryTypes.DISCHARGE]: {
+    filingFees: 0,
+    filingType: 'Discharge Registration',
+    filingTypeCode: FeeSummaryTypes.DISCHARGE,
+    futureEffectiveFees: 0,
+    priorityFees: 0,
+    processingFees: 0,
+    serviceFees: 0,
+    quantity: 1,
+    tax: {
+      gst: 0,
+      pst: 0
+    },
+    total: 10,
+    waived: true,
+    showFeeDesc: false
+  },
+
+  // MHR REGISTRATION FEES
   [FeeSummaryTypes.NEW_MHR]: {
     filingFees: 50,
     filingType: APIRegistrationTypes.MANUFACTURED_HOME_REGISTRATION,
@@ -281,7 +354,7 @@ export const RegistrationFees = {
     showFeeDesc: false
   },
   [FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION]: {
-    filingFees: 50,
+    filingFees: 0,
     filingType: 'Non Residential Exemption',
     filingTypeCode: FeeSummaryTypes.NON_RESIDENTIAL_EXEMPTION,
     futureEffectiveFees: 0,
@@ -292,10 +365,10 @@ export const RegistrationFees = {
       gst: 0,
       pst: 0
     },
-    total: 50,
+    total: 0,
     quantity: 1,
     quantityDesc: '',
-    waived: false,
+    waived: true,
     showFeeDesc: false
   },
   [FeeSummaryTypes.NO_FEE]: {

@@ -54,6 +54,7 @@
           >
             <aside>
               <StickyContainer
+                :show-connect-fees="true"
                 :set-right-offset="true"
                 :set-show-fee-summary="true"
                 :set-fee-type="feeType"

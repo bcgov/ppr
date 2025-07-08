@@ -191,6 +191,7 @@
           >
             <aside>
               <StickyContainer
+                :show-connect-fees="true"
                 :set-right-offset="true"
                 :set-show-fee-summary="true"
                 :set-fee-type="feeType"
@@ -231,11 +232,13 @@ import { RegistrationLengthTrustSummary } from '@/components/registration'
 import { Parties } from '@/components/parties'
 import FolioNumberSummary from '@/components/common/FolioNumberSummary.vue'
 import { getFeatureFlag, scrollToFirstVisibleErrorComponent } from '@/utils'
-import type { ErrorIF } from '@/interfaces'
+import type { ErrorIF, StaffPaymentIF } from '@/interfaces'
 import type { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { storeToRefs } from 'pinia'
 import { useAuth, useNavigation, usePprRegistration } from '@/composables'
 import SecuritiesActNoticesPanels from '@/components/registration/securities-act-notices/SecuritiesActNoticesPanels.vue'
+import { useConnectFeeStore } from '@/store/connectFee'
+import { hasNoCharge } from '@/composables/fees/factories'
 
 export default defineComponent({
   name: 'ReviewConfirm',
@@ -264,6 +267,8 @@ export default defineComponent({
     const { goToDash, goToRoute } = useNavigation()
     const { isAuthenticated } = useAuth()
     const { isSecurityActNotice } = usePprRegistration()
+    const { setFees } = useConnectFeeStore()
+    const { fees } = storeToRefs(useConnectFeeStore())
     const {
       // Actions
       setLengthTrust,
@@ -278,6 +283,7 @@ export default defineComponent({
       showStepErrors,
       getAddCollateral,
       getLengthTrust,
+      getStaffPayment,
       hasUnsavedChanges,
       getRegistrationOther,
       getRegistrationType,
@@ -301,7 +307,7 @@ export default defineComponent({
           lifeYears: getLengthTrust.value?.lifeYears || 0
         }
       }),
-      registrationTypeUI: computed((): string => {
+      registrationTypeUI: computed((): UIRegistrationTypes => {
         if (getRegistrationType.value?.registrationTypeAPI === APIRegistrationTypes.OTHER) {
           return getRegistrationOther.value || ''
         }
@@ -372,6 +378,14 @@ export default defineComponent({
 
     watch(() => props.appReady, (val: boolean) => {
       onAppReady(val)
+    })
+
+    watch(() => getStaffPayment.value, (val: StaffPaymentIF) => {
+      // If staff payment is set to waived, set the fee summary accordingly
+      setFees({[FeeSummaryTypes.NEW]: {
+          ...fees.value[FeeSummaryTypes.NEW],
+          waived: val.option === 0 || hasNoCharge(localState.registrationTypeUI)
+        }})
     })
 
     return {

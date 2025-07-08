@@ -2,6 +2,7 @@ import type { FeeSummaryTypes } from '@/composables/fees/enums'
 import { storeToRefs } from 'pinia'
 import { useConnectFeeStore } from '@/store/connectFee'
 import { RegistrationFees } from '@/resources/feeSchedule'
+import { APIRegistrationTypes, UIRegistrationTypes } from '@/enums'
 
 
 export const useConnectFeesHandler = () => {

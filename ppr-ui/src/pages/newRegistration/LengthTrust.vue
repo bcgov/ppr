@@ -59,6 +59,7 @@
           >
             <aside>
               <StickyContainer
+                :show-connect-fees="true"
                 :set-right-offset="true"
                 :set-show-fee-summary="true"
                 :set-fee-type="feeType"
@@ -85,12 +86,16 @@ import { getFeatureFlag } from '@/utils'
 import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
 import { RegistrationLengthTrust, RegistrationRepairersLien, SecuritiesActNotices } from '@/components/registration'
+import type { UIRegistrationTypes } from '@/enums';
 import { APIRegistrationTypes, RegistrationFlowType, RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import type { ErrorIF } from '@/interfaces'
 import type { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { storeToRefs } from 'pinia'
 import { useAuth, useNavigation, usePprRegistration } from '@/composables'
+import { useConnectFeeStore } from '@/store/connectFee'
+import { RegistrationFees } from '@/resources'
+import { hasNoCharge } from '@/composables/fees/factories'
 
 export default defineComponent({
   name: 'LengthTrust',
@@ -113,8 +118,11 @@ export default defineComponent({
     const { goToDash } = useNavigation()
     const { isAuthenticated } = useAuth()
     const { isSecurityActNotice } = usePprRegistration()
+    const { setFees } = useConnectFeeStore()
+    const { fees, feeOptions } = storeToRefs(useConnectFeeStore())
     const { setLengthTrustStepValidity } = useStore()
     const {
+      isRoleStaffReg,
       getPprSteps,
       showStepErrors,
       getLengthTrust,
@@ -135,7 +143,7 @@ export default defineComponent({
           lifeYears: getLengthTrust.value?.lifeYears || 0
         }
       }),
-      registrationTypeUI: computed((): string => {
+      registrationTypeUI: computed((): UIRegistrationTypes => {
         if (getRegistrationType.value?.registrationTypeAPI === APIRegistrationTypes.OTHER) {
           return getRegistrationOther.value || ''
         }
@@ -211,6 +219,18 @@ export default defineComponent({
 
     onMounted(() => {
       onAppReady(props.appReady)
+
+      // set the registration type for the fees
+      setFees({[FeeSummaryTypes.NEW]: {
+        ...RegistrationFees[FeeSummaryTypes.NEW],
+          filingFees: localState.registrationType === APIRegistrationTypes.MARRIAGE_MH ? 10 : 0,
+          serviceFees: isRoleStaffReg.value ? 0 : 1.50,
+          processingFees: (isRoleStaffReg.value && !hasNoCharge(localState.registrationTypeUI)) ? 10 : 0,
+          filingTypeCode: localState.registrationType,
+          waived: hasNoCharge(localState.registrationTypeUI)
+      }})
+      feeOptions.value.showProcessingFees = isRoleStaffReg.value
+      feeOptions.value.showServiceFees = !isRoleStaffReg.value
     })
 
     /** Called when App is ready and this component can load its data. */
@@ -247,6 +267,36 @@ export default defineComponent({
 
     watch(() => props.appReady, (val: boolean) => {
       onAppReady(val)
+    })
+
+    watch(() => localState.registrationLength, (val: RegistrationLengthI) => {
+      // if (localState.registrationType === APIRegistrationTypes.MARRIAGE_MH) return
+      if (val.lifeInfinite && val.lifeYears < 1) {
+        setFees({[FeeSummaryTypes.NEW]: {
+            ...fees.value[FeeSummaryTypes.NEW],
+            filingFees: 500,
+            quantity: 1,
+            feeDescOverride: 'Infinite Registration',
+            waived: hasNoCharge(localState.registrationTypeUI)
+          }})
+      } else if (!val.lifeInfinite && val.lifeYears >= 1 && val.lifeYears <= 25) {
+        setFees({[FeeSummaryTypes.NEW]: {
+            ...fees.value[FeeSummaryTypes.NEW],
+            filingFees: 5,
+            quantity: val.lifeYears,
+            feeDescOverride: `${val.lifeYears} years @ $5.00/year`,
+            waived: hasNoCharge(localState.registrationTypeUI)
+          }})
+      } else {
+        setFees({[FeeSummaryTypes.NEW]: {
+            ...fees.value[FeeSummaryTypes.NEW],
+            filingFees: 0,
+            quantity: 1,
+            filingTypeCode: localState.registrationType,
+            feeDescOverride: 'Select a valid registration length',
+            waived: hasNoCharge(localState.registrationTypeUI)
+          }})
+      }
     })
 
     watch(() => !!getSecuritiesActNotices.value.length, (val: boolean) => {
