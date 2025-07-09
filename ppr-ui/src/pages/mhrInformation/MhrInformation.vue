@@ -773,7 +773,7 @@ export default defineComponent({
     const { goToDash, goToPay } = useNavigation()
     const { isAuthenticated } = useAuth()
     const { setRegistrationFees, setRegistrationFeeDesc } = useConnectFeesHandler()
-    const { userSelectedPaymentMethod } = storeToRefs(useConnectFeeStore())
+    const { feeOptions, userSelectedPaymentMethod } = storeToRefs(useConnectFeeStore())
     const {
       // Actions
       setMhrStatusType,
@@ -1147,6 +1147,10 @@ export default defineComponent({
       localState.hasAlertMsg = QSLockedStateUnitNoteTypes.includes(getMhrInformation.value.frozenDocumentType)
       localState.loading = false
       localState.dataLoaded = true
+
+      // Default fee options for MHR transactions
+      feeOptions.value.showServiceFees = false
+      feeOptions.value.showProcessingFees = false
     })
 
     const emitError = (error: ErrorIF): void => {
@@ -1620,7 +1624,7 @@ export default defineComponent({
         case LocationChangeTypes.TRANSPORT_PERMIT_SAME_PARK:
           populateLocationInfoForSamePark(getMhrRegistrationLocation.value)
           setUnsavedChanges(false)
-          setRegistrationFees(localState.feeType)
+          setRegistrationFees(FeeSummaryTypes.MHR_TRANSPORT_PERMIT)
           break
         default:
           setRegistrationFees(localState.feeType)
@@ -1628,9 +1632,9 @@ export default defineComponent({
     })
 
     watch(()=> localState.selectedChangeType, val => {
-      if (getMhrTransferType.value?.transferType) {
+      if (!!val && !!getMhrTransferType.value?.transferType) {
         setRegistrationFeeDesc(FeeSummaryTypes.MHR_TRANSFER, getMhrTransferType.value?.transferType)
-      } else setRegistrationFees(FeeSummaryTypes.MHR_OWNER_DEFAULT)
+      } else setRegistrationFees(localState.feeType)
     })
 
     /** Inform root level components when there is an MHR action in Progress **/

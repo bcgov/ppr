@@ -130,12 +130,13 @@ export default {
       feeDesc: {
         // PPR Filing Types
         new: 'Select registration length',
+        mhr_transfer: 'Select transfer type',
 
         // MHR Filing Types
         mhr_staff_correction: 'Staff Error or Omission',
         mhr_client_correction: 'Client Error or Omission',
-        mhr_permit_default: 'Select Location Change Type',
-        mhr_owner_default: 'Select Transfer Type',
+        mhr_permit_default: 'Select location change type',
+        mhr_owner_default: 'Select transfer type',
         mhr_transport_permit: 'Transport Permit',
         mhr_transport_permit_extend: 'Extend Transport Permit',
         mhr_location_change: 'Registered Location Change',
