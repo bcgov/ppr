@@ -218,6 +218,7 @@
       <SearchHistory
         v-if="!loading"
         :search-added="toggleSearchAdded"
+        :search-added-id="searchAddedId"
         @retry="retrieveSearchHistory"
         @error="emitError"
       />
@@ -300,6 +301,8 @@ export default defineComponent({
     const { fetchIsAccountAdmin, qsMsgContent, hideStatusMsg, updateUserMiscSettings } = useUserAccess()
     const {
       // Actions
+      setCurrentRegistrationsTab,
+      setRegTableNewItem,
       setSearchHistory,
       setSearchResults,
       setMhrDraftNumber,
@@ -325,6 +328,8 @@ export default defineComponent({
       getAccountId,
       getSearchHistory,
       getUserServiceFee,
+      getRegTableBaseRegs,
+      getMhRegTableBaseRegs,
       getSearchHistoryLength,
       isRoleQualifiedSupplier,
       hasEnhancedDealerEnabled,
@@ -337,6 +342,7 @@ export default defineComponent({
       snackbarMsg: '',
       toggleSnackbar: false,
       toggleSearchAdded: false,
+      searchAddedId: '',
       dealerRecord: null,
       displayDealerInfo: false,
       searchHistoryLength: computed((): number => {
@@ -389,6 +395,9 @@ export default defineComponent({
       accountPaymentUrl: computed((): string => {
         return useRuntimeConfig().public?.VUE_APP_AUTH_WEB_URL + '/account/' + getAccountId.value +
           '/settings/product-settings'
+      }),
+      pathAnchorId: computed((): string => {
+        return (router.currentRoute.value?.params?.anchorId as string) || ''
       })
     })
 
@@ -407,6 +416,10 @@ export default defineComponent({
       useTransportPermits().setLocationChange(false)
       useTransportPermits().setExtendLocationChange(false)
       useTransportPermits().setNewPermitChange(false)
+
+      if (localState.pathAnchorId) {
+        setTimeout(() => anchorParamHandler(localState.pathAnchorId), 5000)
+      }
     })
 
     /** Redirects browser to Business Registry home page. */
@@ -503,6 +516,72 @@ export default defineComponent({
       await updateUserMiscSettings(SettingOptions.CC_MSG_HIDE, hideMsg)
     }
 
+    const anchorParamHandler = (anchorId: string): void => {
+      const match = anchorId.match(/^([a-zA-Z]+)-([a-zA-Z0-9]+)$/)
+      const prefix = match ? match[1] : null
+      const id = match ? match[2] : null
+
+      switch (prefix) {
+        case 'search':
+          // handle search
+          addedSearchHandler(id)
+          break
+        case 'pprReg':
+          // handle pprReg
+          if (getRegTableBaseRegs.value)  {
+            const { registrationNumber } = getRegTableBaseRegs.value?.find(reg => reg.consumedDraftNumber === id) ||
+              getRegTableBaseRegs.value.find(reg => reg.registrationNumber)
+            if (registrationNumber) addedRegHandler(registrationNumber)
+          }
+          break
+        case 'mhReg':
+          // Switch to MHR tab
+          if (localState.enableDashboardTabs) setCurrentRegistrationsTab(1)
+
+          // handle mhReg
+          if (getMhRegTableBaseRegs.value) {
+            const { mhrNumber } = getMhRegTableBaseRegs.value?.find(reg => reg.consumedDraftNumber === id) ||
+              getMhRegTableBaseRegs.value.find(reg => reg.mhrNumber)
+            if (mhrNumber) addedRegHandler(mhrNumber)
+          }
+          break
+        default:
+          // handle unknown
+          break
+      }
+    }
+
+    /// Handler for when a search is successfully added to the table
+    const addedSearchHandler = (searchId: string = '') => {
+      localState.snackbarMsg = 'Your search was successfully added to your table.'
+      localState.toggleSnackbar = !localState.toggleSnackbar
+      if (searchId) localState.searchAddedId = searchId
+      else localState.toggleSearchAdded = !localState.toggleSearchAdded
+
+      // Remove search added styling after timeout
+      setTimeout(() => {
+        if (searchId) localState.searchAddedId = ''
+        else localState.toggleSearchAdded = !localState.toggleSearchAdded
+      }, 5000)
+    }
+
+    const addedRegHandler = (regId: string = '') => {
+      localState.snackbarMsg = 'Your registration was successfully added to your table.'
+      localState.toggleSnackbar = !localState.toggleSnackbar
+
+      // set new added reg
+      setRegTableNewItem({
+        addedReg: regId,
+        addedRegParent: '',
+        addedRegSummary: null,
+        prevDraft: '',
+        isScrollTo: true
+      })
+      setTimeout( () => {
+        setRegTableNewItem(null)
+      }, 4500)
+    }
+
     watch(() => props.appReady, (val: boolean) => {
       localState.loading = !val && val !== null
       onAppReady(val)
@@ -511,12 +590,7 @@ export default defineComponent({
     watch(() => getSearchHistoryLength.value, (newVal: number, oldVal: number): void => {
       // show snackbar if oldVal was not null and highlight new search
       if (oldVal !== null) {
-        localState.snackbarMsg = 'Your search was successfully added to your table.'
-        localState.toggleSnackbar = !localState.toggleSnackbar
-        localState.toggleSearchAdded = !localState.toggleSearchAdded
-
-        // Remove search added styling after timeout
-        setTimeout(() => { localState.toggleSearchAdded = !localState.toggleSearchAdded }, 5000)
+        addedSearchHandler()
       }
     })
 

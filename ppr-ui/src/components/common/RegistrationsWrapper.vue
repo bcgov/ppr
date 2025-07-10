@@ -888,7 +888,8 @@ export default defineComponent({
     }
 
     const handleRegTableNewItem = async (val: RegTableNewItemI) => {
-      if (val.addedReg) {
+      if (val?.isScrollTo) return
+      if (val?.addedReg) {
         localState.myRegDataAdding = true
 
         // PPR Handling

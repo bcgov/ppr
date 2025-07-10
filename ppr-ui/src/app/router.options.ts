@@ -39,7 +39,7 @@ export default <RouterConfig> {
   // alternatively, could put this inside the setup for each page
   routes: _routes => [
     {
-      path: '/dashboard',
+      path: '/dashboard/:anchorId?',
       name: RouteNames.DASHBOARD,
       component: Dashboard,
       meta: {

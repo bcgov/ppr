@@ -181,7 +181,7 @@ export default defineComponent({
             ) as any
 
           if(exemptionFiling?.paymentPending) {
-            goToPay(exemptionFiling.payment?.invoiceId)
+            goToPay(exemptionFiling.payment?.invoiceId, null, `mhReg-${getMhrInformation.value.mhrNumber}`)
           }
 
           // Add new reg action for table scroll and go to dash

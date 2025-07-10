@@ -293,7 +293,10 @@ export default defineComponent({
       } else {
         // On success return to dashboard
         if (apiResponse?.data.paymentPending) {
-          goToPay(apiResponse.data.payment?.invoiceId)
+          goToPay(
+            apiResponse.data.payment?.invoiceId,
+            null, `search-${getManufacturedHomeSearchResults.value.searchId}`
+          )
         } else goToDash()
       }
     }

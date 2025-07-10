@@ -4,7 +4,7 @@
   >
     <!-- Tabs -->
     <v-tabs
-      v-model="tabNumber"
+      :model-value="tabNumber"
       hide-slider
       grow
       class="ppr-mhr-tabs"
@@ -43,7 +43,7 @@
     </v-tabs>
     <!-- Window Items -->
     <v-window
-      v-model="tabNumber"
+      :model-value="tabNumber"
       class="rounded-bottom bg-white px-6"
     >
       <v-window-item
@@ -116,7 +116,9 @@ export default defineComponent({
     } = useNewMhrRegistration()
 
     const localState = reactive({
-      tabNumber: getCurrentRegistrationsTab.value,
+      tabNumber: computed((): number => {
+        return getCurrentRegistrationsTab.value
+      }),
       isPprTab: computed((): boolean => {
         return localState.tabNumber === 0
       }),
