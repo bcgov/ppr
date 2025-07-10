@@ -349,7 +349,7 @@ export default defineComponent({
           setUnsavedChanges(false)
           goToDash()
         } else if (mhrSubmission?.paymentPending) {
-          goToPay(mhrSubmission.payment?.invoiceId)
+          goToPay(mhrSubmission.payment?.invoiceId, null, 'mhReg-0')
         } else {
           emitError(mhrSubmission?.error)
         }

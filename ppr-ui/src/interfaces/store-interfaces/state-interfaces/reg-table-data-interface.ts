@@ -11,6 +11,7 @@ export interface RegTableNewItemI {
   addedRegParent: string // used for expand
   addedRegSummary: RegistrationSummaryIF | MhRegistrationSummaryIF | DraftResultIF | MhrDraftIF // add new item to table
   prevDraft: string // used to remove previous draft
+  isScrollTo: boolean // used to determine if the table has loaded
 }
 
 export interface RegTableDataI {

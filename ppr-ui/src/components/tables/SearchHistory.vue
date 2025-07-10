@@ -23,6 +23,7 @@ import { storeToRefs } from 'pinia'
 export default defineComponent({
   props: {
     searchAdded: { type: Boolean, default: false },
+    searchAddedId: { type: String, default: '' }
   },
   emits: ['error', 'retry'],
   setup (props, { emit }) {
@@ -246,19 +247,27 @@ export default defineComponent({
     }
 
     /** Scroll to Search Table **/
-    async function scrollToAddedSearch(defaultIndex: number = 0): Promise<void> {
+    async function scrollToAddedSearch(): Promise<void> {
       setTimeout(() => {
-        document?.getElementsByClassName('main-results-div').length > 0 &&
-        document?.getElementsByClassName('main-results-div')[defaultIndex]
-          .scrollIntoView({ behavior: 'smooth' })
+        document?.querySelector('.added-search-effect')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        })
       }, 300)
     }
 
     /** Scroll to event on added search **/
-    watch(() => props.searchAdded, async () => {
+    watch(() => [props.searchAdded, props.searchAddedId], async () => {
       if (props.searchAdded) {
         await nextTick()
         await scrollToAddedSearch()
+      }
+      if (props.searchAddedId) {
+        const index = localState.searchHistory.findIndex(
+          (item: SearchResponseIF) => item.searchId === props.searchAddedId
+        )
+        await nextTick()
+        await scrollToAddedSearch(index)
       }
     }, { immediate: true })
 
@@ -323,7 +332,7 @@ export default defineComponent({
             <tr
               v-for="(item, index) in searchHistory"
               :key="item.searchId"
-              :class="{ 'added-search-effect': searchAdded && index === 0 }"
+              :class="{ 'added-search-effect': ((searchAdded && index === 0) || (item.searchId === searchAddedId)) }"
             >
               <td>
                 <v-icon
@@ -433,7 +442,11 @@ export default defineComponent({
                   color="primary"
                   aria-label="Resume Pay Button"
                   variant="outlined"
-                  @click="goToPay(item.invoiceId, (isPprSearch(item) ? item.searchId : null))"
+                  @click="goToPay(
+                    item.invoiceId,
+                    isPprSearch(item) ? item.searchId : null,
+                    !isPprSearch(item) ? `search-${item.searchId}` : null
+                  )"
                 >
                   <span class="fs-14 leading-none">Resume<br>Payment</span>
                 </v-btn>

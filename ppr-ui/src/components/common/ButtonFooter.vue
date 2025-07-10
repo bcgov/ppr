@@ -334,7 +334,7 @@ export default defineComponent({
           // Emit error message.
           emit('error', apiResponse.error)
         } else if (apiResponse.paymentPending) {
-          goToPay(apiResponse.payment?.invoiceId)
+          goToPay(apiResponse.payment?.invoiceId, null, 'pprReg-0')
         } else {
           const prevDraftId = stateModel.registration?.draft?.financingStatement?.documentId || ''
           const newItem: RegTableNewItemI = {

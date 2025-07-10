@@ -8,7 +8,7 @@ export const useNavigation = () => {
 
   // Payment Urls
   const authWebPayUrl = `${useRuntimeConfig()?.public.VUE_APP_AUTH_WEB_URL}/makePayment`
-  const homeRedirectUrl = sessionStorage.getItem('BASE_URL').replace(/\/dashboard$/, '')
+  const homeRedirectUrl = sessionStorage.getItem('BASE_URL')
   /**
    * Simple Navigation helper
    * @routeName The specified route name to navigate too.
@@ -37,13 +37,17 @@ export const useNavigation = () => {
   /**
    * Redirects to payment page for the specified invoice
    * @param invoiceId - The ID of the invoice to process payment for
-   * @param returnId - Optional return ID to append to the URL
+   * @param returnId - Optional return ID to append to the URL for redirection
+   * @param anchorId - Optional anchor ID to append to the URL to anchor on the home page
    */
-  const goToPay = (invoiceId: string, returnId: string = ''): void => {
+  const goToPay = (invoiceId: string, returnId: string = '', anchorId: string = ''): void => {
     if (invoiceId) {
       try {
         if (returnId) {
           const returnUrl = new URL(`/ppr/search/${returnId}`, homeRedirectUrl)
+          window.location.href = `${authWebPayUrl}/${invoiceId}/${returnUrl}`
+        } else if (anchorId) {
+          const returnUrl = sessionStorage.getItem('BASE_URL') + `/dashboard/${anchorId}`
           window.location.href = `${authWebPayUrl}/${invoiceId}/${returnUrl}`
         } else window.location.href = `${authWebPayUrl}/${invoiceId}/${homeRedirectUrl}`
 

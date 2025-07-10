@@ -104,7 +104,7 @@ export async function fetchConfig (): Promise<any> {
 
   // set Base URL for returning from redirects
   // eg, http://localhost:8080/basePath/xxxx/
-  const baseUrl = windowLocationOrigin + vueRouterBase
+  const baseUrl = windowLocationOrigin
   sessionStorage.setItem('BASE_URL', baseUrl)
   console.info('Set Base URL to: ' + baseUrl)
 

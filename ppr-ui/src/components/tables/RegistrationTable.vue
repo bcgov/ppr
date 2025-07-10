@@ -129,7 +129,7 @@ export default defineComponent({
       clientReferenceId: 7
     }
     // getters
-    const { isRoleStaffReg, getAccountProductSubscriptions } = storeToRefs(useStore())
+    const { getRegTableNewItem, isRoleStaffReg, getAccountProductSubscriptions } = storeToRefs(useStore())
     // helpers
     const {
       // filters
@@ -474,6 +474,18 @@ export default defineComponent({
 
     onMounted(() => {
       if (!isRoleStaffReg.value) clearFilters()
+    })
+
+    // Scroll to the newly added registration item
+    watch(() => getRegTableNewItem.value, (val: RegTableNewItemI) => {
+      if (val && val?.isScrollTo) {
+        setTimeout(() => {
+          document?.querySelector('.added-reg-effect')?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+          })
+        }, 300)
+      }
     })
 
     return {

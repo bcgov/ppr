@@ -980,7 +980,7 @@ export default defineComponent({
               class="resume-pay-btn py-1"
               color="primary"
               aria-label="Edit Button"
-              @click="goToPay(item.invoiceId)"
+              @click="goToPay(item.invoiceId, null, `pprReg-${item.documentId}`)"
             >
               <span>Resume<br>Payment</span>
             </v-btn>
@@ -1357,9 +1357,9 @@ export default defineComponent({
               class="resume-pay-btn py-1"
               aria-hidden="false"
               aria-label="Edit Button"
-              @click="goToPay(item.invoiceId)"
+              @click="goToPay(item.invoiceId, null, `mhReg-${item.draftNumber}`)"
             >
-              <span>Resume <br> Payment</span>
+              <span>Resume<br>Payment</span>
             </v-btn>
           </v-col>
           <v-col
