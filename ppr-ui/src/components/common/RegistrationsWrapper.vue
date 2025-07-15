@@ -754,13 +754,11 @@ export default defineComponent({
     }
 
     const removeDraft = async (regNum: string, docId: string): Promise<void> => {
-      console.log(`Removing draft for regNum: ${regNum}, docId: ${docId}`)
       localState.loading = true
       const deletion = await deleteDraft(docId)
       if (deletion.statusCode !== StatusCodes.NO_CONTENT) {
         emitError(deletion)
       } else {
-        console.log(`Draft removed for regNum: ${regNum}, docId: ${docId}`)
         // remove from table
         setRegTableDraftsBaseReg(getRegTableDraftsBaseReg.value.filter(reg => reg.documentId !== docId))
         setRegTableDraftsChildReg(getRegTableDraftsChildReg.value.filter(reg => reg.documentId !== docId))
@@ -772,11 +770,9 @@ export default defineComponent({
           const baseRegs = getRegTableBaseRegs.value
           // find parent base registration and filter draft out of changes array
           const parentIndex = baseRegs.findIndex(reg => reg.baseRegistrationNumber === regNum)
-          console.log('Parent Reg: ', baseRegs[parentIndex])
 
           const changes = baseRegs[parentIndex].changes as any
           const hasPaymentPendingChanges = changes.some((child) => { !!child.paymentPending })
-          console.log('Has Child Pending Payment: ', hasPaymentPendingChanges)
 
           baseRegs[parentIndex].changes = changes.filter(reg => reg.documentId !== docId)
           if (!hasPaymentPendingChanges) delete baseRegs[parentIndex].paymentPending
