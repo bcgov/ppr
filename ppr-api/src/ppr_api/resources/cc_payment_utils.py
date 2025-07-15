@@ -153,6 +153,7 @@ def save_change_cc_draft(base_reg: Registration, json_data: dict, new_reg: Regis
     draft.registration_number = base_reg.registration_num
     draft.save()
     new_reg.draft = draft
+    json_data["documentId"] = draft.document_number
     new_reg.reg_json = json_data
     # Lock the base registration here:
     base_reg.ver_bypassed = REG_STATUS_LOCKED
@@ -187,6 +188,7 @@ def save_new_cc_draft(json_data: dict, new_reg: Registration) -> Registration:
     draft.user_id = json_data["payment"].get("invoiceId")
     draft.save()
     new_reg.draft = draft
+    json_data["documentId"] = draft.document_number
     new_reg.reg_json = json_data
     statement: FinancingStatement = FinancingStatement()
     statement.registration = [new_reg]
