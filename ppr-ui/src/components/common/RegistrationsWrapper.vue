@@ -87,6 +87,7 @@ import {
   useMhrReRegistration
 } from '@/composables'
 import { UnitNotesInfo } from '@/resources/unitNotes'
+import { useConnectFeeStore } from '@/store/connectFee'
 
 export default defineComponent({
   name: 'RegistrationsWrapper',
@@ -145,6 +146,7 @@ export default defineComponent({
     const { initDraftMhrCorrection } = useMhrCorrections()
     const { goToExemptions } = useExemptions()
     const { initMhrReRegistration, initDraftMhrReRegistration } = useMhrReRegistration()
+    const { fees } = storeToRefs(useConnectFeeStore())
 
     const localState = reactive({
       loading: false,
@@ -300,6 +302,7 @@ export default defineComponent({
 
       resetNewRegistration(null) // Clear store data from the previous registration.
       setRegistrationType(selectedRegistration)
+      fees.value = {} // Reset fees for new registration.
       setRegTableCollapsed(null)
 
       // Manufacturer MHR

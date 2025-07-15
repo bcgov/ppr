@@ -19,9 +19,16 @@ export const useNavigation = () => {
     scrollToTop()
   }
 
-  /** Navigate to home Dashboard **/
-  const goToDash = async (): Promise<void> => {
-    await router.push({ name: RouteNames.DASHBOARD })
+  /**
+   * Navigates to the home Dashboard route.
+   * @param anchorId Optional search ID to include as a route param.
+   */
+  const goToDash = async (anchorId?: string): Promise<void> => {
+    const routeOptions: any = { name: RouteNames.DASHBOARD }
+    if (anchorId) {
+      routeOptions.params = { anchorId }
+    }
+    await router.push(routeOptions)
   }
 
   /** Helper to check is the current route matches */
