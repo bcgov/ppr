@@ -336,7 +336,7 @@ export default defineComponent({
           localState.errorDialog = true
           console.error({ statusCode })
         } else {
-          goToDash()
+          await goToDash(`search-${getSearchResults.value.searchId}`)
         }
       }
     }

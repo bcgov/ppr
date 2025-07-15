@@ -406,27 +406,28 @@ export default defineComponent({
     })
 
     watch(() => localState.registrationTypeUI, (val: UIRegistrationTypes) => {
-      // set the registration amendment fees
-      if (!!val && hasNoCharge(localState.registrationTypeUI)) {
-        // set the registration type for the fees
-        setFees({[FeeSummaryTypes.RENEW]: {
-            ...RegistrationFees[FeeSummaryTypes.RENEW],
-            waived: hasNoCharge(localState.registrationTypeUI)
-          }})
-      } else {
-        // set the registration type for the fees
-        setFees({[FeeSummaryTypes.RENEW]: {
-            ...RegistrationFees[FeeSummaryTypes.RENEW],
-            serviceFees: isRoleStaffReg.value ? 0 : 1.50,
-            processingFees: isRoleStaffReg.value ? 5 : 0
-          }})
+      if (!fees.value[FeeSummaryTypes.RENEW]) {
+        // set the registration renewal fees
+        if (!!val && hasNoCharge(localState.registrationTypeUI)) {
+          // set the registration type for the fees
+          setFees({[FeeSummaryTypes.RENEW]: {
+              ...RegistrationFees[FeeSummaryTypes.RENEW],
+              waived: hasNoCharge(localState.registrationTypeUI)
+            }})
+        } else {
+          // set the registration type for the fees
+          setFees({[FeeSummaryTypes.RENEW]: {
+              ...RegistrationFees[FeeSummaryTypes.RENEW],
+              serviceFees: isRoleStaffReg.value ? 0 : 1.50,
+              processingFees: isRoleStaffReg.value ? 5 : 0
+            }})
+        }
       }
       feeOptions.value.showProcessingFees = isRoleStaffReg.value
       feeOptions.value.showServiceFees = !isRoleStaffReg.value
     }, { immediate: true})
 
     watch(() => localState.registrationLength, (val: RegistrationLengthI) => {
-      // if (localState.registrationType === APIRegistrationTypes.MARRIAGE_MH) return
       if (val.lifeInfinite && val.lifeYears < 1) {
         setFees({[FeeSummaryTypes.RENEW]: {
             ...fees.value[FeeSummaryTypes.RENEW],

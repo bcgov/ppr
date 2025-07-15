@@ -1480,7 +1480,7 @@ img {
 }
 
 .added-reg-effect {
-  background-color: $greenSelected;
+  background-color: $greenSelected!important;
   font-weight: bold;
 }
 
@@ -1495,7 +1495,7 @@ img {
 
 .draft-registration-row {
   // $gray1 0.5 opacity colour at full opacity (needed for .actions-cell overlay)
-  background: #f8f9fa !important;
+  background: #f8f9fa;
 }
 
 .actions-cell {

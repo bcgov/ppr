@@ -219,16 +219,17 @@ export default defineComponent({
 
     onMounted(() => {
       onAppReady(props.appReady)
-
       // set the registration type for the fees
-      setFees({[FeeSummaryTypes.NEW]: {
-        ...RegistrationFees[FeeSummaryTypes.NEW],
-          filingFees: localState.registrationType === APIRegistrationTypes.MARRIAGE_MH ? 10 : 0,
-          serviceFees: (isRoleStaffReg.value || hasNoCharge(localState.registrationTypeUI)) ? 0 : 1.50,
-          processingFees: (isRoleStaffReg.value && !hasNoCharge(localState.registrationTypeUI)) ? 10 : 0,
-          filingTypeCode: localState.registrationType,
-          waived: hasNoCharge(localState.registrationTypeUI)
-      }})
+      if (!fees.value[FeeSummaryTypes.NEW]) {
+        setFees({[FeeSummaryTypes.NEW]: {
+            ...RegistrationFees[FeeSummaryTypes.NEW],
+            filingFees: localState.registrationType === APIRegistrationTypes.MARRIAGE_MH ? 10 : 0,
+            serviceFees: (isRoleStaffReg.value || hasNoCharge(localState.registrationTypeUI)) ? 0 : 1.50,
+            processingFees: (isRoleStaffReg.value && !hasNoCharge(localState.registrationTypeUI)) ? 10 : 0,
+            filingTypeCode: localState.registrationType,
+            waived: hasNoCharge(localState.registrationTypeUI)
+          }})
+      }
       feeOptions.value.showProcessingFees = isRoleStaffReg.value
       feeOptions.value.showServiceFees = !isRoleStaffReg.value
     })

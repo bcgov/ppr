@@ -416,10 +416,6 @@ export default defineComponent({
       useTransportPermits().setLocationChange(false)
       useTransportPermits().setExtendLocationChange(false)
       useTransportPermits().setNewPermitChange(false)
-
-      if (localState.pathAnchorId) {
-        setTimeout(() => anchorParamHandler(localState.pathAnchorId), 5000)
-      }
     })
 
     /** Redirects browser to Business Registry home page. */
@@ -488,6 +484,10 @@ export default defineComponent({
         localState.dealerRecord = await getQualifiedSupplier()
         localState.displayDealerInfo = !localState.dealerRecord?.confirmRequirements
       }
+
+      if (localState.pathAnchorId) {
+        setTimeout(() => anchorParamHandler(localState.pathAnchorId), 2000)
+      }
     }
 
     /** Emits error to app.vue for handling */
@@ -529,9 +529,15 @@ export default defineComponent({
         case 'pprReg':
           // handle pprReg
           if (getRegTableBaseRegs.value)  {
-            const { registrationNumber } = getRegTableBaseRegs.value?.find(reg => reg.consumedDraftNumber === id) ||
+            const registration = getRegTableBaseRegs.value?.find(reg => reg.consumedDraftNumber === id) ||
+              getRegTableBaseRegs.value.find(reg => reg.registrationNumber === id) ||
               getRegTableBaseRegs.value.find(reg => reg.registrationNumber)
-            if (registrationNumber) addedRegHandler(registrationNumber)
+
+            if (registration?.changes?.length) {
+              addedRegHandler(registration.changes[0].registrationNumber, registration.registrationNumber)
+            } else if (registration?.registrationNumber) {
+              addedRegHandler(registration?.registrationNumber)
+            }
           }
           break
         case 'mhReg':
@@ -540,9 +546,15 @@ export default defineComponent({
 
           // handle mhReg
           if (getMhRegTableBaseRegs.value) {
-            const { mhrNumber } = getMhRegTableBaseRegs.value?.find(reg => reg.consumedDraftNumber === id) ||
+            const registration = getMhRegTableBaseRegs.value?.find(reg => reg.consumedDraftNumber === id) ||
+              getMhRegTableBaseRegs.value.find(reg => reg.mhrNumber === id) ||
               getMhRegTableBaseRegs.value.find(reg => reg.mhrNumber)
-            if (mhrNumber) addedRegHandler(mhrNumber)
+
+            if (registration?.changes?.length) {
+              addedRegHandler(registration.changes[0].documentRegistrationNumber, registration.mhrNumber)
+            } else if (registration?.mhrNumber) {
+              addedRegHandler(registration.mhrNumber)
+            }
           }
           break
         default:
@@ -565,20 +577,20 @@ export default defineComponent({
       }, 5000)
     }
 
-    const addedRegHandler = (regId: string = '') => {
+    const addedRegHandler = (regId: string = '', regParentId: string = '') => {
       localState.snackbarMsg = 'Your registration was successfully added to your table.'
       localState.toggleSnackbar = !localState.toggleSnackbar
 
       // set new added reg
       setRegTableNewItem({
         addedReg: regId,
-        addedRegParent: '',
+        addedRegParent: regParentId,
         addedRegSummary: null,
         prevDraft: '',
         isScrollTo: true
       })
       setTimeout( () => {
-        setRegTableNewItem(null)
+        setRegTableNewItem({})
       }, 4500)
     }
 
