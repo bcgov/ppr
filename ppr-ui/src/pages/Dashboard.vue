@@ -520,7 +520,6 @@ export default defineComponent({
       const match = anchorId.match(/^([a-zA-Z]+)-([a-zA-Z0-9]+)$/)
       const prefix = match ? match[1] : null
       const id = match ? match[2] : null
-      console.log('Anchor Param Handler:', anchorId, prefix, id)
 
       switch (prefix) {
         case 'search':
