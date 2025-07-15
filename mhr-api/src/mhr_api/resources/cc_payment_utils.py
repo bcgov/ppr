@@ -145,6 +145,7 @@ def save_change_cc_draft(base_reg: MhrRegistration, json_data: dict) -> MhrRegis
     draft.mhr_number = base_reg.mhr_number
     draft.save()
     registration.draft = draft
+    json_data["draftNumber"] = draft.draft_number
     registration.reg_json = json_data
     # Lock the base registration here:
     base_reg.status_type = MhrRegistrationStatusTypes.DRAFT.value
@@ -180,6 +181,7 @@ def save_new_cc_draft(json_data: dict) -> MhrRegistration:
     draft.user_id = json_data["payment"].get("invoiceId")
     draft.save()
     registration.draft = draft
+    json_data["draftNumber"] = draft.draft_number
     registration.reg_json = json_data
     invoice_id: int = int(json_data["payment"].get("invoiceId"))
     if draft.account_id != STAFF_ROLE:
@@ -221,6 +223,8 @@ def create_basic_registration(draft: MhrDraft) -> MhrRegistration:
     registration.pay_path = draft_json["payment"].get("receipt")
     registration.draft_id = draft.id
     registration.draft = draft
+    if not draft_json.get("draftNumber"):
+        draft_json["draftNumber"] = draft.draft_number
     registration.reg_json = draft_json
     registration.client_reference_id = draft_json.get("clientReferenceId")
     doc: MhrDocument = MhrDocument.create_from_json(
