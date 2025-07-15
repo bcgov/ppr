@@ -140,6 +140,7 @@ export default defineComponent({
           }
         }
         if ((name === RouteNames.DASHBOARD) || (name === RouteNames.SIGN_IN)) {
+          tombstoneBreadcrumbDashboard[0].href = sessionStorage.getItem('REGISTRY_URL') || ''
           tombstoneBreadcrumbDashboard[1].text = roleBasedBreadcrumbTitle || tombstoneBreadcrumbDashboard[1].text
           return tombstoneBreadcrumbDashboard
         } else if (name === RouteNames.SEARCH) {

@@ -293,7 +293,11 @@ export default defineComponent({
     }
 
     const cancelAndRemoveDraft = (item: MhRegistrationSummaryIF): void => {
-      emit('action', { action: TableActions.CANCEL, docId: item?.documentId, regNum: item.draftNumber })
+      emit('action', {
+        action: TableActions.CANCEL,
+        docId: item?.documentId,
+        regNum: item.draftNumber || item.baseRegistrationNumber
+      })
     }
 
     const removeMhrDraft = (item: MhRegistrationSummaryIF): void => {

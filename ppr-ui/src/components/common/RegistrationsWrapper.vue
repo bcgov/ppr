@@ -770,8 +770,13 @@ export default defineComponent({
           const baseRegs = getRegTableBaseRegs.value
           // find parent base registration and filter draft out of changes array
           const parentIndex = baseRegs.findIndex(reg => reg.baseRegistrationNumber === regNum)
+
           const changes = baseRegs[parentIndex].changes as any
+          const hasPaymentPendingChanges = changes.some((child) => { !!child.paymentPending })
+
           baseRegs[parentIndex].changes = changes.filter(reg => reg.documentId !== docId)
+          if (!hasPaymentPendingChanges) delete baseRegs[parentIndex].paymentPending
+
           if (baseRegs[parentIndex].changes.length === 0) {
             // no longer a parent reg so remove irrelevant fields
             delete baseRegs[parentIndex].changes
