@@ -52,6 +52,7 @@
             hide-no-data
             item-title="name"
             item-value="code"
+            :disabled="disableEdits"
             :items="getCountries()"
             :label="countryLabel"
             :rules="[...schemaLocal.country]"
@@ -82,6 +83,7 @@
             class="street-address"
             variant="filled"
             color="primary"
+            :disabled="disableEdits"
             :hint="hideAddressHint ? '' : 'Street address, PO box, rural route, or general delivery address'"
             :label="streetLabel"
             persistent-hint
@@ -98,6 +100,7 @@
             variant="filled"
             color="primary"
             class="street-address-additional"
+            :disabled="disableEdits"
             :label="streetAdditionalLabel"
             rows="1"
             :rules="!!addressLocal.streetAdditional ? [...schemaLocal.streetAdditional] : []"
@@ -110,6 +113,7 @@
             variant="filled"
             color="primary"
             class="item address-city"
+            :disabled="disableEdits"
             :label="cityLabel"
             :rules="[...schemaLocal.city]"
           />
@@ -123,6 +127,7 @@
             hide-no-data
             item-title="name"
             item-value="short"
+            :disabled="disableEdits"
             :items="getCountryRegions(country)"
             :label="regionLabel"
             :rules="[...schemaLocal.region]"
@@ -141,6 +146,7 @@
             variant="filled"
             color="primary"
             class="item address-region"
+            :disabled="disableEdits"
             :label="regionLabel"
             :rules="[...schemaLocal.region]"
           />
@@ -149,6 +155,7 @@
             variant="filled"
             color="primary"
             class="item postal-code"
+            :disabled="disableEdits"
             :label="postalCodeLabel"
             :rules="[...schemaLocal.postalCode]"
           />
@@ -163,6 +170,7 @@
             variant="filled"
             color="primary"
             class="delivery-instructions"
+            :disabled="disableEdits"
             :label="deliveryInstructionsLabel"
             rows="2"
             :rules="!!addressLocal.deliveryInstructions ? [...schemaLocal.deliveryInstructions] : []"
@@ -223,6 +231,10 @@ export default defineComponent({
     },
     /* Hides Delivery Address field (e.g. for Unit Notes) */
     hideDeliveryAddress: {
+      type: Boolean,
+      default: false
+    },
+    disableEdits: {
       type: Boolean,
       default: false
     }

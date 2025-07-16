@@ -159,8 +159,16 @@ export const useSecuredParty = (context?) => {
   }
 
   const setRegisteringParty = (registeringParty: PartyIF) => {
-    let parties = getAddSecuredPartiesAndDebtors.value // eslint-disable-line
-    registeringParty.action = ActionTypes.EDITED
+    const parties = getAddSecuredPartiesAndDebtors.value
+
+    // When current registering party email doesn't match the new one, set action to EDITED
+    if (!isEqual(parties.registeringParty, registeringParty)) {
+      registeringParty.action = ActionTypes.EDITED
+    }
+    if (!registeringParty.emailAddress && !registeringParty.code) {
+      registeringParty.action = null
+    }
+
     parties.registeringParty = registeringParty
     parties.valid = isPartiesValid(parties, getRegistrationType.value?.registrationTypeAPI)
     setAddSecuredPartiesAndDebtors(parties)

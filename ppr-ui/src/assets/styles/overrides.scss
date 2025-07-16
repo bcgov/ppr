@@ -178,15 +178,16 @@
   padding-bottom: 16px
 }
 
-.v-table > .v-table__wrapper > table > tbody > tr > td {
+.v-table:not(#mh-search-results-table) > .v-table__wrapper > table > tbody > tr > td {
   color: $gray7;
   font-size: .875rem;
   text-align: left;
   padding-top: 16px;
   padding-bottom: 16px;
+  vertical-align: top;
 }
 
-.v-table:not(#registration-table) > .v-table__wrapper {
+.v-table:not(#registration-table, #search-history-table) > .v-table__wrapper {
   overflow-x: hidden;
   .actions {
     padding-right: 30px;

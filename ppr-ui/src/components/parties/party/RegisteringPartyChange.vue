@@ -6,6 +6,8 @@
     <v-col v-if="!openChangeScreen">
       <RegisteringParty
         @change-registering-party="changeRegisteringParty"
+        @editing-registering-party="editingRegisteringParty"
+        @email-required-validation="emitRequiredEmail"
       />
     </v-col>
     <v-col
@@ -87,9 +89,13 @@ export default defineComponent({
     setShowErrorBar: {
       type: Boolean,
       default: false
+    },
+    changePartyProp: {
+      type: Boolean,
+      default: false
     }
   },
-  emits: ['registeringPartyOpen'],
+  emits: ['registeringPartyOpen', 'emailRequiredValidation'],
   setup (props, context) {
     const { getAddSecuredPartiesAndDebtors, isRoleStaffSbc } = storeToRefs(useStore())
     const localState = reactive({
@@ -120,6 +126,19 @@ export default defineComponent({
       context.emit('registeringPartyOpen', true)
     }
 
+    const editingRegisteringParty = (val) => {
+      context.emit('registeringPartyOpen', val)
+    }
+
+    const emitRequiredEmail = (val) => {
+      context.emit('emailRequiredValidation', val)
+    }
+
+    const closeChangeRegisteringParty = () => {
+      localState.openChangeScreen = false
+      context.emit('registeringPartyOpen', false)
+    }
+
     const initAdd = () => {
       localState.addEditInProgress = true
       localState.showAddRegisteringParty = true
@@ -140,8 +159,14 @@ export default defineComponent({
       }
     })
 
+    watch(() => props.changePartyProp, (val) => {
+      val ? changeRegisteringParty() : closeChangeRegisteringParty()
+    })
+
     return {
+      emitRequiredEmail,
       changeRegisteringParty,
+      editingRegisteringParty,
       initAdd,
       resetData,
       ...toRefs(localState)
