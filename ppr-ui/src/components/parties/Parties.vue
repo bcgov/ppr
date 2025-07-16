@@ -120,7 +120,7 @@
     <RegisteringPartyChange
       :change-party-prop="changeRegisteringParty"
       @registering-party-open="onPartyChange"
-      @email-required-validation="onEmailRequiredValidation"
+      @email-required-validation="isEmailRequired = $event"
     />
     <v-row
       v-if="!!parties.registeringParty && !!parties.registeringParty.action"
@@ -226,12 +226,21 @@ export default defineComponent({
       localState.registeringPartyOpen = val
     }
 
-    const onEmailRequiredValidation = (val) => {
-      localState.isEmailRequired = val
+    // Watch for changes to the parties and update the validity of the steps
+    watch(() => [
+      localState.parties.registeringParty,
+      localState.isSecuredPartyChecked,
+      localState.parties.debtors,
+      localState.isEmailRequired
+    ], (val) => {
+      console.log('registeringParty:', localState.parties.registeringParty)
+      console.log('isEmailRequired:', localState.isEmailRequired)
+      console.log('isSecuredPartyChecked:', localState.isSecuredPartyChecked)
+      console.log('debtors:', localState.parties.debtors)
 
       setAddSecuredPartiesAndDebtorsStepValidity(!!localState.parties.registeringParty &&
-        !val && localState.isSecuredPartyChecked && localState.parties.debtors.length > 0)
-    }
+        !localState.isEmailRequired && localState.isSecuredPartyChecked && localState.parties.debtors.length > 0)
+    }, { deep: true })
 
     // Watch for changes to the changeRegisteringParty state and scroll to the title
     watch(() => localState.registeringPartyOpen, (val) => {
@@ -246,7 +255,6 @@ export default defineComponent({
     return {
       isRoleStaffSbc,
       onPartyChange,
-      onEmailRequiredValidation,
       ...toRefs(localState)
     }
   }
