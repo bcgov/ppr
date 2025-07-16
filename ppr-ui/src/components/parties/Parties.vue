@@ -232,12 +232,7 @@ export default defineComponent({
       localState.isSecuredPartyChecked,
       localState.parties.debtors,
       localState.isEmailRequired
-    ], (val) => {
-      console.log('registeringParty:', localState.parties.registeringParty)
-      console.log('isEmailRequired:', localState.isEmailRequired)
-      console.log('isSecuredPartyChecked:', localState.isSecuredPartyChecked)
-      console.log('debtors:', localState.parties.debtors)
-
+    ], () => {
       setAddSecuredPartiesAndDebtorsStepValidity(!!localState.parties.registeringParty &&
         !localState.isEmailRequired && localState.isSecuredPartyChecked && localState.parties.debtors.length > 0)
     }, { deep: true })

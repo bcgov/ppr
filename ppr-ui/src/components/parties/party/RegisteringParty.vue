@@ -286,7 +286,6 @@ export default defineComponent({
     // Check if the item requires an email address
     const requiresEmail = (item) => {
       const required = !!(item.action && !item.emailAddress)
-      console.log(`Registering Party requires email: ${required}`)
       context.emit('emailRequiredValidation', required)
       return required
     }
