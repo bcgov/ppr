@@ -3,6 +3,7 @@ import { createDefaultValidationResult } from '@lemoncode/fonk'
 import { formValidation } from './securedPartyFormValidator'
 import { useValidation } from '@/utils/validators/use-validation'
 import { SecuredPartyTypes } from '@/enums'
+import { useStore } from '@/store/store'
 const { validateName } = useValidation()
 
 const createEmptyErrors = () => ({
@@ -16,6 +17,7 @@ const createEmptyErrors = () => ({
 
 export const useSecuredPartyValidation = () => {
   const errors = ref(createEmptyErrors())
+  const { getAccountLabel } = storeToRefs(useStore())
 
   const validateInput = (fieldName, value) => {
     formValidation.validateField(fieldName, value).then(validationResult => {
@@ -27,7 +29,7 @@ export const useSecuredPartyValidation = () => {
     const currentIsBusiness = partyType === SecuredPartyTypes.BUSINESS
     validateName(currentIsBusiness, currentParty.value, errors)
     if (isRegisteringParty) {
-      if (currentParty.value.emailAddress.length === 0) {
+      if (getAccountLabel.value !== currentParty.value.businessName && !currentParty.value.emailAddress) {
         errors.value.emailAddress = {
           type: 'EMAIL',
           succeeded: false,

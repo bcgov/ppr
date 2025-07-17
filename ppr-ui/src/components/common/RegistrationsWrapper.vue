@@ -775,7 +775,12 @@ export default defineComponent({
           const hasPaymentPendingChanges = changes.some((child) => { !!child.paymentPending })
 
           baseRegs[parentIndex].changes = changes.filter(reg => reg.documentId !== docId)
-          if (!hasPaymentPendingChanges) delete baseRegs[parentIndex].paymentPending
+
+          // if there are no more changes, remove the paymentPending field
+          if (!hasPaymentPendingChanges) {
+            baseRegs[parentIndex].hasDraft = false
+            delete baseRegs[parentIndex].paymentPending
+          }
 
           if (baseRegs[parentIndex].changes.length === 0) {
             // no longer a parent reg so remove irrelevant fields

@@ -26,8 +26,25 @@
 
               <!-- Table Body -->
               <tbody v-if="registeringParty.length > 0">
+              <tr v-if="showEditParty">
+                <td
+                  colspan="5"
+                  class="pa-0"
+                >
+                  <v-expand-transition>
+                    <div class="edit-Party-container pa-0 col-12">
+                      <edit-party
+                        :is-registering-party="true"
+                        :is-edit-mode="true"
+                        @reset-event="resetData"
+                      />
+                    </div>
+                  </v-expand-transition>
+                </td>
+              </tr>
                 <tr
                   v-for="item in registeringParty"
+                  v-else
                   :key="item.partyId"
                   class="registering-row"
                 >
@@ -68,7 +85,16 @@
                       :schema="addressSchema"
                     />
                   </td>
-                  <td>{{ item.emailAddress }}</td>
+                  <td>
+                    <span
+                      v-if="requiresEmail(item)"
+                      class="error-text"
+                    >*Required
+                    </span>
+                    <span v-else>
+                      {{item.emailAddress}}
+                    </span>
+                  </td>
                   <td>
                     {{ item.code }}
                   </td>
@@ -76,18 +102,18 @@
                     v-if="!isSecurityActNotice"
                     class="ml-8 pr-0"
                   >
-                    <div class="actions">
+                    <div class="actions inline-flex mt-0 pt-0">
                       <v-btn
                         v-if="!item.action"
                         variant="plain"
                         color="primary"
                         class="smaller-button edit-btn pr-2"
-                        @click="changeRegisteringParty()"
+                        @click="editRegisteringParty()"
                       >
                         <v-icon size="small">
                           mdi-pencil
                         </v-icon>
-                        <span class="ml-1 mr-2">Change</span>
+                        <span class="ml-1 mr-2">Edit</span>
                       </v-btn>
                       <v-btn
                         v-else
@@ -103,8 +129,8 @@
                         <span class="ml-1 mr-2">Undo</span>
                       </v-btn>
                       <span
-                        v-if="item.action && !item.code"
-                        class="actions-border actions__more"
+                        v-if="item.action"
+                        class="actions-border actions__more m-auto"
                       >
                         <v-menu
                           location="bottom right"
@@ -132,21 +158,6 @@
                         </v-menu>
                       </span>
                     </div>
-                  </td>
-                </tr>
-                <tr v-if="showEditParty">
-                  <td
-                    colspan="5"
-                    class="pa-0"
-                  >
-                    <v-expand-transition>
-                      <div class="edit-Party-container pa-0 col-12">
-                        <edit-party
-                          :is-registering-party="true"
-                          @reset-event="resetData"
-                        />
-                      </div>
-                    </v-expand-transition>
                   </td>
                 </tr>
               </tbody>
@@ -211,7 +222,7 @@ export default defineComponent({
     EditParty,
     ErrorContact
   },
-  emits: ['changeRegisteringParty'],
+  emits: ['changeRegisteringParty', 'editingRegisteringParty', 'emailRequiredValidation'],
   setup (props, context) {
     const { getAddSecuredPartiesAndDebtors, getRegistrationFlowType } = storeToRefs(useStore())
     const addressSchema = PartyAddressSchema
@@ -259,6 +270,7 @@ export default defineComponent({
 
     const editRegisteringParty = () => {
       localState.showEditParty = true
+      context.emit('editingRegisteringParty', true)
     }
 
     const undo = async () => {
@@ -268,11 +280,20 @@ export default defineComponent({
     const resetData = () => {
       localState.addEditInProgress = false
       localState.showEditParty = false
+      context.emit('editingRegisteringParty', false)
+    }
+
+    // Check if the item requires an email address
+    const requiresEmail = (item) => {
+      const required = !!(item.action && !item.emailAddress)
+      context.emit('emailRequiredValidation', required)
+      return required
     }
 
     return {
       getName,
       isBusiness,
+      requiresEmail,
       registrationFlowType,
       changeRegisteringParty,
       editRegisteringParty,

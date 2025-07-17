@@ -39,6 +39,7 @@
                   class="mt-0"
                   inline
                   hide-details="true"
+                  :disabled="isEditingRegisteringParty"
                 >
                   <v-radio
                     id="party-individual"
@@ -94,6 +95,7 @@
                       "
                       persistent-hint
                       persistent-clear
+                      :disabled="isEditingRegisteringParty"
                       :clearable="showClear"
                       :clear-icon="'mdi-close'"
                       @click:clear="showClear = false"
@@ -137,6 +139,7 @@
                       color="primary"
                       label="First Name"
                       persistent-hint
+                      :disabled="isEditingRegisteringParty"
                       :error-messages="
                         errors.first.message ? errors.first.message : ''
                       "
@@ -154,6 +157,7 @@
                       color="primary"
                       label="Middle Name (Optional)"
                       persistent-hint
+                      :disabled="isEditingRegisteringParty"
                       :error-messages="
                         errors.middle.message ? errors.middle.message : ''
                       "
@@ -168,6 +172,7 @@
                       color="primary"
                       label="Last Name"
                       persistent-hint
+                      :disabled="isEditingRegisteringParty"
                       :error-messages="
                         errors.last.message ? errors.last.message : ''
                       "
@@ -215,6 +220,7 @@
                   :editing="true"
                   :schema="{ ...addressSchema }"
                   :trigger-errors="showAllAddressErrors"
+                  :disable-edits="isEditingRegisteringParty"
                   @valid="updateValidity($event)"
                   @update-address="currentSecuredParty.address = $event"
                 />
@@ -344,6 +350,8 @@ export default defineComponent({
       originalSecuredParty
     } = useSecuredParty(context)
 
+    const { getAddSecuredPartiesAndDebtors } = storeToRefs(useStore())
+
     const {
       errors,
       updateValidity,
@@ -382,6 +390,9 @@ export default defineComponent({
         }
         text += props.isRegisteringParty ? 'Registering Party' : 'Secured Party'
         return text
+      }),
+      isEditingRegisteringParty: computed((): boolean => {
+        return props.isRegisteringParty && props.isEditMode
       })
     })
 
@@ -402,12 +413,16 @@ export default defineComponent({
       localState.foundDuplicate = false
       currentSecuredParty.value.address = formatAddress(currentSecuredParty.value.address)
       if (validateSecuredPartyForm(partyType.value, currentSecuredParty, props.isRegisteringParty)) {
-        if (partyType.value === SecuredPartyTypes.INDIVIDUAL) {
+        if (partyType.value === SecuredPartyTypes.INDIVIDUAL && !!currentSecuredParty.value.personName) {
           currentSecuredParty.value.businessName = ''
-        } else {
-          currentSecuredParty.value.personName.first = ''
-          currentSecuredParty.value.personName.middle = ''
-          currentSecuredParty.value.personName.last = ''
+        } else if (currentSecuredParty.value.businessName) {
+          if (currentSecuredParty.value.personName) {
+            currentSecuredParty.value.personName = {
+              first: '',
+              middle: '',
+              last: ''
+            }
+          }
         }
 
         if (props.isRegisteringParty) {
@@ -485,8 +500,25 @@ export default defineComponent({
     )
 
     onMounted(() => {
-      getSecuredParty(props.isRegisteringParty, props.activeIndex)
-      currentSecuredParty.value.businessName && setSearchValue(currentSecuredParty.value.businessName)
+      if (localState.isEditingRegisteringParty) {
+
+        if (getAddSecuredPartiesAndDebtors.value.registeringParty.businessName) {
+          partyType.value = SecuredPartyTypes.BUSINESS
+          setSearchValue(getAddSecuredPartiesAndDebtors.value.registeringParty?.businessName)
+        } else {
+          partyType.value = SecuredPartyTypes.INDIVIDUAL
+          const { first, middle, last } =
+            getAddSecuredPartiesAndDebtors.value.registeringParty?.personName || {}
+          currentSecuredParty.value.personName.first = first || ''
+          currentSecuredParty.value.personName.middle = middle || ''
+          currentSecuredParty.value.personName.last = last || ''
+        }
+
+        currentSecuredParty.value = { ...getAddSecuredPartiesAndDebtors.value.registeringParty }
+      } else if (!props.isRegisteringParty) {
+        getSecuredParty(props.isRegisteringParty, props.activeIndex)
+        currentSecuredParty.value.businessName && setSearchValue(currentSecuredParty.value.businessName)
+      }
     })
 
     return {
