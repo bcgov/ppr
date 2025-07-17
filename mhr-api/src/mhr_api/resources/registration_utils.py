@@ -22,6 +22,7 @@ import mhr_api.models.registration_change_utils as change_utils
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import (
     EventTracking,
+    MhrDraft,
     MhrRegistration,
     MhrRegistrationReport,
     SearchResult,
@@ -84,7 +85,7 @@ CALLBACK_MESSAGES = {
     resource_utils.CallbackExceptionCodes.SETUP_ERR.value: "10: setup failed for id={key_id}.",
 }
 PAY_DETAILS_LABEL = "MH Registration Type:"
-PAY_DETAILS_LABEL_TRANS_ID = "MH Registration {trans_id} Type:"
+PAY_DETAILS_LABEL_TRANS_ID = "Registration Number {trans_id} Type:"
 EMAIL_DOWNLOAD = "\n\nTo access the file,\n\n[[{0}]]({1})"
 EMAIL_DOWNLOAD_LOCATION = "\n\n[[{0}]]({1})"
 EVENT_KEY_BATCH_MAN_REG: int = 99000000
@@ -95,19 +96,21 @@ REQUEST_PARAM_CC_PAY: str = "ccPayment"
 
 def get_pay_details(reg_type: str, trans_id: str = None) -> dict:
     """Build pay api transaction description details."""
+    value: str = get_registration_description(reg_type).lower().title()
     label = PAY_DETAILS_LABEL
     if trans_id:
         label = PAY_DETAILS_LABEL_TRANS_ID.format(trans_id=trans_id)
-    details = {"label": label, "value": get_registration_description(reg_type)}
+    details = {"label": label, "value": value}
     return details
 
 
 def get_pay_details_doc(doc_type: str, trans_id: str = None) -> dict:
     """Build pay api transaction description details using the registration document type."""
+    value: str = get_document_description(doc_type).lower().title()
     label = PAY_DETAILS_LABEL
     if trans_id:
         label = PAY_DETAILS_LABEL_TRANS_ID.format(trans_id=trans_id)
-    details = {"label": label, "value": get_document_description(doc_type)}
+    details = {"label": label, "value": value}
     return details
 
 
@@ -123,13 +126,13 @@ def pay(req: request, request_json: dict, account_id: str, trans_type: str, tran
     payment: Payment = None
     pay_ref = None
     client_ref: str = request_json.get("clientReferenceId", "")
-    details: dict = get_pay_details(request_json.get("registrationType"), trans_id)
+    details: dict = get_pay_details(request_json.get("registrationType"))
     if request_json.get("transferDocumentType"):
-        details = get_pay_details_doc(request_json.get("transferDocumentType"), trans_id)
+        details = get_pay_details_doc(request_json.get("transferDocumentType"))
     elif request_json.get("documentType"):
-        details = get_pay_details_doc(request_json.get("documentType"), trans_id)
+        details = get_pay_details_doc(request_json.get("documentType"))
     elif request_json.get("registrationType") == MhrRegistrationTypes.PERMIT and request_json.get("amendment"):
-        details = get_pay_details_doc(MhrDocumentTypes.AMEND_PERMIT, trans_id)
+        details = get_pay_details_doc(MhrDocumentTypes.AMEND_PERMIT)
     details = set_cc_payment(req, details)
     if not is_reg_staff_account(account_id):
         payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id, details=details)
@@ -149,7 +152,7 @@ def pay_staff(req: request, request_json: dict, trans_type: str, trans_id: str =
     doc_type: str = request_json.get("documentType")
     if not doc_type:
         doc_type = request_json["note"].get("documentType")
-    details: dict = get_pay_details_doc(doc_type, trans_id)
+    details: dict = get_pay_details_doc(doc_type)
     details = set_cc_payment(req, details)
     payment_info = build_staff_payment(req, trans_type, 1, trans_id)
     payment = Payment(jwt=jwt.get_token_auth_header(), account_id=None, details=details)
@@ -158,28 +161,28 @@ def pay_staff(req: request, request_json: dict, trans_type: str, trans_id: str =
 
 
 def pay_and_save_registration(  # pylint: disable=too-many-arguments,too-many-positional-arguments
-    req: request,
-    request_json: dict,
-    account_id: str,
-    user_group: str,
-    trans_type: str,
-    trans_id: str = None,
+    req: request, request_json: dict, account_id: str, user_group: str, trans_type: str
 ):
     """Set up the registration statement, pay, and save the data."""
     # Charge a fee.
     token: dict = g.jwt_oidc_token_info
     request_json["affirmByName"] = get_affirmby(token)
     request_json["registrationType"] = MhrRegistrationTypes.MHREG
-    payment, pay_ref = pay(req, request_json, account_id, trans_type, trans_id)
+    # Create draft with MHR number here to include in the pay api request.
+    draft: MhrDraft = MhrDraft.create_from_mhreg_json(request_json, account_id, token.get("username"))
+    draft.save()
+    request_json["mhrNumber"] = draft.mhr_number
+    logger.info(f"New MH registration MHR#={draft.mhr_number}")
+    payment, pay_ref = pay(req, request_json, account_id, trans_type, draft.mhr_number)
     if pay_ref.get("ccPayment"):
         logger.info("Payment response CC method.")
         request_json = setup_cc_draft(request_json, pay_ref, account_id, token.get("username", None), user_group)
-        return cc_payment_utils.save_new_cc_draft(request_json)
+        return cc_payment_utils.save_new_cc_draft(request_json, draft)
     invoice_id = pay_ref["invoiceId"]
     # Try to save the registration: failure throws an exception.
     try:
         registration: MhrRegistration = MhrRegistration.create_new_from_json(
-            request_json, account_id, token.get("username", None), user_group
+            request_json, draft, account_id, token.get("username", None), user_group
         )
         registration.pay_invoice_id = int(invoice_id)
         registration.pay_path = pay_ref["receipt"]
@@ -197,13 +200,7 @@ def pay_and_save_registration(  # pylint: disable=too-many-arguments,too-many-po
 
 
 def pay_and_save_transfer(  # pylint: disable=too-many-arguments,too-many-positional-arguments
-    req: request,
-    current_reg: MhrRegistration,
-    request_json,
-    account_id: str,
-    user_group: str,
-    trans_type: str,
-    trans_id: str = None,
+    req: request, current_reg: MhrRegistration, request_json, account_id: str, user_group: str, trans_type: str
 ):
     """Set up the registration statement, pay, and save the data."""
     # Charge a fee.
@@ -212,7 +209,7 @@ def pay_and_save_transfer(  # pylint: disable=too-many-arguments,too-many-positi
     request_json["affirmByName"] = get_affirmby(token)
     if not request_json.get("registrationType"):
         request_json["registrationType"] = MhrRegistrationTypes.TRANS
-    payment, pay_ref = pay(req, request_json, account_id, trans_type, trans_id)
+    payment, pay_ref = pay(req, request_json, account_id, trans_type, current_reg.mhr_number)
     if pay_ref.get("ccPayment"):
         logger.info("Payment response CC method.")
         request_json = setup_cc_draft(request_json, pay_ref, account_id, token.get("username", None), user_group)
@@ -243,13 +240,7 @@ def pay_and_save_transfer(  # pylint: disable=too-many-arguments,too-many-positi
 
 
 def pay_and_save_exemption(  # pylint: disable=too-many-arguments,too-many-positional-arguments
-    req: request,
-    current_reg: MhrRegistration,
-    request_json,
-    account_id: str,
-    user_group: str,
-    trans_type: str,
-    trans_id: str = None,
+    req: request, current_reg: MhrRegistration, request_json, account_id: str, user_group: str, trans_type: str
 ):
     """Set up the registration statement, pay, and save the data."""
     # Charge a fee.
@@ -260,7 +251,7 @@ def pay_and_save_exemption(  # pylint: disable=too-many-arguments,too-many-posit
         request_json["registrationType"] = MhrRegistrationTypes.EXEMPTION_NON_RES
     else:
         request_json["registrationType"] = MhrRegistrationTypes.EXEMPTION_RES
-    payment, pay_ref = pay(req, request_json, account_id, trans_type, trans_id)
+    payment, pay_ref = pay(req, request_json, account_id, trans_type, current_reg.mhr_number)
     if pay_ref.get("ccPayment"):
         logger.info("Payment response CC method.")
         request_json = setup_cc_draft(request_json, pay_ref, account_id, token.get("username", None), user_group)
@@ -297,13 +288,7 @@ def setup_cc_draft(json_data: dict, pay_ref: dict, account_id: str, username: st
 
 
 def pay_and_save_permit(  # pylint: disable=too-many-arguments,too-many-positional-arguments
-    req: request,
-    current_reg: MhrRegistration,
-    request_json,
-    account_id: str,
-    user_group: str,
-    trans_type: str,
-    trans_id: str = None,
+    req: request, current_reg: MhrRegistration, request_json, account_id: str, user_group: str, trans_type: str
 ):
     """Set up the registration statement, pay, and save the data."""
     # Charge a fee.
@@ -312,7 +297,7 @@ def pay_and_save_permit(  # pylint: disable=too-many-arguments,too-many-position
     request_json["affirmByName"] = get_affirmby(token)
     if not request_json.get("registrationType"):
         request_json["registrationType"] = MhrRegistrationTypes.PERMIT
-    payment, pay_ref = pay(req, request_json, account_id, trans_type, trans_id)
+    payment, pay_ref = pay(req, request_json, account_id, trans_type, current_reg.mhr_number)
     if pay_ref.get("ccPayment"):
         logger.info("Payment response CC method.")
         request_json = setup_cc_draft(request_json, pay_ref, account_id, token.get("username", None), user_group)
@@ -342,13 +327,7 @@ def pay_and_save_permit(  # pylint: disable=too-many-arguments,too-many-position
 
 
 def pay_and_save_note(  # pylint: disable=too-many-arguments,too-many-positional-arguments
-    req: request,
-    current_reg: MhrRegistration,
-    request_json,
-    account_id: str,
-    user_group: str,
-    trans_type: str,
-    trans_id: str = None,
+    req: request, current_reg: MhrRegistration, request_json, account_id: str, user_group: str, trans_type: str
 ):
     """Set up the registration statement, pay, and save the data."""
     # Charge a fee.
@@ -357,7 +336,7 @@ def pay_and_save_note(  # pylint: disable=too-many-arguments,too-many-positional
     request_json["affirmByName"] = get_affirmby(token)
     if not request_json.get("registrationType"):
         request_json["registrationType"] = MhrRegistrationTypes.REG_NOTE
-    payment, pay_ref = pay_staff(req, request_json, trans_type, trans_id)
+    payment, pay_ref = pay_staff(req, request_json, trans_type, current_reg.mhr_number)
     invoice_id = pay_ref["invoiceId"]
     # Try to save the registration: failure throws an exception.
     try:
@@ -382,13 +361,7 @@ def pay_and_save_note(  # pylint: disable=too-many-arguments,too-many-positional
 
 
 def pay_and_save_admin(  # pylint: disable=too-many-arguments,too-many-positional-arguments
-    req: request,
-    current_reg: MhrRegistration,
-    request_json,
-    account_id: str,
-    user_group: str,
-    trans_type: str,
-    trans_id: str = None,
+    req: request, current_reg: MhrRegistration, request_json, account_id: str, user_group: str, trans_type: str
 ):
     """Set up the registration statement, pay, and save the data."""
     # Charge a fee.
@@ -400,9 +373,9 @@ def pay_and_save_admin(  # pylint: disable=too-many-arguments,too-many-positiona
     payment = None
     pay_ref = None
     if is_reg_staff_account(account_id):
-        payment, pay_ref = pay_staff(req, request_json, trans_type, trans_id)
+        payment, pay_ref = pay_staff(req, request_json, trans_type, current_reg.mhr_number)
     else:
-        payment, pay_ref = pay(req, request_json, account_id, trans_type, trans_id)
+        payment, pay_ref = pay(req, request_json, account_id, trans_type, current_reg.mhr_number)
     invoice_id = pay_ref["invoiceId"]
     # Try to save the registration: failure throws an exception.
     try:

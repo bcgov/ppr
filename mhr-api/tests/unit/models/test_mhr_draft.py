@@ -155,6 +155,10 @@ TEST_INVOICE_DATA = [
     ('PS12345', '125234', False, MhrRegistrationTypes.TRANS, DRAFT_TRANSFER),
     ('PS12345', '125234', True, MhrRegistrationTypes.TRANS, DRAFT_TRANSFER)
 ]
+# testdata pattern is ({account_id}, {user_id}, {draft_data})
+TEST_DRAFT_DATA_NEW_MH = [
+    ('PS12345', 'TESTUSER', REGISTRATION),
+]
 
 
 @pytest.mark.parametrize('account_id, has_results, draft_num, mhr_num, reg_type', TEST_ACCOUNT_DRAFT_DATA)
@@ -245,7 +249,7 @@ def test_save_then_delete(session, account_id, mhr_num, reg_type, draft_data):
     draft_data = {
         'type': reg_type,
         'registration': json_data
-    } 
+    }
     new_draft: MhrDraft = MhrDraft.create_from_json(draft_data, account_id, 'TESTUSER')
     new_draft.save()
     draft = new_draft.json
@@ -261,6 +265,21 @@ def test_save_then_delete(session, account_id, mhr_num, reg_type, draft_data):
     draft_number = draft['draftNumber']
     delete_draft = MhrDraft.delete(draft_number)
     assert delete_draft
+
+
+@pytest.mark.parametrize('account_id, user_id, draft_data', TEST_DRAFT_DATA_NEW_MH)
+def test_create_new_mh_draft(session, account_id, user_id, draft_data):
+    """Assert that a save new MH registration draft as part of submitting a registration works as expected."""
+    json_data = copy.deepcopy(draft_data)
+    new_draft: MhrDraft = MhrDraft.create_from_mhreg_json(json_data, account_id, user_id)
+    new_draft.save()
+    assert new_draft.mhr_number
+    assert new_draft.draft_number
+    assert new_draft.id > 0
+    assert new_draft.account_id == account_id
+    assert new_draft.user_id == user_id
+    assert new_draft.create_ts
+    assert new_draft.registration_type == MhrRegistrationTypes.MHREG
 
 
 @pytest.mark.parametrize('status, draft_num, reg_type, draft_data, client_ref', TEST_UPDATE_DRAFT_DATA)

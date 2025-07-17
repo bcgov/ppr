@@ -28,6 +28,31 @@ from mhr_api.utils.logging import logger
 
 from .db import db
 
+
+QUERY_PKEYS = """
+select get_mhr_draft_number() AS draft_num,
+       nextval('mhr_draft_id_seq') AS draft_id
+"""
+QUERY_NEXT_MHR_NUMBER = """
+select get_mhr_number() AS mhr_number
+"""
+QUERY_REUSE_MHR_NUMBER = """
+select min(d.mhr_number), 'X'
+  from mhr_drafts d
+ where d.registration_type = 'MHREG'
+   and d.create_ts > now() - interval '30 days'
+   and d.mhr_number is not null
+   and left(d.draft_number, 1) != 'P'
+   and not exists (select r.id
+                     from mhr_registrations r
+                    where r.registration_type = 'MHREG'
+                      and r.mhr_number = d.mhr_number)
+   and not exists (select d2.id
+                     from mhr_drafts d2
+                    where d2.registration_type = 'MHREG'
+                      and left(d2.draft_number, 1) = 'P'
+                      and d2.mhr_number = d.mhr_number)
+"""
 QUERY_ACCOUNT_DRAFTS_LIMIT = " FETCH FIRST :max_results_size ROWS ONLY"
 QUERY_ACCOUNT_DRAFTS_BASE = """
 SELECT d.draft_number, d.create_ts, d.registration_type,
@@ -332,7 +357,12 @@ class MhrDraft(db.Model):
         draft = None
         if draft_number:
             draft = cls.find_by_draft_number(draft_number, False)
-        if draft:
+        # Preserve to track reused mhr numbers.
+        if draft and draft.mhr_number and draft.registration_type == MhrRegistrationTypes.MHREG:
+            draft.account_id = "SYSTEM"
+            db.session.add(draft)
+            db.session.commit()
+        elif draft:
             db.session.delete(draft)
             db.session.commit()
         return draft
@@ -372,6 +402,38 @@ class MhrDraft(db.Model):
             draft.user_id = user_id
         if json_data.get("registration") and "mhrNumber" in json_data["registration"]:
             draft.mhr_number = json_data["registration"]["mhrNumber"]
+        # Not null constraint: should be removed if staff can submit requests without an account id.
+        if not account_id:
+            draft.account_id = "NA"
+        return draft
+
+    @staticmethod
+    def create_from_mhreg_json(json_data, account_id: str, user_id: str = None):
+        """Create a draft object from a new home registration json object: map json to db."""
+        draft: MhrDraft = MhrDraft.find_draft(json_data)
+        if not draft:
+            draft: MhrDraft = MhrDraft(
+                account_id=account_id, user_id=user_id, registration_type=MhrRegistrationTypes.MHREG, draft=json_data
+            )
+            result = db.session.execute(text(QUERY_PKEYS))
+            row = result.first()
+            draft.draft_number = str(row[0])
+            draft.id = int(row[1])
+            draft.create_ts = model_utils.now_ts()
+        else:
+            draft.account_id = account_id
+            draft.user_id = user_id
+            draft.registration_type = MhrRegistrationTypes.MHREG
+            draft.draft = json_data
+        if not draft.mhr_number:
+            mhr_result = db.session.execute(text(QUERY_REUSE_MHR_NUMBER))
+            mhr_row = mhr_result.first()
+            if mhr_row[0]:
+                draft.mhr_number = str(mhr_row[0])
+        if not draft.mhr_number:
+            mhr_result2 = db.session.execute(text(QUERY_NEXT_MHR_NUMBER))
+            mhr_row2 = mhr_result2.first()
+            draft.mhr_number = str(mhr_row2[0])
         # Not null constraint: should be removed if staff can submit requests without an account id.
         if not account_id:
             draft.account_id = "NA"

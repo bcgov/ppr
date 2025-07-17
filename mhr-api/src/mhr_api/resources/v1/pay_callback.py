@@ -86,9 +86,9 @@ def post_payment_callback(invoice_id: str):  # pylint: disable=too-many-return-s
             logger.warning(f"No draft or search ID found matching invoice {invoice_id}, ignoring notification.")
             return {}, HTTPStatus.OK
         base_reg: MhrRegistration = None
-        if draft.mhr_number:
+        if draft.mhr_number and draft.registration_type != MhrRegistrationTypes.MHREG:
             base_reg = MhrRegistration.find_all_by_mhr_number(draft.mhr_number, draft.account_id, True)
-        if not base_reg and draft.mhr_number:
+        if not base_reg and draft.mhr_number and draft.registration_type != MhrRegistrationTypes.MHREG:
             error_msg: str = PAY_NO_REG_MSG.format(mhr_num=draft.mhr_number)
             return pay_callback_error("04", invoice_id, HTTPStatus.NOT_FOUND, error_msg)
         logger.info(f"Request valid for invoice id={invoice_id} draft id={draft.id}, creating registration.")
