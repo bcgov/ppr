@@ -28,7 +28,6 @@ from mhr_api.utils.logging import logger
 
 from .db import db
 
-
 QUERY_PKEYS = """
 select get_mhr_draft_number() AS draft_num,
        nextval('mhr_draft_id_seq') AS draft_id
