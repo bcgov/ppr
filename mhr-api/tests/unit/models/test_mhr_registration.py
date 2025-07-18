@@ -814,7 +814,9 @@ def test_create_new_from_json(session):
     """Assert that the new MHR registration is created from json data correctly."""
     json_data = copy.deepcopy(REGISTRATION)
     json_data['ownLand'] = True
-    registration: MhrRegistration = MhrRegistration.create_new_from_json(json_data, 'PS12345')
+    draft: MhrDraft = MhrDraft.create_from_mhreg_json(json_data, 'PS12345', 'test-user')
+    json_data["mhrNumber"] = draft.mhr_number
+    registration: MhrRegistration = MhrRegistration.create_new_from_json(json_data, draft, 'PS12345', 'test-user', STAFF_ROLE)
     assert registration.id > 0
     assert registration.mhr_number
     assert registration.registration_ts
@@ -827,7 +829,7 @@ def test_create_new_from_json(session):
     assert registration.draft_id == registration.draft.id
     assert registration.draft.draft_number
     assert registration.draft.registration_type == registration.registration_type
-    assert registration.draft.create_ts == registration.registration_ts
+    assert registration.draft.create_ts
     assert registration.draft.account_id == registration.account_id
     assert registration.parties
     for party in registration.parties:
@@ -878,7 +880,9 @@ def test_save_new(session):
     """Assert that saving a new MHR registration is working correctly."""
     json_data = copy.deepcopy(REGISTRATION)
     json_data['documentId'] = '88878888'
-    registration: MhrRegistration = MhrRegistration.create_new_from_json(json_data, 'PS12345')
+    draft: MhrDraft = MhrDraft.create_from_mhreg_json(json_data, 'PS12345', 'test-user')
+    json_data["mhrNumber"] = draft.mhr_number
+    registration: MhrRegistration = MhrRegistration.create_new_from_json(json_data, draft, 'PS12345', 'test-user', STAFF_ROLE)
     registration.save()
     for party in registration.parties:
         assert party.compressed_name

@@ -71,6 +71,7 @@ PAYMENT_REQUEST_TEMPLATE = {
     "businessInfo": {"corpType": "MHR"},
     "details": [{"label": "", "value": ""}],
 }
+REG_NUM_DETAIL = {"label": "Registration Number:", "value": ""}
 PRIORITY_FILING_TYPE = {"filingTypeCode": "PRIMH", "priority": True, "futureEffective": False, "quantity": 1}
 CC_REQUEST_PAYMENT_INFO = {"methodOfPayment": "DIRECT_PAY"}
 
@@ -389,7 +390,7 @@ class SBCPaymentClient(BaseClient):
 
         return data
 
-    def update_payload_data(self, data: dict) -> dict:
+    def update_payload_data(self, data: dict, trans_id: str = None) -> dict:
         """Explicitly set payment request as CC payment if requested."""
         if self.cc_payment:
             logger.info("Setting pay api payload payment method as CC.")
@@ -397,6 +398,10 @@ class SBCPaymentClient(BaseClient):
         if self.detail_label and self.detail_value:
             data["details"][0]["label"] = self.detail_label
             data["details"][0]["value"] = self.detail_value
+            if trans_id:
+                detail = copy.deepcopy(REG_NUM_DETAIL)
+                detail["value"] = trans_id
+                data["details"].append(detail)
         else:
             del data["details"]
         return data
@@ -408,8 +413,8 @@ class SBCPaymentClient(BaseClient):
         data = SBCPaymentClient.create_payment_data(
             transaction_type, quantity, mhr_id, client_reference_id, processing_fee
         )
-        data = self.update_payload_data(data)
-        logger.debug("create paymnent payload:")
+        data = self.update_payload_data(data, mhr_id)
+        logger.debug("create payment payload:")
         logger.debug(json.dumps(data))
         invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data)
         # logger.debug(invoice_data)
@@ -440,9 +445,9 @@ class SBCPaymentClient(BaseClient):
         """Submit a staff registration payment request for the MHR API transaction."""
         logger.debug("Setting up staff registration data.")
         data = SBCPaymentClient.create_payment_staff_data(transaction_info, client_reference_id)
-        data = self.update_payload_data(data)
-        logger.debug("staff registration create payment payload: ")
-        logger.debug(json.dumps(data))
+        data = self.update_payload_data(data, transaction_info.get("transactionId"))
+        logger.info("staff registration create payment payload: ")
+        logger.info(json.dumps(data))
         invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data, include_account=True)
         return SBCPaymentClient.build_pay_reference(invoice_data, self.api_url, self.account_id)
 

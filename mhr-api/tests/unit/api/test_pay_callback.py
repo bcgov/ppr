@@ -170,7 +170,10 @@ def test_pay_callback(session, client, jwt, desc, status, draft_json, mhr_num, r
         new_reg: MhrRegistration = None
         base_reg: MhrRegistration = None
         if reg_type == MhrRegistrationTypes.MHREG.value:
-            new_reg = cc_payment_utils.save_new_cc_draft(json_data)
+            new_draft: MhrDraft = MhrDraft.create_from_mhreg_json(json_data, "PS12345", "username@idir")
+            new_draft.save()
+            json_data["mhrNumber"] = new_draft.mhr_number
+            new_reg = cc_payment_utils.save_new_cc_draft(json_data, new_draft)
         else:
             json_data["mhrNumber"] = mhr_num
             base_reg: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, "PS12345", True)

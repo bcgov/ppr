@@ -44,8 +44,8 @@ PAY_DETAILS_SEARCH = {
     'value': '123456789'
 }
 PAY_DETAILS_REGISTRATION = {
-    'label': 'Reg Number',
-    'value': '100468B'
+    'label': 'MH Registration Type:',
+    'value': 'New MH Registration'
 }
 PAY_DETAILS_CC = {
     'label': 'CC TEST',
@@ -182,7 +182,7 @@ TEST_PAYMENT_MOCK = [
     ('Valid no detail', SELECT_MHR_ONLY, MOCK_URL_NO_KEY, None, False),
     ('Unauthorized', SELECT_MHR_ONLY, MOCK_URL, None, True)
 ]
-# testdata pattern is ({desc}, {type}, {trans_id}, {client_id}, {quantity}, cc)
+# testdata pattern is ({desc}, {reg_type}, {trans_id}, {client_id}, {quantity}, cc)
 TEST_PAYMENT_DATA = [
     ('MHR Registration', TransactionTypes.REGISTRATION, '1234', 'UT-00001', 1, False),
     ('MHR Registration no client id', TransactionTypes.REGISTRATION, '1234', None, 1, False),
@@ -400,15 +400,15 @@ def test_payment_search_mock(session, client, jwt, desc, selection, pay_url, det
         assert pay_data['receipt']
 
 
-@pytest.mark.parametrize('desc,type,trans_id,client_id,quantity,cc', TEST_PAYMENT_DATA)
-def test_create_payment_data(session, client, jwt, desc, type, trans_id, client_id, quantity, cc):
+@pytest.mark.parametrize('desc,reg_type,trans_id,client_id,quantity,cc', TEST_PAYMENT_DATA)
+def test_create_payment_data(session, client, jwt, desc, reg_type, trans_id, client_id, quantity, cc):
     """Assert that the payment-request body setup is as expected for a non staff transactions."""
     # setup
     token = helper_create_jwt(jwt, [MHR_ROLE])
     details: dict = PAY_DETAILS_REGISTRATION if not cc else PAY_DETAILS_CC
     pay_client = SBCPaymentClient(jwt=token, account_id='PS12345', details=details)
-    data = pay_client.create_payment_data(type, quantity, trans_id, client_id)
-    data = pay_client.update_payload_data(data)
+    data = pay_client.create_payment_data(reg_type, quantity, trans_id, client_id)
+    data = pay_client.update_payload_data(data, trans_id)
     # check
     # current_app.logger.info(data)
     assert data
@@ -427,6 +427,11 @@ def test_create_payment_data(session, client, jwt, desc, type, trans_id, client_
         assert data.get("paymentInfo") == CC_REQUEST_PAYMENT_INFO
     else:
         assert not data.get("paymentInfo")
+    if trans_id:
+        assert len(data.get("details")) == 2
+        assert data["details"][1].get("value") == trans_id
+    else:
+        assert len(data.get("details")) == 1
 
 
 @pytest.mark.parametrize('desc,type,trans_id,client_id,quantity,cc', TEST_PAYMENT_DATA)
@@ -512,7 +517,7 @@ def test_create_payment_data_staff(client, jwt, type, trans_id, client_id, routi
  
     # test
     data = pay_client.create_payment_staff_data(transaction_info, client_id)
-    data = pay_client.update_payload_data(data)
+    data = pay_client.update_payload_data(data, transaction_info.get("transactionId"))
     # check
     assert data
     if waive_fees:
@@ -547,6 +552,11 @@ def test_create_payment_data_staff(client, jwt, type, trans_id, client_id, routi
         assert data.get("paymentInfo") == CC_REQUEST_PAYMENT_INFO
     else:
         assert not data.get("paymentInfo")
+    if transaction_info.get("transactionId"):
+        assert len(data.get("details")) == 2
+        assert data["details"][1].get("value") == trans_id
+    else:
+        assert len(data.get("details")) == 1
 
 
 @pytest.mark.parametrize('type,trans_id,client_id,routing_slip,bcol_num,dat_num,waive_fees,priority,cc',

@@ -541,51 +541,34 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         return registration
 
     @staticmethod
-    def create_new_from_json(json_data, account_id: str = None, user_id: str = None, user_group: str = None):
+    def create_new_from_json(
+        json_data: dict, draft: MhrDraft, account_id: str = None, user_id: str = None, user_group: str = None
+    ):
         """Create a new registration object from dict/json."""
-        # Create or update draft.
-        draft = MhrDraft.find_draft(json_data)
-        registration: MhrRegistration = MhrRegistration()
-        if account_id == STAFF_ROLE and json_data.get("mhrNumber"):
-            logger.info("New staff MH reg using provided MHR number: " + json_data.get("mhrNumber"))
-            reg_vals: MhrRegistration = reg_utils.get_change_generated_values(
-                MhrRegistration(), draft, user_group, json_data.get("documentId")
-            )
-            registration.id = reg_vals.id  # pylint: disable=invalid-name; allow name of id.
-            registration.doc_reg_number = reg_vals.doc_reg_number
-            registration.registration_type = json_data.get("registrationType")
-            registration.mhr_number = json_data.get("mhrNumber")
-            if json_data.get("documentId"):
-                registration.doc_id = json_data.get("documentId")
-            else:
-                registration.doc_id = reg_vals.doc_id
-            registration.doc_pkey = reg_vals.doc_pkey
-        else:
-            reg_vals: MhrRegistration = reg_utils.get_generated_values(
-                MhrRegistration(), draft, user_group, json_data.get("documentId")
-            )
-            registration.id = reg_vals.id  # pylint: disable=invalid-name; allow name of id.
-            registration.mhr_number = reg_vals.mhr_number
-            registration.doc_reg_number = reg_vals.doc_reg_number
-            registration.doc_pkey = reg_vals.doc_pkey
-        registration.registration_ts = model_utils.now_ts()
-        registration.registration_type = MhrRegistrationTypes.MHREG
-        registration.status_type = MhrRegistrationStatusTypes.ACTIVE
-        registration.account_id = account_id
-        registration.user_id = user_id
+        # Draft always exists.
+        registration: MhrRegistration = MhrRegistration(
+            registration_type=MhrRegistrationTypes.MHREG,
+            registration_ts=model_utils.now_ts(),
+            status_type=MhrRegistrationStatusTypes.ACTIVE,
+            account_id=account_id,
+            user_id=user_id,
+            mhr_number=draft.mhr_number,
+        )
+        logger.info(f"New MH reg for MHR number: {draft.mhr_number}")
+        reg_vals: MhrRegistration = reg_utils.get_change_generated_values(
+            MhrRegistration(), draft, user_group, json_data.get("documentId")
+        )
+        registration.id = reg_vals.id  # pylint: disable=invalid-name; allow name of id.
+        registration.doc_reg_number = reg_vals.doc_reg_number
+        registration.doc_pkey = reg_vals.doc_pkey
         if json_data.get("documentId"):
             registration.doc_id = json_data.get("documentId")
         else:
             registration.doc_id = reg_vals.doc_id
             json_data["documentId"] = registration.doc_id
         registration.reg_json = json_data
-        if not draft:
-            registration.draft_number = reg_vals.draft_number
-            registration.draft_id = reg_vals.draft_id
-            draft = MhrDraft.create_from_registration(registration, json_data)
-        else:
-            draft.draft = json_data
-            registration.draft_id = draft.id
+        draft.draft = json_data
+        registration.draft_id = draft.id
         registration.draft = draft
         if "clientReferenceId" in json_data:
             registration.client_reference_id = json_data["clientReferenceId"]

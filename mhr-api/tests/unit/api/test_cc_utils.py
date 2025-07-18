@@ -157,17 +157,21 @@ def test_new_registration(session, pay_ref, account_id, username, usergroup, dra
     json_data["registrationType"] = reg_type
     if json_data.get("mhrNumber"):
         del json_data["mhrNumber"]
+    new_draft: MhrDraft = None
     json_data = setup_cc_draft(json_data, pay_ref, account_id, username, usergroup)
-    if draft_num:
+    if not mhr_num and reg_type == MhrRegistrationTypes.MHREG:
+        new_draft: MhrDraft = MhrDraft.create_from_mhreg_json(json_data, account_id, username)
+        new_draft.save()
+    elif draft_num:
         json_data["draftNumber"] = draft_num
-    new_reg: MhrRegistration = cc_payment_utils.save_new_cc_draft(json_data)
+    new_reg: MhrRegistration = cc_payment_utils.save_new_cc_draft(json_data, new_draft)
     assert not new_reg.id
     assert new_reg.draft
     assert new_reg.reg_json
     draft: MhrDraft = new_reg.draft
     assert draft.draft_number.startswith(DRAFT_PAY_PENDING_PREFIX)
     assert draft.user_id == pay_ref.get("invoiceId")
-    assert not draft.mhr_number
+    assert draft.mhr_number
     assert draft.registration_type == reg_type
     reg_json = new_reg.reg_json
     assert reg_json.get("paymentPending")
@@ -218,7 +222,10 @@ def test_create_registration(session, draft_json, mhr_num, reg_type, invoice_id)
     new_reg: MhrRegistration = None
     base_reg: MhrRegistration = None
     if reg_type == MhrRegistrationTypes.MHREG.value:
-        new_reg = cc_payment_utils.save_new_cc_draft(json_data)
+        new_draft: MhrDraft = MhrDraft.create_from_mhreg_json(json_data, "PS12345", "username@idir")
+        new_draft.save()
+        json_data["mhrNumber"] = new_draft.mhr_number
+        new_reg = cc_payment_utils.save_new_cc_draft(json_data, new_draft)
     else:
         json_data["mhrNumber"] = mhr_num
         base_reg: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_num, "PS12345", True)

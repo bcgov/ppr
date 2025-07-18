@@ -160,7 +160,7 @@ def save_change_cc_draft(base_reg: MhrRegistration, json_data: dict) -> MhrRegis
     return registration
 
 
-def save_new_cc_draft(json_data: dict) -> MhrRegistration:
+def save_new_cc_draft(json_data: dict, existing: MhrDraft = None) -> MhrRegistration:
     """
     New registration with credit card payment create/update draft. Returns an unsaved registration
     with response JSON.
@@ -169,7 +169,7 @@ def save_new_cc_draft(json_data: dict) -> MhrRegistration:
         json_data (dict): Request payload updated with some extra registration information (payment).
     """
     # Create or update draft.
-    draft: MhrDraft = MhrDraft.find_draft(json_data)
+    draft: MhrDraft = MhrDraft.find_draft(json_data) if not existing else existing
     registration: MhrRegistration = MhrRegistration()
     json_data["paymentPending"] = True
     if draft:
@@ -178,6 +178,8 @@ def save_new_cc_draft(json_data: dict) -> MhrRegistration:
     else:
         draft = create_new_draft(json_data)
     draft.update_ts = model_utils.now_ts()
+    if not draft.mhr_number:
+        draft.mhr_number = json_data.get("mhrNumber")
     draft.user_id = json_data["payment"].get("invoiceId")
     draft.save()
     registration.draft = draft
@@ -198,17 +200,10 @@ def create_basic_registration(draft: MhrDraft) -> MhrRegistration:
     registration: MhrRegistration = MhrRegistration(
         registration_type=draft.registration_type, account_id=draft.account_id, user_id=draft_json.get("username")
     )
-    reg_vals: MhrRegistration = None
-    if draft.registration_type == MhrRegistrationTypes.MHREG.value:
-        reg_vals = reg_utils.get_generated_values(
-            MhrRegistration(), draft, draft_json.get("usergroup"), draft_json.get("documentId")
-        )
-        registration.mhr_number = reg_vals.mhr_number
-    else:
-        reg_vals = reg_utils.get_change_generated_values(
-            MhrRegistration(), draft, draft_json.get("usergroup"), draft_json.get("documentId")
-        )
-        registration.mhr_number = draft.mhr_number
+    reg_vals: MhrRegistration = reg_utils.get_change_generated_values(
+        MhrRegistration(), draft, draft_json.get("usergroup"), draft_json.get("documentId")
+    )
+    registration.mhr_number = draft.mhr_number
     registration.doc_reg_number = reg_vals.doc_reg_number
     registration.id = reg_vals.id  # pylint: disable=invalid-name; allow name of id.
     registration.doc_pkey = reg_vals.doc_pkey
