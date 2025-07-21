@@ -185,32 +185,61 @@
             </div>
           </div>
 
-          <h2 class="pt-14">
-            Registering Party for this Amendment
-            <v-tooltip
-              class="pa-2"
-              content-class="top-tooltip"
-              location="top"
-              transition="fade-transition"
-            >
-              <template #activator="{ props }">
-                <v-icon
-                  class="ml-1"
-                  color="primary"
-                  v-bind="props"
+          <v-row no-gutters class="pt-14">
+            <v-col cols="9">
+              <h2 id="registering-party-change-title">
+                Registering Party for this Amendment
+                <v-tooltip
+                  class="pa-2"
+                  content-class="top-tooltip"
+                  location="top"
+                  transition="fade-transition"
                 >
-                  mdi-information-outline
-                </v-icon>
-              </template>
-              <div class="pt-2 pb-2">
-                {{ tooltipTxt }}
-              </div>
-            </v-tooltip>
-          </h2>
+                  <template #activator="{ props }">
+                    <v-icon
+                      class="ml-1"
+                      color="primary"
+                      v-bind="props"
+                    >
+                      mdi-information-outline
+                    </v-icon>
+                  </template>
+                  <div class="pt-2 pb-2">
+                    {{ tooltipTxt }}
+                  </div>
+                </v-tooltip>
+              </h2>
+            </v-col>
+            <v-col cols="3">
+              <v-btn
+                variant="plain"
+                color="primary"
+                class="smaller-button edit-btn float-right pr-0"
+                :ripple="false"
+                :disabled="registeringOpen"
+                @click="changeRegisteringParty = true"
+              >
+                <v-icon size="small">mdi-pencil</v-icon>
+                <span>Change Registering Party</span>
+              </v-btn>
+            </v-col>
+          </v-row>
+
+          <v-row
+            v-if="isEmailRequired"
+            class="no-gutters pb-2"
+          >
+            <v-col class="mt-0 pt-0">
+              <span class="error-text fs-14">*Email address is required. Click ‘Edit’ in the dropdown to add one.</span>
+            </v-col>
+          </v-row>
+
           <registering-party-change
             class="pt-4"
+            :change-party-prop="changeRegisteringParty"
             :set-show-error-bar="showErrors && registeringOpen"
             @registering-party-open="regOpenClose($event)"
+            @email-required-validation="isEmailRequired = $event"
           />
           <caution-box
             v-if="showRegMsg"
@@ -352,6 +381,8 @@ export default defineComponent({
     const localState = reactive({
       collateralSummary: '',
       registeringOpen: false,
+      changeRegisteringParty: false,
+      isEmailRequired: false,
       showRegMsg: false,
       financingStatementDate: null as Date,
       options: unsavedChangesDialog as DialogOptionsIF,
@@ -548,6 +579,9 @@ export default defineComponent({
     }
 
     const regOpenClose = (open: boolean): void => {
+      if (!open) {
+        localState.changeRegisteringParty = false
+      }
       localState.registeringOpen = open
       localState.showErrors = false
       setShowWarning()
@@ -576,7 +610,8 @@ export default defineComponent({
     }
 
     const submitButton = (): void => {
-      if (!localState.validFolio || !localState.certifyInformationValid || localState.registeringOpen) {
+      if (!localState.validFolio || !localState.certifyInformationValid || localState.registeringOpen ||
+        localState.isEmailRequired) {
         localState.showErrors = true
         scrollToInvalid()
         return
@@ -661,6 +696,16 @@ export default defineComponent({
           ...fees.value[FeeSummaryTypes.AMEND],
           waived: val.option === 0 || hasNoCharge(localState.registrationTypeUI)
         }})
+    })
+
+    // Watch for changes to the changeRegisteringParty state and scroll to the title
+    watch(() => localState.registeringOpen, (val) => {
+      if (!val) {
+        document?.querySelector('#registering-party-change-title')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        })
+      }
     })
 
     return {
