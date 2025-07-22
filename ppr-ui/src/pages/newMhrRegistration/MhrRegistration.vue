@@ -337,19 +337,22 @@ export default defineComponent({
         if (!mhrSubmission.error && mhrSubmission?.mhrNumber) {
           resetAllValidations()
           setShowGroups(false)
-          const newRegItem: RegTableNewItemI = {
-            addedReg: (isMhrCorrection.value || isMhrReRegistration.value)
-             ? mhrSubmission.documentRegistrationNumber : mhrSubmission.mhrNumber,
-            addedRegParent: (isMhrCorrection.value || isMhrReRegistration.value)
-              ? getMhrInformation.value.mhrNumber : '',
-            addedRegSummary: mhrSubmission,
-            prevDraft: mhrSubmission.documentId
+
+          if (mhrSubmission?.paymentPending) {
+            goToPay(mhrSubmission.payment?.invoiceId, null, 'mhReg-0')
+          } else {
+            const newRegItem: RegTableNewItemI = {
+              addedReg: (isMhrCorrection.value || isMhrReRegistration.value)
+                ? mhrSubmission.documentRegistrationNumber : mhrSubmission.mhrNumber,
+              addedRegParent: (isMhrCorrection.value || isMhrReRegistration.value)
+                ? getMhrInformation.value.mhrNumber : '',
+              addedRegSummary: mhrSubmission,
+              prevDraft: mhrSubmission.documentId
+            }
+            setRegTableNewItem(newRegItem)
+            setUnsavedChanges(false)
+            goToDash()
           }
-          setRegTableNewItem(newRegItem)
-          setUnsavedChanges(false)
-          goToDash()
-        } else if (mhrSubmission?.paymentPending) {
-          goToPay(mhrSubmission.payment?.invoiceId, null, 'mhReg-0')
         } else {
           emitError(mhrSubmission?.error)
         }
