@@ -131,17 +131,17 @@ export const useInputRules = () => {
   const firstNameRules = (isOptional: boolean = false) => {
     return customRules(
       !isOptional ? required('Enter a first name') : [],
-      maxLength(15),
+      maxLength(50),
       invalidSpaces()
     )
   }
 
-  const middleNameRules = customRules(maxLength(15), invalidSpaces())
+  const middleNameRules = customRules(maxLength(50), invalidSpaces())
 
   const lastNameRules = (isOptional: boolean = false) => {
     return customRules(
       !isOptional ? required('Enter a last name') : [],
-      maxLength(25),
+      maxLength(50),
       invalidSpaces())
   }
 

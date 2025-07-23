@@ -1,4 +1,7 @@
 export default {
+  ConnectHeader: {
+    title: 'BC Registries and Online Services'
+  },
   ConnectFeeWidget: {
     feeSummary: {
       title: 'Fee Summary',

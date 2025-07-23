@@ -384,7 +384,7 @@ export default defineComponent({
 
     const firstNameRules = customRules(
       required('Enter a first name'),
-      maxLength(15),
+      maxLength(50),
       invalidSpaces()
     )
 
@@ -398,11 +398,11 @@ export default defineComponent({
       isPhone(14)
     )
 
-    const middleNameRules = customRules(maxLength(15), invalidSpaces())
+    const middleNameRules = customRules(maxLength(50), invalidSpaces())
 
     const lastNameRules = customRules(
       required('Enter a last name'),
-      maxLength(25),
+      maxLength(50),
       invalidSpaces())
 
     const businessNameRules = customRules(
