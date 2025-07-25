@@ -348,7 +348,7 @@ export default defineComponent({
       if (apiResponse === undefined || apiResponse?.error !== undefined) {
         emit('error', apiResponse?.error)
       } else if (apiResponse.paymentPending) {
-        goToPay(apiResponse.payment?.invoiceId, null, `pprReg-${apiResponse.baseRegistrationNumber}`)
+        goToPay(apiResponse.payment?.invoiceId, null, `pprReg-${apiResponse.documentId}`)
       } else {
         // set new added reg
         const newItem: RegTableNewItemI = {

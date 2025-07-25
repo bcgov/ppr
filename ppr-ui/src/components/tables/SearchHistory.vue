@@ -305,7 +305,7 @@ export default defineComponent({
         <v-table
           v-if="searchHistory"
           id="search-history-table"
-          height="20rem"
+          height="25rem"
           fixed-header
         >
           <template #default>
@@ -314,7 +314,7 @@ export default defineComponent({
               <th
                 v-for="header in headers"
                 :key="header.value"
-                class="px-1 py-0"
+                class="px-1 py-0 table-header"
                 :class="header.class"
               >
                 {{ header.text }}
@@ -336,7 +336,7 @@ export default defineComponent({
             >
               <td>
                 <v-icon
-                  class="pr-2 mt-n1"
+                  class="pl-4 pr-2 mt-n1"
                   color="#212529"
                   aria-hidden="false"
                   :aria-label="
@@ -345,7 +345,7 @@ export default defineComponent({
                 >
                   {{ isPprSearch(item) ? 'mdi-account-details' : 'mdi-home' }}
                 </v-icon>
-                <span aria-hidden="true">{{ displaySearchValue(item.searchQuery) }}</span>
+                <span class="pl-2" aria-hidden="true">{{ displaySearchValue(item.searchQuery) }}</span>
               </td>
               <td>
                   <span
@@ -571,6 +571,10 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 @import '@/assets/styles/theme.scss';
+.table-header:first-child {
+  padding-left: 24px!important;
+}
+
 .added-search-effect {
   background-color: $greenSelected;
   font-weight: bold;

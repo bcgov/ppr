@@ -185,6 +185,7 @@
   padding-top: 16px;
   padding-bottom: 16px;
   vertical-align: top;
+  overflow-wrap: anywhere;
 }
 
 .v-table:not(#registration-table, #search-history-table) > .v-table__wrapper {

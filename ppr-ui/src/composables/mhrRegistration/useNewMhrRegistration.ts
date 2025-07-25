@@ -411,7 +411,8 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
 
     if (!sortOptions?.status || sortOptions?.status === MhApiStatusTypes.DRAFT) {
       mhRegDrafts = mhrDrafts?.filter(draft =>
-        !draft.mhrNumber && [APIMhrTypes.MANUFACTURED_HOME_REGISTRATION, APIMhrTypes.REGISTRY_STAFF_ADMIN]
+        (!draft.mhrNumber || draft.paymentPending) &&
+        [APIMhrTypes.MANUFACTURED_HOME_REGISTRATION, APIMhrTypes.REGISTRY_STAFF_ADMIN]
           .includes(draft.registrationType as APIMhrTypes)
       )
     }

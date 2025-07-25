@@ -1303,7 +1303,10 @@ export default defineComponent({
             )
 
           if(transportPermitFilingResp?.paymentPending) {
-            goToPay(transportPermitFilingResp.payment?.invoiceId, null, `mhReg-${getMhrInformation.value.mhrNumber}`)
+            goToPay(
+              transportPermitFilingResp.payment?.invoiceId,
+              null,
+              `mhReg-${transportPermitFilingResp.draftNumber}`)
           }
 
           if (!transportPermitFilingResp?.error) {
@@ -1336,7 +1339,10 @@ export default defineComponent({
           )
 
         if(mhrTransferFiling?.paymentPending) {
-          goToPay(mhrTransferFiling.payment?.invoiceId, null, `mhReg-${getMhrInformation.value.mhrNumber}`)
+          goToPay(
+            mhrTransferFiling.payment?.invoiceId,
+            null,
+            `mhReg-${mhrTransferFiling.draftNumber}`)
         }
 
         if (!mhrTransferFiling.error) {

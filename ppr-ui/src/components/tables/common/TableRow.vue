@@ -724,7 +724,7 @@ export default defineComponent({
           />
           <!-- Locked Badges when payment pending -->
           <InfoChip
-            v-if="!isPpr && !isChild && item.mhrNumber && (item.statusType === MhApiStatusTypes.DRAFT)"
+            v-if="!isPpr && !isChild && item.mhrNumber && !item.statusType && item.paymentPending"
             action="PAYMENT PENDING"
           />
           <InfoChip
@@ -1018,7 +1018,7 @@ export default defineComponent({
                     <v-icon size="small">
                       mdi-delete
                     </v-icon>
-                    <span class="ml-1">Cancel Registration</span>
+                    <span class="ml-1">Delete Draft</span>
                   </v-list-item-subtitle>
                 </v-list-item>
               </v-list>
@@ -1395,7 +1395,7 @@ export default defineComponent({
                     <v-icon size="small">
                       mdi-delete
                     </v-icon>
-                    <span class="ml-1">Cancel Registration</span>
+                    <span class="ml-1">Delete Draft</span>
                   </v-list-item-subtitle>
                 </v-list-item>
               </v-list>

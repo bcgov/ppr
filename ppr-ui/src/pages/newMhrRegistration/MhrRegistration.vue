@@ -339,7 +339,7 @@ export default defineComponent({
           setShowGroups(false)
 
           if (mhrSubmission?.paymentPending) {
-            goToPay(mhrSubmission.payment?.invoiceId, null, 'mhReg-0')
+            goToPay(mhrSubmission.payment?.invoiceId, null, `mhReg-${mhrSubmission.draftNumber}`)
           } else {
             const newRegItem: RegTableNewItemI = {
               addedReg: (isMhrCorrection.value || isMhrReRegistration.value)

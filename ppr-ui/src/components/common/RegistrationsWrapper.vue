@@ -527,12 +527,9 @@ export default defineComponent({
           localState.myRegActionDialog = renewConfirmationDialog
           localState.myRegActionDialogDisplay = true
           break
+        case TableActions.CANCEL:
         case TableActions.DELETE:
           localState.myRegDeleteDialog = tableDeleteDialog
-          localState.myRegDeleteDialogDisplay = true
-          break
-        case TableActions.CANCEL:
-          localState.myRegDeleteDialog = tableCancelDialog
           localState.myRegDeleteDialogDisplay = true
           break
         case TableActions.REMOVE:
