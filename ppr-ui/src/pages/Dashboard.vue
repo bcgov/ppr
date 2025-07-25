@@ -270,7 +270,7 @@ import { computed, defineComponent, onMounted, onBeforeMount, reactive, toRefs, 
 import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { ProductStatus, RouteNames, SettingOptions } from '@/enums'
+import { APIMhrTypes, ProductStatus, RouteNames, SettingOptions } from '@/enums'
 import { getFeatureFlag } from '@/utils'
 import { searchHistory } from '@/utils/ppr-api-helper'
 import { getQualifiedSupplier, updateQualifiedSupplier } from '@/utils/mhr-api-helper'
@@ -329,6 +329,7 @@ export default defineComponent({
       getSearchHistory,
       getUserServiceFee,
       getRegTableBaseRegs,
+      getRegTableDraftsBaseReg,
       getMhRegTableBaseRegs,
       getSearchHistoryLength,
       isRoleQualifiedSupplier,
@@ -519,7 +520,8 @@ export default defineComponent({
     const anchorParamHandler = (anchorId: string): void => {
       const match = anchorId.match(/^([a-zA-Z]+)-([a-zA-Z0-9]+)$/)
       const prefix = match ? match[1] : null
-      const id = match ? match[2] : null
+      const id = match ? trimIdentifier(match[2]) : null
+      const pprRegistrations = [...getRegTableDraftsBaseReg.value, ...getRegTableBaseRegs.value]
 
       switch (prefix) {
         case 'search':
@@ -528,15 +530,34 @@ export default defineComponent({
           break
         case 'pprReg':
           // handle pprReg
-          if (getRegTableBaseRegs.value)  {
-            const registration = getRegTableBaseRegs.value?.find(reg => reg.consumedDraftNumber === id) ||
-              getRegTableBaseRegs.value.find(reg => reg.registrationNumber === id) ||
-              getRegTableBaseRegs.value.find(reg => reg.registrationNumber)
+          if (pprRegistrations)  {
+            let registration
 
-            if (registration?.changes?.length) {
-              addedRegHandler(registration.changes[0].registrationNumber, registration.registrationNumber)
-            } else if (registration?.registrationNumber) {
-              addedRegHandler(registration?.registrationNumber)
+            // Find the registration in the MHR base registrations
+            for (const reg of pprRegistrations) {
+              if ([
+                trimIdentifier(reg.consumedDraftNumber),
+                trimIdentifier(reg.documentId),
+              ].includes(id)) {
+                registration = reg
+              }
+              if (Array.isArray(reg.changes)) {
+                const childReg = reg.changes.find((change: any) =>
+                  trimIdentifier(change.consumedDraftNumber) === id || trimIdentifier(change.documentId) === id
+                )
+                if (childReg) {
+                  registration = childReg
+                }
+              }
+            }
+
+            if(registration) {
+              if (registration?.baseRegistrationNumber) {
+                addedRegHandler(
+                  (registration.registrationNumber || registration.documentId),
+                  registration.baseRegistrationNumber
+                )
+              } else addedRegHandler(registration.documentId || registration.registrationNumber)
             }
           }
           break
@@ -546,15 +567,28 @@ export default defineComponent({
 
           // handle mhReg
           if (getMhRegTableBaseRegs.value) {
-            const registration = getMhRegTableBaseRegs.value?.find(reg => reg.consumedDraftNumber === id) ||
-              getMhRegTableBaseRegs.value.find(reg => reg.mhrNumber === id) ||
-              getMhRegTableBaseRegs.value.find(reg => reg.mhrNumber)
+            let registration
 
-            if (registration?.changes?.length) {
-              addedRegHandler(registration.changes[0].documentRegistrationNumber, registration.mhrNumber)
-            } else if (registration?.mhrNumber) {
-              addedRegHandler(registration.mhrNumber)
+            // Find the registration in the MHR base registrations
+            for (const reg of getMhRegTableBaseRegs.value) {
+              if ([reg.consumedDraftNumber, reg.mhrNumber, trimIdentifier(reg.draftNumber)].includes(id)) {
+                registration = reg
+              }
+              if (Array.isArray(reg.changes)) {
+                const childReg = reg.changes.find((change: any) =>
+                  change?.consumedDraftNumber === id ||
+                  trimIdentifier(change.draftNumber) === id
+                )
+                if (childReg) {
+                  registration = childReg
+                }
+              }
             }
+
+            if (registration.registrationType !== APIMhrTypes.MANUFACTURED_HOME_REGISTRATION) {
+              addedRegHandler(registration.documentRegistrationNumber || registration.draftNumber,
+                registration.mhrNumber)
+            } else addedRegHandler(registration.mhrNumber)
           }
           break
         default:
@@ -592,6 +626,11 @@ export default defineComponent({
       setTimeout( () => {
         setRegTableNewItem({})
       }, 4500)
+    }
+
+    /** Returns a trimmed identifier (removes non-numeric characters) */
+    const trimIdentifier = (identifier: string): string => {
+      return identifier ? identifier.replace(/\D+/g, '') : undefined
     }
 
     watch(() => props.appReady, (val: boolean) => {

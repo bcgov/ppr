@@ -649,8 +649,8 @@ export default defineComponent({
       triggerAddressErrors: false,
       isHelpPanelOpen: false,
       displayPhone: props.editHomeOwner !== null ? props.editHomeOwner.phoneNumber : '',
-      firsNameRules: customRules(required('Enter a first name'), maxLength(15)),
-      lastNameRules: customRules(required('Enter a last name'), maxLength(25)),
+      firsNameRules: customRules(required('Enter a first name'), maxLength(50)),
+      lastNameRules: customRules(required('Enter a last name'), maxLength(50)),
       orgNameRules: customRules(
         required('Enter a business or organization name'),
         maxLength(70)

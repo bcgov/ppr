@@ -1491,6 +1491,7 @@ export default defineComponent({
   .owner-icon-name {
     display: flex;
     align-items: flex-start;
+    overflow-wrap: anywhere;
 
     div {
       word-break: break-word;

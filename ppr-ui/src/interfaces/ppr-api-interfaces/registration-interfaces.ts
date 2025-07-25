@@ -103,6 +103,7 @@ export interface MhrDraftIF {
   draftNumber?: string
   lastUpdateDateTime?: string
   statusType?: string
+  paymentPending?: boolean
 }
 
 export interface DraftResultIF {
