@@ -213,6 +213,7 @@ export default defineNuxtConfig({
       keycloakAuthUrl: process.env.VUE_APP_KEYCLOAK_AUTH_URL || '',
       keycloakRealm: process.env.VUE_APP_KEYCLOAK_REALM || '',
       keycloakClientId: process.env.VUE_APP_KEYCLOAK_CLIENTID || '',
+      sessionIdleTimeout: parseInt(process.env.NUXT_CONNECT_SESSION_INACTIVITY_TIMEOUT!) || 7200000,
       appNameDisplay: 'assets-ui'
     }
   }
