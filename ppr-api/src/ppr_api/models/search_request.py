@@ -374,62 +374,43 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         return search
 
     @classmethod
-    def find_all_by_account_id(
-        cls, account_id: str = None, from_ui: bool = False
-    ):  # pylint: disable=too-many-branches, too-many-locals
+    def find_all_by_account_id(cls, account_id: str, history_params: dict):
         """Return a search history summary list of searches executed by an account."""
         history_list = []
-        if account_id:
-            query = search_utils.ACCOUNT_SEARCH_HISTORY_DATE_QUERY.replace("?", account_id)
-            if from_ui:
-                query = search_utils.ACCOUNT_SEARCH_HISTORY_DATE_QUERY_NEW.replace("?", account_id)
-            if search_utils.GET_HISTORY_DAYS_LIMIT <= 0:
-                query = search_utils.ACCOUNT_SEARCH_HISTORY_QUERY.replace("?", account_id)
-                if from_ui:
-                    query = search_utils.ACCOUNT_SEARCH_HISTORY_QUERY_NEW.replace("?", account_id)
-            rows = None
-            try:
-                result = db.session.execute(text(query))
-                rows = result.fetchall()
-            except Exception as db_exception:  # noqa: B902; return nicer error
-                logger.error("DB find_all_by_account_id exception: " + str(db_exception))
-                raise DatabaseException(db_exception) from db_exception
-            if rows is not None:
-                for row in rows:
-                    search_id = str(row[0])
-                    selected_value = row[9]
-                    select_size = int(selected_value) if selected_value else 0
-                    search_ts = row[1]
-                    # Signal UI report pending if async report is not yet available.
-                    if row[7] is not None and row[8] is None:
-                        search_id += "_" + REPORT_STATUS_PENDING
-                    search = {
-                        "searchId": search_id,
-                        "searchDateTime": model_utils.format_ts(search_ts),
-                        "searchQuery": row[2],
-                        "totalResultsSize": int(row[3]),
-                        "returnedResultsSize": int(row[4]),
-                        "selectedResultsSize": select_size,
-                        "username": str(row[10]),
-                    }
-                    if row[5]:
-                        search["exactResultsSize"] = int(row[5])
-                    else:
-                        search["exactResultsSize"] = 0
-                    history_list.append(search)
-                    if from_ui:
-                        # if api_result is null then the selections have not been finished
-                        search["inProgress"] = not row[11] and row[11] != [] and search["totalResultsSize"] > 0
-                        search["userId"] = str(row[12])
-                        if row[13] and int(row[13]) == PAY_PENDING:
-                            search["paymentPending"] = True
-                            search["invoiceId"] = str(row[14]) if row[14] else ""
-                            search["reportAvailable"] = False
-                        elif not search.get("inProgress") and (row[8] or model_utils.report_retry_elapsed(search_ts)):
-                            search["reportAvailable"] = True
-                        else:
-                            search["reportAvailable"] = False
+        query: str = build_search_history_query(account_id, history_params)
+        page_offset = history_params.get("page_number")
+        page_size = search_utils.ACCOUNT_SEARCH_HISTORY_MAX_SIZE
+        if page_offset <= 1:
+            page_offset = 0
+        else:
+            page_offset = (page_offset - 1) * page_size
+        query_params = {"query_account": account_id, "page_size": page_size, "page_offset": page_offset}
+        rows = None
+        from_ui: bool = history_params.get("from_ui")
+        count = SearchRequest.get_account_history_count(account_id)
+        if count < 1:
+            return history_list
+        try:
+            result = db.session.execute(text(query), query_params)
+            rows = result.fetchall()
+        except Exception as db_exception:  # noqa: B902; return nicer error
+            logger.error("DB find_all_by_account_id exception: " + str(db_exception))
+            raise DatabaseException(db_exception) from db_exception
+        if rows is not None:
+            for row in rows:
+                history_list.append(build_search_history_json(row, from_ui))
+        if history_list:
+            history_list[0]["searchHistoryTotal"] = count
         return history_list
+
+    @classmethod
+    def get_account_history_count(cls, account_id: str) -> int:
+        """Get the total number of available search results for an account."""
+        count: int = 0
+        result = db.session.execute(text(search_utils.QUERY_ACCOUNT_HISTORY_TOTAL), {"query_account": account_id})
+        row = result.first()
+        count = int(row[0])
+        return count
 
     @staticmethod
     def create_from_json(search_json, account_id: str = None, user_id: str = None):
@@ -507,3 +488,51 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             if name and not valid_charset(name):
                 error_msg += CHARACTER_SET_UNSUPPORTED.format(name)
         return error_msg
+
+
+@staticmethod
+def build_search_history_query(account_id: str, history_params) -> str:
+    """Build the account search history query based on the request parameters."""
+    from_ui: bool = history_params.get("from_ui")
+    query: str = search_utils.ACCOUNT_SEARCH_HISTORY_DATE_QUERY
+    if search_utils.GET_HISTORY_DAYS_LIMIT <= 0 and from_ui:
+        query = search_utils.ACCOUNT_SEARCH_HISTORY_QUERY_NEW
+    elif search_utils.GET_HISTORY_DAYS_LIMIT <= 0:
+        query = search_utils.ACCOUNT_SEARCH_HISTORY_QUERY
+    elif from_ui:
+        query = search_utils.ACCOUNT_SEARCH_HISTORY_DATE_QUERY_NEW
+    query += search_utils.QUERY_ACCOUNT_HISTORY_LIMIT
+    return query
+
+
+@staticmethod
+def build_search_history_json(row, from_ui: bool) -> dict:
+    """Build the account search history query based on the request parameters."""
+    search_id: str = str(row[0])
+    search_ts = row[1]
+    # Signal UI report pending if async report is not yet available.
+    if row[7] is not None and row[8] is None:
+        search_id += "_" + REPORT_STATUS_PENDING
+    search = {
+        "searchId": search_id,
+        "searchDateTime": model_utils.format_ts(search_ts),
+        "searchQuery": row[2],
+        "totalResultsSize": int(row[3]),
+        "returnedResultsSize": int(row[4]),
+        "exactResultsSize": int(row[5]) if row[5] else 0,
+        "selectedResultsSize": int(row[9]) if row[9] else 0,
+        "username": str(row[10]),
+    }
+    if from_ui:
+        # if api_result is null then the selections have not been finished
+        search["inProgress"] = not row[11] and row[11] != [] and search["totalResultsSize"] > 0
+        search["userId"] = str(row[12])
+        if row[13] and int(row[13]) == PAY_PENDING:
+            search["paymentPending"] = True
+            search["invoiceId"] = str(row[14]) if row[14] else ""
+            search["reportAvailable"] = False
+        elif not search.get("inProgress") and (row[8] or model_utils.report_retry_elapsed(search_ts)):
+            search["reportAvailable"] = True
+        else:
+            search["reportAvailable"] = False
+    return search

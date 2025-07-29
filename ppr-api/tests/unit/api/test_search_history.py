@@ -19,55 +19,45 @@ Test-Suite to ensure that the /search-history endpoint is working as expected.
 
 from http import HTTPStatus
 
-from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE
+import pytest
+
+from ppr_api.services.authz import COLIN_ROLE, PPR_ROLE, STAFF_ROLE
 from tests.unit.services.utils import create_header_account, create_header
 
 
-def test_search_history_valid_200(session, client, jwt):
-    """Assert that valid search history account with some records returns a 200 status."""
-    # no setup
+# testdata pattern is ({desc}, {roles}, {status}, {account}, {from_ui}, {page_num}, {has_results})
+TEST_GET_DATA = [
+    ("Missing account", [PPR_ROLE], HTTPStatus.BAD_REQUEST, None, None, None, False),
+    ("Missing account staff", [PPR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None, None, None, False),
+    ("Invalid role", [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, "PS12345", None, None, False),
+    ("Valid", [PPR_ROLE], HTTPStatus.OK, "PS12345", None, None, True),
+    ("Valid from UI", [PPR_ROLE], HTTPStatus.OK, "PS12345", True, None, True),
+    ("Valid from UI page num", [PPR_ROLE], HTTPStatus.OK, "PS12345", True, 1, True),
+    ("Valid no results", [PPR_ROLE], HTTPStatus.OK, "PS12345", None, 2, False),
+]
 
+
+@pytest.mark.parametrize('desc,roles,status,account, from_ui, page_num, has_results', TEST_GET_DATA)
+def test_get_search_history(session, client, jwt, desc, roles, status, account, from_ui, page_num, has_results):
+    """Assert that account get search history works as expected."""
+    headers = None
+    if account:
+        headers = create_header_account(jwt, roles, 'test-user', account)
+    else:
+        headers = create_header(jwt, roles)
+    path = "/api/v1/search-history"
+    if from_ui:
+        path += "?fromUI=true"
+        if page_num:
+            path += f"&pageNumber={page_num}"
+    elif page_num:
+        path += f"?pageNumber={page_num}"
     # test
-    rv = client.get('/api/v1/search-history',
-                    headers=create_header_account(jwt, [PPR_ROLE], 'test-user', 'PS12345'))
+    rv = client.get(path, headers=headers)
     # check
-    assert rv.status_code == HTTPStatus.OK
-
-
-def test_search_history_missing_account_400(session, client, jwt):
-    """Assert that a search history request with no account ID returns a 400 status."""
-    # no setup
-
-    # test
-    rv = client.get('/api/v1/search-history',
-                    headers=create_header(jwt, [PPR_ROLE]))
-
-    # check
-    assert rv.status_code == HTTPStatus.BAD_REQUEST
-
-
-def test_search_history_unauthorized_401(session, client, jwt):
-    """Assert that a search history request with a non-ppr role and an account ID returns a 401 status."""
-    # no setup
-
-    # test
-    rv = client.get('/api/v1/search-history',
-                    headers=create_header_account(jwt, [COLIN_ROLE], 'test-user', 'PS12345'))
-
-    # check
-    # print(rv.json)
-    assert rv.status_code == HTTPStatus.UNAUTHORIZED
-
-
-def test_search_history_not_no_result(session, client, jwt):
-    """Assert that a search history request with an unknown account ID returns a 404 status."""
-    # no setup
-
-    # test
-    rv = client.get('/api/v1/search-history',
-                    headers=create_header_account(jwt, [PPR_ROLE], 'test-user', 'PZZ49X42'))
-
-    # check
-    # print(rv.json)
-    assert rv.status_code == HTTPStatus.OK
-    assert len(rv.json) == 0
+    assert rv.status_code == status
+    if status == HTTPStatus.OK:
+        if has_results:
+            assert rv.json
+        else:
+            assert not rv.json

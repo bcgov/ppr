@@ -27,7 +27,10 @@ from ppr_api.utils.auth import jwt
 from ppr_api.utils.logging import logger
 
 bp = Blueprint("SEARCH_HISTORY1", __name__, url_prefix="/api/v1/search-history")  # pylint: disable=invalid-name
-VAL_ERROR = "Search history request data validation errors."  # Validation error prefix
+VAL_ERROR: str = "Search history request data validation errors."  # Validation error prefix
+FROM_UI_PARAM2: str = "fromUI"
+FROM_UI_PARAM: str = "from_ui"
+PAGE_NUM_PARAM: str = "pageNumber"
 
 
 @bp.route("", methods=["GET", "OPTIONS"])
@@ -48,8 +51,8 @@ def get_search_history():
         # Try to fetch search history by account id.
         # No results throws a not found business exception.
         logger.info(f"Fetching search history for {account_id}.")
-        from_ui = request.args.get("from_ui", False)
-        history = SearchRequest.find_all_by_account_id(account_id, from_ui)
+        history_params: dict = get_search_history_params(request)
+        history = SearchRequest.find_all_by_account_id(account_id, history_params)
         return jsonify(history), HTTPStatus.OK
 
     except DatabaseException as db_exception:
@@ -58,3 +61,14 @@ def get_search_history():
         return resource_utils.business_exception_response(exception)
     except Exception as default_exception:  # noqa: B902; return nicer default error
         return resource_utils.default_exception_response(default_exception)
+
+
+def get_search_history_params(req: request) -> dict:
+    """Extract account search history query parameters from the request."""
+    history_params = {
+        "from_ui": req.args.get(FROM_UI_PARAM, False),
+        "page_number": int(req.args.get(PAGE_NUM_PARAM, 0)),
+    }
+    if not history_params.get("from_ui"):
+        history_params["from_ui"] = req.args.get(FROM_UI_PARAM2, False)
+    return history_params

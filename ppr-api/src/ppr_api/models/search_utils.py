@@ -292,6 +292,18 @@ COUNT_QUERY_FROM_SEARCH_TYPE = {
     "SS": SERIAL_NUM_TOTAL_COUNT,
 }
 
+QUERY_ACCOUNT_HISTORY_TOTAL = f"""
+SELECT COUNT(sc.id)
+FROM search_requests sc, search_results sr
+WHERE sc.id = sr.search_id
+  AND sc.account_id = :query_account
+  AND sc.search_ts > ((now() at time zone 'utc') - interval '{str(GET_HISTORY_DAYS_LIMIT)} days')
+  AND NOT EXISTS (SELECT sc2.id
+                    FROM search_requests sc2
+                   WHERE sc2.id = sc.id
+                     AND sc2.search_type IN ('MM', 'MI', 'MO', 'MS')
+                     AND sc2.pay_path IS NULL)
+"""
 
 ACCOUNT_SEARCH_HISTORY_DATE_QUERY = f"""
 SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size,
@@ -316,18 +328,17 @@ SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_
   sr.api_result, sc.user_id, sr.score, sc.pay_invoice_id
 FROM search_requests sc, search_results sr
 WHERE sc.id = sr.search_id
-  AND sc.account_id = '?'
+  AND sc.account_id = :query_account
   AND sc.search_ts > ((now() at time zone 'utc') - interval '{str(GET_HISTORY_DAYS_LIMIT)} days')
   AND NOT EXISTS (SELECT sc2.id
                     FROM search_requests sc2
                    WHERE sc2.id = sc.id
                      AND sc2.search_type IN ('MM', 'MI', 'MO', 'MS')
                      AND sc2.pay_path IS NULL)
-ORDER BY sc.search_ts DESC
-FETCH FIRST {str(ACCOUNT_SEARCH_HISTORY_MAX_SIZE)} ROWS ONLY
+ORDER BY sc.search_ts DESC 
 """
 
-ACCOUNT_SEARCH_HISTORY_QUERY = f"""
+ACCOUNT_SEARCH_HISTORY_QUERY = """
 SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size,
   (SELECT CASE WHEN sc.search_type IN ('MM', 'MI', 'MO', 'MS') THEN -1
                WHEN sr.api_result IS NULL THEN 0 
@@ -350,14 +361,13 @@ SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_
   sr.api_result, sc.user_id, sr.score, sc.pay_invoice_id
 FROM search_requests sc, search_results sr
 WHERE sc.id = sr.search_id
-  AND sc.account_id = '?'
+  AND sc.account_id = :query_account
   AND NOT EXISTS (SELECT sc2.id
                     FROM search_requests sc2
                    WHERE sc2.id = sc.id
                      AND sc2.search_type IN ('MM', 'MI', 'MO', 'MS')
                      AND sc2.pay_path IS NULL)
-ORDER BY sc.search_ts DESC
-FETCH FIRST {str(ACCOUNT_SEARCH_HISTORY_MAX_SIZE)} ROWS ONLY
+ORDER BY sc.search_ts DESC 
 """
 
 ACCOUNT_SEARCH_HISTORY_DATE_QUERY_NEW = f"""
@@ -382,18 +392,17 @@ SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_
   sr.api_result, sc.user_id, sr.score, sc.pay_invoice_id
 FROM search_requests sc, search_results sr
 WHERE sc.id = sr.search_id
-  AND sc.account_id = '?'
+  AND sc.account_id = :query_account
   AND sc.search_ts > ((now() at time zone 'utc') - interval '{str(GET_HISTORY_DAYS_LIMIT)} days')
   AND NOT EXISTS (SELECT sc2.id
                     FROM search_requests sc2
                    WHERE sc2.id = sc.id
                      AND sc2.search_type IN ('MM', 'MI', 'MO', 'MS')
                      AND sc2.pay_path IS NULL)
-ORDER BY sc.search_ts DESC
-FETCH FIRST {str(ACCOUNT_SEARCH_HISTORY_MAX_SIZE)} ROWS ONLY
+ORDER BY sc.search_ts DESC 
 """
 
-ACCOUNT_SEARCH_HISTORY_QUERY_NEW = f"""
+ACCOUNT_SEARCH_HISTORY_QUERY_NEW = """
 SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size,
   (SELECT CASE WHEN sc.search_type IN ('MM', 'MI', 'MO', 'MS') THEN -1
                WHEN sc.updated_selection IS NULL THEN
@@ -415,15 +424,15 @@ SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_
   sr.api_result, sc.user_id, sr.score, sc.pay_invoice_id
 FROM search_requests sc, search_results sr
 WHERE sc.id = sr.search_id
-  AND sc.account_id = '?'
+  AND sc.account_id = :query_account
   AND NOT EXISTS (SELECT sc2.id
                     FROM search_requests sc2
                    WHERE sc2.id = sc.id
                      AND sc2.search_type IN ('MM', 'MI', 'MO', 'MS')
                      AND sc2.pay_path IS NULL)
-ORDER BY sc.search_ts DESC
-FETCH FIRST {str(ACCOUNT_SEARCH_HISTORY_MAX_SIZE)} ROWS ONLY
+ORDER BY sc.search_ts DESC 
 """
+QUERY_ACCOUNT_HISTORY_LIMIT = " LIMIT :page_size OFFSET :page_offset"
 
 
 def format_mhr_number(request_json):

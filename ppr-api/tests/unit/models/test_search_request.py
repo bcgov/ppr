@@ -399,11 +399,13 @@ TEST_MHR_NUMBER_DATA = [
     ('22000', '022000'),
     ('22000 ', '022000')
 ]
-# testdata pattern is ({account_id}, {from_ui}, {has_result})
+# testdata pattern is ({account_id}, {from_ui}, {page_num}, {has_result})
 TEST_ACCOUNT_DATA = [
-    ('PS12345', False, True),
-    ('PS12345', True, True),
-    ('PSXXXXX', True, False)
+    ('PS12345', False, 1, True),
+    ('PS12345', False, None, True),
+    ('PS12345', True, 1, True),
+    ('PS12345', True, 2, False),
+    ('PSXXXXX', True, 1, False)
 ]
 
 
@@ -653,10 +655,14 @@ def test_search_enddatatetime_invalid(session, client, jwt):
     print(bad_request_err.value.error)
 
 
-@pytest.mark.parametrize('account_id,from_ui,has_results', TEST_ACCOUNT_DATA)
-def test_find_by_account_id(session, account_id, from_ui, has_results):
+@pytest.mark.parametrize('account_id,from_ui,page_num,has_results', TEST_ACCOUNT_DATA)
+def test_find_by_account_id(session, account_id, from_ui, page_num, has_results):
     """Assert that the account search history list first item contains all expected elements."""
-    history = SearchRequest.find_all_by_account_id(account_id, from_ui)
+    history_params = {
+        "from_ui": from_ui,
+        "page_number": 1 if page_num is None else page_num
+    }
+    history = SearchRequest.find_all_by_account_id(account_id, history_params)
     if not has_results:
         assert len(history) == 0
     else:
