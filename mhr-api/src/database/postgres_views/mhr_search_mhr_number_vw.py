@@ -27,12 +27,16 @@ mhr_search_mhr_number_vw = PGView(
                AND og.registration_id = p.registration_id
                AND og.status_type IN ('ACTIVE', 'EXEMPT')
                ORDER BY p.id DESC
-               FETCH FIRST 1 ROWS ONLY) AS owner_info
+               FETCH FIRST 1 ROWS ONLY) AS owner_info,
+          d.manufacturer_name,
+          case when a.street_additional is not null then a.street || '|' || a.street_additional || '|' || a.city || ' ' || a.region || '|' || initcap(ct.country_desc)
+               else a.street || '|' || a.city || ' ' || a.region || '|' || initcap(ct.country_desc) end as civic_address
      FROM mhr_registrations r,
           mhr_registrations rl,
           mhr_registrations rd,
           mhr_locations l, 
-          addresses a, 
+          addresses a,
+          country_types ct,
           mhr_descriptions d
      WHERE (r.registration_type = 'MHREG' or r.registration_type = 'MHREG_CONVERSION')
      AND r.mhr_number = rl.mhr_number
@@ -40,6 +44,7 @@ mhr_search_mhr_number_vw = PGView(
      AND rl.id = l.registration_id
      AND l.status_type = 'ACTIVE'
      AND l.address_id = a.id
+     and a.country = ct.country_type
      AND rd.id = d.registration_id
      AND d.status_type = 'ACTIVE'
 """
