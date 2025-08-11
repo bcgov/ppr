@@ -18,8 +18,10 @@ mhr_account_reg_vw = PGView(
         r.client_reference_id,
         r.registration_type,       
         (SELECT string_agg((CASE WHEN p.business_name IS NOT NULL THEN p.business_name
-                                  WHEN p.middle_name IS NOT NULL THEN p.first_name || ' ' || p.middle_name || ' ' || p.last_name
-                                  ELSE p.first_name || ' ' || p.last_name END), '\n')
+                                 WHEN p.suffix IS NOT NULL AND p.party_type = 'OWNER_IND' AND p.middle_name IS NOT NULL THEN p.first_name || ' ' || p.middle_name || ' ' || p.last_name || ' ' || p.suffix
+                                 WHEN p.suffix IS NOT NULL AND p.party_type = 'OWNER_IND' THEN p.first_name || ' ' || p.last_name || ' ' || p.suffix
+                                 WHEN p.middle_name IS NOT NULL THEN p.first_name || ' ' || p.middle_name || ' ' || p.last_name
+                                 ELSE p.first_name || ' ' || p.last_name END), '\n')
             FROM mhr_registrations r1, mhr_owner_groups og, mhr_parties p
           WHERE r1.mhr_number = r.mhr_number 
             AND r1.id = og.registration_id
