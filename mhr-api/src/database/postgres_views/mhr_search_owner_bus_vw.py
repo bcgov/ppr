@@ -19,7 +19,10 @@ mhr_search_owner_bus_vw = PGView(
           d.make, d.model, r.id,
           p.business_name,
           og.status_type AS owner_status_type,
-          p.compressed_name
+          p.compressed_name,
+          d.manufacturer_name,
+          case when a.street_additional is not null then a.street || '|' || a.street_additional || '|' || a.city || ' ' || a.region || '|' || initcap(ct.country_desc)
+               else a.street || '|' || a.city || ' ' || a.region || '|' || initcap(ct.country_desc) end as civic_address
      FROM mhr_registrations r,
           mhr_registrations rl,
           mhr_registrations rd,
@@ -27,7 +30,8 @@ mhr_search_owner_bus_vw = PGView(
           mhr_owner_groups og,
           mhr_parties p,
           mhr_locations l, 
-          addresses a, 
+          addresses a,
+          country_types ct,
           mhr_descriptions d
      WHERE (r.registration_type = 'MHREG' or r.registration_type = 'MHREG_CONVERSION')
      AND ro.mhr_number = r.mhr_number 
@@ -41,6 +45,7 @@ mhr_search_owner_bus_vw = PGView(
      AND rl.id = l.registration_id
      AND l.status_type = 'ACTIVE'
      AND l.address_id = a.id
+     AND a.country = ct.country_type
      AND rd.id = d.registration_id
      AND d.status_type = 'ACTIVE'
 """

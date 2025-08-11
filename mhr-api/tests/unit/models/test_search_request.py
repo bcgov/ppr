@@ -464,6 +464,8 @@ def test_search_valid(session, search_type, json_data):
                 assert match['ownerName']['first']
                 assert match['ownerName']['last']
             assert match['ownerStatus'] in ('ACTIVE', 'EXEMPT', 'PREVIOUS')
+        assert match.get("manufacturerName")
+        assert match.get("civicAddress")
 
 
 @pytest.mark.parametrize('search_type,json_data', TEST_NONE_DATA)
@@ -680,6 +682,8 @@ def test_search_mhr_number_direct(session, mhr_num, status, city, serial, year, 
             assert result.get('exemptCount') == 1
         elif o_status == 'PREVIOUS':
             assert result.get('historicalCount') == 1
+        assert result.get("manufacturerName")
+        assert result.get("civicAddress")
 
 
 @pytest.mark.parametrize('mhr_num,status,city,serial,year,make,model,id,o_status', TEST_SERIAL_NUMBER_DATA_DIRECT)
@@ -720,6 +724,8 @@ def test_search_serial_number_direct(session, mhr_num, status, city, serial, yea
             assert result.get('exemptCount') == 1
         elif o_status == 'PREVIOUS':
             assert result.get('historicalCount') == 1
+        assert result.get("manufacturerName")
+        assert result.get("civicAddress")
 
 
 @pytest.mark.parametrize('mhr_num,status,city,serial,year,id,criteria,bus_name,o_status', TEST_OWNER_BUS_DATA_DIRECT)
@@ -760,6 +766,8 @@ def test_search_owner_bus_direct(session, mhr_num, status, city, serial, year, i
                     assert result.get('exemptCount') == 1
                 elif o_status == 'PREVIOUS':
                     assert result.get('historicalCount') == 1
+                assert result.get("manufacturerName")
+                assert result.get("civicAddress")
 
 
 @pytest.mark.parametrize('mhr_num,status,city,serial,year,id,criteria,last,first,middle,o_status',
@@ -803,6 +811,8 @@ def test_search_owner_ind_direct(session, mhr_num, status, city, serial, year, i
                     assert result.get('exemptCount') == 1
                 elif o_status == 'PREVIOUS':
                     assert result.get('historicalCount') == 1
+                assert result.get("manufacturerName")
+                assert result.get("civicAddress")
 
 
 def test_search_key(session):

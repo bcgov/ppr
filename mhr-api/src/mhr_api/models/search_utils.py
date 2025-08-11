@@ -131,26 +131,28 @@ SELECT DISTINCT fs.id
 ORDER BY fs.id ASC
 """
 SEARCH_MHR_NUMBER_QUERY = """
-SELECT mhr_number, status_type, registration_ts, city, serial_number, year_made, make, model, id, owner_info
+SELECT mhr_number, status_type, registration_ts, city, serial_number, year_made, make, model, id, owner_info,
+       manufacturer_name, civic_address
   FROM mhr_search_mhr_number_vw
  WHERE mhr_number = :query_value
 """
 SEARCH_SERIAL_QUERY = """
-SELECT mhr_number, status_type, registration_ts, city, serial_number, year_made, make, model, id, owner_info
+SELECT mhr_number, status_type, registration_ts, city, serial_number, year_made, make, model, id, owner_info,
+       manufacturer_name, civic_address
   FROM mhr_search_serial_vw
  WHERE compressed_key = mhr_serial_compressed_key(:query_value)
   ORDER BY section_id 
 """
 SEARCH_OWNER_BUS_QUERY = """
 SELECT mhr_number, status_type, registration_ts, city, serial_number, year_made, make, model, id,
-       business_name, owner_status_type
+       business_name, owner_status_type, manufacturer_name, civic_address
   FROM mhr_search_owner_bus_vw
  WHERE compressed_name LIKE mhr_name_compressed_key(:query_value) || '%'
  ORDER BY business_name ASC, owner_status_type ASC, status_type ASC, mhr_number DESC
  """
 SEARCH_OWNER_IND_QUERY = """
 SELECT mhr_number, status_type, registration_ts, city, serial_number, year_made, make, model, id,
-       owner_status_type, last_name, first_name, middle_name
+       owner_status_type, last_name, first_name, middle_name, manufacturer_name, civic_address
   FROM mhr_search_owner_ind_vw
  WHERE compressed_name LIKE mhr_name_compressed_key(:query_value) || '%'
  ORDER BY last_name ASC, first_name ASC, middle_name ASC, owner_status_type ASC, status_type ASC, mhr_number DESC
@@ -240,6 +242,8 @@ def build_search_result_mhr(row):
         "exemptCount": 0,
         "historicalCount": 0,
         "mhId": int(row[8]),
+        "manufacturerName": str(row[10]),
+        "civicAddress": str(row[11]).replace("|", "\n"),
     }
     return set_owner_info(result_json, row)
 
@@ -263,6 +267,8 @@ def build_search_result_serial(row):
         "exemptCount": 0,
         "historicalCount": 0,
         "mhId": int(row[8]),
+        "manufacturerName": str(row[10]),
+        "civicAddress": str(row[11]).replace("|", "\n"),
     }
     return set_owner_info(result_json, row)
 
@@ -287,6 +293,8 @@ def build_search_result_owner_bus(row):
         "historicalCount": 0,
         "mhId": int(row[8]),
         "organizationName": str(row[9]),
+        "manufacturerName": str(row[11]),
+        "civicAddress": str(row[12]).replace("|", "\n"),
     }
     owner_status: str = str(row[10])
     result_json["ownerStatus"] = owner_status
@@ -312,6 +320,8 @@ def build_search_result_owner_ind(row):
         "exemptCount": 0,
         "historicalCount": 0,
         "mhId": int(row[8]),
+        "manufacturerName": str(row[13]),
+        "civicAddress": str(row[14]).replace("|", "\n"),
     }
     owner_status: str = str(row[9])
     owner_name = {"last": str(row[10]), "first": str(row[11])}

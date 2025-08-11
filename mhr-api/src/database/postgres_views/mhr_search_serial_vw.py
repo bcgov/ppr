@@ -23,12 +23,16 @@ mhr_search_serial_vw = PGView(
                AND og.status_type IN ('ACTIVE', 'EXEMPT')
                ORDER BY p.id DESC
                FETCH FIRST 1 ROWS ONLY) AS owner_info,
-          s.id AS section_id
+          s.id AS section_id,
+          d.manufacturer_name,
+          case when a.street_additional is not null then a.street || '|' || a.street_additional || '|' || a.city || ' ' || a.region || '|' || initcap(ct.country_desc)
+               else a.street || '|' || a.city || ' ' || a.region || '|' || initcap(ct.country_desc) end as civic_address
      FROM mhr_registrations r,
           mhr_registrations rl,
           mhr_registrations rd,
           mhr_locations l, 
           addresses a, 
+          country_types ct,
           mhr_descriptions d,
           mhr_registrations rs,
           mhr_sections s
@@ -38,6 +42,7 @@ mhr_search_serial_vw = PGView(
      AND rl.id = l.registration_id
      AND l.status_type = 'ACTIVE'
      AND l.address_id = a.id
+     AND a.country = ct.country_type
      AND rd.id = d.registration_id
      AND d.status_type = 'ACTIVE'
      AND rs.mhr_number = r.mhr_number 
