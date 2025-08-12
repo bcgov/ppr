@@ -291,6 +291,8 @@ export default defineComponent({
       if (apiResponse === undefined || apiResponse.status !== 200) {
         emit('error', { category: ErrorCategories.SEARCH })
       } else {
+        // Reset the certified search checkbox after a successful response
+        setSearchCertified(false)
         // On success return to dashboard
         if (apiResponse?.data.paymentPending) {
           goToPay(
