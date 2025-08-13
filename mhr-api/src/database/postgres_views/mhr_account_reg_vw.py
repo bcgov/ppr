@@ -7,7 +7,7 @@ mhr_account_reg_vw = PGView(
     schema="public",
     signature="mhr_account_reg_vw",
     definition=r"""
-  SELECT r.mhr_number, r.status_type, r.registration_ts,
+SELECT r.mhr_number, r.status_type, r.registration_ts,
         (SELECT CASE WHEN p.business_name IS NOT NULL THEN p.business_name
                       WHEN p.middle_name IS NOT NULL THEN p.first_name || ' ' || p.middle_name || ' ' || p.last_name
                       ELSE p.first_name || ' ' || p.last_name
@@ -92,9 +92,21 @@ mhr_account_reg_vw = PGView(
         d.affirm_by,
         (SELECT COUNT(mrr.id)
             FROM mhr_registration_reports mrr
-          WHERE mrr.registration_id = r.id) AS report_count
-    FROM mhr_registrations r, mhr_documents d, mhr_document_types dt
+          WHERE mrr.registration_id = r.id) AS report_count,
+       de.manufacturer_name,
+       case when a.street_additional is not null then a.street || '|' || a.street_additional || '|' || a.city || ' ' || a.region || '|' || initcap(ct.country_desc)
+            else a.street || '|' || a.city || ' ' || a.region || '|' || initcap(ct.country_desc) end as civic_address
+    FROM mhr_registrations r, mhr_documents d, mhr_document_types dt, 
+         mhr_registrations rl, mhr_registrations rd, mhr_descriptions de, mhr_locations l, addresses a, country_types ct
   WHERE r.id = d.registration_id
     AND d.document_type = dt.document_type
+    AND r.mhr_number = rl.mhr_number
+    AND r.mhr_number = rd.mhr_number
+     AND rl.id = l.registration_id
+     AND l.status_type = 'ACTIVE'
+     AND l.address_id = a.id
+     and a.country = ct.country_type
+     AND rd.id = de.registration_id
+     AND de.status_type = 'ACTIVE'    
 """
 )

@@ -323,6 +323,7 @@ def get_account_registration_params(req: request, params: AccountRegistrationPar
     params.filter_reg_start_date = req.args.get(reg_utils.START_TS_PARAM, None)
     params.filter_reg_end_date = req.args.get(reg_utils.END_TS_PARAM, None)
     params.filter_document_id = req.args.get(reg_utils.DOCUMENT_ID_PARAM, None)
+    params.filter_manufacturer = req.args.get(reg_utils.MANUFACTURER_NAME_PARAM, None)
     # start_ts = req.args.get(reg_utils.START_TS_PARAM, None)
     # end_ts = req.args.get(reg_utils.END_TS_PARAM, None)
     # if start_ts and end_ts:
@@ -350,6 +351,9 @@ def get_account_registration_params(req: request, params: AccountRegistrationPar
         params.filter_reg_start_date = remove_quotes(params.filter_reg_start_date)
     if params.filter_reg_end_date:
         params.filter_reg_end_date = remove_quotes(params.filter_reg_end_date)
+    if params.filter_manufacturer:
+        params.filter_manufacturer = params.filter_manufacturer.strip().upper()
+        params.filter_manufacturer = remove_quotes(params.filter_manufacturer)
     return params
 
 

@@ -139,7 +139,11 @@ TEST_QUERY_ORDER_DATA = [
     (reg_utils.REG_TS_PARAM, reg_utils.SORT_ASCENDING,
      mhr_draft.ORDER_BY_DATE + mhr_draft.SORT_ASCENDING + mhr_draft.QUERY_ACCOUNT_DRAFTS_LIMIT),
     (reg_utils.USER_NAME_PARAM, reg_utils.SORT_DESCENDING,
-     mhr_draft.ORDER_BY_USERNAME + mhr_draft.SORT_DESCENDING + mhr_draft.QUERY_ACCOUNT_DRAFTS_LIMIT)
+     mhr_draft.ORDER_BY_USERNAME + mhr_draft.SORT_DESCENDING + mhr_draft.QUERY_ACCOUNT_DRAFTS_LIMIT),
+    (reg_utils.MANUFACTURER_NAME_PARAM, reg_utils.SORT_DESCENDING,
+     mhr_draft.ORDER_BY_MANUFACTURER_NAME + mhr_draft.SORT_DESCENDING + mhr_draft.QUERY_ACCOUNT_DRAFTS_LIMIT),
+    (reg_utils.CIVIC_ADDRESS_PARAM, reg_utils.SORT_DESCENDING,
+     mhr_draft.ORDER_BY_CIVIC_ADDRESS + mhr_draft.SORT_DESCENDING + mhr_draft.QUERY_ACCOUNT_DRAFTS_LIMIT),
 ]
 # testdata pattern is ({filter1}, {value1}, {filter2}, {value2}, {clause1}, {clause2})
 TEST_QUERY_FILTER_DATA = [
@@ -148,7 +152,8 @@ TEST_QUERY_FILTER_DATA = [
     (reg_utils.USER_NAME_PARAM, 'USER', None, None, mhr_draft.FILTER_USERNAME, None),
     (reg_utils.SUBMITTING_NAME_PARAM, 'SUBMITTING', None, None, mhr_draft.FILTER_SUBMITTING_NAME, None),
     (reg_utils.REG_TYPE_PARAM, 'REG TYPE', None, None, mhr_draft.FILTER_REG_TYPE, None),
-    (reg_utils.CLIENT_REF_PARAM, 'CLIENT', None, None, mhr_draft.FILTER_CLIENT_REF, None)
+    (reg_utils.CLIENT_REF_PARAM, 'CLIENT', None, None, mhr_draft.FILTER_CLIENT_REF, None),
+    (reg_utils.MANUFACTURER_NAME_PARAM, 'man', None, None, mhr_draft.FILTER_MANUFACTURER, None),
 ]
 # testdata pattern is ({account_id}, {mhr_numb}, {exists}, {reg_type}, {draft_data})
 TEST_INVOICE_DATA = [
@@ -187,6 +192,8 @@ def test_find_all_by_account_id(session, account_id, has_results, draft_num, mhr
                 found_draft = True
             if draft.get('mhrNumber'):
                 assert 'outOfDate' in draft
+            assert 'manufacturerName' in draft
+            assert 'civicAddress' in draft
         assert found_draft
         if mhr_num:
             assert found_mhr
@@ -390,6 +397,8 @@ def test_account_filter(session, filter1, value1, filter2, value2, clause1, clau
         params.filter_submitting_name = value1
     elif filter1 == reg_utils.USER_NAME_PARAM:
         params.filter_username = value1
+    elif filter1 == reg_utils.MANUFACTURER_NAME_PARAM:
+        params.filter_manufacturer = value1
     if filter2 and value2:
       if filter2 == reg_utils.END_TS_PARAM:
           params.filter_reg_end_date = value2
@@ -405,6 +414,8 @@ def test_account_filter(session, filter1, value1, filter2, value2, clause1, clau
           params.filter_submitting_name = value2
       elif filter2 == reg_utils.USER_NAME_PARAM:
           params.filter_username = value2
+      elif filter2 == reg_utils.MANUFACTURER_NAME_PARAM:
+          params.filter_manufacturer = value2
 
     base_query: str = mhr_draft.QUERY_ACCOUNT_DRAFTS_BASE
     filter_query: str = MhrDraft.build_account_query_filter(base_query, params)
