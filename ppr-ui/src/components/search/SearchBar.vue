@@ -405,7 +405,8 @@ export default defineComponent({
       setSearching,
       setStaffPayment,
       setFolioOrReferenceNumber,
-      setSelectedManufacturedHomes
+      setSelectedManufacturedHomes,
+      setSearchCertified
     } = useStore()
     const {
       // Getters
@@ -670,6 +671,8 @@ export default defineComponent({
           emit('searchData', resp)
         }
         setSearching(false)
+        // Clear the certified search state once the search is completed.
+        setSearchCertified(false)
       }
     }, 2000, { trailing: false })
     const searchCheck = async () => {
