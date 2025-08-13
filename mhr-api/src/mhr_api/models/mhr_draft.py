@@ -84,7 +84,23 @@ SELECT d.draft_number, d.create_ts, d.registration_type,
                      AND r.registration_ts > d.create_ts)
             END stale_count,
         d.account_id,
-        d.user_id
+        d.user_id,
+       CASE WHEN d.draft -> 'description' IS NOT NULL AND d.draft -> 'description' -> 'manufacturer' IS NOT NULL THEN
+                 d.draft -> 'description' ->> 'manufacturer'
+            ELSE '' END manufacturer_name,
+       CASE WHEN d.draft -> 'location' IS NOT NULL AND d.draft -> 'location' -> 'address' IS NOT NULL THEN
+            CASE WHEN d.draft -> 'location' -> 'address' -> 'streetAdditional' IS NOT NULL THEN
+                      concat(d.draft -> 'location' -> 'address' ->> 'street', '\n',
+                             d.draft -> 'location' -> 'address' ->> 'streetAdditional', '\n',
+                             d.draft -> 'location' -> 'address' ->> 'city', ' ',
+                             d.draft -> 'location' -> 'address' ->> 'region', '\n',
+                             d.draft -> 'location' -> 'address' ->> 'country')
+                 ELSE concat(d.draft -> 'location' -> 'address' ->> 'street', '\n',
+                             d.draft -> 'location' -> 'address' ->> 'city', ' ',
+                             d.draft -> 'location' -> 'address' ->> 'region', '\n',
+                             d.draft -> 'location' -> 'address' ->> 'country')
+                 END
+            ELSE '' END civic_address
   FROM mhr_drafts d, mhr_registration_types rt
  WHERE d.account_id = :query_account
    AND d.registration_type = rt.registration_type
@@ -106,6 +122,7 @@ FILTER_REG_TYPE = " AND registration_type_desc = '?'"
 FILTER_SUBMITTING_NAME = " AND submitting_party LIKE '%?%'"
 FILTER_CLIENT_REF = " AND UPPER(TRIM(clientReferenceId)) LIKE '%?%'"
 FILTER_USERNAME = " AND TRIM(UPPER(registering_name)) LIKE '%?%'"
+FILTER_MANUFACTURER = " AND TRIM(UPPER(manufacturer_name)) LIKE '%?%'"
 FILTER_DATE = " AND create_ts BETWEEN :query_start AND :query_end"
 
 ORDER_BY_DATE = " ORDER BY create_ts"
@@ -114,6 +131,8 @@ ORDER_BY_REG_TYPE = " ORDER BY registration_type_desc"
 ORDER_BY_SUBMITTING_NAME = " ORDER BY submitting_party"
 ORDER_BY_CLIENT_REF = " ORDER BY clientReferenceId"
 ORDER_BY_USERNAME = " ORDER BY registering_name"
+ORDER_BY_MANUFACTURER_NAME = " ORDER BY manufacturer_name"
+ORDER_BY_CIVIC_ADDRESS = " ORDER BY civic_address"
 SORT_DESCENDING = " DESC"
 SORT_ASCENDING = " ASC"
 QUERY_ACCOUNT_DRAFTS_DEFAULT_ORDER = ORDER_BY_DATE + SORT_DESCENDING
@@ -127,6 +146,8 @@ QUERY_ACCOUNT_ORDER_BY = {
     reg_utils.SUBMITTING_NAME_PARAM: ORDER_BY_SUBMITTING_NAME,
     reg_utils.CLIENT_REF_PARAM: ORDER_BY_CLIENT_REF,
     reg_utils.USER_NAME_PARAM: ORDER_BY_USERNAME,
+    reg_utils.MANUFACTURER_NAME_PARAM: ORDER_BY_MANUFACTURER_NAME,
+    reg_utils.CIVIC_ADDRESS_PARAM: ORDER_BY_CIVIC_ADDRESS,
 }
 QUERY_ACCOUNT_FILTER_BY = {
     reg_utils.MHR_NUMBER_PARAM: FILTER_MHR_NUMBER,
@@ -135,6 +156,7 @@ QUERY_ACCOUNT_FILTER_BY = {
     reg_utils.CLIENT_REF_PARAM: FILTER_CLIENT_REF,
     reg_utils.USER_NAME_PARAM: FILTER_USERNAME,
     reg_utils.START_TS_PARAM: FILTER_DATE,
+    reg_utils.MANUFACTURER_NAME_PARAM: FILTER_MANUFACTURER,
 }
 DRAFT_PAY_PENDING_PREFIX = "P"  # Special draft number when payment pending.
 
@@ -258,6 +280,8 @@ class MhrDraft(db.Model):
             filters.append((reg_utils.SUBMITTING_NAME_PARAM, params.filter_submitting_name))
         if params.filter_username:
             filters.append((reg_utils.USER_NAME_PARAM, params.filter_username))
+        if params.filter_manufacturer:
+            filters.append((reg_utils.MANUFACTURER_NAME_PARAM, params.filter_manufacturer))
         if filters:
             return filters
         return None
@@ -304,6 +328,8 @@ class MhrDraft(db.Model):
             "registeringName": registering_name,
             "clientReferenceId": ref_id,
             "mhrNumber": mhr_num,
+            "manufacturerName": str(row[12]),
+            "civicAddress": str(row[13]),
         }
         if draft_json.get("mhrNumber"):
             draft_json["outOfDate"] = stale_count > 0

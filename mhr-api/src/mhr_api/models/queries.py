@@ -126,7 +126,9 @@ SELECT mhr_number, status_type, registration_ts, submitting_name, client_referen
                    FROM mhr_drafts d, mhr_registrations r
                   WHERE arv.registration_id = r.id
                     AND r.draft_id = d.id)
-            ELSE NULL END draft_number
+            ELSE NULL END draft_number,
+      manufacturer_name,
+      civic_address
   FROM mhr_account_reg_vw arv
 """
 
@@ -176,6 +178,8 @@ REG_ORDER_BY_USERNAME = " ORDER BY registering_name"
 REG_ORDER_BY_OWNER_NAME = " ORDER BY owner_names"
 REG_ORDER_BY_EXPIRY_DAYS = " ORDER BY mhr_number"
 REG_ORDER_BY_DOCUMENT_ID = " ORDER BY document_id"
+REG_ORDER_BY_MANUFACTURER_NAME = " ORDER BY manufacturer_name"
+REG_ORDER_BY_CIVIC_ADDRESS = " ORDER BY civic_address"
 REG_FILTER_REG_TYPE = " AND document_type = '?'"
 REG_FILTER_REG_TYPE_COLLAPSE = """
  AND mhr_number IN (SELECT DISTINCT r2.mhr_number
@@ -227,6 +231,12 @@ REG_FILTER_DOCUMENT_ID_COLLAPSE = """
                       FROM mhr_registrations r2, mhr_documents d2
                      WHERE r2.id = d2.registration_id
                        AND d2.document_id LIKE '?%')
+"""
+REG_FILTER_MANUFACTURER_NAME = " AND manufacturer_name LIKE '%?%'"
+REG_FILTER_MANUFACTURER_NAME_COLLAPSE = """
+ AND mhr_number IN (SELECT DISTINCT arv2.mhr_number
+                      FROM mhr_account_reg_vw arv2
+                     WHERE arv2.manufacturer_name LIKE '%?%')
 """
 ACCOUNT_SORT_DESCENDING = " DESC"
 ACCOUNT_SORT_ASCENDING = " ASC"

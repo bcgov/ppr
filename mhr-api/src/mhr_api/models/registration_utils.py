@@ -44,6 +44,8 @@ from mhr_api.models.queries import (
     REG_FILTER_DATE_COLLAPSE,
     REG_FILTER_DOCUMENT_ID,
     REG_FILTER_DOCUMENT_ID_COLLAPSE,
+    REG_FILTER_MANUFACTURER_NAME,
+    REG_FILTER_MANUFACTURER_NAME_COLLAPSE,
     REG_FILTER_MHR,
     REG_FILTER_REG_TYPE,
     REG_FILTER_REG_TYPE_COLLAPSE,
@@ -53,10 +55,12 @@ from mhr_api.models.queries import (
     REG_FILTER_SUBMITTING_NAME_COLLAPSE,
     REG_FILTER_USERNAME,
     REG_FILTER_USERNAME_COLLAPSE,
+    REG_ORDER_BY_CIVIC_ADDRESS,
     REG_ORDER_BY_CLIENT_REF,
     REG_ORDER_BY_DATE,
     REG_ORDER_BY_DOCUMENT_ID,
     REG_ORDER_BY_EXPIRY_DAYS,
+    REG_ORDER_BY_MANUFACTURER_NAME,
     REG_ORDER_BY_MHR_NUMBER,
     REG_ORDER_BY_OWNER_NAME,
     REG_ORDER_BY_REG_TYPE,
@@ -99,6 +103,8 @@ STATUS_PARAM = "statusType"
 SUBMITTING_NAME_PARAM = "submittingName"
 OWNER_NAME_PARAM = "ownerName"
 USER_NAME_PARAM = "username"
+MANUFACTURER_NAME_PARAM = "manufacturerName"
+CIVIC_ADDRESS_PARAM = "civicAddress"
 EXPIRY_DAYS_PARAM = "expiryDays"
 DOCUMENT_ID_PARAM = "documentId"
 SORT_ASCENDING = "ascending"
@@ -122,6 +128,7 @@ QUERY_ACCOUNT_FILTER_BY = {
     USER_NAME_PARAM: REG_FILTER_USERNAME,
     START_TS_PARAM: REG_FILTER_DATE,
     DOCUMENT_ID_PARAM: REG_FILTER_DOCUMENT_ID,
+    MANUFACTURER_NAME_PARAM: REG_FILTER_MANUFACTURER_NAME,
 }
 QUERY_ACCOUNT_FILTER_BY_COLLAPSE = {
     MHR_NUMBER_PARAM: REG_FILTER_MHR,
@@ -132,6 +139,7 @@ QUERY_ACCOUNT_FILTER_BY_COLLAPSE = {
     USER_NAME_PARAM: REG_FILTER_USERNAME_COLLAPSE,
     START_TS_PARAM: REG_FILTER_DATE_COLLAPSE,
     DOCUMENT_ID_PARAM: REG_FILTER_DOCUMENT_ID_COLLAPSE,
+    MANUFACTURER_NAME_PARAM: REG_FILTER_MANUFACTURER_NAME_COLLAPSE,
 }
 QUERY_ACCOUNT_ORDER_BY = {
     REG_TS_PARAM: REG_ORDER_BY_DATE,
@@ -144,6 +152,8 @@ QUERY_ACCOUNT_ORDER_BY = {
     EXPIRY_DAYS_PARAM: REG_ORDER_BY_EXPIRY_DAYS,
     USER_NAME_PARAM: REG_ORDER_BY_USERNAME,
     DOCUMENT_ID_PARAM: REG_ORDER_BY_DOCUMENT_ID,
+    MANUFACTURER_NAME_PARAM: REG_ORDER_BY_MANUFACTURER_NAME,
+    CIVIC_ADDRESS_PARAM: REG_ORDER_BY_CIVIC_ADDRESS,
 }
 
 
@@ -167,6 +177,7 @@ class AccountRegistrationParams:
     filter_submitting_name: str = None
     filter_username: str = None
     filter_document_id: str = None
+    filter_manufacturer: str = None
 
     def __init__(self, account_id, collapse: bool = False, sbc_staff: bool = False):
         """Set common base initialization."""
@@ -186,6 +197,8 @@ class AccountRegistrationParams:
                 STATUS_PARAM,
                 EXPIRY_DAYS_PARAM,
                 DOCUMENT_ID_PARAM,
+                MANUFACTURER_NAME_PARAM,
+                CIVIC_ADDRESS_PARAM,
             ):
                 return True
         return False
@@ -201,6 +214,7 @@ class AccountRegistrationParams:
             or self.filter_submitting_name
             or self.filter_username
             or self.filter_document_id
+            or self.filter_manufacturer
         )
 
     def get_filter_values(self):  # pylint: disable=too-many-return-statements
@@ -221,6 +235,8 @@ class AccountRegistrationParams:
             return USER_NAME_PARAM, self.filter_username
         if self.filter_document_id:
             return DOCUMENT_ID_PARAM, self.filter_document_id
+        if self.filter_manufacturer:
+            return MANUFACTURER_NAME_PARAM, self.filter_manufacturer
         return None, None
 
     def get_page_size(self) -> int:
@@ -878,6 +894,8 @@ def __build_summary(row, account_id: str, staff: bool, add_in_user_list: bool = 
         "registrationType": str(row[5]),
         "locationType": str(row[22]),
         "consumedDraftNumber": str(row[26]) if row[26] else "",
+        "manufacturerName": str(row[27]) if row[27] else "",
+        "civicAddress": str(row[28]) if row[28] else "",
     }
     summary = __get_report_path(account_id, staff, summary, row, timestamp)
     if add_in_user_list and summary["registrationType"] in (
@@ -1055,6 +1073,8 @@ def get_multiple_filters(params: AccountRegistrationParams) -> dict:
         filters.append(("username", params.filter_username))
     if params.filter_document_id:
         filters.append(("documentId", params.filter_document_id))
+    if params.filter_manufacturer:
+        filters.append(("manufacturerName", params.filter_manufacturer))
     if filters:
         return filters
     return None
