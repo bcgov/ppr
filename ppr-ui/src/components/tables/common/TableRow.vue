@@ -119,6 +119,18 @@ export default defineComponent({
       })
     })
 
+    const isMhrPaymentPending = (item: MhRegistrationSummaryIF) => {
+      return !props.isPpr &&
+        !localState.isChild &&
+        (
+          (item.mhrNumber && !item.statusType && item.paymentPending) ||
+          // Check if the child item’s status indicates a pending payment
+          (item.hasDraft && item.changes.some(
+            obj => obj.statusType === MhApiStatusTypes.DRAFT && obj.invoiceId != null
+          ))
+        )
+    }
+
     const documentRecordUrl = (documentId: string) => {
       const configDocumentUrl = sessionStorage.getItem('DOCUMENTS_URL')
       return `${configDocumentUrl}/document-records/${documentId}?class=MHR`
@@ -557,6 +569,7 @@ export default defineComponent({
       isRepairersLien,
       isRepairersLienAndTransitioning,
       isExemptOrCancelled,
+      isMhrPaymentPending,
       isRenewalDisabled,
       isRepairersLienAmendDisabled,
       isRoleStaffReg,
@@ -724,7 +737,7 @@ export default defineComponent({
           />
           <!-- Locked Badges when payment pending -->
           <InfoChip
-            v-if="!isPpr && !isChild && item.mhrNumber && !item.statusType && item.paymentPending"
+            v-if="isMhrPaymentPending(item)"
             action="PAYMENT PENDING"
           />
           <InfoChip
