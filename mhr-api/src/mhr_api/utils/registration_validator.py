@@ -355,7 +355,7 @@ def validate_permit_extended_tax(json_data: dict, staff: bool) -> str:
     if staff or not json_data.get("newLocation"):  # Skip for staff.
         return error_msg
     location = json_data.get("newLocation")
-    if "taxCertificate" not in location:
+    if not location.get("taxCertificate"):
         return error_msg
     if location.get("taxCertificate"):
         if location.get("taxExpiryDate"):

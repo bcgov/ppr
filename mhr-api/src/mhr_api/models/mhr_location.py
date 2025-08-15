@@ -231,7 +231,7 @@ class MhrLocation(db.Model):  # pylint: disable=too-many-instance-attributes
         if json_data.get("exceptionPlan"):
             location.exception_plan = json_data["exceptionPlan"].strip()
         if json_data.get("dealerName"):
-            location.dealer_name = json_data["dealerName"].strip()
+            location.dealer_name = json_data["dealerName"].strip().upper()
         if json_data.get("additionalDescription"):
             location.additional_description = json_data["additionalDescription"].strip()
         if location.location_type == MhrLocationTypes.RESERVE:
