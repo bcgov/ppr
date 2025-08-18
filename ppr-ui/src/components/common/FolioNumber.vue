@@ -28,18 +28,18 @@ export default defineComponent({
     const localState = reactive({
       folioEdit: false,
       folioEditError: '',
-      folioEditHint: `${15 - props.defaultFolioNumber?.length}`,
+      folioEditHint: `${50 - props.defaultFolioNumber?.length}`,
       folioEditNumber: props.defaultFolioNumber,
       folioNumber: props.defaultFolioNumber
     })
 
     watch(() => localState.folioEditNumber, (val: string) => {
-      if (val?.length > 15) {
-        localState.folioEditError = 'Maximum 15 characters reached'
+      if (val?.length > 50) {
+        localState.folioEditError = 'Maximum 50 characters reached'
         emit('folioError', true)
       } else {
         localState.folioEditError = ''
-        localState.folioEditHint = `${15 - val?.length}`
+        localState.folioEditHint = `${50 - val?.length}`
         localState.folioNumber = localState.folioEditNumber
         emit('folioError', false)
       }

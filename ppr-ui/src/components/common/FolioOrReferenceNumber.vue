@@ -29,7 +29,7 @@
           :input-label="folioOrRefConfig.inputLabel"
           :input-col-width="hasWiderInput ? 10 : undefined"
           :label-col-width="hasWiderInput ? 2 : undefined"
-          :rules="maxLength(30)"
+          :rules="maxLength(50)"
           :show-errors="setShowErrors"
           @update-value="$emit('setStoreProperty', $event)"
         />
