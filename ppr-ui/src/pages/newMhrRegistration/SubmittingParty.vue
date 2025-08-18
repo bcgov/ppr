@@ -23,7 +23,7 @@
     >
       <ContactInformation
         :contact-info="getMhrRegistrationSubmittingParty"
-        :content="submittingPartyRegistrationContent"
+        :content="isRoleStaffReg ? submittingPartyContentStaff : submittingPartyRegistrationContent"
         :validate="validateSubmitter"
         :section-number="2"
         @set-store-property="setMhrRegistrationSubmittingParty"
@@ -56,11 +56,13 @@ import { useStore } from '@/store/store'
 import { useInputRules } from '@/composables'
 import type { FormIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
-import { submittingPartyRegistrationContent } from '@/resources'
+import { submittingPartyRegistrationContent, submittingPartyContentStaff } from '@/resources'
+import PartySelectMethod from '@/components/parties/PartySelectMethod.vue'
 
 export default defineComponent({
   name: 'SubmittingParty',
   components: {
+    PartySelectMethod,
     DocumentId,
     Attention,
     ContactInformation
@@ -74,6 +76,7 @@ export default defineComponent({
     } = useStore()
     const {
       // Getters
+      isRoleStaffReg,
       getMhrAttentionReference,
       getMhrRegistrationDocumentId,
       getMhrRegistrationValidationModel,
@@ -128,12 +131,14 @@ export default defineComponent({
     }, { deep: true })
 
     return {
+      isRoleStaffReg,
       documentIdForm,
       MhrCompVal,
       MhrSectVal,
       getMhrRegistrationSubmittingParty,
       setMhrRegistrationSubmittingParty,
       setValidation,
+      submittingPartyContentStaff,
       submittingPartyRegistrationContent,
       maxLength,
       hasError,

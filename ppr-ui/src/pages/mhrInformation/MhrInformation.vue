@@ -285,6 +285,7 @@
                       : submittingPartyChangeContent"
                     :validate="validateSubmittingParty"
                     :hide-party-search="isTransportPermitByStaffSbc"
+                    :is-transfer="true"
                     @set-store-property="(isChangeLocationActive || isCancelChangeLocationActive ||
                       isExtendChangeLocationActive)
                       ? setMhrTransportPermit({ key: 'submittingParty', value: $event })
@@ -721,10 +722,12 @@ import {
   submitMhrTransfer,
   updateMhrDraft
 } from '@/utils/mhr-api-helper'
+import PartySelectMethod from '@/components/parties/PartySelectMethod.vue'
 
 export default defineComponent({
   name: 'MhrInformation',
   components: {
+    PartySelectMethod,
     TransportPermitDetails,
     Attention,
     CautionBox,

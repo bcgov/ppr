@@ -1,17 +1,16 @@
 /* Lines below re-import Tailwind base styles to fix issues where utilities didn't work due to Vuetify's global reset */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-@import "tailwindcss" theme(static);
+@import "tailwindcss";
 @import "@nuxt/ui";
 @source "../../../node_modules/@sbc-connect/nuxt-core-layer-beta";
 
 /* Customize Nuxt UI default tokens */
 :root {
-  /* Slightly elevated background */
-  --ui-bg-elevated: var(--ui-color-neutral-200);
-  /* More prominent background */
-  --ui-bg-accented: var(--ui-color-neutral-300);
+    --ui-radius: 0.25rem;
+    --ui-error: var(--color-red-600);
+    /* Slightly elevated background */
+    --ui-bg-elevated: var(--ui-color-neutral-200);
+    /* More prominent background */
+    --ui-bg-accented: var(--ui-color-neutral-300);
 }
 
 @theme static {
