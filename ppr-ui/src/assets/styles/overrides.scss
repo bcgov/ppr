@@ -189,7 +189,7 @@
 }
 
 .v-table:not(#registration-table, #search-history-table) > .v-table__wrapper {
-  overflow-x: hidden;
+  overflow-x: auto;
   .actions {
     padding-right: 30px;
     width: 100%;

@@ -285,6 +285,7 @@
                       : submittingPartyChangeContent"
                     :validate="validateSubmittingParty"
                     :hide-party-search="isTransportPermitByStaffSbc"
+                    :is-transfer="true"
                     @set-store-property="(isChangeLocationActive || isCancelChangeLocationActive ||
                       isExtendChangeLocationActive)
                       ? setMhrTransportPermit({ key: 'submittingParty', value: $event })

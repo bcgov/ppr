@@ -11,8 +11,16 @@
 
     <v-expand-transition>
       <div v-show="!isHidden">
+        <PartySelectMethod
+          v-if="isRoleStaffReg"
+          class="mb-8 w-full"
+          :is-transfer="isTransfer"
+          @party="handlePartySelect($event)"
+          @owner="handleOwnerSelect($event)"
+        />
+
         <PartySearch
-          v-if="!hidePartySearch"
+          v-else-if="!hidePartySearch"
           is-mhr-party-search
           class="mb-8"
           @select-item="handlePartySelect($event)"
@@ -233,207 +241,164 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { useInputRules } from '@/composables'
 import { ContactTypes } from '@/enums'
 import type { ContactInformationContentIF, FormIF, PartyIF, SubmittingPartyIF } from '@/interfaces'
-import { computed, defineComponent, nextTick, reactive, ref, toRefs, watch } from 'vue'
-import { PartyAddressSchema, OptionalPartyAddressSchema } from '@/schemas'
+import { computed, nextTick, reactive, ref, watch } from 'vue'
+import { PartyAddressSchema } from '@/schemas'
 import { BaseAddress } from '@/composables/address'
-import { PartySearch } from '../parties/party'
-import { CautionBox } from '@/components/common'
-import { emptyContactInfo, phoneMask  } from '@/resources'
+import { emptyContactInfo, phoneMask } from '@/resources'
 import { cloneDeep } from 'lodash'
+import PartySelectMethod from '@/components/parties/PartySelectMethod.vue'
 
-export default defineComponent({
-  name: 'ContactInformation',
-  components: {
-    BaseAddress,
-    CautionBox,
-    PartySearch
-  },
-  props: {
-    contactInfo: {
-      type: Object as () => PartyIF | SubmittingPartyIF,
-      required: true
-    },
-    validate: {
-      type: Boolean,
-      default: false
-    },
-    sectionNumber: {
-      type: Number,
-      required: false,
-      default: null
-    },
-    content: {
-      type: Object as () => ContactInformationContentIF,
-      default: () => {}
-    },
-    hidePartySearch: {
-      type: Boolean,
-      default: false
-    },
-    hideDeliveryAddress: {
-      type: Boolean,
-      default: false
-    },
-    enableCombinedNameValidation: {
-      type: Boolean,
-      default: false
-    },
-    isHidden: { // form isHidden
-      type: Boolean,
-      default: false
+const props = withDefaults(defineProps<{
+  contactInfo: PartyIF | SubmittingPartyIF
+  validate?: boolean
+  sectionNumber?: number | null
+  content?: ContactInformationContentIF
+  hidePartySearch?: boolean
+  hideDeliveryAddress?: boolean
+  enableCombinedNameValidation?: boolean
+  isHidden?: boolean,
+  isTransfer?: boolean
+}>(), {
+  validate: false,
+  sectionNumber: null,
+  content: () => ({}),
+  hidePartySearch: false,
+  hideDeliveryAddress: false,
+  enableCombinedNameValidation: false,
+  isHidden: false,
+  isTransfer: false
+})
+
+const emit = defineEmits<{
+  (e: 'isValid', value: boolean): void
+  (e: 'setStoreProperty', value: PartyIF | SubmittingPartyIF): void
+}>()
+
+const {
+  customRules,
+  invalidSpaces,
+  maxLength,
+  required,
+  isNumber,
+  isEmailOptional,
+  isPhone
+} = useInputRules()
+const { isRoleStaffReg } = storeToRefs(useStore())
+
+const contactInfoForm = ref<FormIF | null>(null)
+const contactAddress = ref(null)
+
+const contactInfoModel = reactive(cloneDeep({ ...emptyContactInfo, ...props.contactInfo }))
+const contactInfoType = ref((props.contactInfo as PartyIF)?.businessName ? ContactTypes.BUSINESS : ContactTypes.PERSON)
+const isContactInfoFormValid = ref(false)
+const isAddressValid = ref(false)
+const hasLongCombinedName = ref(false)
+
+const longCombinedNameErrorMsg = computed(() =>
+  hasLongCombinedName.value ? 'Person\'s Legal Name combined cannot exceed 40 characters' : ''
+)
+const isPersonOption = computed(() => contactInfoType.value === ContactTypes.PERSON)
+const isBusinessOption = computed(() => contactInfoType.value === ContactTypes.BUSINESS)
+const showBorderError = computed(() =>
+  !props.isHidden && props.validate &&
+  !(isContactInfoFormValid.value && isAddressValid.value)
+)
+const firstNameRules = customRules(
+  required('Enter a first name'),
+  maxLength(50),
+  invalidSpaces()
+)
+const emailRules = customRules(
+  maxLength(250),
+  isEmailOptional(),
+  invalidSpaces()
+)
+const phoneRules = customRules(
+  isPhone(14)
+)
+const middleNameRules = customRules(maxLength(50), invalidSpaces())
+const lastNameRules = customRules(
+  required('Enter a last name'),
+  maxLength(50),
+  invalidSpaces()
+)
+const businessNameRules = customRules(
+  required('Business name is required'),
+  maxLength(150),
+  invalidSpaces()
+)
+const phoneExtensionRules = customRules(
+  isNumber(null, null, null, 'Enter numbers only'),
+  invalidSpaces(),
+  maxLength(5, true)
+)
+
+async function handlePartySelect(party: SubmittingPartyIF) {
+  contactInfoType.value = party.businessName ? ContactTypes.BUSINESS : ContactTypes.PERSON
+  party.hasUsedPartyLookup = true
+  contactInfoModel.address.country = party.address.country
+  await nextTick()
+  Object.assign(contactInfoModel, party)
+}
+
+const handleOwnerSelect = (owner: PartyIF) => {
+  contactInfoType.value = (owner as PartyIF)?.businessName
+    ? ContactTypes.BUSINESS
+    : ContactTypes.PERSON
+  Object.assign(contactInfoModel, cloneDeep({
+    ...emptyContactInfo,
+    ...owner as SubmittingPartyIF | PartyIF
+  }))
+}
+
+watch(contactInfoType, async (val) => {
+  if (val === ContactTypes.BUSINESS) {
+    contactInfoModel.personName = { first: '', middle: '', last: '' }
+  } else {
+    contactInfoModel.businessName = ''
+  }
+  if (props.validate) {
+    await nextTick()
+    await contactInfoForm.value?.validate()
+  } else {
+    if (contactInfoForm.value?.errorMessages?.length > 0) {
+      await contactInfoForm.value?.resetValidation()
     }
-  },
-  emits: ['isValid', 'setStoreProperty'],
-  setup (props, { emit }) {
-    const {
-      customRules,
-      invalidSpaces,
-      maxLength,
-      required,
-      isNumber,
-      isEmailOptional,
-      isPhone
-    } = useInputRules()
+  }
+})
 
-    const contactInfoForm = ref(null) as FormIF
-    const contactAddress = ref(null)
+watch([isContactInfoFormValid, isAddressValid], () => {
+  if (!props.isHidden) emit('isValid', isContactInfoFormValid.value && isAddressValid.value)
+})
 
-    const localState = reactive({
-      // Clone deep to ensure sub objects don't get overwritten
-      contactInfoModel: cloneDeep({ ...emptyContactInfo, ...props.contactInfo as SubmittingPartyIF | PartyIF }),
-      contactInfoType: (props.contactInfo as PartyIF)?.businessName
-        ? ContactTypes.BUSINESS
-        : ContactTypes.PERSON,
-      isContactInfoFormValid: false,
-      isAddressValid: false,
-      hasLongCombinedName: false,
-      longCombinedNameErrorMsg: computed((): string =>
-        localState.hasLongCombinedName ? 'Person\'s Legal Name combined cannot exceed 40 characters' : ''),
-      isPersonOption: computed((): boolean =>
-        localState.contactInfoType === ContactTypes.PERSON
-      ),
-      isBusinessOption: computed((): boolean =>
-        localState.contactInfoType === ContactTypes.BUSINESS
-      ),
-      showBorderError: computed((): boolean => !props.isHidden && props.validate &&
-        !(localState.isContactInfoFormValid && localState.isAddressValid))
-    })
+watch(contactInfoModel, (val) => {
+  emit('setStoreProperty', val)
+}, { deep: true, immediate: true })
 
-    const handlePartySelect = async (party: SubmittingPartyIF) => {
-      localState.contactInfoType = party.businessName ? ContactTypes.BUSINESS : ContactTypes.PERSON
-      party.hasUsedPartyLookup = true
-      localState.contactInfoModel.address.country = party.address.country // Deals with bug (13637)
-      await nextTick()
-      localState.contactInfoModel = party
-    }
+watch(() => props.validate, async () => {
+  contactInfoForm.value?.validate()
+})
 
-    watch(() => localState.contactInfoType, async (val) => {
-      if (val === ContactTypes.BUSINESS) {
-        localState.contactInfoModel.personName = {
-          first: '',
-          middle: '',
-          last: ''
-        }
-      } else {
-        localState.contactInfoModel.businessName = ''
-      }
-      if (props.validate) {
-        await nextTick()
-        await contactInfoForm.value?.validate()
-      } else {
-        // Deals with lingering validation errors when switching between person and business
-        if (contactInfoForm.value?.errorMessages?.length > 0) {
-          await contactInfoForm.value?.resetValidation()
-        }
-      }
-    })
-    watch(() => [localState.isContactInfoFormValid, localState.isAddressValid], () => {
-      if (!props.isHidden) emit('isValid', localState.isContactInfoFormValid && localState.isAddressValid)
-    })
+watch(() => contactInfoModel.personName, async () => {
+  hasLongCombinedName.value =
+    props.enableCombinedNameValidation &&
+    (0 || contactInfoModel.personName?.first?.length) +
+    (0 || contactInfoModel.personName?.middle?.length) +
+    (0 || contactInfoModel.personName?.last?.length) > 40
+}, { deep: true })
 
-    watch(() => localState.contactInfoModel, (val) => {
-      emit('setStoreProperty', val)
-    }, { deep: true, immediate: true })
-
-    watch(() => props.validate, async () => {
-      contactInfoForm.value?.validate()
-    })
-
-    watch(() => localState.contactInfoModel.personName, async () => {
-      localState.hasLongCombinedName =
-        props.enableCombinedNameValidation &&
-        (0 || localState.contactInfoModel.personName?.first?.length) +
-        (0 || localState.contactInfoModel.personName?.middle?.length) +
-        (0 || localState.contactInfoModel.personName?.last?.length) > 40
-    }, { deep: true })
-
-    watch(() => props.isHidden, async (isHidden: boolean) => {
-      if (isHidden) {
-        localState.contactInfoType = ContactTypes.PERSON
-        localState.contactInfoModel = cloneDeep(emptyContactInfo)
-      } else if (props.validate) {
-        await nextTick()
-        contactInfoForm.value?.validate()
-        contactAddress.value?.validate()
-      }
-    })
-
-    const firstNameRules = customRules(
-      required('Enter a first name'),
-      maxLength(50),
-      invalidSpaces()
-    )
-
-    const emailRules = customRules(
-      maxLength(250),
-      isEmailOptional(),
-      invalidSpaces()
-    )
-
-    const phoneRules = customRules(
-      isPhone(14)
-    )
-
-    const middleNameRules = customRules(maxLength(50), invalidSpaces())
-
-    const lastNameRules = customRules(
-      required('Enter a last name'),
-      maxLength(50),
-      invalidSpaces())
-
-    const businessNameRules = customRules(
-      required('Business name is required'),
-      maxLength(150),
-      invalidSpaces()
-    )
-
-    const phoneExtensionRules = customRules(
-      isNumber(null, null, null, 'Enter numbers only'),
-      invalidSpaces(),
-      maxLength(5, true)
-    )
-
-    return {
-      phoneMask,
-      handlePartySelect,
-      contactInfoForm,
-      contactAddress,
-      emailRules,
-      firstNameRules,
-      middleNameRules,
-      lastNameRules,
-      businessNameRules,
-      phoneRules,
-      phoneExtensionRules,
-      ContactTypes,
-      PartyAddressSchema,
-      OptionalPartyAddressSchema,
-      ...toRefs(localState)
-    }
+watch(() => props.isHidden, async (isHidden: boolean) => {
+  if (isHidden) {
+    contactInfoType.value = ContactTypes.PERSON
+    Object.assign(contactInfoModel, cloneDeep(emptyContactInfo))
+  } else if (props.validate) {
+    await nextTick()
+    contactInfoForm.value?.validate()
+    contactAddress.value?.validate()
   }
 })
 </script>

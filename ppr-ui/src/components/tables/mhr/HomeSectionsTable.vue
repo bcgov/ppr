@@ -283,7 +283,7 @@ td {
   cursor: pointer;
 }
 :deep(.v-table__wrapper) {
-  overflow-x: hidden;
+  overflow-x: hidden !important;
 }
 :deep() {
   .v-data-table--fixed-header > .v-data-table__wrapper {

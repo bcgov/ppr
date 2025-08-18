@@ -10,6 +10,15 @@ export const submittingPartyRegistrationContent: ContactInformationContentIF = {
   mailAddressInfo: 'Registry documents and decal will be mailed to this address.'
 }
 
+export const submittingPartyContentStaff: ContactInformationContentIF = {
+  title: 'Submitting Party',
+  description: 'Enter the name and contact information for the person or business submitting this registration, ' +
+    'either by entering the details manually, using the PPR party code lookup, or selecting an owner as the submitting' +
+    ' party.',
+  sideLabel: 'Add Submitting Party',
+  mailAddressInfo: 'Registry documents and decal will be mailed to this address.'
+}
+
 export const submittingPartyChangeContent : ContactInformationContentIF = {
   title: 'Submitting Party for this change',
   description: 'Provide the name and contact information for the person or business submitting this registration. ' +

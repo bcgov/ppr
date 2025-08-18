@@ -7,7 +7,7 @@
       class="px-6"
       align="center"
     >
-      <v-col cols="6">
+      <v-col :cols="hideManualSearchLabel ? 12 : 6">
         <v-text-field
           id="txt-code"
           v-model="searchValue"
@@ -21,6 +21,7 @@
         />
       </v-col>
       <v-col
+        v-if="!hideManualSearchLabel"
         cols="6"
         class="pt-0 mt-n5 d-flex"
         :class="{ 'disabled-text': isAutoCompleteDisabled }"
@@ -57,7 +58,7 @@
       </v-col>
     </v-row>
     <v-row
-      v-if="registrationFlowType !== RegistrationFlowType.AMENDMENT && !isRegisteringParty && !isMhrPartySearch"
+      v-if="getRegistrationFlowType !== RegistrationFlowType.AMENDMENT && !isRegisteringParty && !isMhrPartySearch"
       class="px-6"
       align="center"
     >
@@ -84,14 +85,7 @@
   </v-container>
 </template>
 
-<script lang="ts">
-import {
-  defineComponent,
-  reactive,
-  toRefs,
-  watch,
-  computed
-} from 'vue'
+<script setup lang="ts">
 import { useStore } from '@/store/store'
 import { PartyAutocomplete } from '@/components/parties/party'
 import { RegistrationFlowType } from '@/enums'
@@ -99,128 +93,93 @@ import type { SearchPartyIF } from '@/interfaces'
 import { partyCodeSearch } from '@/utils/ppr-api-helper'
 import { storeToRefs } from 'pinia'
 
-export default defineComponent({
-  components: {
-    PartyAutocomplete
-  },
-  props: {
-    isAutoCompleteDisabled: {
-      type: Boolean,
-      default: false
-    },
-    registeringPartyAdded: {
-      type: Boolean,
-      default: false
-    },
-    isRegisteringParty: {
-      type: Boolean,
-      default: false
-    },
-    isMhrPartySearch: {
-      type: Boolean,
-      default: false
-    }
-  },
-  emits: [
-    'selectItem',
-    'hideSearch',
-    'showSecuredPartyAdd',
-    'addRegisteringParty',
-    'removeRegisteringParty'
-  ],
-  setup (props, context) {
-    const { getRegistrationFlowType } = storeToRefs(useStore())
-    const registrationFlowType = getRegistrationFlowType.value
-    const localState = reactive({
-      searchValue: '',
-      autoCompleteResults: null,
-      setAutoCompleteActive: false,
-      registeringPartySelected: false,
-      resultAdded: [],
-      partyCode: 0,
-      partyWord: computed((): string => props.isRegisteringParty
-        ? 'Registering'
-        : 'Secured'),
-      searchFieldLabel: computed((): string => {
-        if (props.isMhrPartySearch) return 'Use PPR Party Code or Name'
-        else if (props.isRegisteringParty) return 'Registering Party Code or Name'
-        else return 'Secured Party Code or Name'
-      })
-    })
+const props = withDefaults(defineProps<{
+  isAutoCompleteDisabled?: boolean
+  registeringPartyAdded?: boolean
+  isRegisteringParty?: boolean
+  isMhrPartySearch?: boolean
+  hideManualSearchLabel?: boolean
+}>(), {
+  isAutoCompleteDisabled: false,
+  registeringPartyAdded: false,
+  isRegisteringParty: false,
+  isMhrPartySearch: false,
+  hideManualSearchLabel: true
+})
 
-    const goToAddSecuredParty = () => {
-      if (localState.searchValue) {
-        localState.searchValue = ''
-        localState.setAutoCompleteActive = false
-        closeAutoComplete()
-      }
-      context.emit('showSecuredPartyAdd')
-    }
+const emit = defineEmits<{
+  (e: 'selectItem', value: any): void
+  (e: 'hideSearch' | 'showSecuredPartyAdd' | 'addRegisteringParty' | 'removeRegisteringParty'): void
+}>()
 
-    const addRegisteringParty = () => {
-      if (localState.registeringPartySelected) {
-        context.emit('addRegisteringParty')
-      } else {
-        context.emit('removeRegisteringParty')
-      }
-    }
+const { getRegistrationFlowType } = storeToRefs(useStore())
 
-    const closeAutoComplete = () => {
-      localState.setAutoCompleteActive = false
-      localState.autoCompleteResults = []
-    }
+const searchValue = ref('')
+const autoCompleteResults = ref<SearchPartyIF[] | null>(null)
+const setAutoCompleteActive = ref(false)
+const registeringPartySelected = ref(false)
+const resultAdded = ref([])
+const partyCode = ref(0)
+const partyWord = computed((): string => props.isRegisteringParty ? 'Registering' : 'Secured')
+const searchFieldLabel = computed((): string => {
+  if (props.isMhrPartySearch) return 'Use PPR Party Code or Name'
+  else if (props.isRegisteringParty) return 'Registering Party Code or Name'
+  else return 'Secured Party Code or Name'
+})
 
-    const selectItem = (selectedItem) => {
-      localState.searchValue = ''
-      context.emit('selectItem', selectedItem)
-      context.emit('hideSearch')
-    }
+function goToAddSecuredParty() {
+  if (searchValue.value) {
+    searchValue.value = ''
+    setAutoCompleteActive.value = false
+    closeAutoComplete()
+  }
+  emit('showSecuredPartyAdd')
+}
 
-    const updateAutoCompleteResults = async (searchValue: string) => {
-      const response: [SearchPartyIF] = await partyCodeSearch(
-        searchValue,
-        false
-      )
-      // check if results are still relevant before updating list
-      if ((response?.length > 0) && (searchValue === localState.searchValue)) {
-        localState.autoCompleteResults = response
-        localState.setAutoCompleteActive = true
-      }
-      if ((response?.length < 1) && (searchValue === localState.searchValue)) {
-        localState.autoCompleteResults = []
-        localState.setAutoCompleteActive = true
-      }
-    }
+function addRegisteringParty() {
+  if (registeringPartySelected.value) {
+    emit('addRegisteringParty')
+  } else {
+    emit('removeRegisteringParty')
+  }
+}
 
-    watch(
-      () => localState.searchValue,
-      (val: string) => {
-        if (localState.searchValue.length >= 3) {
-          updateAutoCompleteResults(val)
-        }
-        if (localState.searchValue.length === 0) {
-          localState.setAutoCompleteActive = false
-        }
-      }
-    )
-    watch(
-      () => props.registeringPartyAdded,
-      (sel: boolean) => {
-        localState.registeringPartySelected = sel
-      }
-    )
+function closeAutoComplete() {
+  setAutoCompleteActive.value = false
+  autoCompleteResults.value = []
+}
 
-    return {
-      goToAddSecuredParty,
-      addRegisteringParty,
-      closeAutoComplete,
-      registrationFlowType,
-      RegistrationFlowType,
-      selectItem,
-      ...toRefs(localState)
-    }
+function selectItem(selectedItem: any) {
+  searchValue.value = ''
+  emit('selectItem', selectedItem)
+  emit('hideSearch')
+}
+
+async function updateAutoCompleteResults(searchValueArg: string) {
+  const response: SearchPartyIF[] = await partyCodeSearch(searchValueArg, false)
+  if ((response?.length > 0) && (searchValueArg === searchValue.value)) {
+    autoCompleteResults.value = response
+    setAutoCompleteActive.value = true
+  }
+  if ((response?.length < 1) && (searchValueArg === searchValue.value)) {
+    autoCompleteResults.value = []
+    setAutoCompleteActive.value = true
+  }
+}
+
+watch(() => searchValue.value, (val: string) => {
+  if (val.length >= 3) {
+    updateAutoCompleteResults(val)
+  }
+  if (val.length === 0) {
+    setAutoCompleteActive.value = false
   }
 })
+
+watch(() => props.registeringPartyAdded, (sel: boolean) => {
+  registeringPartySelected.value = sel
+})
+
 </script>
 
 <style lang="scss" module>
