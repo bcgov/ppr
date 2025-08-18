@@ -722,12 +722,10 @@ import {
   submitMhrTransfer,
   updateMhrDraft
 } from '@/utils/mhr-api-helper'
-import PartySelectMethod from '@/components/parties/PartySelectMethod.vue'
 
 export default defineComponent({
   name: 'MhrInformation',
   components: {
-    PartySelectMethod,
     TransportPermitDetails,
     Attention,
     CautionBox,

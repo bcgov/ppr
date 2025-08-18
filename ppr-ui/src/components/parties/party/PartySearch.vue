@@ -109,10 +109,7 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{
   (e: 'selectItem', value: any): void
-  (e: 'hideSearch'): void
-  (e: 'showSecuredPartyAdd'): void
-  (e: 'addRegisteringParty'): void
-  (e: 'removeRegisteringParty'): void
+  (e: 'hideSearch' | 'showSecuredPartyAdd' | 'addRegisteringParty' | 'removeRegisteringParty'): void
 }>()
 
 const { getRegistrationFlowType } = storeToRefs(useStore())

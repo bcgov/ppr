@@ -34,7 +34,8 @@ export default defineAppConfig({
         group: 'px-0 py-2',
         trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200 text-bcGovGray-midGray',
         item: 'my-0.75 text-bcGovGray-900 before:rounded-none data-[state=checked]:text-blue-500 cursor-pointer',
-        itemLeadingIcon: 'group-data-[state=checked]:text-blue-500 group-data-highlighted:text-blue-500 text-bcGovGray-900',
+        itemLeadingIcon: 'group-data-[state=checked]:text-blue-500 group-data-highlighted:text-blue-500 ' +
+          'text-bcGovGray-900',
         placeholder: 'text-bcGovColor-midGray',
       }
     },

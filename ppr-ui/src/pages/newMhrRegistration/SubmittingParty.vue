@@ -57,12 +57,10 @@ import { useInputRules } from '@/composables'
 import type { FormIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
 import { submittingPartyRegistrationContent, submittingPartyContentStaff } from '@/resources'
-import PartySelectMethod from '@/components/parties/PartySelectMethod.vue'
 
 export default defineComponent({
   name: 'SubmittingParty',
   components: {
-    PartySelectMethod,
     DocumentId,
     Attention,
     ContactInformation
