@@ -1,6 +1,7 @@
 /* Lines below re-import Tailwind base styles to fix issues where utilities didn't work due to Vuetify's global reset */
 @import "tailwindcss";
 @import "@nuxt/ui";
+@source "../../../node_modules/documents-common-base-layer/components/FileUpload";
 @source "../../../node_modules/@sbc-connect/nuxt-core-layer-beta";
 
 /* Customize Nuxt UI default tokens */

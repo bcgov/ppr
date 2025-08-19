@@ -104,7 +104,7 @@ const props = withDefaults(defineProps<{
   registeringPartyAdded: false,
   isRegisteringParty: false,
   isMhrPartySearch: false,
-  hideManualSearchLabel: true
+  hideManualSearchLabel: false
 })
 
 const emit = defineEmits<{

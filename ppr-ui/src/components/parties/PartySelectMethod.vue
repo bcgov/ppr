@@ -92,6 +92,7 @@ function handlePartySelect(party: SubmittingPartyIF) {
         v-if="selectPartyMethod === 'partycode'"
         is-mhr-party-search
         class="pt-0!"
+        :hide-manual-search-label="true"
         @select-item="handlePartySelect($event)"
       />
       <USelect
