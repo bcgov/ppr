@@ -21,6 +21,7 @@ from flask_cors import cross_origin
 
 from ppr_api.exceptions import BusinessException, DatabaseException
 from ppr_api.models import SearchRequest
+from ppr_api.models.search_utils import AccountSearchParams
 from ppr_api.resources import utils as resource_utils
 from ppr_api.services.authz import authorized
 from ppr_api.utils.auth import jwt
@@ -51,8 +52,9 @@ def get_search_history():
         # Try to fetch search history by account id.
         # No results throws a not found business exception.
         logger.info(f"Fetching search history for {account_id}.")
-        history_params: dict = get_search_history_params(request)
-        history = SearchRequest.find_all_by_account_id(account_id, history_params)
+        params: AccountSearchParams = AccountSearchParams(account_id, False)
+        params = resource_utils.get_account_search_params(request, params)
+        history = SearchRequest.find_all_by_account_id(params)
         return jsonify(history), HTTPStatus.OK
 
     except DatabaseException as db_exception:
@@ -61,14 +63,3 @@ def get_search_history():
         return resource_utils.business_exception_response(exception)
     except Exception as default_exception:  # noqa: B902; return nicer default error
         return resource_utils.default_exception_response(default_exception)
-
-
-def get_search_history_params(req: request) -> dict:
-    """Extract account search history query parameters from the request."""
-    history_params = {
-        "from_ui": req.args.get(FROM_UI_PARAM, False),
-        "page_number": int(req.args.get(PAGE_NUM_PARAM, 0)),
-    }
-    if not history_params.get("from_ui"):
-        history_params["from_ui"] = req.args.get(FROM_UI_PARAM2, False)
-    return history_params

@@ -26,6 +26,7 @@ from sqlalchemy.sql import text
 from ppr_api.exceptions import BusinessException, DatabaseException
 from ppr_api.models import search_utils
 from ppr_api.models import utils as model_utils
+from ppr_api.models.search_utils import AccountSearchParams
 from ppr_api.utils.base import BaseEnum
 from ppr_api.utils.logging import logger
 from ppr_api.utils.validators import valid_charset
@@ -374,20 +375,17 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         return search
 
     @classmethod
-    def find_all_by_account_id(cls, account_id: str, history_params: dict):
+    def find_all_by_account_id(cls, params: AccountSearchParams):
         """Return a search history summary list of searches executed by an account."""
         history_list = []
-        query: str = build_search_history_query(account_id, history_params)
-        page_offset = history_params.get("page_number")
-        page_size = search_utils.ACCOUNT_SEARCH_HISTORY_MAX_SIZE
-        if page_offset <= 1:
-            page_offset = 0
-        else:
-            page_offset = (page_offset - 1) * page_size
-        query_params = {"query_account": account_id, "page_size": page_size, "page_offset": page_offset}
+        query: str = search_utils.build_search_history_query(params)
+        # logger.info(query)
+        query_params = search_utils.build_account_query_params(params)
+        # logger.info(query_params)
         rows = None
-        from_ui: bool = history_params.get("from_ui")
-        count = SearchRequest.get_account_history_count(account_id)
+        from_ui: bool = params.from_ui is not None and params.from_ui
+        count = SearchRequest.get_account_history_count(params.account_id)
+        # logger.info(f"count={count}")
         if count < 1:
             return history_list
         try:
