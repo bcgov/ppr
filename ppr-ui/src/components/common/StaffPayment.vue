@@ -89,6 +89,7 @@
               variant="filled"
               color="primary"
               label="Folio Number (Optional)"
+              :rules="folioNumberRules"
               :disabled="staffPaymentData.option === StaffPaymentOptions.FAS
                 || staffPaymentData.option === StaffPaymentOptions.NO_FEE"
               @focus="staffPaymentData.option = StaffPaymentOptions.BCOL"
@@ -185,6 +186,12 @@ export default defineComponent({
         return [
           v => !!v || 'Enter DAT Number',
           v => /^[A-Z]{1}[0-9]{7,9}$/.test(v) || 'DAT Number must be in standard format (eg, C1234567)'
+        ]
+      }),
+      /** Validation rules for folio Number */
+      folioNumberRules: computed((): Array<ValidationRule> => {
+        return [
+          (v: string) => v.length <= 50 || 'Maximum 50 characters reached' // maximum character count
         ]
       })
     })
