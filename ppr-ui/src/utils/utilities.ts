@@ -131,3 +131,7 @@ export const deepChangesComparison = (
     (v1, v2) => (typeof v1 === 'string' && !isCaseSensitive) ? insensitiveStrCompare(v1, v2) : undefined
   )
 }
+
+/** Removes invisible Unicode whitespace and trims the name. */
+export const sanitizeName = (name: string): string =>
+  name.replace(/[\u00A0-\u00BF\u2000-\u200F\u2028-\u202F\uFEFF]/g, '').trim()
