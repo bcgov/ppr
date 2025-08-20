@@ -18,7 +18,10 @@
     </v-overlay>
 
     <!-- View Content -->
-    <div class="container pa-0 pt-4">
+    <div
+      v-if="!loading"
+      class="container pa-0 pt-4"
+    >
       <v-row
         id="registration-header"
         no-gutters
@@ -125,7 +128,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { getMhrHistory } from '@/utils/mhr-api-helper'
+import { getMhrHistory, getMHRegistrationSummary  } from '@/utils/mhr-api-helper'
 import { pacificDate , getFeatureFlag } from '@/utils'
 import { useAuth, useNavigation } from '@/composables'
 import { storeToRefs } from 'pinia'
@@ -148,35 +151,58 @@ import {
 import type { OwnerIF } from '@/interfaces'
 
 /** Composables **/
+const route = useRoute()
 const { isAuthenticated } = useAuth()
 const { goToDash } = useNavigation()
+const { setMhrInformation } = useStore()
 const { getMhrInformation } = storeToRefs(useStore())
 
 /** Props **/
-const props = withDefaults(defineProps<{
-  appReady?: boolean
-}>(), {
-  appReady: false
-})
+const emit = defineEmits(['haveData'])
 
 /** Local Properties **/
 const dataLoaded = ref(true)
-const loading = ref(false)
+const loading = ref(true)
 const mhrHistory = ref({})
 
 
 onMounted(async (): Promise<void> => {
   // do not proceed if app is not ready
   // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-  if (!props.appReady || !isAuthenticated.value || !getFeatureFlag('mhr-history-enabled')) {
+  if (!isAuthenticated.value || !getFeatureFlag('mhr-history-enabled')) {
+    await goToDash()
+    return
+  }
+
+  // If the route contains an mhrNumber, set it in the store
+  if (route.query?.mhrNumber) {
+    // Get and set the MHR information using the registration summary request
+    const mhrInfo = await getMHRegistrationSummary(route.query.mhrNumber, false)
+    await setMhrInformation(mhrInfo)
+  }
+
+// If either the store or route is missing mhrNumber, redirect to dashboard
+  if (!getMhrInformation.value?.mhrNumber) {
     await goToDash()
     return
   }
 
   // Fetch Manufactured Home History
   loading.value = true
-  mhrHistory.value = await getMhrHistory(getMhrInformation.value?.mhrNumber)
-  loading.value = false
+  setTimeout(async () => {
+    try {
+      mhrHistory.value = await getMhrHistory(getMhrInformation.value?.mhrNumber)
+      if (!mhrHistory.value) {
+        await goToDash()
+        return
+      }
+    } catch (error) {
+      await goToDash()
+      return
+    }
+    emit('haveData', true)
+    loading.value = false
+  }, 3000)
 })
 
 const getHomeOwnerIcon = (partyType: HomeOwnerPartyTypes, isBusiness = false): string => {

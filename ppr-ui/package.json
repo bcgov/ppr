@@ -1,6 +1,6 @@
 {
   "name": "ppr-ui",
-  "version": "5.0.19",
+  "version": "5.0.20",
   "private": true,
   "appName": "Assets UI",
   "connectLayerName": "Core UI",

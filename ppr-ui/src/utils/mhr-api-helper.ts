@@ -1038,6 +1038,7 @@ export async function getMhrHistory (mhrNumber: string): Promise<MhrHistoryRoIF>
     const response = await axios.get<MhrHistoryRoIF>(`registrations/history/${mhrNumber}`, getDefaultConfig())
     const data: MhrHistoryRoIF = response?.data
     if (!data) {
+      console.log('No data returned for MHR history. Failure')
       throw new Error('Invalid API response')
     }
     return data
