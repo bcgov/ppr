@@ -69,7 +69,7 @@ SEARCH_ORDER_BY_DATE = " ORDER BY search_ts"
 SEARCH_ORDER_BY_CLIENT_REF = " ORDER BY client_reference_id"
 SEARCH_ORDER_BY_USERNAME = " ORDER BY username"
 SEARCH_ORDER_BY_SEARCH_TYPE = " ORDER BY search_type"
-SEARCH_ORDER_BY_SEARCH_CRITERIA = " ORDER BY searchDateTime"
+SEARCH_ORDER_BY_SEARCH_CRITERIA = " ORDER BY search_criteria"
 SEARCH_ORDER_BY_DEFAULT = " ORDER BY search_ts DESC"
 SEARCH_FILTER_CLIENT_REF = " AND UPPER(client_reference_id) LIKE :query_client_ref"
 SEARCH_FILTER_USERNAME = " WHERE UPPER(username) LIKE :query_username"
@@ -413,7 +413,15 @@ SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_
              FROM users u WHERE u.username = sc.user_id FETCH FIRST 1 ROWS ONLY)
       END) AS username,
   sr.api_result, sc.user_id, sr.score, sc.pay_invoice_id,
-  sc.search_type, sc.client_reference_id
+  sc.search_type, sc.client_reference_id,
+  CASE WHEN sc.search_type = 'BS' THEN UPPER(api_criteria -> 'criteria' -> 'debtorName' ->> 'business')
+       WHEN sc.search_type = 'IS' THEN concat(UPPER(api_criteria -> 'criteria' -> 'debtorName' ->> 'last'),
+                                              ' ',
+                                              UPPER(api_criteria -> 'criteria' -> 'debtorName' ->> 'first'))
+       WHEN sc.search_type = 'MI' THEN concat(UPPER(api_criteria -> 'criteria' -> 'ownerName' ->> 'last'),
+                                              ' ',
+                                              UPPER(api_criteria -> 'criteria' -> 'ownerName' ->> 'first'))
+       ELSE UPPER(api_criteria -> 'criteria' ->> 'value') END as search_criteria
 FROM search_requests sc, search_results sr
 WHERE sc.id = sr.search_id
   AND sc.account_id = :query_account

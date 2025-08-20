@@ -30,7 +30,7 @@ FILTER_CLIENT_REF: str = "?clientReferenceId=UT-SQ-RG-001&sortCriteriaName=clien
 FILTER_USERNAME: str = "?fromUI=true&username=BOB&sortCriteriaName=username&sortDirection=ascending"
 FILTER_DATE: str = "?startDateTime=2025-08-01&endDateTime=2025-08-14&sortCriteriaName=searchDateTime"
 FILTER_IS_CRITERIA: str = "?type=INDIVIDUAL_DEBTOR&criteria=IND TEST"
-FILTER_MI_CRITERIA: str = "?type=MHR_OWNER_NAME&criteria=TEST&sortCriteriaName=searchDateTime"
+FILTER_MI_CRITERIA: str = "?type=MHR_OWNER_NAME&criteria=TEST&sortCriteriaName=criteria"
 
 # testdata pattern is ({desc}, {roles}, {status}, {account}, {from_ui}, {page_num}, {has_results})
 TEST_GET_DATA = [
