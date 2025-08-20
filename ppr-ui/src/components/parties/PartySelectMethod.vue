@@ -92,6 +92,7 @@ function handlePartySelect(party: SubmittingPartyIF) {
         v-if="selectPartyMethod === 'partycode'"
         is-mhr-party-search
         class="pt-0!"
+        :hide-manual-search-label="true"
         @select-item="handlePartySelect($event)"
       />
       <USelect
@@ -102,6 +103,7 @@ function handlePartySelect(party: SubmittingPartyIF) {
         placeholder="Select an Owner"
         class="cursor-pointer ml-4 w-[98%] min-h-[58px] rounded-sm bg-bcGovColor-lightGray/10 px-[16px]
          disabled:opacity-40 text-bcGovColor-midGray disabled:cursor-default"
+        :content="{  bodyLock: false }"
         @update:model-value="handleOwnerSelect"
       />
     </div>

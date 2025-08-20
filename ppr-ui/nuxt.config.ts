@@ -52,7 +52,7 @@ export default defineNuxtConfig({
     '~/components/userAccess'
   ],
   extends: [
-    '@sbc-connect/nuxt-core-layer-beta'
+    '@sbc-connect/nuxt-core-layer-beta', 'documents-common-base-layer',
   ],
   imports: {
     dirs: ['store', 'composables', 'enums', 'interfaces', 'utils']
