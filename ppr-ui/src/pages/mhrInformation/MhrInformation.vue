@@ -886,6 +886,7 @@ export default defineComponent({
       populateLocationInfoForSamePark,
       buildAndSubmitTransportPermit,
     } = useTransportPermits()
+    const { resetPartySelect } = usePartySelect()
 
     // Refs
     const homeOwnersComponentRef = ref(null) as Component
@@ -1152,6 +1153,7 @@ export default defineComponent({
       // Default fee options for MHR transactions
       feeOptions.value.showServiceFees = false
       feeOptions.value.showProcessingFees = false
+      resetPartySelect()
     })
 
     const emitError = (error: ErrorIF): void => {

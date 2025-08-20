@@ -39,6 +39,7 @@
       class="mt-15"
     >
       <ContactInformation
+        is-transfer
         :contact-info="unitNoteSubmittingParty"
         :content="isRedemptionUnitNote ? submittingPartyRegistrationContent : submittingPartyChangeContent"
         :validate="validate"

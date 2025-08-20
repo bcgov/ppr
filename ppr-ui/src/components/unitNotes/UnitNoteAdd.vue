@@ -45,7 +45,6 @@
         :content="contactInfoContent"
         :validate="validate"
         :is-hidden="hasNoPersonGivingNotice"
-        is-transfer
         enable-combined-name-validation
         hide-party-search
         hide-delivery-address

@@ -12,7 +12,7 @@
     <v-expand-transition>
       <div v-show="!isHidden">
         <PartySelectMethod
-          v-if="isRoleStaffReg"
+          v-if="isRoleStaffReg && !hidePartySearch"
           class="mb-8 w-full"
           :is-transfer="isTransfer"
           @party="handlePartySelect($event)"
