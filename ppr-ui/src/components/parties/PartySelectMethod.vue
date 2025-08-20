@@ -1,65 +1,22 @@
 <script setup lang="ts">
 import type { SubmittingPartyIF } from '@/interfaces'
-import { useHomeOwners } from '@/composables'
-import { HomeOwnerPartyTypes } from '@/enums'
+import { usePartySelect } from '@/composables'
+import type { OwnerEmitPayload } from '@/composables'
 
 const props = withDefaults(defineProps<{ isTransfer?: boolean }>(), { isTransfer: false })
 const emit = defineEmits<{
   (e: 'party', party: SubmittingPartyIF): void
-  (e: 'owner', owner: string): void
+  (e: 'owner', owner: OwnerEmitPayload): void
 }>()
 
-const { getTransferOrRegistrationHomeOwners } = useHomeOwners(props.isTransfer)
-const selectPartyMethod = ref('manual')
-const selectedOwner = ref(null)
-const partyMethods = [
-  { label: 'Manual Entry', value: 'manual' },
-  { label: 'PPR PartyCode Lookup', value: 'partycode' },
-  { label: 'Owner', value: 'owner' }
-]
-
-// Map to USelect items
-const ownerOptions = computed(() =>
-  getTransferOrRegistrationHomeOwners()
-    .filter(owner => owner.action !== ActionTypes.REMOVED)
-    .map(owner => ({
-    label: owner.partyType === HomeOwnerPartyTypes.OWNER_BUS
-      ? owner.organizationName
-      : [owner.individualName?.first, owner.individualName?.middle, owner.individualName?.last]
-        .filter(Boolean)
-        .join(' '),
-    value: owner.ownerId
-  }))
-)
-
-function formatOwner(owner: any) {
-  return {
-    personName: owner.individualName || { first: '', middle: '', last: '' },
-    businessName: owner.organizationName || '',
-    emailAddress: owner.emailAddress || '',
-    phoneNumber: owner.phoneNumber || '',
-    phoneExtension: owner.phoneExtension || '',
-    address: {
-      street: owner.address?.street || '',
-      city: owner.address?.city || '',
-      region: owner.address?.region || '',
-      country: owner.address?.country || '',
-      postalCode: owner.address?.postalCode || '',
-      streetAdditional: owner.address?.streetAdditional || ''
-    }
-  }
-}
-
-function handleOwnerSelect(ownerId: string) {
-  const owner = getTransferOrRegistrationHomeOwners().find(o => o.ownerId === ownerId)
-  if (owner) {
-    emit('owner', formatOwner(owner))
-  }
-}
-
-function handlePartySelect(party: SubmittingPartyIF) {
-  emit('party', party)
-}
+const {
+  selectPartyMethod,
+  selectedOwner,
+  partyMethods,
+  ownerOptions,
+  handleOwnerSelect,
+  handlePartySelect
+} = usePartySelect(props.isTransfer, emit)
 </script>
 
 <template>

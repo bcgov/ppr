@@ -188,6 +188,25 @@
           </v-list-item>
         </v-list>
       </v-menu>
+
+      <!-- Staff-only: Mhr History Open-in-new Btn -->
+      <v-btn
+        id="mhr-history-btn"
+        class="pl-1"
+        color="primary"
+        variant="plain"
+        role="link"
+        :ripple="false"
+        @click="openMhrHistory"
+      >
+        <v-icon
+          color="primary"
+          class="mr-1"
+        >
+          mdi-open-in-new
+        </v-icon>
+        <span class="fs-14">Mhr History</span>
+      </v-btn>
     </v-row>
     <v-row v-else>
       <v-col>
@@ -223,6 +242,7 @@ export default defineComponent({
   },
   setup (props) {
     const {
+      isRoleStaffReg,
       isConvertedCl,
       isRlTransition,
       getRegistrationCreationDate,
@@ -295,7 +315,15 @@ export default defineComponent({
       }),
     })
 
+    const openMhrHistory = () => {
+      if (getMhrInformation.value?.mhrNumber) {
+        window.open(`/mhr-history?mhrNumber=${getMhrInformation.value?.mhrNumber}`, '_blank')
+      }
+    }
+
     return {
+      isRoleStaffReg,
+      openMhrHistory,
       RouteNames,
       isRouteName,
       isConvertedCl,
