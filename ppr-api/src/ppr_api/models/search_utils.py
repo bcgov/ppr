@@ -15,6 +15,8 @@
 
 Search constants and helper functions.
 """
+from ppr_api.models import utils as model_utils
+
 # flake8: noqa Q000,E122,E131
 # Disable Q000: Allow query strings to be in double quotation marks that contain single quotation marks.
 # Disable E122: allow query strings to be more human readable.
@@ -31,6 +33,92 @@ SEARCH_RESULTS_MAX_SIZE = 5000
 
 # Result set size limit clause
 RESULTS_SIZE_LIMIT_CLAUSE = "FETCH FIRST :max_results_size ROWS ONLY"
+
+# Accoun search filtering, soriting request parameters
+FROM_UI_PARAM = "fromUI"
+FROM_UI_PARAM2 = "from_ui"
+PAGE_NUM_PARAM = "pageNumber"
+SORT_DIRECTION_PARAM = "sortDirection"
+SORT_CRITERIA_PARAM = "sortCriteriaName"
+START_TS_PARAM = "startDateTime"
+END_TS_PARAM = "endDateTime"
+CLIENT_REF_PARAM = "clientReferenceId"
+SEARCH_TS_PARAM = "searchDateTime"
+SEARCH_TYPE_PARAM = "type"
+SEARCH_CRITERIA_PARAM = "criteria"
+USERNAME_PARAM = "username"
+SORT_ASCENDING = "ascending"
+SORT_DESCENDING = "descending"
+ACCOUNT_SORT_DESCENDING = " DESC"
+ACCOUNT_SORT_ASCENDING = " ASC"
+
+TO_FILTER_SEARCH_TYPE = {
+    "AIRCRAFT_DOT": "AC",
+    "BUSINESS_DEBTOR": "BS",
+    "INDIVIDUAL_DEBTOR": "IS",
+    "MHR_NUMBER": "MH",
+    "REGISTRATION_NUMBER": "RG",
+    "SERIAL_NUMBER": "SS",
+    "MHR_OWNER_NAME": "MI",
+    "MHR_ORGANIZATION_NAME": "MO",
+    "MHR_MHR_NUMBER": "MM",
+    "MHR_SERIAL_NUMBER": "MS",
+}
+
+SEARCH_ORDER_BY_DATE = " ORDER BY search_ts"
+SEARCH_ORDER_BY_CLIENT_REF = " ORDER BY client_reference_id"
+SEARCH_ORDER_BY_USERNAME = " ORDER BY username"
+SEARCH_ORDER_BY_SEARCH_TYPE = " ORDER BY search_type"
+SEARCH_ORDER_BY_SEARCH_CRITERIA = " ORDER BY searchDateTime"
+SEARCH_ORDER_BY_DEFAULT = " ORDER BY search_ts DESC"
+SEARCH_FILTER_CLIENT_REF = " AND UPPER(client_reference_id) LIKE :query_client_ref"
+SEARCH_FILTER_USERNAME = " WHERE UPPER(username) LIKE :query_username"
+SEARCH_FILTER_DATE = " AND search_ts BETWEEN :query_start AND :query_end"
+SEARCH_FILTER_TYPE = " AND search_type = :query_type"
+SEARCH_FILTER_CRITERIA_DEFAULT = " AND UPPER(api_criteria -> 'criteria' ->> 'value') like :query_criteria"
+SEARCH_FILTER_CRITERIA_BS = " AND UPPER(api_criteria -> 'criteria' -> 'debtorName' ->> 'business') like :query_criteria"
+SEARCH_FILTER_CRITERIA_IS = """
+ AND UPPER(api_criteria -> 'criteria' -> 'debtorName' ->> 'last') like :query_last
+ AND UPPER(api_criteria -> 'criteria' -> 'debtorName' ->> 'first') like :query_first
+"""
+SEARCH_FILTER_CRITERIA_MI = """
+ AND UPPER(api_criteria -> 'criteria' -> 'ownerName' ->> 'last') like :query_last
+ AND UPPER(api_criteria -> 'criteria' -> 'ownerName' ->> 'first') like :query_first
+"""
+SEARCH_FILTER_CRITERIA_IS_LAST = " AND UPPER(api_criteria -> 'criteria' -> 'debtorName' ->> 'last') like :query_last"
+SEARCH_FILTER_CRITERIA_MI_LAST = " AND UPPER(api_criteria -> 'criteria' -> 'ownerName' ->> 'last') like :query_last"
+FILTER_SEARCH_CRITERIA = {
+    "AC": SEARCH_FILTER_CRITERIA_DEFAULT,
+    "MH": SEARCH_FILTER_CRITERIA_DEFAULT,
+    "RG": SEARCH_FILTER_CRITERIA_DEFAULT,
+    "SS": SEARCH_FILTER_CRITERIA_DEFAULT,
+    "MM": SEARCH_FILTER_CRITERIA_DEFAULT,
+    "MS": SEARCH_FILTER_CRITERIA_DEFAULT,
+    "MO": SEARCH_FILTER_CRITERIA_DEFAULT,
+    "BS": SEARCH_FILTER_CRITERIA_BS,
+    "IS": SEARCH_FILTER_CRITERIA_IS,
+    "MI": SEARCH_FILTER_CRITERIA_MI,
+}
+# Last name only
+FILTER_SEARCH_CRITERIA_LASTNAME = {
+    "IS": SEARCH_FILTER_CRITERIA_IS_LAST,
+    "MI": SEARCH_FILTER_CRITERIA_MI_LAST,
+}
+QUERY_ACCOUNT_ORDER_BY = {
+    SEARCH_TS_PARAM: SEARCH_ORDER_BY_DATE,
+    SEARCH_TYPE_PARAM: SEARCH_ORDER_BY_SEARCH_TYPE,
+    CLIENT_REF_PARAM: SEARCH_ORDER_BY_CLIENT_REF,
+    USERNAME_PARAM: SEARCH_ORDER_BY_USERNAME,
+    SEARCH_CRITERIA_PARAM: SEARCH_ORDER_BY_SEARCH_CRITERIA,
+}
+QUERY_ACCOUNT_FILTER_BY = {
+    CLIENT_REF_PARAM: SEARCH_FILTER_CLIENT_REF,
+    USERNAME_PARAM: SEARCH_FILTER_USERNAME,
+    START_TS_PARAM: SEARCH_FILTER_DATE,
+    SEARCH_TYPE_PARAM: SEARCH_FILTER_TYPE,
+    SEARCH_CRITERIA_PARAM: SEARCH_FILTER_CRITERIA_DEFAULT,
+}
+
 
 # Serial number search base where clause
 SERIAL_SEARCH_BASE = """
@@ -305,72 +393,7 @@ WHERE sc.id = sr.search_id
                      AND sc2.pay_path IS NULL)
 """
 
-ACCOUNT_SEARCH_HISTORY_DATE_QUERY = f"""
-SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size,
-  (SELECT CASE WHEN sc.search_type IN ('MM', 'MI', 'MO', 'MS') THEN -1
-               WHEN sr.api_result IS NULL THEN 0 
-               WHEN sc.updated_selection IS NULL THEN
-                    (SELECT COUNT(*) 
-                       FROM json_array_elements(sr.api_result) sr2
-                      WHERE sr2 ->> 'matchType' = 'EXACT')
-               ELSE (SELECT COUNT(*) 
-                       FROM json_array_elements(sr.api_result) sr2
-                      WHERE sr2 ->> 'matchType' = 'EXACT') END) AS exact_match_count,
-  sr.similar_match_count, sr.callback_url, sr.doc_storage_url,
-  json_array_length(sr.api_result) as selected_match_count,
-  (SELECT CASE WHEN sc.user_id IS NULL THEN ''
-     ELSE (SELECT CASE WHEN u.lastname IS NOT NULL AND u.firstname IS NOT NULL THEN u.firstname || ' ' || u.lastname 
-                       WHEN u.lastname IS NULL AND u.firstname IS NOT NULL THEN u.firstname
-                       WHEN u.lastname IS NOT NULL AND u.firstname IS NULL THEN u.lastname
-                       ELSE '' END
-             FROM users u WHERE u.username = sc.user_id FETCH FIRST 1 ROWS ONLY)
-      END) AS username,
-  sr.api_result, sc.user_id, sr.score, sc.pay_invoice_id
-FROM search_requests sc, search_results sr
-WHERE sc.id = sr.search_id
-  AND sc.account_id = :query_account
-  AND sc.search_ts > ((now() at time zone 'utc') - interval '{str(GET_HISTORY_DAYS_LIMIT)} days')
-  AND NOT EXISTS (SELECT sc2.id
-                    FROM search_requests sc2
-                   WHERE sc2.id = sc.id
-                     AND sc2.search_type IN ('MM', 'MI', 'MO', 'MS')
-                     AND sc2.pay_path IS NULL)
-ORDER BY sc.search_ts DESC 
-"""
-
-ACCOUNT_SEARCH_HISTORY_QUERY = """
-SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size,
-  (SELECT CASE WHEN sc.search_type IN ('MM', 'MI', 'MO', 'MS') THEN -1
-               WHEN sr.api_result IS NULL THEN 0 
-               WHEN sc.updated_selection IS NULL THEN
-                    (SELECT COUNT(*) 
-                       FROM json_array_elements(sr.api_result) sr2
-                      WHERE sr2 ->> 'matchType' = 'EXACT')
-               ELSE (SELECT COUNT(*) 
-                       FROM json_array_elements(sr.api_result) sr2
-                      WHERE sr2 ->> 'matchType' = 'EXACT') END) AS exact_match_count,
-  sr.similar_match_count, sr.callback_url, sr.doc_storage_url,
-  json_array_length(sr.api_result) as selected_match_count,
-  (SELECT CASE WHEN sc.user_id IS NULL THEN ''
-     ELSE (SELECT CASE WHEN u.lastname IS NOT NULL AND u.firstname IS NOT NULL THEN u.firstname || ' ' || u.lastname 
-                       WHEN u.lastname IS NULL AND u.firstname IS NOT NULL THEN u.firstname
-                       WHEN u.lastname IS NOT NULL AND u.firstname IS NULL THEN u.lastname
-                       ELSE '' END
-             FROM users u WHERE u.username = sc.user_id FETCH FIRST 1 ROWS ONLY)
-      END) AS username,
-  sr.api_result, sc.user_id, sr.score, sc.pay_invoice_id
-FROM search_requests sc, search_results sr
-WHERE sc.id = sr.search_id
-  AND sc.account_id = :query_account
-  AND NOT EXISTS (SELECT sc2.id
-                    FROM search_requests sc2
-                   WHERE sc2.id = sc.id
-                     AND sc2.search_type IN ('MM', 'MI', 'MO', 'MS')
-                     AND sc2.pay_path IS NULL)
-ORDER BY sc.search_ts DESC 
-"""
-
-ACCOUNT_SEARCH_HISTORY_DATE_QUERY_NEW = f"""
+ACCOUNT_SEARCH_HISTORY_BASE = f"""
 SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size,
   (SELECT CASE WHEN sc.search_type IN ('MM', 'MI', 'MO', 'MS') THEN -1
                WHEN sc.updated_selection IS NULL THEN
@@ -389,7 +412,8 @@ SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_
                        ELSE '' END
              FROM users u WHERE u.username = sc.user_id FETCH FIRST 1 ROWS ONLY)
       END) AS username,
-  sr.api_result, sc.user_id, sr.score, sc.pay_invoice_id
+  sr.api_result, sc.user_id, sr.score, sc.pay_invoice_id,
+  sc.search_type, sc.client_reference_id
 FROM search_requests sc, search_results sr
 WHERE sc.id = sr.search_id
   AND sc.account_id = :query_account
@@ -399,39 +423,21 @@ WHERE sc.id = sr.search_id
                    WHERE sc2.id = sc.id
                      AND sc2.search_type IN ('MM', 'MI', 'MO', 'MS')
                      AND sc2.pay_path IS NULL)
-ORDER BY sc.search_ts DESC 
 """
 
-ACCOUNT_SEARCH_HISTORY_QUERY_NEW = """
-SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_results_size,
-  (SELECT CASE WHEN sc.search_type IN ('MM', 'MI', 'MO', 'MS') THEN -1
-               WHEN sc.updated_selection IS NULL THEN
-                    (SELECT COUNT(*) 
-                       FROM json_array_elements(sr.api_result) sr2
-                      WHERE sr2 ->> 'matchType' = 'EXACT')
-               ELSE (SELECT COUNT(*) 
-                       FROM json_array_elements(sc.updated_selection) sc2
-                      WHERE sc2 ->> 'matchType' = 'EXACT') END) AS exact_match_count,
-  sr.similar_match_count, sr.callback_url, sr.doc_storage_url,
-  json_array_length(sc.updated_selection) as selected_match_count,
-  (SELECT CASE WHEN sc.user_id IS NULL THEN ''
-     ELSE (SELECT CASE WHEN u.lastname IS NOT NULL AND u.firstname IS NOT NULL THEN u.firstname || ' ' || u.lastname 
-                       WHEN u.lastname IS NULL AND u.firstname IS NOT NULL THEN u.firstname
-                       WHEN u.lastname IS NOT NULL AND u.firstname IS NULL THEN u.lastname
-                       ELSE '' END
-             FROM users u WHERE u.username = sc.user_id FETCH FIRST 1 ROWS ONLY)
-      END) AS username,
-  sr.api_result, sc.user_id, sr.score, sc.pay_invoice_id
-FROM search_requests sc, search_results sr
-WHERE sc.id = sr.search_id
-  AND sc.account_id = :query_account
-  AND NOT EXISTS (SELECT sc2.id
-                    FROM search_requests sc2
-                   WHERE sc2.id = sc.id
-                     AND sc2.search_type IN ('MM', 'MI', 'MO', 'MS')
-                     AND sc2.pay_path IS NULL)
-ORDER BY sc.search_ts DESC 
+ACCOUNT_SEARCH_HISTORY_DATE_QUERY = (
+    ACCOUNT_SEARCH_HISTORY_BASE
+    + f""" AND sc.search_ts > ((now() at time zone 'utc') - interval '{str(GET_HISTORY_DAYS_LIMIT)} days')
+ ORDER BY sc.search_ts DESC 
 """
+)
+
+ACCOUNT_SEARCH_HISTORY_QUERY = ACCOUNT_SEARCH_HISTORY_BASE + " ORDER BY sc.search_ts DESC "
+
+ACCOUNT_SEARCH_HISTORY_DATE_QUERY_NEW = ACCOUNT_SEARCH_HISTORY_DATE_QUERY
+
+ACCOUNT_SEARCH_HISTORY_QUERY_NEW = ACCOUNT_SEARCH_HISTORY_QUERY
+
 QUERY_ACCOUNT_HISTORY_LIMIT = " LIMIT :page_size OFFSET :page_offset"
 
 
@@ -440,3 +446,184 @@ def format_mhr_number(request_json):
     mhr_num: str = request_json["criteria"]["value"]
     mhr_num = mhr_num.strip().rjust(6, "0")
     request_json["criteria"]["value"] = mhr_num
+
+
+class AccountSearchParams:
+    """Contains parameter values to use when querying account summary search history information."""
+
+    account_id: str
+    sbc_staff: bool = False
+    from_ui: bool = False
+    sort_direction: str = SORT_DESCENDING
+    page_number: int = 1
+    sort_criteria: str = None
+    filter_search_criteria: str = None
+    filter_search_type: str = None
+    filter_client_reference_id: str = None
+    filter_username: str = None
+    filter_start_date: str = None
+    filter_end_date: str = None
+    filter_last_name: str = None
+    filter_first_name: str = None
+
+    def __init__(self, account_id, sbc_staff: bool = False):
+        """Set common base initialization."""
+        self.account_id = account_id
+        self.sbc_staff = sbc_staff
+
+    def has_sort(self) -> bool:
+        """Check if sort criteria provided."""
+        if self.sort_criteria:
+            if self.sort_criteria in (
+                SEARCH_TS_PARAM,
+                SEARCH_TYPE_PARAM,
+                SEARCH_CRITERIA_PARAM,
+                USERNAME_PARAM,
+                CLIENT_REF_PARAM,
+            ):
+                return True
+        return False
+
+    def has_filter(self) -> bool:
+        """Check if filter criteria provided."""
+        return (
+            self.filter_client_reference_id
+            or self.filter_search_criteria
+            or self.filter_search_type
+            or self.filter_start_date
+            or self.filter_username
+        )
+
+    def get_filter_values(self):  # pylint: disable=too-many-return-statements
+        """Provide optional filter name and value if available."""
+        if self.filter_search_type:
+            return SEARCH_TYPE_PARAM, self.filter_search_type
+        if self.filter_start_date:
+            return START_TS_PARAM, self.filter_start_date
+        if self.filter_search_criteria:
+            return SEARCH_CRITERIA_PARAM, self.filter_search_criteria
+        if self.filter_client_reference_id:
+            return CLIENT_REF_PARAM, self.filter_client_reference_id
+        if self.filter_username:
+            return USERNAME_PARAM, self.filter_username
+        return None, None
+
+    def get_page_size(self) -> int:
+        """Provide account registrations query page size."""
+        return ACCOUNT_SEARCH_HISTORY_MAX_SIZE
+
+    def get_page_offset(self) -> int:
+        """Provide account registrations query page offset."""
+        page_offset: int = self.page_number
+        if page_offset <= 1:
+            return 0
+        return (page_offset - 1) * self.get_page_size()
+
+
+def get_multiple_filters(params: AccountSearchParams) -> dict:
+    """Build the list of all applied filters as a key/value dictionary."""
+    filters = []
+    if params.filter_search_type:
+        filters.append(("type", params.filter_search_type))
+    if params.filter_start_date and params.filter_end_date:
+        filters.append(("startDateTime", params.filter_start_date))
+    if params.filter_search_criteria:
+        filters.append(("criteria", params.filter_search_criteria))
+    if params.filter_client_reference_id:
+        filters.append(("clientReferenceId", params.filter_client_reference_id))
+    if params.filter_username:
+        filters.append(("username", params.filter_username))
+    if filters:
+        return filters
+    return None
+
+
+def build_account_query_filter(query_text: str, params: AccountSearchParams) -> str:
+    """Build the account search history summary query filter clause."""
+    if not params.has_filter():
+        return query_text
+    filter_clause: str = ""
+    # Get all selected filters and loop through, applying them
+    filters = get_multiple_filters(params)
+    for query_filter in filters:
+        filter_type = query_filter[0]
+        filter_value = query_filter[1]
+        if filter_type and filter_value:
+            if filter_type == "criteria":
+                if not params.filter_search_type:
+                    filter_clause = SEARCH_FILTER_CRITERIA_DEFAULT
+                elif params.filter_search_type in ("IS", "MI") and not params.filter_first_name:
+                    filter_clause = FILTER_SEARCH_CRITERIA_LASTNAME.get(params.filter_search_type)
+                else:
+                    filter_clause = FILTER_SEARCH_CRITERIA.get(params.filter_search_type)
+            elif filter_type != "username":
+                filter_clause = QUERY_ACCOUNT_FILTER_BY.get(filter_type)
+            if filter_clause:
+                query_text += filter_clause
+    base_query: str = f"SELECT * FROM ({query_text}) AS q "
+    if params.filter_username:
+        base_query += SEARCH_FILTER_USERNAME
+    return base_query
+
+
+def get_account_query_order(params: AccountSearchParams) -> str:
+    """Build the account search history summary query order by clause."""
+    order_clause: str = ""
+    if params.has_sort():
+        order_clause = QUERY_ACCOUNT_ORDER_BY.get(params.sort_criteria)
+        if params.sort_direction and params.sort_direction == SORT_ASCENDING:
+            order_clause += ACCOUNT_SORT_ASCENDING
+        else:
+            order_clause += ACCOUNT_SORT_DESCENDING
+    else:  # Default sort order if filter but no sorting specified.
+        order_clause += SEARCH_ORDER_BY_DEFAULT
+    return order_clause
+
+
+def build_search_history_query(params: AccountSearchParams) -> str:
+    """Build the account search history query based on the request parameters."""
+    if not params.has_filter() and not params.has_sort():
+        query: str = ACCOUNT_SEARCH_HISTORY_DATE_QUERY_NEW
+        if GET_HISTORY_DAYS_LIMIT <= 0:
+            query = ACCOUNT_SEARCH_HISTORY_QUERY_NEW
+        query += QUERY_ACCOUNT_HISTORY_LIMIT
+        return query
+    query_text: str = ACCOUNT_SEARCH_HISTORY_BASE
+    if params.has_filter():
+        query_text = build_account_query_filter(query_text, params)
+    query_text += get_account_query_order(params)
+    return query_text + QUERY_ACCOUNT_HISTORY_LIMIT
+
+
+def build_account_query_params(
+    params: AccountSearchParams,
+) -> dict:
+    """Build the account query runtime parameter set from the provided parameters."""
+    page_offset: int = params.page_number
+    page_size: int = params.get_page_size()
+    if page_offset <= 1:
+        page_offset = 0
+    else:
+        page_offset = (page_offset - 1) * page_size
+    query_params = {"query_account": params.account_id, "page_size": page_size, "page_offset": page_offset}
+    if params.has_filter():
+        if params.filter_start_date and params.filter_end_date:
+            start_ts = model_utils.search_ts(params.filter_start_date, True)
+            end_ts = model_utils.search_ts(params.filter_end_date, False)
+            # logger.info(f'start_ts={start_ts} end_ts={end_ts}')
+            query_params["query_start"] = start_ts
+            query_params["query_end"] = end_ts
+        if params.filter_search_type:
+            query_params["query_type"] = params.filter_search_type
+        if params.filter_username:
+            query_params["query_username"] = params.filter_username
+        if params.filter_client_reference_id:
+            query_params["query_client_ref"] = params.filter_client_reference_id
+        if params.filter_search_criteria:
+            if not params.filter_last_name:
+                query_params["query_criteria"] = params.filter_search_criteria
+            else:
+                query_params["query_last"] = params.filter_last_name
+                if params.filter_first_name:
+                    query_params["query_first"] = params.filter_first_name
+    return query_params

@@ -23,6 +23,7 @@ import pytest
 
 from ppr_api.models import SearchRequest, search_utils
 from ppr_api.models.search_request import CHARACTER_SET_UNSUPPORTED
+from ppr_api.models.search_utils import AccountSearchParams
 from ppr_api.models.utils import now_ts_offset, format_ts
 from ppr_api.exceptions import BusinessException
 
@@ -658,11 +659,10 @@ def test_search_enddatatetime_invalid(session, client, jwt):
 @pytest.mark.parametrize('account_id,from_ui,page_num,has_results', TEST_ACCOUNT_DATA)
 def test_find_by_account_id(session, account_id, from_ui, page_num, has_results):
     """Assert that the account search history list first item contains all expected elements."""
-    history_params = {
-        "from_ui": from_ui,
-        "page_number": 1 if page_num is None else page_num
-    }
-    history = SearchRequest.find_all_by_account_id(account_id, history_params)
+    params: AccountSearchParams = AccountSearchParams(account_id, False)
+    params.from_ui = from_ui
+    params.page_number = 1 if page_num is None else page_num
+    history = SearchRequest.find_all_by_account_id(params)
     if not has_results:
         assert len(history) == 0
     else:

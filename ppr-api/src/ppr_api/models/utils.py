@@ -838,3 +838,13 @@ def get_cl_transition_ts() -> _datetime:
     if reg_type and reg_type.act_ts:
         return reg_type.act_ts
     return None
+
+
+def search_ts(date_iso: str, start: bool = True):
+    """Get a search timestamp in utc time zone as start or end of day."""
+    date_part = date.fromisoformat(date_iso[0:10])
+    if start:
+        day_time = time(0, 0, 1, tzinfo=timezone.utc)
+        return _datetime.combine(date_part, day_time)
+    day_time = time(23, 59, 59, tzinfo=timezone.utc)
+    return _datetime.combine(date_part, day_time)
