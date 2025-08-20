@@ -174,9 +174,7 @@ export default defineComponent({
 
     const selectResult = (resultIndex: number) => {
       if (resultIndex >= 0) {
-        console.log('Pre Sanitized Name: ', localState.autoCompleteResults[resultIndex]?.name)
         const searchValue = sanitizeName(localState.autoCompleteResults[resultIndex]?.name)
-        console.log('Post Sanitized Name: ',  searchValue)
 
         localState.autoCompleteIsActive = false
         localState.isSearchResultSelected = true
