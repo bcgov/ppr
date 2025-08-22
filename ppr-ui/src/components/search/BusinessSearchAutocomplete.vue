@@ -112,6 +112,7 @@ import type { SearchResponseI } from '@/interfaces'
 import { useSearch } from '@/composables/useSearch'
 import { BusinessTypes } from '@/enums/business-types'
 import { debounce } from 'lodash'
+import { sanitizeName } from '@/utils/utilities'
 
 export default defineComponent({
   name: 'BusinessSearchAutocomplete',
@@ -173,7 +174,8 @@ export default defineComponent({
 
     const selectResult = (resultIndex: number) => {
       if (resultIndex >= 0) {
-        const searchValue = localState.autoCompleteResults[resultIndex]?.name
+        const searchValue = sanitizeName(localState.autoCompleteResults[resultIndex]?.name)
+
         localState.autoCompleteIsActive = false
         localState.isSearchResultSelected = true
         emit('searchValue', searchValue)
