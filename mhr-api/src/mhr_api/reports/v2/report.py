@@ -366,6 +366,8 @@ class Report:  # pylint: disable=too-few-public-methods
             "macros",
             "registrarSignature",
             "registrarSignatureBlack",
+            "registrarSignatureSO",
+            "registrarSignatureBlackSO",
             "registration/details",
             "registration/givingNoticeParty",
             "registration/location",
