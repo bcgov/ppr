@@ -141,6 +141,7 @@ export default defineComponent({
       localState.editor = new Editor({
         content: props.editorContent || null,
         editorProps: editorProperties,
+        enableInputRules: false,
         extensions: [
           Underline,
           Table,

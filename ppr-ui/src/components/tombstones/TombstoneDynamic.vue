@@ -203,9 +203,9 @@
           color="primary"
           class="mr-1"
         >
-          mdi-open-in-new
+          mdi-history
         </v-icon>
-        <span class="fs-14">Mhr History</span>
+        <span class="fs-14">Historical Home Information</span>
       </v-btn>
     </v-row>
     <v-row v-else>
