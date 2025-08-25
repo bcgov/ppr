@@ -93,6 +93,8 @@ export interface MhrDraftIF {
   error?: ErrorIF
   clientReferenceId?: string
   // Part of Draft Api Response
+  civicAddress?: string
+  manufacturerName?: string
   mhrNumber?: string
   registeringName?: string
   registrationDescription?: string
@@ -110,9 +112,11 @@ export interface DraftResultIF {
   baseRegistrationNumber?: string // identifier for the parent registration
   clientReferenceId: string
   createDateTime: string // Generated on first draft save.
+  civicAddress
   documentId: string // identifier for the draft
   error?: ErrorIF
   lastUpdateDateTime: string // Timestamp of last draft update.
+  manufacturerName?: string
   path: string
   registeringName?: string
   registrationDescription: string
@@ -129,6 +133,7 @@ export interface RegistrationSummaryIF {
   clientReferenceId?: string // AKA folio max length 20.
   changes?: (RegistrationSummaryIF | DraftResultIF) []
   createDateTime?: string // Included in a successful response.
+  civicAddress?: string
   documentId?: string
   error?: ErrorIF
   expand?: boolean // used in UI table to toggle expansion.
@@ -136,6 +141,7 @@ export interface RegistrationSummaryIF {
   hasDraft?: boolean // added by UI to show extra text
   inUserList?: boolean // whether the registration is in their table or not
   lastUpdateDateTime?: string // Included in a successful response. Timestamp of last draft update.
+  manufacturerName?: string
   new?: boolean // used to prevent the collapse of a newly added base reg
   path: string
   legacy?: boolean // Flag indicating if filing was completed in the legacy system

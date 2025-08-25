@@ -449,17 +449,17 @@ export const mhRegistrationTableHeaders: Array<BaseHeaderIF> = [
     display: true
   },
   {
+    class: 'column-md',
+    sortable: true,
+    text: 'Current Status',
+    value: 'statusType',
+    display: true
+  },
+  {
     class: 'column-lg',
     sortable: true,
     text: 'Registration Type',
     value: 'registrationDescription',
-    display: true
-  },
-  {
-    class: 'column-sm',
-    sortable: false,
-    text: 'Documents',
-    value: 'vs',
     display: true
   },
   {
@@ -472,15 +472,36 @@ export const mhRegistrationTableHeaders: Array<BaseHeaderIF> = [
   {
     class: 'column-mdl',
     sortable: true,
+    text: 'Owners',
+    value: 'ownerNames',
+    display: true
+  },
+  {
+    class: 'column-sm',
+    sortable: false,
+    text: 'Verifications',
+    value: 'vs',
+    display: true
+  },
+  {
+    class: 'column-mdl',
+    sortable: true,
     text: 'Document ID',
     value: 'documentId',
     display: true
   },
   {
-    class: 'column-md',
+    class: 'column-mdl',
     sortable: true,
-    text: 'Current Status',
-    value: 'statusType',
+    text: 'Civic Address',
+    value: 'civicAddress',
+    display: true
+  },
+  {
+    class: 'column-mdl',
+    sortable: true,
+    text: 'Manufacturer',
+    value: 'manufacturerName',
     display: true
   },
   {
@@ -495,13 +516,6 @@ export const mhRegistrationTableHeaders: Array<BaseHeaderIF> = [
     sortable: true,
     text: 'Submitting Party',
     value: 'registeringParty',
-    display: true
-  },
-  {
-    class: 'column-mdl',
-    sortable: true,
-    text: 'Owners',
-    value: 'ownerNames',
     display: true
   },
   {

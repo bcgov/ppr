@@ -136,6 +136,7 @@ export default defineComponent({
       registrationNumber,
       registeredBy,
       registeringParty,
+      manufacturerName,
       securedParties,
       folioNumber,
       status,
@@ -198,7 +199,7 @@ export default defineComponent({
       search: computed(() => { return props.setSearch }),
       tableFiltersActive: computed((): boolean => {
         return !!(dateTxt.value || registrationNumber.value || registrationType.value ||
-          status.value || registeredBy.value || registeringParty.value ||
+          status.value || registeredBy.value || registeringParty.value || manufacturerName.value ||
           securedParties.value || folioNumber.value || documentId.value)
       }),
       tableHeadersWidth: computed(() => {
@@ -415,9 +416,10 @@ export default defineComponent({
         submittedEndDate.value,
         orderBy.value,
         orderVal.value,
-        documentId.value
+        documentId.value,
+        manufacturerName.value
       ], (
-        [regParty, regType, regNum, folNum, secParty, regBy, status, startDate, endDate, orderBy, orderVal, documentId]
+        [regParty, regType, regNum, folNum, secParty, regBy, status, startDate, endDate, orderBy, orderVal, documentId, manufacturerName]
       ) => {
         // Close Date Picker on Sort
         localState.showDatePicker = false
@@ -439,7 +441,8 @@ export default defineComponent({
             secParty,
             startDate,
             status,
-            documentId
+            documentId,
+            manufacturerName
           } as RegistrationSortIF,
           sorting: localState.tableFiltersActive
         })
@@ -517,6 +520,7 @@ export default defineComponent({
       toggleOrderBy,
       registeredBy,
       registeringParty,
+      manufacturerName,
       securedParties,
       folioNumber,
       status,
@@ -768,6 +772,18 @@ export default defineComponent({
                     hide-details="true"
                     type="text"
                     label="Document ID"
+                    density="compact"
+                    aria-hidden="true"
+                  />
+                  <v-text-field
+                    v-if="!isPpr && header.value === 'manufacturerName'"
+                    v-model="manufacturerName"
+                    variant="filled"
+                    color="primary"
+                    single-line
+                    hide-details="true"
+                    type="text"
+                    :label="header.text"
                     density="compact"
                     aria-hidden="true"
                   />

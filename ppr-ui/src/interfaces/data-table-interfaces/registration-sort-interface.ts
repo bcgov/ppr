@@ -11,4 +11,6 @@ export interface RegistrationSortIF {
   startDate: string,
   status: string,
   documentId: string
+  civicAddress: string
+  manufacturerName: string
 }

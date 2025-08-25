@@ -21,6 +21,7 @@ export const useRegistration = (setSort: RegistrationSortIF) => {
     status: setSort?.status || null,
     registeredBy: setSort?.regBy || '',
     documentId: setSort?.documentId || '',
+    manufacturerName: setSort?.manufacturerName || '',
     registeringParty: setSort?.regParty || '',
     securedParties: setSort?.secParty || '',
     shouldClearType: false,

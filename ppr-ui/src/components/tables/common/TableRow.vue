@@ -680,6 +680,7 @@ export default defineComponent({
         </v-col>
       </v-row>
     </td>
+    <!-- registrationNumber -->
     <td
       v-if="inSelectedHeaders('registrationNumber') || inSelectedHeaders('mhrNumber')"
       :class="{'border-left': (isChild || setIsExpanded), 'fix-td-width': hasRequiredTransfer(item) }"
@@ -766,6 +767,32 @@ export default defineComponent({
         </v-col>
       </v-row>
     </td>
+    <!-- statusType -->
+    <td
+      v-if="inSelectedHeaders('statusType')"
+      :class="isChild || item.expanded ? 'border-left': ''"
+    >
+      <div v-if="item.invoiceId">Pending Payment</div>
+      <div v-else-if="!isChild || isDraft(item) || !isPpr">
+        {{
+          isMhrTransfer(item) && !isChild ?
+            'Completed' : getStatusDescription(
+              item.statusType,
+              isChild,
+              isPpr,
+              isDraft(item),
+              !isChild && item.mhrNumber && (item.statusType === MhApiStatusTypes.DRAFT)
+            )
+        }}
+        <p
+          v-if="!isChild && item.hasDraft"
+          class="ma-0"
+        >
+          <i>{{ isPpr ? '* Draft Amendment' : '* Draft Changes' }}</i>
+        </p>
+      </div>
+    </td>
+    <!-- registrationType -->
     <td
       v-if="inSelectedHeaders('registrationType') || inSelectedHeaders('registrationDescription')"
       :class="isChild || item.expanded ? 'border-left': ''"
@@ -812,6 +839,26 @@ export default defineComponent({
         </v-tooltip>
       </div>
     </td>
+    <!-- createDateTime -->
+    <td
+      v-if="inSelectedHeaders('createDateTime')"
+      :class="isChild || item.expanded ? 'border-left': ''"
+    >
+      <span v-if="!isDraft(item)">
+        {{ getFormattedDate(item.createDateTime) }}
+      </span>
+      <span v-else>
+        Not Registered
+      </span>
+    </td>
+    <!-- ownerNames  -->
+    <td
+      v-if="inSelectedHeaders('ownerNames')"
+      :class="isChild || item.expanded ? 'border-left': ''"
+    >
+      {{ item.ownerNames }}
+    </td>
+    <!-- verification -->
     <td
       v-if="inSelectedHeaders('vs')"
       :class="isChild || item.expanded ? 'border-left': ''"
@@ -860,17 +907,6 @@ export default defineComponent({
         </div>
       </v-tooltip>
     </td>
-    <td
-      v-if="inSelectedHeaders('createDateTime')"
-      :class="isChild || item.expanded ? 'border-left': ''"
-    >
-      <span v-if="!isDraft(item)">
-        {{ getFormattedDate(item.createDateTime) }}
-      </span>
-      <span v-else>
-        Not Registered
-      </span>
-    </td>
 
     <!-- Conditional Document ID: Staff Only and Selected -->
     <td
@@ -912,30 +948,19 @@ export default defineComponent({
         </v-tooltip>
       </span>
     </td>
-
+    <!-- civicAddress  -->
     <td
-      v-if="inSelectedHeaders('statusType')"
+      v-if="inSelectedHeaders('civicAddress')"
       :class="isChild || item.expanded ? 'border-left': ''"
     >
-      <div v-if="item.invoiceId">Pending Payment</div>
-      <div v-else-if="!isChild || isDraft(item) || !isPpr">
-        {{
-          isMhrTransfer(item) && !isChild ?
-            'Completed' : getStatusDescription(
-              item.statusType,
-              isChild,
-              isPpr,
-              isDraft(item),
-              !isChild && item.mhrNumber && (item.statusType === MhApiStatusTypes.DRAFT)
-            )
-        }}
-        <p
-          v-if="!isChild && item.hasDraft"
-          class="ma-0"
-        >
-          <i>{{ isPpr ? '* Draft Amendment' : '* Draft Changes' }}</i>
-        </p>
-      </div>
+      {{ item.civicAddress }}
+    </td>
+    <!-- manufacturerName  -->
+    <td
+      v-if="inSelectedHeaders('manufacturerName')"
+      :class="isChild || item.expanded ? 'border-left': ''"
+    >
+      {{ item.manufacturerName }}
     </td>
     <td
       v-if="inSelectedHeaders('registeringName')"
@@ -950,12 +975,6 @@ export default defineComponent({
       :class="isChild || item.expanded ? 'border-left': ''"
     >
       {{ item.registeringParty || item.submittingParty }}
-    </td>
-    <td
-      v-if="inSelectedHeaders('ownerNames')"
-      :class="isChild || item.expanded ? 'border-left': ''"
-    >
-      {{ item.ownerNames }}
     </td>
     <td
       v-if="inSelectedHeaders('securedParties') && isPpr"
