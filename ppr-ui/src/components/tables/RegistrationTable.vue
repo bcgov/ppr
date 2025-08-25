@@ -419,7 +419,21 @@ export default defineComponent({
         documentId.value,
         manufacturerName.value
       ], (
-        [regParty, regType, regNum, folNum, secParty, regBy, status, startDate, endDate, orderBy, orderVal, documentId, manufacturerName]
+        [
+          regParty,
+          regType,
+          regNum,
+          folNum,
+          secParty,
+          regBy,
+          status,
+          startDate,
+          endDate,
+          orderBy,
+          orderVal,
+          documentId,
+          manufacturerName
+        ]
       ) => {
         // Close Date Picker on Sort
         localState.showDatePicker = false
