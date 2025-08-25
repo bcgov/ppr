@@ -820,7 +820,9 @@ const UIFilterToApiFilter = {
   startDate: 'startDateTime',
   status: 'statusType',
   regParty: 'submittingName',
-  documentId: 'documentId'
+  documentId: 'documentId',
+  civicAddress: 'civicAddress',
+  manufacturerName: 'manufacturerName'
 }
 
 // add sorting params for registration history/draft api calls
