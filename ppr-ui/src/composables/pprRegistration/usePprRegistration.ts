@@ -12,7 +12,6 @@ import { useStore } from '@/store/store'
 import { cloneDeep } from 'lodash'
 import type { ComputedRef } from 'vue';
 import { computed } from 'vue'
-import { getFeatureFlag } from '@/utils'
 import { storeToRefs } from 'pinia'
 
 export const usePprRegistration = () => {
@@ -115,7 +114,7 @@ export const usePprRegistration = () => {
 
     if (flowType === RegistrationFlowType.RENEWAL) {
       const isRepairsLien = registrationType.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN &&
-        !getFeatureFlag('cla-enabled')
+        false
       lengthTrust = {
         valid: !!isRepairsLien,
         showInvalid: false,
@@ -165,7 +164,7 @@ export const usePprRegistration = () => {
 
   /** Returns true when Security Act Notice Feature Flag is enabled **/
   const isSecurityActNoticeEnabled: ComputedRef<boolean> = computed((): boolean => {
-    return getUserSettings.value?.hasSecuritiesActAccess && getFeatureFlag('ppr-sa-notice-enabled')
+    return getUserSettings.value?.hasSecuritiesActAccess
   })
 
   return {

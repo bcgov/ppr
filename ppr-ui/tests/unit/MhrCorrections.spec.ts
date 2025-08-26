@@ -35,9 +35,6 @@ describe.skip('Mhr Staff Corrections', async () => {
   }
 
   beforeEach(async () => {
-    defaultFlagSet['mhr-staff-correction-enabled'] = true
-    defaultFlagSet['mhr-registration-enabled'] = true
-
     await store.setAuthRoles([AuthRoles.PPR_STAFF])
     await store.setRegistrationType(MhrCorrectionStaff)
     await store.setMhrBaseline(cloneDeep(mockedMhrRegistration))
@@ -371,9 +368,6 @@ describe.skip('Mhr Client Corrections', async () => {
   }
 
   beforeEach(async () => {
-    defaultFlagSet['mhr-staff-correction-enabled'] = true
-    defaultFlagSet['mhr-registration-enabled'] = true
-
     await store.setAuthRoles([AuthRoles.PPR_STAFF])
     await store.setRegistrationType(MhrCorrectionClient)
     await store.setMhrBaseline(cloneDeep(mockedMhrRegistration))

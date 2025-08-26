@@ -189,7 +189,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { RegistrationLengthTrustSummary, SecuritiesActNoticesPanels } from '@/components/registration'
 import { DebtorSummary, RegisteringPartySummary, SecuredPartySummary } from '@/components/parties/summaries'
 import { notCompleteDialog } from '@/resources/dialogOptions'
-import { convertDate, getFeatureFlag, pacificDate } from '@/utils'
+import { convertDate, pacificDate } from '@/utils'
 import { getFinancingStatement } from '@/utils/ppr-api-helper'
 import type { APIRegistrationTypes } from '@/enums'
 import { RegistrationFlowType, RouteNames, UIRegistrationTypes } from '@/enums'
@@ -329,7 +329,7 @@ export default defineComponent({
       // do not proceed if app is not ready
       if (!val) return
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
+      if (!isAuthenticated.value) {
         goToDash()
         return
       }

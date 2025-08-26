@@ -156,7 +156,6 @@ describe('TombstoneDynamic component - MHR', () => {
   })
 
   it('does not render correction btns for Mhr when staff and the FF is disabled', async () => {
-    defaultFlagSet['mhr-staff-correction-enabled'] = false
     setupMockStaffUser()
     await nextTick()
 
@@ -165,7 +164,6 @@ describe('TombstoneDynamic component - MHR', () => {
   })
 
   it('does not render correction btns for Mhr when not staff and the FF is enabled', async () => {
-    defaultFlagSet['mhr-staff-correction-enabled'] = true
     setupMockUser()
     await nextTick()
 
@@ -174,7 +172,6 @@ describe('TombstoneDynamic component - MHR', () => {
   })
 
   it('renders correction btns properly for Mhr when staff and the FF is enabled', async () => {
-    defaultFlagSet['mhr-staff-correction-enabled'] = true
     setupMockStaffUser()
     await nextTick()
 

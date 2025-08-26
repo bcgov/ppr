@@ -9,7 +9,6 @@ describe('Exemptions.vue', () => {
   let wrapper
 
   beforeEach(async () => {
-    defaultFlagSet['mhr-exemption-enabled'] = true
     wrapper = await createComponent(Exemptions, { appReady: true }, RouteNames.EXEMPTION_DETAILS)
     wrapper.vm.dataLoaded = true
     await nextTick()

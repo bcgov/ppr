@@ -1,5 +1,4 @@
 import { ProductCode, AuthRoles } from '@/enums'
-import { getFeatureFlag } from '@/utils'
 
 /**
  * Util function to get user's role and subscribed products as one string.
@@ -20,15 +19,11 @@ export function getRoleProductCode (
     subscribedProductCodes.length === 0) {
     // Staff User
     accessRole.push('STAFF')
-    // If MHR UI is disabled then user has access only to PPR
-    if (!getFeatureFlag('mhr-ui-enabled')) {
-      accessRole.push('PPR')
-    }
   } else if (authRoles.includes(AuthRoles.PUBLIC)) {
     // Client User
     accessRole.push('CLIENT')
 
-    if (subscribedProductCodes.includes(ProductCode.MHR) && getFeatureFlag('mhr-ui-enabled')) {
+    if (subscribedProductCodes.includes(ProductCode.MHR)) {
       accessRole.push('MHR')
     }
 

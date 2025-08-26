@@ -135,7 +135,6 @@ import { FolioNumberSummary, StaffPayment, StickyContainer } from '@/components/
 import { ConnectPaymentMethod, ErrorCategories, RouteNames, StaffPaymentOptions, UIMHRSearchTypeValues } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { notCompleteSearchDialog } from '@/resources/dialogOptions'
-import { getFeatureFlag } from '@/utils'
 import { submitSelectedMhr } from '@/utils/mhr-api-helper'
 import { uniqBy } from 'lodash'
 
@@ -366,7 +365,7 @@ export default defineComponent({
       if (!val) return
 
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || !getFeatureFlag('mhr-ui-enabled')) {
+      if (!isAuthenticated.value) {
         goToDash()
         return
       }

@@ -2,7 +2,6 @@
 import { defineComponent, reactive, toRefs } from 'vue'
 import { RegistrationTypes } from '@/resources'
 import { UIRegistrationTypes, APIRegistrationTypes } from '@/enums'
-import { getFeatureFlag } from '@/utils'
 
 export default defineComponent({
   name: 'RegistrationBarButtonList',
@@ -24,7 +23,6 @@ export default defineComponent({
     }
 
     return {
-      getFeatureFlag,
       selectRegistration,
       ...toRefs(localState)
     }
@@ -84,7 +82,6 @@ export default defineComponent({
           </v-list-item>
 
           <v-list-item
-            v-if="getFeatureFlag('cla-enabled')"
             id="btn-commercial-lien"
             class="copy-normal"
             @click="selectRegistration(registrationTypeValues.COMMERCIAL_LIEN)"
@@ -92,18 +89,6 @@ export default defineComponent({
             <v-list-item-title>
               {{ registrationTypes.COMMERCIAL_LIEN }}
               ({{ registrationTypeValues.COMMERCIAL_LIEN }})
-            </v-list-item-title>
-          </v-list-item>
-
-          <v-list-item
-            v-else
-            id="btn-repairers"
-            class="copy-normal"
-            @click="selectRegistration(registrationTypeValues.REPAIRERS_LIEN)"
-          >
-            <v-list-item-title>
-              {{ registrationTypes.REPAIRERS_LIEN }}
-              ({{ registrationTypeValues.REPAIRERS_LIEN }})
             </v-list-item-title>
           </v-list-item>
 

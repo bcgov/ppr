@@ -37,7 +37,7 @@ import {
   MHRegistrationTypesOrg
 } from '@/resources'
 import { storeToRefs } from 'pinia'
-import { dateToYyyyMmDd, yyyyMmDdToPacificDate, localTodayDate, getFeatureFlag } from '@/utils'
+import { dateToYyyyMmDd, yyyyMmDdToPacificDate, localTodayDate } from '@/utils'
 import TableObserver from '@/components/tables/common/TableObserver.vue'
 
 export default defineComponent({
@@ -164,14 +164,7 @@ export default defineComponent({
       statusTypes: [...StatusTypes],
       mhStatusTypes: MhStatusTypes,
       registrationTypes: computed(() => {
-        let registrationTypes = RegistrationTypesStandard
-
-        // Filter out the commercial lien registration type if the feature flag is disabled
-        if(!getFeatureFlag('cla-enabled')){
-          registrationTypes = RegistrationTypesStandard.filter(item =>
-            item?.registrationTypeAPI !== APIRegistrationTypes.COMMERCIAL_LIEN
-          )
-        }
+        const registrationTypes = RegistrationTypesStandard
 
         return [...registrationTypes].slice(1)
       }),

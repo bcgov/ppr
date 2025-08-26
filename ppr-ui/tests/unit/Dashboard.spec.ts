@@ -66,16 +66,6 @@ vi.mock('@/utils/mhr-api-helper', () => ({
 describe('Dashboard component', () => {
   let wrapper
 
-  beforeAll(() => {
-    defaultFlagSet['mhr-registration-enabled'] = true
-    defaultFlagSet['mhr-ui-enabled'] = true
-  })
-
-  afterAll(() => {
-    defaultFlagSet['mhr-registration-enabled'] = false
-    defaultFlagSet['mhr-ui-enabled'] = false
-  })
-
   beforeEach(async () => {
     await store.setAuthRoles([AuthRoles.PUBLIC, 'ppr'])
     await store.setUserProductSubscriptionsCodes([ProductCode.PPR])

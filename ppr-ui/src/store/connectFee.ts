@@ -1,5 +1,4 @@
 import { ConnectPaymentMethod } from '~/enums/connect-payment-method'
-import { getFeatureFlag } from '@/utils'
 
 export const useConnectFeeStore = defineStore('connect/fee', () => {
   const { $payApi } = useNuxtApp()
@@ -124,7 +123,7 @@ export const useConnectFeeStore = defineStore('connect/fee', () => {
     // if pad in confirmation period then set selected payment to CC
     if (PAD_PENDING_STATES.includes(userPaymentAccount.value?.cfsAccount?.status)) {
       userSelectedPaymentMethod.value = null // ConnectPaymentMethod.DIRECT_PAY
-      allowAlternatePaymentMethod.value = getFeatureFlag('mhr-credit-card-enabled')
+      allowAlternatePaymentMethod.value = true
       // TODO: show modal for user
     }
   })
@@ -168,7 +167,7 @@ export const useConnectFeeStore = defineStore('connect/fee', () => {
       userSelectedPaymentMethod.value = defaultMethod
 
       // only set allowed flag to true if previous steps didnt cause an error
-      allowAlternatePaymentMethod.value = getFeatureFlag('mhr-credit-card-enabled')
+      allowAlternatePaymentMethod.value = true
     } catch (e) {
       logFetchError(e, 'Error initializing user payment account')
     }

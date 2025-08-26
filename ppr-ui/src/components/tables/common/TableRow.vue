@@ -1,6 +1,6 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
-import { stripChars, multipleWordsToTitleCase, isWithinMinutes, getFeatureFlag } from '@/utils'
+import { stripChars, multipleWordsToTitleCase, isWithinMinutes } from '@/utils'
 import { getRegistrationSummary, registrationPDF } from '@/utils/ppr-api-helper'
 import { mhRegistrationPDF, getMHRegistrationSummary } from '@/utils/mhr-api-helper'
 import { useStore } from '@/store/store'
@@ -367,7 +367,7 @@ export default defineComponent({
 
     const isRepairersLienAmendDisabled = (item: RegistrationSummaryIF): boolean => {
       // return if the repairers lien transition is enabled
-      if (getFeatureFlag('cla-enabled')) return false
+      return false
 
       const changes = item?.changes as RegistrationSummaryIF[]
       // if there are amendments, get the vehicle count from the first array element
@@ -409,7 +409,7 @@ export default defineComponent({
     }
 
     const isRepairersLienAndTransitioning = (item: RegistrationSummaryIF): boolean => {
-      return isRepairersLien(item) && getFeatureFlag('cla-enabled')
+      return isRepairersLien(item)
     }
 
     const isExemptOrCancelled = (statusType: MhApiStatusTypes): boolean =>

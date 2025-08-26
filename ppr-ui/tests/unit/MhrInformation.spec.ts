@@ -91,7 +91,6 @@ describe('Mhr Information', async () => {
   const LEGAL_NAME = 'TEST NAME'
 
   beforeEach(async () => {
-    defaultFlagSet['mhr-transfer-enabled'] = true
     await store.setCertifyInformation({
       valid: false,
       certified: false,
@@ -161,11 +160,7 @@ describe('Mhr Information', async () => {
     transferTypeComponent.vm.displayGroup = { 1: true, 2: true, 3: true }
     await nextTick()
 
-    if (defaultFlagSet['mhr-misc-transfers-enabled']) {
-      expect(transferTypeComponent.vm.transferTypesSelector).toStrictEqual(StaffTransferTypes)
-    } else {
-      expect(transferTypeComponent.vm.transferTypesSelector).toStrictEqual(StaffTransferTypesOrg)
-    }
+    expect(transferTypeComponent.vm.transferTypesSelector).toStrictEqual(StaffTransferTypes)
 
     await store.setAuthRoles([AuthRoles.MHR_TRANSFER_SALE])
     await store.setUserProductSubscriptionsCodes([ProductCode.LAWYERS_NOTARIES])
@@ -1059,7 +1054,6 @@ describe('Mhr Information', async () => {
   })
 
   it('should hide the Transfer Change button when the feature flag is false', async () => {
-    defaultFlagSet['mhr-transfer-enabled'] = false
     setupCurrentHomeOwners()
     wrapper = await createComponent(MhrInformation, { appReady: true, isMhrTransfer: true }, RouteNames.MHR_INFORMATION)
 
@@ -1117,7 +1111,6 @@ describe('Mhr Information', async () => {
   })
 
   it('should render correct MHR Info view for Exempt home', async () => {
-    defaultFlagSet['mhr-transport-permit-enabled'] = true
     await store.setAuthRoles([AuthRoles.PPR_STAFF])
     await store.setMhrStatusType(MhApiStatusTypes.EXEMPT)
     await store.setMhrExemptDateTime('2024-02-10T08:51:24-08:00')
@@ -1140,8 +1133,6 @@ describe('Mhr Information', async () => {
   })
 
   it('should render correct MHR Info view for Cancelled home', async () => {
-    defaultFlagSet['mhr-transport-permit-enabled'] = true
-
     await store.setAuthRoles([AuthRoles.PPR_STAFF])
     await store.setMhrStatusType(MhApiStatusTypes.CANCELLED)
 
@@ -1156,8 +1147,6 @@ describe('Mhr Information', async () => {
 
 
   it('should enable amend and cancel transport permit', async () => {
-    defaultFlagSet['mhr-transport-permit-enabled'] = true
-
     const transportPermitComposable = useTransportPermits()
 
     // set all conditions to enable the Amend/Cancel Permits

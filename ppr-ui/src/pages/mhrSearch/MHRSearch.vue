@@ -67,7 +67,6 @@ import { computed, defineComponent, onBeforeMount, reactive, toRefs, watch } fro
 import { useStore } from '@/store/store'
 import { SearchedResultsMhr } from '@/components/tables/mhr'
 import { RouteNames } from '@/enums'
-import { getFeatureFlag } from '@/utils'
 import { storeToRefs } from 'pinia'
 import { useAuth, useNavigation } from '@/composables'
 
@@ -134,7 +133,7 @@ export default defineComponent({
       if (!val) return
 
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
+      if (!isAuthenticated.value) {
         window.alert('Personal Property Registry is under construction. Please check again later.')
         navigateToUrl(props.registryUrl)
         return

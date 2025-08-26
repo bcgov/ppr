@@ -13,8 +13,6 @@ const store = useStore()
 describe('UserAccess', () => {
   let wrapper
 
-  defaultFlagSet['mhr-user-access-enabled'] = true
-
   beforeEach(async () => {
     wrapper = await createComponent(UserAccess, { appReady: true }, RouteNames.QS_ACCESS_TYPE)
   })

@@ -129,7 +129,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { getMhrHistory, getMHRegistrationSummary  } from '@/utils/mhr-api-helper'
-import { pacificDate , getFeatureFlag } from '@/utils'
+import { pacificDate } from '@/utils'
 import { useAuth, useNavigation } from '@/composables'
 import { storeToRefs } from 'pinia'
 import { useStore } from '@/store/store'
@@ -169,7 +169,7 @@ const mhrHistory = ref({})
 onMounted(async (): Promise<void> => {
   // do not proceed if app is not ready
   // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-  if (!isAuthenticated.value || !getFeatureFlag('mhr-history-enabled')) {
+  if (!isAuthenticated.value) {
     await goToDash()
     return
   }

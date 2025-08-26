@@ -102,7 +102,7 @@
 import { defineComponent, nextTick, onMounted, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { getFeatureFlag, scrollToFirstVisibleErrorComponent } from '@/utils'
+import { scrollToFirstVisibleErrorComponent } from '@/utils'
 import type { MhrSubTypes} from '@/enums';
 import { RouteNames } from '@/enums'
 import QsSelectAccess from './QsSelectAccess.vue'
@@ -153,7 +153,7 @@ export default defineComponent({
     onMounted(async (): Promise<void> => {
       // do not proceed if app is not ready
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!props.appReady || !isAuthenticated.value || !getFeatureFlag('mhr-user-access-enabled')) {
+      if (!props.appReady || !isAuthenticated.value) {
         await goToDash()
         return
       }

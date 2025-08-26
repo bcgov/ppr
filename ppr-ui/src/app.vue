@@ -231,12 +231,10 @@ export default defineComponent({
         console.error('Auth product subscription error = ', error)
       }
 
-      if (getFeatureFlag('mhr-credit-card-enabled')) {
-        try {
-          await loadPaymentInfo()
-        } catch (error) {
-          console.error('Fetch payment information error = ', error)
-        }
+      try {
+        await loadPaymentInfo()
+      } catch (error) {
+        console.error('Fetch payment information error = ', error)
       }
 
       // update Launch Darkly

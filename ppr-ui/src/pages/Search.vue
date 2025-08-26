@@ -116,7 +116,7 @@ import {
   saveResultsError,
   saveSelectionsError
 } from '@/resources/dialogOptions'
-import { getFeatureFlag, pacificDate } from '@/utils'
+import { pacificDate } from '@/utils'
 import { getPprSearchHistoryById, submitSelected, successfulPPRResponses, updateSelected } from '@/utils/ppr-api-helper'
 import type { SearchResultIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
@@ -356,7 +356,7 @@ export default defineComponent({
       if (!val) return
 
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
+      if (!isAuthenticated.value) {
         window.alert('Personal Property Registry is under contruction. Please check again later.')
         redirectRegistryHome()
         return

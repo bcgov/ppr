@@ -179,7 +179,7 @@ import { StaffPaymentDialog } from '@/components/dialogs'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
 import { RegisteringPartyChange } from '@/components/parties/party'
 import { notCompleteDialog } from '@/resources/dialogOptions'
-import { getFeatureFlag, saveRenewal } from '@/utils'
+import { saveRenewal } from '@/utils'
 import { ConnectPaymentMethod, type UIRegistrationTypes } from '@/enums'
 import { ActionTypes, APIRegistrationTypes, RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
@@ -294,7 +294,7 @@ export default defineComponent({
     /** Called when App is ready and this component can load its data. */
     const onAppReady = (): void => {
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
+      if (!isAuthenticated.value) {
         goToDash()
       }
 

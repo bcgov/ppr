@@ -78,7 +78,6 @@ import type { ComputedRef} from 'vue'
 import { computed, ref, toRefs } from 'vue'
 import { useMhrCorrections, useMhrValidations } from '@/composables'
 import { MhrSectVal } from '@/composables/mhrRegistration/enums'
-import { getFeatureFlag } from '@/utils'
 import {
   ExemptionDetails,
   ExemptionReview,
@@ -179,14 +178,12 @@ export const useStore = defineStore('assetsStore', () => {
   })
   /** Returns true if CLA is enabled the current registration type is Commercial Lien and it was Converted **/
   const isConvertedCl = computed((): boolean => {
-    return getFeatureFlag('cla-enabled') &&
-      getRegistrationType.value?.registrationTypeAPI === APIRegistrationTypes.COMMERCIAL_LIEN &&
+    return getRegistrationType.value?.registrationTypeAPI === APIRegistrationTypes.COMMERCIAL_LIEN &&
       state.value.registration?.transitioned
   })
   /** Returns true if CLA is enabled the current registration type is RepairersLien **/
   const isRlTransition = computed((): boolean => {
-    return getFeatureFlag('cla-enabled') &&
-      getRegistrationType.value?.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN
+    return getRegistrationType.value?.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN
   })
   /** Returns true if CLA is enabled the current registration type is RepairersLien or it was a Converted CL **/
   const displayHistoricalLienInfo = computed((): boolean => {
@@ -361,16 +358,16 @@ export const useStore = defineStore('assetsStore', () => {
     return getUserProductSubscriptionsCodes.value.includes(ProductCode.PPR)
   })
   const hasMhrEnabled = computed<boolean>(() => {
-    return getUserProductSubscriptionsCodes.value.includes(ProductCode.MHR) && getFeatureFlag('mhr-ui-enabled')
+    return getUserProductSubscriptionsCodes.value.includes(ProductCode.MHR)
   })
   const hasMhrReIssuePermitEnabled = computed<boolean>(() => {
-    return getFeatureFlag('mhr-re-issue-permit-enabled')
+    return true
   })
   const hasDrsEnabled = computed<boolean>(() => {
-    return isRoleStaffReg.value && getFeatureFlag('drs-integration-enabled')
+    return isRoleStaffReg.value
   })
   const hasEnhancedDealerEnabled = computed<boolean>(() => {
-    return isRoleQualifiedSupplierHomeDealer.value && getFeatureFlag('mhr-enhanced-dealers-enabled')
+    return isRoleQualifiedSupplierHomeDealer.value
   })
   const getUserServiceFee = computed<number>(() => {
     return state.value.userInfo?.feeSettings?.serviceFee || 1.50

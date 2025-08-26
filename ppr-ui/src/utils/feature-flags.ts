@@ -5,30 +5,6 @@ import { initialize } from 'launchdarkly-js-client-sdk'
  * Default feature flags in case LD env key is not defined (eg, local development).
  */
 export const defaultFlagSet: LDFlagSet = {
-  'financing-statement': false,
-  'ppr-ui-enabled': true, // PPR Search -  default true: Should remove from codebase,
-  'ppr-sa-notice-enabled': false, // PPR Security Act Notice
-  'cla-enabled': false, // Enables the Commercial Lien Registration flows
-  'bcregistry-ui-mhr-enabled': true,
-  'search-registration-number': true,
-  'search-serial-number': true,
-  'mhr-ui-enabled': true, // Mhr Search - default true: Should remove from codebase
-  'mhr-registration-enabled': false, // Enables MHR table tab
-  'mhr-staff-correction-enabled': false, // Enables access to staff mhr correction
-  'mhr-transfer-enabled': false, // Enables changes to base MHR HomeOwners within the MHR Information flow
-  'mhr-misc-transfers-enabled': false, // Enables misc and non-bill sale transfers within the MHR Information flow
-  'mhr-exemption-enabled': false,
-  'mhr-non-res-exemption-enabled': false, // Enables Non-Residential Exemption for Staff
-  'mhr-transport-permit-enabled': false,
-  'mhr-amend-transport-permit-enabled': false,
-  'mhr-cancel-transport-permit-enabled': false,
-  'mhr-user-access-enabled': false,
-  'mhr-history-enabled': false,
-  'mhr-re-issue-permit-enabled': false, // Enables Create New and Extend Transport Permit: Staff Targeted for now
-  'drs-integration-enabled': false, // Enables connections to Documents Record
-  'mhr-enhanced-dealers-enabled': false, // Enables Dealer permissions for MHR Permits and Transfers
-  'mhr-credit-card-enabled': false, // Enables credit card payment processing for MHR Products
-  'sentry-enable': false, // by default, no sentry logs
   'banner-text': '' // by default, there is no banner text
 }
 /**

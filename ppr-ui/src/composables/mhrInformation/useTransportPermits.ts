@@ -3,7 +3,6 @@ import { computed, nextTick, ref } from 'vue'
 import {
   createDateFromPacificTime,
   fromDisplayPhone,
-  getFeatureFlag,
 } from '@/utils'
 import {
   deleteEmptyProperties,
@@ -70,20 +69,17 @@ export const useTransportPermits = () => {
 
   /** Returns true when staff or qualified supplier and the feature flag is enabled **/
   const isChangeLocationEnabled: ComputedRef<boolean> = computed((): boolean => {
-    return (isRoleStaffReg.value || isRoleQualifiedSupplier.value || isRoleStaffSbc.value) &&
-      getFeatureFlag('mhr-transport-permit-enabled')
+    return (isRoleStaffReg.value || isRoleQualifiedSupplier.value || isRoleStaffSbc.value)
   })
 
   /** Returns true when staff and the feature flag is enabled to amend transport **/
   const isAmendChangeLocationEnabled: ComputedRef<boolean> = computed((): boolean => {
-    return (isRoleStaffReg.value || isRoleQualifiedSupplier.value || isRoleStaffSbc.value) &&
-      getFeatureFlag('mhr-amend-transport-permit-enabled')
+    return (isRoleStaffReg.value || isRoleQualifiedSupplier.value || isRoleStaffSbc.value)
   })
 
   /** Returns true when staff and the feature flag is enabled to cancel transport permit**/
   const isCancelChangeLocationEnabled: ComputedRef<boolean> = computed((): boolean => {
-    return (isRoleStaffReg.value || isRoleQualifiedSupplier.value || isRoleStaffSbc.value) &&
-      getFeatureFlag('mhr-cancel-transport-permit-enabled')
+    return (isRoleStaffReg.value || isRoleQualifiedSupplier.value || isRoleStaffSbc.value)
   })
 
   /** Checks if Home's current location is not on Manufacturer's Lot **/

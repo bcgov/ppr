@@ -7,7 +7,6 @@ import { RouteNames } from '@/enums'
 
 describe('HistoricalManufacturedHomeInfo', () => {
   let wrapper: any
-  defaultFlagSet['mhr-history-enabled'] = true
 
   vi.mock('@/utils/mhr-api-helper', () => ({
     getMhrHistory: vi.fn(() =>
@@ -47,7 +46,6 @@ describe('HistoricalManufacturedHomeInfo', () => {
   })
 
   it('navigates to dashboard if feature flag is disabled', async () => {
-    defaultFlagSet['mhr-history-enabled'] = false
     wrapper = await createComponent(MhrHistory, {
       appReady: true
     }, RouteNames.MHR_HISTORY)

@@ -5,7 +5,6 @@ import { computed, reactive } from 'vue'
 import {
   deepChangesComparison,
   fromDisplayPhone,
-  getFeatureFlag
 } from '@/utils'
 import {
   deleteEmptyProperties,
@@ -56,7 +55,7 @@ export const useMhrCorrections = () => {
 
   /** Returns true for staff when the feature flag is enabled **/
   const isMhrChangesEnabled: ComputedRef<boolean> = computed((): boolean => {
-    return isRoleStaffReg.value && getFeatureFlag('mhr-staff-correction-enabled')
+    return isRoleStaffReg.value
   })
 
   /** Returns true when the current route is a Registration Route (mhr or mhr corrections) **/

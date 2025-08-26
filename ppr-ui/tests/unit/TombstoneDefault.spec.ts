@@ -118,13 +118,11 @@ describe('TombstoneDefault component tests', () => {
     const CLIENT_PPR_MHR = [AuthRoles.PUBLIC, AuthRoles.PPR, AuthRoles.MHR]
     const HELP_DESK_PPR_MHR = [AuthRoles.PPR, AuthRoles.MHR, AuthRoles.HELPDESK]
 
-    defaultFlagSet['mhr-ui-enabled'] = false
     /* eslint-disable max-len */
     await assertHeaderForRole(wrapper, CLIENT_PPR, 'My Personal Property Registry', [ProductCode.PPR])
     await assertHeaderForRole(wrapper, CLIENT_PPR_MHR, 'My Personal Property Registry', [ProductCode.PPR, ProductCode.MHR])
     await assertHeaderForRole(wrapper, STAFF_PPR, 'Staff Personal Property Registry')
 
-    defaultFlagSet['mhr-ui-enabled'] = true
     await assertHeaderForRole(wrapper, STAFF_MHR, 'Staff Asset Registries')
     await assertHeaderForRole(wrapper, CLIENT_MHR, 'My Manufactured Home Registry', [ProductCode.MHR])
     await assertHeaderForRole(wrapper, STAFF_PPR_MHR, 'Staff Asset Registries')

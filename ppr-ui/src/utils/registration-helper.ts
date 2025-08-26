@@ -16,7 +16,7 @@ import type {
   VehicleCollateralIF
 } from '@/interfaces'
 import {
-  convertToISO8601LastMinute, getFeatureFlag,
+  convertToISO8601LastMinute,
   removeEmptyProperties
 } from '@/utils'
 import {
@@ -778,24 +778,7 @@ export async function saveRenewal (
   registration.registeringParty = cleanupParty(registration.registeringParty)
 
   // No lifeYears, lifeInfinite for RL renewal
-  if (stateModel.registration.registrationType.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN &&
-    !getFeatureFlag('cla-enabled')) {
-    registration.courtOrderInformation = stateModel.registration.courtOrderInformation
-    if (registration.courtOrderInformation.orderDate.length === 10) {
-      // add current time to date
-      const now = new Date()
-      const d = new Date(`${registration.courtOrderInformation.orderDate}T${now.toTimeString().substring(0, 8)}`)
-      // convert back to UTC (required to pass api validation properly in some edge cases)
-      let month = `${d.getUTCMonth() + 1}`
-      let day = `${d.getUTCDate()}`
-      let hours = `${d.getUTCHours()}`
-      if (month.length < 2) month = `0${month}`
-      if (day.length < 2) day = `0${day}`
-      if (hours.length < 2) hours = `0${hours}`
-      const orderDateUTC = `${d.getUTCFullYear()}-${month}-${day}T${hours}:00:00+00:00`
-      registration.courtOrderInformation.orderDate = orderDateUTC
-    }
-  } else if (trustLength.lifeInfinite) {
+  if (trustLength.lifeInfinite) {
     registration.lifeInfinite = trustLength.lifeInfinite
   } else {
     registration.lifeYears = trustLength.lifeYears

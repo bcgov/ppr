@@ -119,38 +119,6 @@
           {{ trustIndentureSummary }}
         </v-col>
       </v-row>
-      <template
-        v-if="!getFeatureFlag('cla-enabled') && !isRenewal && registrationType === APIRegistrationTypes.REPAIRERS_LIEN"
-      >
-        <v-row
-          no-gutters
-          class="pt-6"
-        >
-          <v-col
-            cols="3"
-            class="generic-label"
-          >
-            Amount of Lien
-          </v-col>
-          <v-col class="summary-text">
-            {{ lienAmountSummary }}
-          </v-col>
-        </v-row>
-        <v-row
-          no-gutters
-          class="pt-6"
-        >
-          <v-col
-            cols="3"
-            class="generic-label"
-          >
-            Surrender Date
-          </v-col>
-          <v-col class="summary-text">
-            {{ surrenderDateSummary }}
-          </v-col>
-        </v-row>
-      </template>
     </v-container>
   </v-card>
 </template>
@@ -168,7 +136,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 // local
 import type { LengthTrustIF } from '@/interfaces'
-import { convertDate, formatExpiryDate, getFeatureFlag, isInt } from '@/utils'
+import { convertDate, formatExpiryDate, isInt } from '@/utils'
 import { APIRegistrationTypes, RouteNames, RegistrationFlowType } from '@/enums'
 import { getFinancingFee } from '@/composables/fees/factories'
 import { storeToRefs } from 'pinia'
@@ -334,7 +302,6 @@ export default defineComponent({
     }
 
     return {
-      getFeatureFlag,
       isRlTransition,
       goToLengthTrust,
       APIRegistrationTypes,

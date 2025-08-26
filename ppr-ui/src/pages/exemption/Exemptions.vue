@@ -87,7 +87,7 @@ import { defineComponent, nextTick, onMounted, reactive, toRefs, watch } from 'v
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { createExemption } from '@/utils/mhr-api-helper'
-import { getFeatureFlag, scrollToFirstVisibleErrorComponent } from '@/utils'
+import { scrollToFirstVisibleErrorComponent } from '@/utils'
 import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { MhrExemptionFooterConfig } from '@/resources/buttonFooterConfig'
 import { useAuth, useExemptions, useMhrInformation, useNavigation } from '@/composables'
@@ -140,7 +140,7 @@ export default defineComponent({
     onMounted(async (): Promise<void> => {
       // do not proceed if app is not ready
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!props.appReady || !isAuthenticated.value || !getFeatureFlag('mhr-exemption-enabled')) {
+      if (!props.appReady || !isAuthenticated.value) {
         await goToDash()
         return
       }

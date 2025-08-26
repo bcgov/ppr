@@ -42,7 +42,6 @@ for (const subProduct of subProducts) {
     })
 
     beforeEach(async () => {
-      defaultFlagSet['mhr-transfer-enabled'] = true
       wrapper = await createComponent(
         MhrInformation,
         { appReady: true, isMhrTransfer: true },
