@@ -29,8 +29,6 @@ describe('Mhr Public Amendments', async () => {
     await nextTick()
   }
   beforeEach(async () => {
-    defaultFlagSet['mhr-staff-correction-enabled'] = true
-    defaultFlagSet['mhr-registration-enabled'] = true
     mockComponent('NuxtPage', { setup(props) { } })
 
     await store.setAuthRoles([AuthRoles.PPR_STAFF])

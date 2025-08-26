@@ -712,7 +712,7 @@ import type {
   StaffPaymentIF,
   TransferTypeSelectIF
 } from '@/interfaces'
-import { getAccountInfoFromAuth, getFeatureFlag, pacificDate, scrollToTop } from '@/utils'
+import { getAccountInfoFromAuth, pacificDate, scrollToTop } from '@/utils'
 import {
   createMhrDraft,
   getMhrDraft,
@@ -1052,7 +1052,7 @@ export default defineComponent({
         return localState.isReviewMode ? 'Register Changes and Pay' : 'Review and Confirm'
       }),
       enableHomeOwnerChanges: computed((): boolean => {
-        return !isRoleStaffSbc.value && getFeatureFlag('mhr-transfer-enabled')
+        return !isRoleStaffSbc.value
       }),
       isDraft: computed((): string => {
         return getMhrInformation.value.draftNumber

@@ -74,7 +74,6 @@ import { useStore } from '@/store/store'
 import { MHRSearchTypes, SearchTypes } from '@/resources'
 import { APISearchTypes, UISearchTypes } from '@/enums'
 import type { SearchTypeIF } from '@/interfaces'
-import { getFeatureFlag } from '@/utils'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({
@@ -130,13 +129,8 @@ export default defineComponent({
 
         // Staff Only Options
         if (isRoleStaff.value || isRoleStaffReg.value) {
-          if (getFeatureFlag('mhr-ui-enabled')) {
-            allSearchTypes.push(...SearchTypes, ...MHRSearchTypes)
-            return allSearchTypes
-          } else {
-            allSearchTypes.push(...SearchTypes)
-            return allSearchTypes.slice(1)
-          }
+          allSearchTypes.push(...SearchTypes, ...MHRSearchTypes)
+          return allSearchTypes
         } else {
           // Client Only Blocks
           if (hasPprEnabled.value && hasMhrEnabled.value) {

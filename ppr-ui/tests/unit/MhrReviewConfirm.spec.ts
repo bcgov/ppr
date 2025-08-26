@@ -159,7 +159,6 @@ describe('Mhr Manufacturer Registration Review and Confirm', () => {
   sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
 
   beforeAll(async () => {
-    defaultFlagSet['mhr-registration-enabled'] = true
     await store.setAuthRoles(mockedManufacturerAuthRoles)
     await store.setRegistrationType(MhrRegistrationType)
     await store.setUserProductSubscriptionsCodes([ProductCode.MHR, ProductCode.MANUFACTURER])
@@ -170,7 +169,6 @@ describe('Mhr Manufacturer Registration Review and Confirm', () => {
   })
 
   afterAll(async () => {
-    defaultFlagSet['mhr-registration-enabled'] = false
     await store.setAuthRoles([])
     await store.setRegistrationType(null)
   })

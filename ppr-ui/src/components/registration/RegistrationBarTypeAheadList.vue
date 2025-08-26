@@ -77,7 +77,6 @@ import type { RegistrationTypeIF } from '@/interfaces'
 import { RegistrationTypes } from '@/resources'
 import { registrationOtherDialog } from '@/resources/dialogOptions'
 import { usePprRegistration } from '@/composables'
-import { getFeatureFlag } from '@/utils'
 
 export default defineComponent({
   name: 'RegistrationBarTypeAheadList',
@@ -123,12 +122,10 @@ export default defineComponent({
         return !props.isLightBackGround ? 'filled' : 'plain'
       }),
       displayItems: computed(() => {
-        // Filter out the repairers lien registration type if the feature flag is enabled
-        const registrationTypes = getFeatureFlag('cla-enabled')
-          ? props.defaultClearable
-            ? RegistrationTypes
-            : RegistrationTypes.filter(item => item?.registrationTypeAPI !== APIRegistrationTypes.REPAIRERS_LIEN)
-          : RegistrationTypes.filter(item => item?.registrationTypeAPI !== APIRegistrationTypes.COMMERCIAL_LIEN)
+        // Filter out the repairers lien registration type
+        const registrationTypes = props.defaultClearable
+          ? RegistrationTypes
+          : RegistrationTypes.filter(item => item?.registrationTypeAPI !== APIRegistrationTypes.REPAIRERS_LIEN)
         return filterListByGroupStatus(registrationTypes, localState.displayGroup)
       })
     })

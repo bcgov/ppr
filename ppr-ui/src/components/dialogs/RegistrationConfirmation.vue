@@ -119,7 +119,6 @@ import { useStore } from '@/store/store'
 import type { DebtorNameIF, DialogOptionsIF } from '@/interfaces'
 import { debtorNames } from '@/utils/ppr-api-helper'
 import { APIRegistrationTypes } from '@/enums'
-import { getFeatureFlag } from '@/utils'
 
 export default defineComponent({
   props: {
@@ -154,7 +153,7 @@ export default defineComponent({
       regNumber: props.registrationNumber,
       fullDebtorInfo: null,
       isRlReg: computed(() => {
-        return getFeatureFlag('cla-enabled') && getRegTableBaseRegs.value?.some(reg =>
+        return getRegTableBaseRegs.value?.some(reg =>
            reg.baseRegistrationNumber === props.registrationNumber &&
             reg.registrationType === APIRegistrationTypes.REPAIRERS_LIEN)
       })

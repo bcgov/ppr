@@ -26,7 +26,6 @@ describe.skip('Mhr Registration', () => {
 
   beforeEach(async () => {
     // Staff with MHR enabled
-    defaultFlagSet['mhr-registration-enabled'] = true
     await store.setRegistrationType(MhrRegistrationType)
     wrapper = await createComponent(MhrRegistration, { appReady: true }, RouteNames.YOUR_HOME)
   })
@@ -50,7 +49,6 @@ describe.skip('Mhr Manufacturer Registration', () => {
   let wrapper: any
 
   beforeEach(async () => {
-    defaultFlagSet['mhr-registration-enabled'] = true
     await store.setAuthRoles(mockedManufacturerAuthRoles)
     await store.setRegistrationType(MhrRegistrationType)
 
@@ -78,7 +76,6 @@ describe.skip('Mhr Correction', () => {
 
   beforeEach(async () => {
     // Staff with MHR enabled
-    defaultFlagSet['mhr-registration-enabled'] = true
     await store.setRegistrationType(MhrCorrectionStaff)
     await initDraftOrCurrentMhr(mockedMhrRegistration)
     wrapper = await createComponent(MhrRegistration, { appReady: true }, RouteNames.SUBMITTING_PARTY)
@@ -105,7 +102,6 @@ describe.skip('Mhr Re-Registration', () => {
   beforeEach(async () => {
     // Staff with MHR enabled
     await store.setAuthRoles([AuthRoles.PPR_STAFF])
-    defaultFlagSet['mhr-registration-enabled'] = true
     store.setRegistrationType(MhrReRegistrationType)
     store.setMhrStatusType(MhApiStatusTypes.EXEMPT)
 

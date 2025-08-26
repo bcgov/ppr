@@ -181,7 +181,7 @@ import {
 } from '@/components/common'
 import { RegisteringPartyChange } from '@/components/parties/party'
 import { notCompleteDialog } from '@/resources/dialogOptions'
-import { getFeatureFlag, saveDischarge, scrollToFirstVisibleErrorComponent } from '@/utils'
+import { saveDischarge, scrollToFirstVisibleErrorComponent } from '@/utils'
 import type { APIRegistrationTypes, UIRegistrationTypes } from '@/enums';
 import { ActionTypes, RouteNames } from '@/enums'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
@@ -278,7 +278,7 @@ export default defineComponent({
 
     const onAppReady = (): void => {
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) goToDash()
+      if (!isAuthenticated.value) goToDash()
 
       // if data is not accurate/missing (could be caused if user manually edits the url)
       if (!localState.registrationNumber || !getConfirmDebtorName.value ||

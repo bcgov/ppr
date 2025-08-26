@@ -17,7 +17,6 @@ describe('Confirm MHRSearch view', () => {
   let wrapper
 
   beforeEach(async () => {
-    defaultFlagSet['mhr-ui-enabled'] = true
     await store.setManufacturedHomeSearchResults(mockedMHRSearchResults)
     await nextTick()
 

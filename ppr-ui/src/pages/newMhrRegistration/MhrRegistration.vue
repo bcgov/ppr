@@ -122,7 +122,6 @@ import { useConnectFeeStore } from '@/store/connectFee'
 import { storeToRefs } from 'pinia'
 import { ConnectPaymentMethod, type UIRegistrationTypes } from '@/enums'
 import { APIMhrTypes, ErrorCategories, RegistrationFlowType, RouteNames } from '@/enums'
-import { getFeatureFlag } from '@/utils'
 import { getMhrDraft, submitAdminRegistration, submitMhrRegistration } from '@/utils/mhr-api-helper'
 import {
   useAuth,
@@ -251,7 +250,7 @@ export default defineComponent({
     onMounted(async (): Promise<void> => {
       // do not proceed if app is not ready
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!props.appReady || !isAuthenticated.value || !getFeatureFlag('mhr-registration-enabled')) {
+      if (!props.appReady || !isAuthenticated.value) {
         goToDash()
         return
       }

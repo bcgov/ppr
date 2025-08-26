@@ -425,7 +425,6 @@ import { vehicleTableHeaders, VehicleTypes } from '@/resources'
 import { useVehicle } from './factories/useVehicle'
 import { cloneDeep } from 'lodash'
 import { storeToRefs } from 'pinia'
-import { getFeatureFlag } from '@/utils'
 
 export default defineComponent({
   components: {
@@ -612,7 +611,6 @@ export default defineComponent({
 
     return {
       isRlTransition,
-      getFeatureFlag,
       removeVehicle,
       initEdit,
       initAdd,

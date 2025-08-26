@@ -294,7 +294,6 @@ describe('MHR registration table tests', () => {
   }))
 
   beforeEach(async () => {
-    defaultFlagSet['drs-integration-enabled'] = true
     // set base selected columns
     await store.setUserInfo(
       { settings: { [SettingOptions.REGISTRATION_TABLE]: { columns: mhRegistrationTableHeaders } } }

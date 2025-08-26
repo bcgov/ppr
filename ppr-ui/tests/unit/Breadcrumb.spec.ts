@@ -279,7 +279,6 @@ describe('Breadcrumb component tests', () => {
     await nextTick()
 
     // Set up
-    defaultFlagSet['mhr-ui-enabled'] = true
     store.setAuthRoles(mockedManufacturerAuthRoles)
     store.setUserProductSubscriptionsCodes([ProductCode.MHR])
     await nextTick()
@@ -297,7 +296,6 @@ describe('Breadcrumb component tests', () => {
     }
 
     // Tear down
-    defaultFlagSet['mhr-ui-enabled'] = false
     store.setUserProductSubscriptionsCodes([])
   })
 
@@ -306,7 +304,6 @@ describe('Breadcrumb component tests', () => {
     await nextTick()
 
     // Set up
-    defaultFlagSet['mhr-ui-enabled'] = true
     store.setAuthRoles(mockedManufacturerAuthRoles)
     store.setUserProductSubscriptionsCodes([ProductCode.MHR, ProductCode.PPR])
     await nextTick()
@@ -324,7 +321,6 @@ describe('Breadcrumb component tests', () => {
     }
 
     // Tear down
-    defaultFlagSet['mhr-ui-enabled'] = false
     store.setUserProductSubscriptionsCodes([])
   })
 })

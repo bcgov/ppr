@@ -6,7 +6,6 @@ import {
   fromDisplayPhone,
   getAccountInfoFromAuth,
   getAccountMembers,
-  getFeatureFlag,
   getKeyByValue,
   hasTruthyValue,
   isObjectEqual,
@@ -102,8 +101,7 @@ export const useUserAccess = () => {
 
   /** Returns true when not staff, on the appropriate routes and the feature flag is enabled **/
   const isQsAccessEnabled: ComputedRef<boolean> = computed((): boolean => {
-    return !isRoleStaffReg.value && hasMhrEnabled.value &&
-      getFeatureFlag('mhr-user-access-enabled')
+    return !isRoleStaffReg.value && hasMhrEnabled.value
   })
 
   /** Returns true while the account has an active Mhr Sub Product **/

@@ -82,7 +82,6 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
-import { getFeatureFlag } from '@/utils'
 import { Stepper, StickyContainer } from '@/components/common'
 import ButtonFooter from '@/components/common/ButtonFooter.vue'
 import { RegistrationLengthTrust, RegistrationRepairersLien, SecuritiesActNotices } from '@/components/registration'
@@ -239,7 +238,7 @@ export default defineComponent({
       // do not proceed if app is not ready
       if (!val) return
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
+      if (!isAuthenticated.value) {
         goToDash()
         return
       }

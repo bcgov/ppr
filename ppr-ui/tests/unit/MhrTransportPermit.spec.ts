@@ -180,7 +180,6 @@ describe('MhrTransportPermit', () => {
   })
 
   it('should render amend transport permit form and its components (staff)', async () => {
-    defaultFlagSet['mhr-amend-transport-permit-enabled'] = true
     wrapper = await createComponent(MhrTransportPermit)
 
     await setupActiveTransportPermit()
@@ -226,7 +225,6 @@ describe('MhrTransportPermit', () => {
   }
 
   it('should render restricted amend transport permit for QS and Sbc roles', async () => {
-    defaultFlagSet['mhr-amend-transport-permit-enabled'] = true
     await store.setAuthRoles(AuthRoles.MHR_TRANSFER_SALE)
     await store.setUserProductSubscriptionsCodes([ProductCode.MANUFACTURER])
     await setupActiveTransportPermit()
@@ -244,7 +242,6 @@ describe('MhrTransportPermit', () => {
   })
 
   it('should render amend transport permit badges', async () => {
-    defaultFlagSet['mhr-amend-transport-permit-enabled'] = true
     wrapper = await createComponent(MhrTransportPermit)
 
     await setupActiveTransportPermit()
@@ -277,9 +274,6 @@ describe('MhrTransportPermit', () => {
   })
 
   it('should correctly show and hide Amend Transport Permit button with a feature flag', async () => {
-    // disable amend FF
-    defaultFlagSet['mhr-transport-permit-enabled'] = true
-    defaultFlagSet['mhr-amend-transport-permit-enabled'] = false
     wrapper = await createComponent(MhrTransportPermit)
 
     // Transport Permit button should exist (FF is on)
@@ -290,7 +284,6 @@ describe('MhrTransportPermit', () => {
     expect(wrapper.findByTestId('amend-transport-permit-btn').exists()).toBeFalsy()
 
     // setup new component with amend FF enabled
-    defaultFlagSet['mhr-amend-transport-permit-enabled'] = true
     wrapper = await createComponent(MhrTransportPermit)
     expect(wrapper.findByTestId('amend-transport-permit-btn').exists()).toBeTruthy()
     expect(wrapper.findByTestId('transport-permit-btn').exists()).toBeFalsy()
@@ -308,8 +301,6 @@ describe('Mhr Information Transport Permit', async () => {
   sessionStorage.setItem('AUTH_API_URL', 'https://bcregistry-bcregistry-mock.apigee.net/mockTarget/auth/api/v1/')
 
   beforeEach(async () => {
-    defaultFlagSet['mhr-transport-permit-enabled'] = true
-
     wrapper = await createComponent(MhrInformation, { appReady: true }, RouteNames.MHR_INFORMATION)
     await store.setAuthRoles([AuthRoles.PPR_STAFF])
     wrapper.vm.dataLoaded = true
@@ -691,7 +682,6 @@ describe('Mhr Information Transport Permit', async () => {
 
   it('should validate amend transport permit components and top error message', async () => {
     // setup Transport Permit
-    defaultFlagSet['mhr-amend-transport-permit-enabled'] = true
     wrapper.vm.dataLoaded = true
 
     await setupActiveTransportPermit()
@@ -755,15 +745,10 @@ describe('Mhr Information Transport Permit', async () => {
     expect(feeSummaryContainerText).toContain('Amend Transport Permit')
     expect(feeSummaryContainerText).toContain('$15.00')
 
-    // reset feature flags
-    defaultFlagSet['mhr-amend-transport-permit-enabled'] = false
     useTransportPermits().setLocationChange(false)
   })
 
   it('should have amended badges on Review and Confirm page for Transport Permit', async () => {
-    // setup Transport Permit
-    defaultFlagSet['mhr-amend-transport-permit-enabled'] = true
-
     wrapper = await createComponent(
       MhrInformation,
       { appReady: true, isMhrTransfer: false },
@@ -814,7 +799,6 @@ describe('Mhr Information Transport Permit', async () => {
   })
 
   it('should render cancel transport permit form and its components (staff)', async () => {
-    defaultFlagSet['mhr-cancel-transport-permit-enabled'] = true
     wrapper.vm.dataLoaded = true
 
     // setup current location to be cancelled
@@ -872,7 +856,6 @@ describe('Mhr Information Transport Permit', async () => {
   })
 
   it('should render review cancel transport permit and its components (staff)', async () => {
-    defaultFlagSet['mhr-cancel-transport-permit-enabled'] = true
     wrapper.vm.dataLoaded = true
 
     // setup current location to be cancelled

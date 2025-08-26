@@ -6,7 +6,6 @@ import { useNavigation } from '@/composables'
 import {
   fromDisplayPhone,
   getAccountInfoFromAuth,
-  getFeatureFlag,
   hasTruthyValue,
   parseAccountToSubmittingParty,
   removeEmptyProperties
@@ -40,13 +39,12 @@ export const useExemptions = () => {
 
   /** Returns true when staff or qualified supplier(Lawyers and Notaries) and the feature flag is enabled **/
   const isExemptionEnabled: ComputedRef<boolean> = computed((): boolean => {
-    return (isRoleStaffReg.value || isRoleQualifiedSupplierLawyersNotaries.value) &&
-      getFeatureFlag('mhr-exemption-enabled')
+    return (isRoleStaffReg.value || isRoleQualifiedSupplierLawyersNotaries.value)
   })
 
   /** Returns true when staff and the feature flag is enabled **/
   const isNonResExemptionEnabled: ComputedRef<boolean> = computed((): boolean => {
-    return isRoleStaffReg.value && getFeatureFlag('mhr-non-res-exemption-enabled')
+    return isRoleStaffReg.value
   })
 
   /** Returns true when current exemption type is non-residential **/

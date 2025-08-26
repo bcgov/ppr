@@ -137,8 +137,7 @@
       >
         <template #contentSLot>
           <!-- Post Message to be enabled following the CLA Launch -->
-          <PostClaMessage v-if="getFeatureFlag('cla-enabled')" />
-          <PreClaMessage v-else />
+          <PostClaMessage />
         </template>
         <template
           v-if="true"
@@ -271,7 +270,6 @@ import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { APIMhrTypes, ProductStatus, RouteNames, SettingOptions } from '@/enums'
-import { getFeatureFlag } from '@/utils'
 import { searchHistory } from '@/utils/ppr-api-helper'
 import { getQualifiedSupplier, updateQualifiedSupplier } from '@/utils/mhr-api-helper'
 import type {
@@ -360,7 +358,7 @@ export default defineComponent({
       hasMHR: computed((): boolean => {
         // For Staff, we check roles, for Client we check Products
         if (isRoleStaff.value || isRoleStaffBcol.value || isRoleStaffReg.value) {
-          return hasMhrRole.value && getFeatureFlag('mhr-ui-enabled')
+          return hasMhrRole.value
         } else {
           return hasMhrEnabled.value
         }
@@ -376,8 +374,7 @@ export default defineComponent({
         return ''
     }),
       hasMhrTableEnabled: computed((): boolean => {
-        return getFeatureFlag('mhr-registration-enabled') && localState.hasMHR &&
-          (isRoleStaff.value || isRoleQualifiedSupplier.value) // Ensures that search only clients can't view table
+        return localState.hasMHR && (isRoleStaff.value || isRoleQualifiedSupplier.value) // Ensures that search only clients can't view table
       }),
       enableDashboardTabs: computed((): boolean => {
         return localState.hasPPR && localState.hasMhrTableEnabled
@@ -388,7 +385,7 @@ export default defineComponent({
         )
       }),
       showCcPaymentMsg: computed((): boolean => {
-        return getFeatureFlag('mhr-credit-card-enabled') && !isRoleStaff.value &&
+        return !isRoleStaff.value &&
           !getUserSettings.value[SettingOptions.MISCELLANEOUS_PREFERENCES]?.some(
             setting => setting?.accountId === getAccountId.value && setting[SettingOptions.CC_MSG_HIDE] === true
           )
@@ -466,7 +463,7 @@ export default defineComponent({
       if (!val) return
 
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
+      if (!isAuthenticated.value) {
         window.alert('Personal Property Registry is under construction. Please check again later.')
         redirectRegistryHome()
         return
@@ -656,7 +653,6 @@ export default defineComponent({
       qsMsgContent,
       hideStatusMsg,
       hideCcStatusMsg,
-      getFeatureFlag,
       getUserServiceFee,
       setSearchDebtorName,
       redirectRegistryHome,

@@ -5,7 +5,6 @@ import { defaultFlagSet } from '@/utils'
 
 describe('QsSelectAccess', () => {
   let wrapper
-  defaultFlagSet['mhr-user-access-enabled'] = true
 
   beforeEach(async () => {
     wrapper = await createComponent(QsSelectAccess)

@@ -231,7 +231,7 @@ import ButtonFooter from '@/components/common/ButtonFooter.vue'
 import { RegistrationLengthTrustSummary } from '@/components/registration'
 import { Parties } from '@/components/parties'
 import FolioNumberSummary from '@/components/common/FolioNumberSummary.vue'
-import { getFeatureFlag, scrollToFirstVisibleErrorComponent } from '@/utils'
+import { scrollToFirstVisibleErrorComponent } from '@/utils'
 import type { ErrorIF, StaffPaymentIF } from '@/interfaces'
 import type { RegistrationLengthI } from '@/composables/fees/interfaces'
 import { storeToRefs } from 'pinia'
@@ -327,7 +327,7 @@ export default defineComponent({
       // do not proceed if app is not ready
       if (!val) return
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
+      if (!isAuthenticated.value) {
         goToDash()
         return
       }

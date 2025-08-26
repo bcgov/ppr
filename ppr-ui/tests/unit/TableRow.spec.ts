@@ -427,7 +427,6 @@ describe('Mhr TableRow tests', () => {
     mockedMhDraft,
     mockedMhRegistration
   ]
-  defaultFlagSet['mhr-exemption-enabled'] = true
 
   beforeEach(async () => {
     setupMockStaffUser()

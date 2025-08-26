@@ -19,7 +19,6 @@ for (const subProduct of subProducts) {
     const { setQsInformationModel } = useUserAccess()
 
     beforeAll(async () => {
-      defaultFlagSet['mhr-user-access-enabled'] = true
       await store.setMhrSubProduct(subProduct)
       await setQsInformationModel(subProduct)
       await setupMockUser()

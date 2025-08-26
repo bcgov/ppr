@@ -19,7 +19,6 @@ describe('QsReviewConfirm', () => {
     authorizationName: 'Test User'
   }
   beforeAll(async () => {
-    defaultFlagSet['mhr-user-access-enabled'] = true
     await store.setMhrSubProduct(subProduct)
     await store.setMhrQsSubmittingParty(mockedAccountInfo)
     await store.setMhrQsIsRequirementsConfirmed(false)
@@ -29,7 +28,6 @@ describe('QsReviewConfirm', () => {
   })
 
   afterAll(async () => {
-    defaultFlagSet['mhr-user-access-enabled'] = false
     await flushPromises()
   })
 

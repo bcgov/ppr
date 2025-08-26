@@ -598,7 +598,6 @@ describe('HomeOwner Corrections', () => {
   const { initDraftOrCurrentMhr } = useNewMhrRegistration()
 
   beforeEach(async () => {
-    defaultFlagSet['mhr-registration-enabled'] = true
     await store.setRegistrationType(MhrCorrectionStaff)
     await initDraftOrCurrentMhr(mockedMhrRegistration)
     wrapper = await createComponent(HomeOwners, { appReady: true }, RouteNames.HOME_OWNERS)

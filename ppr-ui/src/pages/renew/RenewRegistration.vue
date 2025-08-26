@@ -178,7 +178,7 @@ import { RegistrationFees } from '@/resources'
 import { notCompleteDialog } from '@/resources/dialogOptions'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { getFinancingStatement } from '@/utils/ppr-api-helper'
-import { convertDate, getFeatureFlag, pacificDate } from '@/utils'
+import { convertDate, pacificDate } from '@/utils'
 import type {
   UIRegistrationTypes
 } from '@/enums';
@@ -375,7 +375,7 @@ export default defineComponent({
       // do not proceed if app is not ready
       if (!val) return
       // redirect if not authenticated (safety check - should never happen) or if app is not open to user (ff)
-      if (!isAuthenticated.value || !getFeatureFlag('ppr-ui-enabled')) {
+      if (!isAuthenticated.value) {
         goToDash()
         return
       }
