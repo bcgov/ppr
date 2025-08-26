@@ -100,6 +100,7 @@ export const useRegistration = (setSort: RegistrationSortIF) => {
     localState.shouldClearType = true
     localState.orderBy = setSort?.orderBy || ''
     localState.orderVal = setSort?.orderVal || ''
+    localState.manufacturerName = ''
   }
 
   const hasRenewal = (

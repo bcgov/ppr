@@ -230,6 +230,8 @@ export default defineComponent({
       }
     })
 
+    let debounceTimeout: ReturnType<typeof setTimeout> | null = null
+
     // Toggle groups in the Registration Type filter
     const toggleGroup = (group: number) => {
       const initial = localState.displayGroup[group]
@@ -420,46 +422,50 @@ export default defineComponent({
         manufacturerName.value
       ], (
         [
-          regParty,
-          regType,
-          regNum,
-          folNum,
-          secParty,
-          regBy,
-          status,
-          startDate,
-          endDate,
-          orderBy,
-          orderVal,
-          documentId,
-          manufacturerName
-        ]
-      ) => {
-        // Close Date Picker on Sort
-        localState.showDatePicker = false
+        regParty,
+        regType,
+        regNum,
+        folNum,
+        secParty,
+        regBy,
+        status,
+        startDate,
+        endDate,
+        orderBy,
+        orderVal,
+        documentId,
+        manufacturerName
+      ]
+    ) => {
+        if (debounceTimeout) clearTimeout(debounceTimeout)
 
-        // need both (only one ref will scroll)
-        scrollToRef(firstItem)
-        scrollToRef(newAndFirstItem)
+        debounceTimeout = setTimeout(() => {
+          // Close Date Picker on Sort
+          localState.showDatePicker = false
 
-        emit('sort', {
-          sortOptions: {
-            endDate,
-            folNum: props.isPpr ? folNum : folNum.toUpperCase(),
-            orderBy,
-            orderVal,
-            regBy,
-            regNum,
-            regParty,
-            regType: mapMhrDescriptionToCodes[regType] || regType,
-            secParty,
-            startDate,
-            status,
-            documentId,
-            manufacturerName
-          } as RegistrationSortIF,
-          sorting: localState.tableFiltersActive
-        })
+          // need both (only one ref will scroll)
+          scrollToRef(firstItem)
+          scrollToRef(newAndFirstItem)
+
+          emit('sort', {
+            sortOptions: {
+              endDate,
+              folNum: props.isPpr ? folNum : folNum.toUpperCase(),
+              orderBy,
+              orderVal,
+              regBy,
+              regNum,
+              regParty,
+              regType: mapMhrDescriptionToCodes[regType] || regType,
+              secParty,
+              startDate,
+              status,
+              documentId,
+              manufacturerName
+            } as RegistrationSortIF,
+            sorting: localState.tableFiltersActive
+          })
+        }, 500)
       }
     )
 
