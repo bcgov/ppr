@@ -67,6 +67,9 @@ body {
     p {
       margin-bottom: 16px;
     }
+    ol {
+      list-style: revert;
+    }
   }
 }
 
@@ -557,6 +560,9 @@ ul {
 
     p {
       margin: 0;
+    }
+    ol {
+      list-style: revert;
     }
   }
 }

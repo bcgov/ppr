@@ -96,7 +96,7 @@ import type { DialogOptionsIF, WysiwygToolsIF } from '@/interfaces'
 import { useInputRules } from '@/composables'
 
 // External editor package and extensions
-import { Editor, EditorContent } from '@tiptap/vue-3'
+import { Editor, EditorContent, Extension } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Table from '@tiptap/extension-table'
 import TableCell from '@tiptap/extension-table-cell'
@@ -148,6 +148,7 @@ export default defineComponent({
           TableRow,
           TableHeader,
           TableCell,
+          TabHandler,
           StarterKit.configure(),
           Placeholder.configure({
             placeholder: props.placeHolderText
@@ -155,6 +156,29 @@ export default defineComponent({
         ]
       })
     })
+
+    const TAB_CHAR = '\u00A0\u00A0\u00A0\u00A0';
+
+    const TabHandler = Extension.create({
+      name: 'tabHandler',
+      addKeyboardShortcuts() {
+        return {
+          Tab: ({ editor }) => {
+            // Sinks a list item / inserts a tab character
+            editor
+              .chain()
+              .sinkListItem('listItem')
+              .command(({ tr }) => {
+                tr.insertText(TAB_CHAR);
+                return true;
+              })
+              .run();
+            // Prevent default behavior (losing focus)
+            return true;
+          },
+        };
+      },
+    });
 
     /** Set the content of the editor block */
     const setEditorContent = (val: string) => {
