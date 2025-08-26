@@ -80,9 +80,8 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
         except StorageException as storage_err:
             raise storage_err
         except Exception as err:  # pylint: disable=broad-except # noqa F841;
-            logger.error(f"get_document failed for doc type={doc_type}, name={name}.")
-            logger.error(str(err))
-            raise StorageException("GET document failed for doc type={doc_type}, name={name}.") from err
+            logger.error(f"get_document failed for doc type={doc_type}, name={name}. {err}")
+            raise StorageException("The system failed to retrieve the specified document.") from err
 
     @classmethod
     def get_document_link(cls, name: str, doc_type: str = None, available_days: int = 1):
@@ -93,9 +92,8 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
         except StorageException as storage_err:
             raise storage_err
         except Exception as err:  # pylint: disable=broad-except # noqa F841;
-            logger.error(f"get_document failed for doc type={doc_type}, name={name}.")
-            logger.error(str(err))
-            raise StorageException(f"GET document failed for doc type={doc_type}, name={name}.") from err
+            logger.error(f"get_document failed for doc type={doc_type}, name={name}. {err}")
+            raise StorageException("The system failed to retrieve the specified document.") from err
 
     @classmethod
     def delete_document(cls, name: str, doc_type: str = None):
@@ -104,8 +102,7 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
             logger.info(f"Deleting doc type={doc_type}, name={name}.")
             return cls.__call_cs_api(HTTP_DELETE, name, None, doc_type)
         except Exception as err:  # pylint: disable=broad-except # noqa F841;
-            logger.error(f"get_document failed for doc type {doc_type}, name {name}.")
-            logger.error(str(err))
+            logger.error(f"get_document failed for doc type {doc_type}, name {name}. {err}")
         return None
 
     @classmethod
@@ -117,9 +114,8 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
         except StorageException as storage_err:
             raise storage_err
         except Exception as err:  # pylint: disable=broad-except # noqa F841;
-            logger.error(f"save_document failed for doc type={doc_type}, name={name}.")
-            logger.error(str(err))
-            raise StorageException(f"POST document failed for doc type={doc_type}, name={name}.") from err
+            logger.error(f"save_document failed for doc type={doc_type}, name={name}. {err}")
+            raise StorageException("The system failed to upload the specified document.") from err
 
     @classmethod
     def save_document_link(cls, name: str, raw_data, doc_type: str = None, available_days: int = 1):
@@ -131,9 +127,8 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
         except StorageException as storage_err:
             raise storage_err
         except Exception as err:  # pylint: disable=broad-except # noqa F841;
-            logger.error(f"save_document failed for doc type={doc_type}, name={name}.")
-            logger.error(str(err))
-            raise StorageException(f"POST document failed for doc type={doc_type}, name={name}.") from err
+            logger.error(f"save_document failed for doc type={doc_type}, name={name}. {err}")
+            raise StorageException("The system failed to upload the specified document.") from err
 
     @classmethod
     def __get_bucket_id(cls, doc_type: str = None):

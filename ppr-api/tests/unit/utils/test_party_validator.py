@@ -1045,7 +1045,7 @@ def test_actual_party_ids(session):
     # example registration party ID's are bogus
     error_msg = validator.validate_party_ids(json_data, statement)
     assert error_msg != ''
-    assert error_msg.find('Invalid partyId') != -1
+    assert error_msg.find('The party ID provided for deleting a') != -1
 
     for party in statement.parties:
         if not party.registration_id_end and party.party_type == 'SP':

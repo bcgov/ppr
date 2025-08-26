@@ -34,15 +34,16 @@ from ppr_api.services.payment.payment import Payment
 from ppr_api.utils.auth import jwt
 from ppr_api.utils.logging import logger
 
-VAL_ERROR = "Financing Statement request data validation errors."  # Default validation error prefix
-VAL_ERROR_AMEND = "Amendment Statement request data validation errors."  # Amendment validation error prefix
+# Validation error prefixes.
+VAL_ERROR = "There are validation errors in the Financing Statement request data."
+VAL_ERROR_AMEND = "There are validation errors in the Amendment Statement request data."
 VAL_ERROR_CHANGE = "Change Statement request data validation errors."  # Change validation error prefix
-VAL_ERROR_RENEWAL = "Renewal Statement request data validation errors."  # Renewal validation error prefix
-VAL_ERROR_DISCHARGE = "Discharge Statement request data validation errors."  # Discharge validation error prefix
+VAL_ERROR_RENEWAL = "There are validation errors in the Renewal Statement request data."
+VAL_ERROR_DISCHARGE = "There are validation errors in the Discharge Statement request data."
 SAVE_ERROR_MESSAGE = "Account {0} create {1} statement db save failed: {2}"
 PAY_REFUND_MESSAGE = "Account {0} create {1} statement refunding payment for invoice {2}."
 PAY_REFUND_ERROR = "Account {0} create {1} statement payment refund failed for invoice {2}: {3}."
-DUPLICATE_REGISTRATION_ERROR = "Registration {0} is already available to the account."
+DUPLICATE_REGISTRATION_ERROR = "The specified registration {0} is already accessible to the account. "
 # Payment detail/transaction description by registration.
 REG_CLASS_TO_STATEMENT_TYPE = {
     "AMENDMENT": "Register an Amendment Statement",

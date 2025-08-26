@@ -401,20 +401,30 @@ ORDER BY registration_ts DESC
 """
 
 # Error messages
-ERR_FINANCING_NOT_FOUND = "{code}: no Financing Statement found for registration number {registration_num}."
-ERR_REGISTRATION_NOT_FOUND = "{code}: no registration found for registration number {registration_num}."
+ERR_FINANCING_NOT_FOUND = (
+    "{code}: No financing statement exists for the specified registration number {registration_num}."
+)
+ERR_REGISTRATION_NOT_FOUND = (
+    "{code}: No registration record was found for the given registration number {registration_num}."
+)
 ERR_FINANCING_HISTORICAL = (
-    "{code}: the Financing Statement for registration number {registration_num} has expired or been discharged."
+    "{code}: The financing statement has either expired or been officially discharged {registration_num}."
 )
-ERR_REGISTRATION_ACCOUNT = "{code}: the account ID {account_id} does not match registration number {registration_num}."
+ERR_REGISTRATION_ACCOUNT = (
+    "{code}: The provided account ID {account_id} does not correspond to the specified "
+    + "registration number {registration_num}."
+)
 ERR_REGISTRATION_MISMATCH = (
-    "{code}: the registration {registration_num} does not match the Financing Statement registration {base_reg_num}."
+    "{code}: The registration number {registration_num} does not align with the base "
+    + "financing statement registration number {base_reg_num}."
 )
-ERR_DRAFT_NOT_FOUND = "{code}: no Draft Statement found for Document ID {document_number}."
-ERR_DRAFT_USED = "{code}: Draft Statement for Document ID {document_number} has been used."
-ERR_SEARCH_TOO_OLD = "{code}: search get details search ID {search_id} timestamp too old: must be after {min_ts}."
-ERR_SEARCH_COMPLETE = "{code}: search select results failed: results already provided for search ID {search_id}."
-ERR_SEARCH_NOT_FOUND = "{code}: search select results failed: invalid search ID {search_id}."
+ERR_DRAFT_NOT_FOUND = "{code}: No draft statement exists for the specified document ID {document_number}."
+ERR_DRAFT_USED = "{code}: The draft statement {document_number} has already been used and cannot be reused."
+ERR_SEARCH_TOO_OLD = (
+    "{code}: The search {search_id} timestamp is outdated and must be more recent than the specified minimum {min_ts}."
+)
+ERR_SEARCH_COMPLETE = "{code}: The search results have already been retrieved for the given search ID {search_id}."
+ERR_SEARCH_NOT_FOUND = "{code}: The search failed because the search ID {search_id} is invalid."
 
 SEARCH_RESULTS_DOC_NAME = "search-results-report-{search_id}.pdf"
 MAIL_DOC_NAME = "PPRVER.{rep_date}.{registration_id}.{party_id}.PDF"
