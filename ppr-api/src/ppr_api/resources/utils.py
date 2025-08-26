@@ -32,36 +32,44 @@ from ppr_api.utils.validators import financing_validator, party_validator, regis
 
 # Resource error messages
 # Model business error messages in models.utils.py
-ACCOUNT_REQUIRED = "{code}: Account-Id header required."
-UNAUTHORIZED = "{code}: authorization failure submitting a request for {account_id}."
-CROWN_CHARGE_FORBIDDEN = "{code}: the account ID {account_id} is not authorized to access a Crown Charge registration."
-ACCOUNT_ACCESS = (
-    "{code}: the account ID {account_id} cannot access statement information for "
-    + "registration number {registration_num}."
+ACCOUNT_REQUIRED = "{code}: The request is missing the required Account ID header."
+UNAUTHORIZED = "{code}: The account ID {account_id} is not authorized to submit the request."
+CROWN_CHARGE_FORBIDDEN = (
+    "{code}: The account ID {account_id} does not have permission to view Crown Charge registrations."
 )
-STAFF_SEARCH_BCOL_FAS = "{code}: provide either a BCOL Account Number or a Routing Slip Number but not both."
-SBC_SEARCH_NO_PAYMENT = "{code}: provide either a BCOL Account Number or a Routing Slip Number."
-DATABASE = "{code}: {context} database error for {account_id}."
-NOT_FOUND = "{code}: no {item} found for {key}."
-PATH_PARAM = "{code}: a {param_name} path parameter is required."
-PATH_MISMATCH = "{code}: the path value ({path_value}) does not match the data {description} value ({data_value})."
-HISTORICAL = "{code}: the Financing Statement for registration number {reg_num} has been discharged."
-DEBTOR_NAME = "{code}: No match found for the provided debtor name and registration."
-REPORT = "{code}: error generating report. Detail: {detail}"
-DEFAULT = "{code}: error processing request."
-PAYMENT = "{code}:{status} payment error for account {account_id}."
+ACCOUNT_ACCESS = (
+    "{code}: The account ID {account_id} is not authorized to access the specified registration "
+    + "statement {registration_num}."
+)
+STAFF_SEARCH_BCOL_FAS = "{code}: Only one of BCOL Account Number or Routing Slip Number should be provided, not both."
+SBC_SEARCH_NO_PAYMENT = "{code}: A BCOL Account Number or a Routing Slip Number must be provided."
+DATABASE = (
+    "{code}: A database error occurred while processing the request for the given account ID {account_id}. {context}."
+)
+NOT_FOUND = "{code}: The specified item {item} could not be found using the provided key {key}. "
+PATH_PARAM = "{code}: The request is missing a required path parameter {param_name}. "
+PATH_MISMATCH = (
+    "{code}: The path value ({path_value}) does not match the expected data {description} value ({data_value}). "
+)
+HISTORICAL = "{code}: The specified {reg_num} Financing Statement has already been discharged."
+DEBTOR_NAME = "{code}: No matching record was found for the given debtor name and registration number."
+REPORT = "{code}: An error occurred while generating the report, with additional details provided. {detail}"
+DEFAULT = "{code}: An error occurred while processing the request."
+PAYMENT = "{code}: A payment error {status} occurred for the specified account ID {account_id}."
 REPORT_ERROR_BUSY = (
     ResourceErrorCodes.REPORT_ERR
     + ": "
-    + "Report request accepted but the service is busy: retry with a GET request: {detail}"
+    + "The report request was accepted but the service is currently busy; retry using a GET request. {detail}"
 )
 REPORT_ERROR = (
-    ResourceErrorCodes.REPORT_ERR + ": " + "Report request accepted but the service generated an error: {detail}"
+    ResourceErrorCodes.REPORT_ERR
+    + ": "
+    + "The report request was accepted but an error occurred during processing. {detail}"
 )
 REPORT_ERROR_IMMEDIATE = (
     ResourceErrorCodes.REPORT_ERR
     + ": "
-    + "Submission processed successfully but the report request failed: retry with a GET request: {detail}"
+    + "The submission was successful but the report generation failed; retry using a GET request. {detail}"
 )
 
 PARTY_REGISTERING = "RG"

@@ -382,13 +382,13 @@ TEST_AUTHORIZATION_DATA = [
 TEST_RENEWAL_DATA = [
     ('TEST0001', RENEWAL_SA_VALID, True, None, None),
     ('TEST0001', RENEWAL_SA_INFINITE_VALID, True, None, None),
-    ('TEST0001', RENEWAL_SA_INVALID, False, None, 'CourtOrderInformation is not allowed'),
+    ('TEST0001', RENEWAL_SA_INVALID, False, None, validator.COURT_ORDER_INVALID.format('SA')),
     ('TEST0012', RENEWAL_SA_VALID, False, None, validator.RENEWAL_INVALID),
     ('TEST0001', RENEWAL_SA_LIFE_MISSING, False, None, validator.LIFE_MISSING),
     ('TEST0001', RENEWAL_SA_LIFE_INVALID, False, None, validator.LIFE_INVALID),
     ('TEST0017', RENEWAL_SA_VALID, True, -1, None),
     ('TEST0017', RENEWAL_SA_INFINITE_VALID, True, -1, None),
-    ('TEST0017', RENEWAL_SA_INVALID, False, -1, 'CourtOrderInformation is not allowed'),
+    ('TEST0017', RENEWAL_SA_INVALID, False, -1, validator.COURT_ORDER_INVALID.format('RL')),
     ('TEST0017', RENEWAL_SA_LIFE_MISSING, False, -1, validator.LIFE_MISSING),
     ('TEST0017', RENEWAL_SA_LIFE_INVALID, False, -1, validator.LIFE_INVALID),
 ]
@@ -401,7 +401,7 @@ TEST_AMEND_SE_DATA = [
     ('Invalid delete SP', False, False, True, False, False, validator.SE_AMEND_SP_INVALID),
     ('Invalid delete notices', False, False, False, False, True, validator.SE_DELETE_INVALID),
     ('Invalid delete missing id', False, False, False, True, True, validator.SE_DELETE_MISSING_ID),
-    ('Invalid delete id', False, False, False, True, True, 'Invalid deleteId')
+    ('Invalid delete id', False, False, False, True, True, 'The delete ID provided for the Securities Act Notice is invalid')
 ]
 # testdata pattern is ({desc}, {valid}, {cla_act_offset}, {message content})
 TEST_AMEND_RL_DATA = [
@@ -488,7 +488,7 @@ def test_actual_collateral_ids(session):
     # example registration collateral ID's are bogus
     error_msg = validator.validate_collateral(json_data, statement)
     assert error_msg != ''
-    assert error_msg.find('Invalid vehicleId') != -1
+    assert error_msg.find('The vehicle ID provided for deletion is invalid') != -1
     json_data['deleteVehicleCollateral'][0]['vehicleId'] = statement.vehicle_collateral[0].id
     error_msg = validator.validate_collateral(json_data, statement)
     if error_msg != '':
