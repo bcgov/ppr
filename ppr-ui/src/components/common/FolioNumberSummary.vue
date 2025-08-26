@@ -66,7 +66,8 @@ import {
   toRefs,
   watch,
   ref,
-  computed
+  computed,
+  nextTick
 } from 'vue'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
@@ -112,8 +113,9 @@ export default defineComponent({
       }
     )
 
-    const setFolioAndEmit = (val: string) => {
-      form.value.validate()
+    const setFolioAndEmit = async (val: string) => {
+      await nextTick()
+      await form.value.validate()
       context.emit('folioValid', localState.isValid)
       setFolioOrReferenceNumber(val)
     }
