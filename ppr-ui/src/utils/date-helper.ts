@@ -1,6 +1,5 @@
 import type { Moment } from 'moment';
 import moment from 'moment'
-import 'moment-timezone'
 
 const date = new Date()
 

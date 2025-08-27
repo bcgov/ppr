@@ -87,7 +87,7 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import { useStore } from '@/store/store'
- 
+
 import type { DialogOptionsIF } from '@/interfaces'
 
 export default defineComponent({
@@ -143,7 +143,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 .v-btn.primary {
   font-weight: normal;
 }

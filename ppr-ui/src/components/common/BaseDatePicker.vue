@@ -260,7 +260,7 @@ const getMonth = (d: Date) => {
 }
 </script>
 <style lang="scss">
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 .base-date-picker {
   width: 300px;
 

@@ -159,7 +159,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 .staff-header-img {
   background-color: #fff;
   background-image: url('@/assets/img/AssetsRegistries_dashboard.jpg');

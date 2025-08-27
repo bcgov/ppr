@@ -183,7 +183,7 @@ watch(() => props.registeringPartyAdded, (sel: boolean) => {
 </script>
 
 <style lang="scss" module>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 .close-btn-row {
   height: 1rem;
 }

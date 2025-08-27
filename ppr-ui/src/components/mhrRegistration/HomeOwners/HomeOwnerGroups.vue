@@ -182,7 +182,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 :deep(#mhr-home-owner-groups) {
   ul {
     color: $gray7;

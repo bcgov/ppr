@@ -47,7 +47,7 @@
 import { ref } from 'vue'
 
 /** Props **/
- 
+
 const props = withDefaults(defineProps<{
   tabConfig?: any
 }>(), {
@@ -59,7 +59,7 @@ const tab = ref(0)
 
 </script>
 <style lang="scss" scoped>
-@import '@/assets/styles/theme';
+@use '@/assets/styles/theme' as *;
 #tabbed-container {
   background-color: inherit;
 }

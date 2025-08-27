@@ -73,7 +73,7 @@ const { setSecuritiesActNotices } = useStore()
 const { getSecuritiesActNotices } = storeToRefs(useStore())
 
 /** Props **/
- 
+
 const props = withDefaults(defineProps<{
   isAmendment?: boolean
 }>(), {
@@ -93,5 +93,5 @@ const handleAddNotice = (notice: AddEditSaNoticeIF) => {
 }
 </script>
 <style lang="scss" scoped>
-@import '@/assets/styles/theme';
+@use '@/assets/styles/theme' as *;
 </style>
