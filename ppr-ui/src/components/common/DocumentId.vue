@@ -221,7 +221,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 :deep(.v-field--disabled .v-label.v-field-label, .v-field--focused .v-label.v-field-label) {
   opacity: .4;
 }

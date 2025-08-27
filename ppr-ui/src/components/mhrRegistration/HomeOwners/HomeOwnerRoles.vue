@@ -105,7 +105,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 .underline {
   border-bottom: 1px dotted $gray7;
   text-decoration: none;

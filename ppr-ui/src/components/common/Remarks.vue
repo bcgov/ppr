@@ -151,5 +151,5 @@ export default defineComponent({
 </script>
 
 <style lang="scss" module>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 </style>

@@ -282,7 +282,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 :deep(.mhr-transfer-details) {
   margin: 43px 0;
 

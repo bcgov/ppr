@@ -104,7 +104,7 @@ import { InfoChip, UpdatedBadge } from '@/components/common'
 import { useTransportPermits } from '@/composables'
 const { getMhrInformation } = storeToRefs(useStore())
 
- 
+
 const props = withDefaults(defineProps<{
   isCancelledLocation?: boolean,
   isCompletedLocation?: boolean,
@@ -122,7 +122,7 @@ const { isExtendChangeLocationActive } = useTransportPermits()
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 h3 {
   line-height: unset;
 }

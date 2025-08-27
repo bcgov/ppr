@@ -149,7 +149,7 @@ const getItemValue = (item: object, valuePaths: Array<string> | string): string 
 
 </script>
 <style lang="scss" scoped>
-@import '@/assets/styles/theme';
+@use '@/assets/styles/theme' as *;
 .gray9 {
   color: $gray9 !important;
 }

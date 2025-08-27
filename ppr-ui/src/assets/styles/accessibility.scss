@@ -1,3 +1,5 @@
+@use 'theme.scss' as *;
+
 // Mixin for focus-visible styles with default values
 @mixin focus-visible-style($outline-offset: 2px, $border-radius: null) {
   outline: 2px solid $focus-outline;

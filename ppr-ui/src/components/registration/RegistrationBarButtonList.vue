@@ -186,7 +186,7 @@ export default defineComponent({
   </v-container>
 </template>
 <style lang="scss" scoped>
-@import "@/assets/styles/theme.scss";
+@use '@/assets/styles/theme.scss' as *;;
 .registration-bar-btn {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
