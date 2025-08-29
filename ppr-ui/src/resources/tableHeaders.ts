@@ -567,6 +567,12 @@ export const mhSearchNameHeaders: Array<BaseHeaderIF> = [
     value: 'status'
   },
   {
+    class: 'column-md',
+    sortable: false,
+    text: 'Manufacturer',
+    value: 'manufacturerName'
+  },
+  {
     class: 'column-xs',
     sortable: false,
     text: 'Year',
@@ -575,14 +581,8 @@ export const mhSearchNameHeaders: Array<BaseHeaderIF> = [
   {
     class: 'column-sm',
     sortable: false,
-    text: 'Make',
-    value: 'make'
-  },
-  {
-    class: 'column-xs',
-    sortable: false,
-    text: 'Model',
-    value: 'model'
+    text: 'Make/Model',
+    value: 'makeModel'
   },
   {
     class: 'column-sm',
@@ -633,6 +633,12 @@ export const mhSearchSerialNumberHeaders: Array<BaseHeaderIF> = [
     value: 'ownerStatus'
   },
   {
+    class: 'column-md',
+    sortable: false,
+    text: 'Manufacturer',
+    value: 'manufacturerName'
+  },
+  {
     class: 'column-xs',
     sortable: false,
     text: 'Year',
@@ -641,14 +647,8 @@ export const mhSearchSerialNumberHeaders: Array<BaseHeaderIF> = [
   {
     class: 'column-mds',
     sortable: false,
-    text: 'Make',
-    value: 'make'
-  },
-  {
-    class: 'column-xs',
-    sortable: false,
-    text: 'Model',
-    value: 'model'
+    text: 'Make/Model',
+    value: 'makeModel'
   },
   {
     class: 'column-mds',
@@ -688,6 +688,12 @@ export const mhSearchMhrNumberHeaders: Array<BaseHeaderIF> = [
     value: 'ownerStatus'
   },
   {
+    class: 'column-md',
+    sortable: false,
+    text: 'Manufacturer',
+    value: 'manufacturerName'
+  },
+  {
     class: 'column-xs',
     sortable: false,
     text: 'Year',
@@ -696,14 +702,8 @@ export const mhSearchMhrNumberHeaders: Array<BaseHeaderIF> = [
   {
     class: 'column-mds',
     sortable: false,
-    text: 'Make',
+    text: 'Make/Model',
     value: 'make'
-  },
-  {
-    class: 'column-xs',
-    sortable: false,
-    text: 'Model',
-    value: 'model'
   },
   {
     class: 'column-mds',
@@ -740,7 +740,7 @@ export const mhSearchNameHeadersReview: Array<BaseHeaderIF> = [
   {
     class: 'column-md',
     sortable: false,
-    text: 'Year Make Model',
+    text: 'Year/Make/Model',
     value: 'yearMakeModel'
   },
   {
@@ -782,7 +782,7 @@ export const mhSearchSerialNumberHeadersReview: Array<BaseHeaderIF> = [
   {
     class: 'column-md',
     sortable: false,
-    text: 'Year Make Model',
+    text: 'Year/Make/Model',
     value: 'yearMakeModel'
   },
   {
@@ -814,7 +814,7 @@ export const mhSearchMhrNumberHeadersReview: Array<BaseHeaderIF> = [
   {
     class: 'column-md',
     sortable: false,
-    text: 'Year Make Model',
+    text: 'Year/Make/Model',
     value: 'yearMakeModel'
   },
   {

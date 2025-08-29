@@ -3,17 +3,20 @@
     <!-- Table Header -->
     <section
       id="search-meta-info"
-      class="px-6 pt-8"
     >
-      <v-row no-gutters>
+      <v-row 
+        no-gutters 
+        class="px-6 py-4"
+        :class="{'bg-lt-blue': !isReviewMode}"
+      >
         <p class="search-sub-title">
-          {{ searchType }} - <b>"{{ searchValue }}"</b>
+          Search Results: {{ searchType }} - <b>"{{ searchValue }}"</b>
         </p>
       </v-row>
       <v-row
         v-if="searched && !isReviewMode"
         id="search-summary-info"
-        class="result-info pt-6"
+        class="result-info pt-6 px-6"
       >
         <v-col
           id="home-results-count"
@@ -26,7 +29,7 @@
         <v-col
           id="selected-results-count"
           cols="auto"
-          class="pl-0"
+          class="pl-6"
         >
           <p class="divider pr-3">
             Matches Selected: <b>{{ selectedMatchesLength }}</b>
@@ -63,7 +66,7 @@
       </v-row>
       <v-row
         v-else
-        class="result-info"
+        class="result-info px-6 my-0"
       >
         <v-col
           id="review-results-count"
@@ -110,7 +113,7 @@
                           <v-checkbox
                             id="select-all-checkbox"
                             v-model="selectAll"
-                            class="header-checkbox ma-0 pa-0"
+                            class="header-checkbox ma-0 pa-0 align-start"
                             hide-details
                             :label="headerSlotLabel"
                           />
@@ -128,7 +131,7 @@
                     <v-checkbox
                       id="select-all-lien-checkbox"
                       v-model="selectAllLien"
-                      class="header-checkbox ma-0 pa-0"
+                      class="header-checkbox ma-0 pa-0 align-start"
                       label="Include lien information for all selections"
                       :disabled="selectedMatchesLength === 0"
                       hide-details
@@ -176,6 +179,7 @@
                       :label="isReviewMode ? getOwnerName(item) + ' ' + getOwnerCount(item) : getOwnerName(item) "
                       :ripple="false"
                       hide-details
+                      class="align-start"
                       @click="onSelectionCheckboxClick(item)"
                     />
                   </td>
@@ -183,9 +187,9 @@
                     <td>{{ getOwnerStatusText(item) }}</td>
                     <td>{{ item.mhrNumber }}</td>
                     <td>{{ item.status }}</td>
+                    <td>{{ item.manufacturerName }}</td>
                     <td>{{ item.baseInformation.year || '-' }}</td>
-                    <td>{{ item.baseInformation.make || '-' }}</td>
-                    <td>{{ item.baseInformation.model || '-' }}</td>
+                    <td>{{ item.baseInformation.make || '-' }} / {{ item.baseInformation.model || '-' }}</td>
                     <td>{{ item.homeLocation }}</td>
                     <td>{{ item.serialNumber }}</td>
                     <td class="lien-col">
@@ -198,6 +202,7 @@
                           <span v-bind="props">
                             <v-checkbox
                               v-model="item.includeLienInfo"
+                              class="align-start"
                               :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                               :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
                               :ripple="false"
@@ -236,7 +241,7 @@
                           </v-tooltip>
                         </td>
                         <td>
-                          {{ item.baseInformation.year }} {{ item.baseInformation.make }}
+                          {{ item.baseInformation.year }}/{{ item.baseInformation.make }}/
                           {{ item.baseInformation.model }}
                         </td>
                         <td>{{ item.homeLocation }}</td>
@@ -251,6 +256,7 @@
                               <span v-bind="props">
                                 <v-checkbox
                                   v-model="item.includeLienInfo"
+                                  class="align-start"
                                   :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                                   :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
                                   :ripple="false"
@@ -282,7 +288,7 @@
                         {{ item.mhrNumber }}
                       </td>
                       <td>
-                        {{ item.baseInformation.year }} {{ item.baseInformation.make }}
+                        {{ item.baseInformation.year }}/{{ item.baseInformation.make }}/
                         {{ item.baseInformation.model }}
                       </td>
                       <td>{{ item.homeLocation }}</td>
@@ -297,6 +303,7 @@
                             <span v-bind="props">
                               <v-checkbox
                                 v-model="item.includeLienInfo"
+                                class="align-start"
                                 :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                                 :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
                                 :ripple="false"
@@ -339,6 +346,7 @@
                   <td v-else>
                     <v-checkbox
                       v-model="item.selected"
+                      class="align-start"
                       :label="item.mhrNumber"
                       :ripple="false"
                       hide-details
@@ -349,9 +357,9 @@
                     <td>{{ item.status }}</td>
                     <td>{{ getOwnerName(item) }}</td>
                     <td>{{ getOwnerStatusText(item) }}</td>
+                    <td>{{ item.manufacturerName }}</td>
                     <td>{{ item.baseInformation.year || '-' }}</td>
-                    <td>{{ item.baseInformation.make || '-' }}</td>
-                    <td>{{ item.baseInformation.model || '-' }}</td>
+                    <td>{{ item.baseInformation.make || '-' }} / {{ item.baseInformation.model || '-' }}</td>
                     <td>{{ item.homeLocation }}</td>
                     <td>{{ item.serialNumber }}</td>
                     <td class="lien-col">
@@ -364,6 +372,7 @@
                           <span v-bind="props">
                             <v-checkbox
                               v-model="item.includeLienInfo"
+                              class="align-start"
                               :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                               :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
                               :ripple="false"
@@ -382,7 +391,7 @@
                   <template v-else>
                     <td>{{ getOwnerName(item) }}</td>
                     <td>
-                      {{ item.baseInformation.year }} {{ item.baseInformation.make }} {{ item.baseInformation.model }}
+                      {{ item.baseInformation.year }}/{{ item.baseInformation.make }}/{{ item.baseInformation.model }}
                     </td>
                     <td>{{ item.homeLocation }}</td>
                     <td>{{ item.serialNumber }}</td>
@@ -396,6 +405,7 @@
                           <span v-bind="props">
                             <v-checkbox
                               v-model="item.includeLienInfo"
+                              class="align-start"
                               :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                               :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
                               :ripple="false"
@@ -418,6 +428,7 @@
                   <td :class="item.selected && !isReviewMode ? 'selected-row' : ''">
                     <v-checkbox
                       v-model="item.selected"
+                      class="align-start"
                       :label="item.activeCount > 1
                         ? `${item.serialNumber} (${item.activeCount})`
                         : `${item.serialNumber}`"
@@ -431,9 +442,9 @@
                     <td>{{ item.status }}</td>
                     <td>{{ getOwnerName(item) }}</td>
                     <td>{{ getOwnerStatusText(item) }}</td>
+                    <td>{{ item.manufacturerName }}</td>
                     <td>{{ item.baseInformation.year || '-' }}</td>
-                    <td>{{ item.baseInformation.make || '-' }}</td>
-                    <td>{{ item.baseInformation.model || '-' }}</td>
+                    <td>{{ item.baseInformation.make || '-' }} / {{ item.baseInformation.model || '-' }}</td>
                     <td>{{ item.homeLocation }}</td>
                     <td class="lien-col">
                       <v-tooltip
@@ -445,6 +456,7 @@
                           <span v-bind="props">
                             <v-checkbox
                               v-model="item.includeLienInfo"
+                              class="align-start"
                               :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                               :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
                               :ripple="false"
@@ -466,7 +478,7 @@
                     </td>
                     <td>{{ getOwnerName(item) }}</td>
                     <td>
-                      {{ item.baseInformation.year }} {{ item.baseInformation.make }}
+                      {{ item.baseInformation.year }}/{{ item.baseInformation.make }}/
                       {{ item.baseInformation.model }}
                     </td>
                     <td>{{ item.homeLocation }}</td>
@@ -480,6 +492,7 @@
                           <span v-bind="props">
                             <v-checkbox
                               v-model="item.includeLienInfo"
+                              class="align-start"
                               :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
                               :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
                               :ripple="false"
@@ -864,7 +877,6 @@ export default defineComponent({
 @import '@/assets/styles/theme.scss';
 
 th {
-  vertical-align: middle !important;
   padding-bottom: 10px !important;
 }
 
@@ -879,6 +891,7 @@ th {
 :deep(.v-selection-control .v-label) {
   color: $gray7;
   font-size: 0.875rem;
+  align-items: flex-start;
 }
 
 .selected-row {
@@ -895,6 +908,7 @@ th {
 
 :deep(.v-selection-control__input>.v-icon) {
   color: $app-blue !important;
+  align-items: flex-start;
 }
 
 :deep(.v-table__wrapper) {
@@ -903,6 +917,11 @@ th {
 
 :deep(.v-table>.v-table__wrapper>table>tbody>tr>td) {
   padding: 8px 16px;
+  vertical-align: top !important;
+}
+:deep(.v-table>.v-table__wrapper>table>thead>tr>th) {
+  vertical-align: top !important;
+  box-shadow: inset 0 -3px 0 #dee2e6;
 }
 
 .no-border-bottom td {
@@ -911,5 +930,14 @@ th {
 
 .lien-col {
   min-width: 12rem;
+}
+:deep(.v-selection-control__input) {
+  align-items: flex-start;
+}
+:deep(.v-selection-control) {
+  align-items: flex-start;
+}
+.bg-lt-blue{
+ background-color: $app-lt-blue; 
 }
 </style>

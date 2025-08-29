@@ -8,6 +8,7 @@ export interface ManufacturedHomeSearchResultIF {
   status: string // ACTIVE or EXEMPT or HISTORIC
   mhrNumber: string
   serialNumber: string
+  manufacturerName: string
   baseInformation?: {
     year?: number | '' // Optional
     make?: string // Optional
