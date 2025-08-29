@@ -620,7 +620,7 @@ export default defineComponent({
       'added-reg-effect': applyAddedRegEffect,
     }"
   >
-    <td>
+  <td>
       <v-row no-gutters>
         <v-col
           v-if="item.changes"
@@ -680,9 +680,14 @@ export default defineComponent({
         </v-col>
       </v-row>
     </td>
+    <template
+      v-for="(header, index) in headers"
+      :key="index"
+      :ref="header.value + 'Ref'"
+    >
     <!-- registrationNumber -->
     <td
-      v-if="inSelectedHeaders('registrationNumber') || inSelectedHeaders('mhrNumber')"
+      v-if="header.value == 'registrationNumber' || header.value == 'mhrNumber'"
       :class="{'border-left': (isChild || setIsExpanded), 'fix-td-width': hasRequiredTransfer(item) }"
     >
       <v-row no-gutters>
@@ -769,7 +774,7 @@ export default defineComponent({
     </td>
     <!-- statusType -->
     <td
-      v-if="inSelectedHeaders('statusType')"
+      v-else-if="header.value == 'statusType'"
       :class="isChild || item.expanded ? 'border-left': ''"
     >
       <div v-if="item.invoiceId">Pending Payment</div>
@@ -794,7 +799,7 @@ export default defineComponent({
     </td>
     <!-- registrationType -->
     <td
-      v-if="inSelectedHeaders('registrationType') || inSelectedHeaders('registrationDescription')"
+      v-else-if="header.value == 'registrationType' || header.value == 'registrationDescription'"
       :class="isChild || item.expanded ? 'border-left': ''"
     >
       <div v-if="isPpr && !!item.registrationType">
@@ -841,7 +846,7 @@ export default defineComponent({
     </td>
     <!-- createDateTime -->
     <td
-      v-if="inSelectedHeaders('createDateTime')"
+      v-else-if="header.value == 'createDateTime'"
       :class="isChild || item.expanded ? 'border-left': ''"
     >
       <span v-if="!isDraft(item)">
@@ -853,14 +858,14 @@ export default defineComponent({
     </td>
     <!-- ownerNames  -->
     <td
-      v-if="inSelectedHeaders('ownerNames')"
+      v-else-if="header.value == 'ownerNames'"
       :class="isChild || item.expanded ? 'border-left': ''"
     >
       {{ item.ownerNames }}
     </td>
     <!-- verification -->
     <td
-      v-if="inSelectedHeaders('vs')"
+      v-else-if="header.value == 'vs'"
       :class="isChild || item.expanded ? 'border-left': ''"
     >
       <v-btn
@@ -910,7 +915,7 @@ export default defineComponent({
 
     <!-- Conditional Document ID: Staff Only and Selected -->
     <td
-      v-if="hasDrsEnabled && hasDrsEnabled && inSelectedHeaders('documentId')"
+      v-else-if="hasDrsEnabled && hasDrsEnabled && header.value == 'documentId'"
       :class="isChild || item.expanded ? 'border-left': ''"
     >
       <span v-if="!isDraft(item) && isElegibleDocId(item?.documentId)">
@@ -950,49 +955,55 @@ export default defineComponent({
     </td>
     <!-- civicAddress  -->
     <td
-      v-if="inSelectedHeaders('civicAddress')"
+      v-else-if="header.value == 'civicAddress'"
       :class="isChild || item.expanded ? 'border-left': ''"
     >
       {{ item.civicAddress }}
     </td>
     <!-- manufacturerName  -->
     <td
-      v-if="inSelectedHeaders('manufacturerName')"
+      v-else-if="header.value == 'manufacturerName'"
       :class="isChild || item.expanded ? 'border-left': ''"
     >
       {{ item.manufacturerName }}
     </td>
+    <!-- registeringName -->
     <td
-      v-if="inSelectedHeaders('registeringName')"
+      v-else-if="header.value == 'registeringName'"
       :class="isChild || item.expanded ? 'border-left': ''"
     >
       <span v-if="item.accountId">{{ item.accountId }}<br></span>
       <span v-if="item.registeringName">{{ getRegisteringName(item.registeringName) }}</span>
       <span v-else>{{ item.username || 'N/A' }}</span>
     </td>
+    <!-- registeringParty -->
     <td
-      v-if="inSelectedHeaders('registeringParty')"
+      v-else-if="header.value == 'registeringParty'"
       :class="isChild || item.expanded ? 'border-left': ''"
     >
       {{ item.registeringParty || item.submittingParty }}
     </td>
+    <!-- securedParties -->
     <td
-      v-if="inSelectedHeaders('securedParties') && isPpr"
+      v-else-if="header.value == 'securedParties' && isPpr"
       :class="isChild || item.expanded ? 'border-left': ''"
     >
       {{ item.securedParties || '' }}
     </td>
+    <!-- clientReferenceId -->
     <td
-      v-if="inSelectedHeaders('clientReferenceId')"
+      v-else-if="header.value == 'clientReferenceId'"
       :class="isChild || item.expanded ? 'border-left': ''"
     >
       {{ item.clientReferenceId }}
     </td>
+    <!-- expireDays -->
     <td
-      v-if="inSelectedHeaders('expireDays')"
+      v-else-if="header.value == 'expireDays'"
       :class="isChild || item.expanded ? 'border-left': ''"
       v-html="showExpireDays(item)"
     />
+    </template>
 
     <!--Action Btns-->
     <td
