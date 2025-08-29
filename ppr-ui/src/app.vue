@@ -689,6 +689,6 @@ export default defineComponent({
 </template>
 
 <style lang="scss">
-@import '@/assets/styles/theme';
-@import '@/assets/styles/overrides';
+@use '@/assets/styles/theme' as *;
+@use '@/assets/styles/overrides' as *;
 </style>

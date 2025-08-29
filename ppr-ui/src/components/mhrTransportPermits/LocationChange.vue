@@ -448,7 +448,7 @@ const handleTransportPermitAddressUpdate = (addressField: { key, value }) => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 .v-overlay {
   .v-list-item {
     line-height: 3em;

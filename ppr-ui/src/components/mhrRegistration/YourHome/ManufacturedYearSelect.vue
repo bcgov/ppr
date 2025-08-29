@@ -93,7 +93,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 :deep(.theme--light.v-select .v-select__selection--comma) {
   color: $gray7;
 }

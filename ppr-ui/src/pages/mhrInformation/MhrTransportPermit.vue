@@ -588,7 +588,7 @@ const handleConfirmNewPermit = (val: boolean) => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme';
+@use '@/assets/styles/theme' as *;
 .help-note {
   margin-top: 20px;
   font-size: 14px;

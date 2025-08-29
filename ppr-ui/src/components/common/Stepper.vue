@@ -125,7 +125,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 .step-buttons-container {
   min-width: 830px;
   display: flex;
