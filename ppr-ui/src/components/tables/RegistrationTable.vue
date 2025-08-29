@@ -869,6 +869,7 @@ export default defineComponent({
                     color="primary"
                     :ripple="false"
                     variant="outlined"
+                    :disabled="loadingData"
                     @click="clearFilters()"
                   >
                     Clear Filters

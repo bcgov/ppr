@@ -166,7 +166,7 @@
                     </td>
                     <td>{{ item.vehicleCollateral.year }}</td>
                     <td>
-                      {{ item.vehicleCollateral.make }} {{ item.vehicleCollateral.model }}
+                      {{ item.vehicleCollateral.make }}/{{ item.vehicleCollateral.model }}
                     </td>
                   </template>
 
@@ -252,7 +252,7 @@
                     </td>
                     <td>{{ item.vehicleCollateral.year }}</td>
                     <td>
-                      {{ item.vehicleCollateral.make }} {{ item.vehicleCollateral.model }}
+                      {{ item.vehicleCollateral.make }}/{{ item.vehicleCollateral.model }}
                     </td>
                   </template>
 

@@ -10,7 +10,7 @@
         :class="{'bg-lt-blue': !isReviewMode}"
       >
         <p class="search-sub-title">
-          Search Results: {{ searchType }} - <b>"{{ searchValue }}"</b>
+          <strong>Search Results:</strong> {{ searchType }} - <b>"{{ searchValue }}"</b>
         </p>
       </v-row>
       <v-row
@@ -241,8 +241,8 @@
                           </v-tooltip>
                         </td>
                         <td>
-                          {{ item.baseInformation.year }}/{{ item.baseInformation.make }}/
-                          {{ item.baseInformation.model }}
+                          {{ item.baseInformation.year || '-' }} / {{ item.baseInformation.make || '-' }} /
+                          {{ item.baseInformation.model || '-' }}
                         </td>
                         <td>{{ item.homeLocation }}</td>
                         <td>{{ item.serialNumber }}</td>
@@ -288,8 +288,8 @@
                         {{ item.mhrNumber }}
                       </td>
                       <td>
-                        {{ item.baseInformation.year }}/{{ item.baseInformation.make }}/
-                        {{ item.baseInformation.model }}
+                        {{ item.baseInformation.year || '-' }} / {{ item.baseInformation.make || '-' }} /
+                        {{ item.baseInformation.model || '-' }}
                       </td>
                       <td>{{ item.homeLocation }}</td>
                       <td>{{ item.serialNumber }}</td>
@@ -391,7 +391,8 @@
                   <template v-else>
                     <td>{{ getOwnerName(item) }}</td>
                     <td>
-                      {{ item.baseInformation.year }}/{{ item.baseInformation.make }}/{{ item.baseInformation.model }}
+                      {{ item.baseInformation.year || '-' }} / {{ item.baseInformation.make || '-' }} /
+                      {{ item.baseInformation.model || '-' }}
                     </td>
                     <td>{{ item.homeLocation }}</td>
                     <td>{{ item.serialNumber }}</td>
@@ -478,8 +479,8 @@
                     </td>
                     <td>{{ getOwnerName(item) }}</td>
                     <td>
-                      {{ item.baseInformation.year }}/{{ item.baseInformation.make }}/
-                      {{ item.baseInformation.model }}
+                      {{ item.baseInformation.year || '-' }} / {{ item.baseInformation.make || '-' }} /
+                      {{ item.baseInformation.model || '-' }}
                     </td>
                     <td>{{ item.homeLocation }}</td>
                     <td class="lien-col">
@@ -939,5 +940,8 @@ th {
 }
 .bg-lt-blue{
  background-color: $app-lt-blue; 
+}
+.search-sub-title{
+  color: #212529;
 }
 </style>
