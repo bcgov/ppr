@@ -141,7 +141,7 @@ TEST_NOTE_DATA_STATE = [
     ('Valid exempt NPUB', True, 'NPUB', '000912', 'PS12345', None),
     ('Valid exempt NCON', True, 'NCON', '000912', 'PS12345', None),
     ('Invalid exempt not NPUB', False, 'CAU', '000912', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
-    ('Invalid cancelled', False, 'CAU', '000913', 'PS12345', validator_utils.STATE_NOT_ALLOWED)
+    ('Invalid cancelled', False, 'CAU', '000913', 'PS12345', validator_utils.STATE_CANCELLED)
  ]
 
 

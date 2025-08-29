@@ -353,7 +353,7 @@ TEST_PERMIT_DATA = [
     ('Invalid staff FROZEN', False, True, DOC_ID_VALID, validator_utils.STATE_FROZEN_AFFIDAVIT, '000917', 'PS12345',
      STAFF_ROLE),
     ('Invalid EXEMPT', False, False, DOC_ID_VALID, validator_utils.STATE_NOT_ALLOWED, '000912', 'PS12345', STAFF_ROLE),
-    ('Invalid CANCELLED', False, False, None, validator_utils.STATE_NOT_ALLOWED, '000913', 'PS12345',
+    ('Invalid CANCELLED', False, False, None, validator_utils.STATE_CANCELLED, '000913', 'PS12345',
      REQUEST_TRANSPORT_PERMIT),
     ('Invalid frozen payment', False, False, DOC_ID_VALID, validator_utils.STATE_FROZEN_PAYMENT, '000931',
      'PS12345', STAFF_ROLE),

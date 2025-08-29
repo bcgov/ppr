@@ -33,88 +33,97 @@ from mhr_api.utils.logging import logger
 
 OWNERS_NOT_ALLOWED = "Owners not allowed with new registrations: use ownerGroups instead. "
 OWNER_GROUPS_REQUIRED = "At least one owner group is required for staff registrations. "
-DECLARED_VALUE_REQUIRED = "Declared value is required and must be greater than 0 for this registration. "
-CONSIDERATION_REQUIRED = "Consideration is required for this registration. "
-TRANSFER_DATE_REQUIRED = "Transfer date is required for this registration. "
+DECLARED_VALUE_REQUIRED = "Declared value is required and must be greater than zero for this registration. "
+CONSIDERATION_REQUIRED = "Consideration value is required for this registration. "
+TRANSFER_DATE_REQUIRED = "Transfer date must be provided for this registration. "
 VALIDATOR_ERROR = "Error performing extra validation. "
-NOTE_DOC_TYPE_INVALID = "The note document type is invalid for the registration type. "
+NOTE_DOC_TYPE_INVALID = "The specified note document type is invalid for the selected registration type. "
 LOCATION_ADDRESS_MISMATCH = "The existing location address must match the current location address. "
 OWNER_NAME_MISMATCH = "The existing owner name must match exactly a current owner name for this registration. "
-MANUFACTURER_DEALER_INVALID = "The existing location must be a dealer or manufacturer lot for this registration. "
+MANUFACTURER_DEALER_INVALID = (
+    "Registration is not allowed because the current location is not a dealer or manufacturer lot. "
+)
 MANUFACTURER_PERMIT_INVALID = "A manufacturer can only submit a transport permit once for a home. "
 PARTY_TYPE_INVALID = "Death of owner requires an executor, trustee, administrator owner party type. "
-REG_STAFF_ONLY = "Only BC Registries Staff are allowed to submit this registration. "
-TRAN_DEATH_JOINT_TYPE = "The existing tenancy type must be joint for this transfer registration. "
+REG_STAFF_ONLY = "Only BC Registries Staff are authorized to submit a transfer due to death registration. "
+TRAN_DEATH_JOINT_TYPE = "The existing tenancy type must be JOINT for this transfer registration. "
 TRAN_ADMIN_OWNER_INVALID = "The existing owners must be administrators for this registration. "
-TRAN_DEATH_OWNER_INVALID = "The owners must be individuals or businesses for this registration. "
+TRAN_DEATH_OWNER_INVALID = "Only individuals or businesses can be deleted as owners in this registration. "
 TRAN_EXEC_OWNER_INVALID = "The owners must be individuals, businesses, or executors for this registration. "
-TRAN_ADMIN_NEW_OWNER = "One of the new owners must be an administrator for this registration. "
-TRAN_DEATH_NEW_OWNER = "One of the new owners must be an individual or business for this registration. "
-TRAN_AFFIDAVIT_NEW_OWNER = "One of the new owners must be an executor for this registration. "
+TRAN_ADMIN_NEW_OWNER = "New owners must be administrators for this registration type. "
+TRAN_DEATH_NEW_OWNER = "Only individuals or businesses can be added as new owners in this registration. "
+TRAN_AFFIDAVIT_NEW_OWNER = "New owners must be executors for this registration type. "
 TRAN_DEATH_ADD_OWNER = "Owners cannot be added with this registration. "
-TRAN_DEATH_CERT_MISSING = "A death certificate number is required with this registration. "
-TRAN_DEATH_CORP_NUM_MISSING = "A removed business owner corporation number is required with this registration. "
-TRAN_DEATH_DATE_MISSING = "A death date and time is required with this registration. "
-TRAN_DEATH_DATE_INVALID = "A death date and time must be in the past. "
+TRAN_DEATH_CERT_MISSING = "Provide a valid death certficate number. "
+TRAN_DEATH_CORP_NUM_MISSING = "Provide the corporation number for any removed business owner. "
+TRAN_DEATH_DATE_MISSING = "Specify the date and time of death. "
+TRAN_DEATH_DATE_INVALID = "The death date and time must be earlier than the current date. "
 TRAN_DEATH_QS_JOINT = (
-    "A lawyer/notary qualified supplier JOINT tenancy business owner is not allowed with this " + "registration. "
+    "Business owners with JOINT tenancy are not allowed in lawyer/notary qualified supplier DEAT registrations. "
 )
-TRAN_AFFIDAVIT_DECLARED_VALUE = "Declared value cannot be greater than 25000 for this registration. "
-TRAN_WILL_PROBATE = "One (and only one) deceased owner must have a probate document (no death certificate). "
+TRAN_AFFIDAVIT_DECLARED_VALUE = "Declared value must not exceed 25,000 for this registration type. "
+TRAN_WILL_PROBATE = (
+    "Exactly one deceased owner must be linked to a probate document, and no death certificate should be used. "
+)
 TRAN_WILL_DEATH_CERT = (
-    "Deceased owners without a probate document must have a death certificate " + "or corporation number. "
+    "Deceased owners without a probate document must provide a death certificate or corporation number. "
 )
 TRAN_WILL_NEW_OWNER = "One of the new owners must be an executor for this registration. "
 TRAN_EXEC_DEATH_CERT = "All deceased owners must have a death certificate or corporation number. "
-TRAN_ADMIN_GRANT = "One (and only one) deceased owner must have a grant document (no death certificate). "
-TRAN_ADMIN_DEATH_CERT = "Deceased owners without a grant document must have a death certificate or corporation number. "
-TRAN_QUALIFIED_DELETE = "Qualified suppliers must either delete one owner group or all owner groups. "
-NOTICE_NAME_REQUIRED = "The giving notice party person or business name is required. "
-NOTICE_ADDRESS_REQUIRED = "The giving notice address is required. "
-DESTROYED_FUTURE = "The exemption destroyed/converted date (expiryDateTime) cannot be in the future. "
-DESTROYED_EXRS = "The destroyed/converted date (note expiryDateTime) cannot be submitted with a residential exemption. "
+TRAN_ADMIN_GRANT = "Exactly one deceased owner must be linked to a grant document, without using a death certificate "
+TRAN_ADMIN_DEATH_CERT = (
+    "Deceased owners without a grant document must provide a death certificate or corporation number. "
+)
+TRAN_QUALIFIED_DELETE = (
+    "Qualified suppliers must delete either one owner group or all owner groups, not a partial selection. "
+)
+NOTICE_NAME_REQUIRED = "The name of the person or business giving notice is missing and must be provided. "
+NOTICE_ADDRESS_REQUIRED = "The address of the person giving notice is missing and must be provided. "
+DESTROYED_FUTURE = (
+    "The destroyed or converted date (expiryDateTime) for non-residential exemption cannot be set in the future. "
+)
+DESTROYED_EXRS = "Destroyed or converted date (expiryDateTime) must not be submitted with a residential exemption. "
 LOCATION_NOT_ALLOWED = (
-    "A Residential Exemption is not allowed when the home current location is a "
-    "dealer/manufacturer lot or manufactured home park. "
+    "Residential exemption is not allowed when the home is located in a dealer/manufacturer lot "
+    + "or a manufactured home park. "
 )
-TRANS_DOC_TYPE_INVALID = "The transferDocumentType is only allowed with a TRANS transfer due to sale or gift. "
+TRANS_DOC_TYPE_INVALID = "The transferDocumentType field is only valid for TRANS transfers due to sale or gift. "
 AMEND_LOCATION_TYPE_QS = "New location type cannot be different than the existing location type."
-AMEND_PERMIT_INVALID = "Amend transport permit not allowed: no active tansport permit exists. "
+AMEND_PERMIT_INVALID = "Amendment of transport permit is not allowed because no active transport permit exists. "
 TRAN_DEATH_QS_JOINT_REMOVE = (
-    "A lawyer/notary qualified supplier JOINT tenancy business owner cannot be changed " + "with this registration. "
+    "Business owners with JOINT tenancy are not allowed in lawyer/notary qualified supplier DEAT registrations. "
 )
-PERMIT_QS_ADDRESS_MISSING = "No existing qualified supplier lot address found. "
+PERMIT_QS_ADDRESS_MISSING = (
+    "Transport permit registration is not allowed because no qualified supplier lot address is found. "
+)
 PERMIT_QS_INFO_MISSING = "No existing qualified supplier service agreement information found. "
 PERMIT_QS_ADDRESS_MISMATCH = (
-    "The current transport permit home location address must match the " + "manufacturer/dealer lot address. "
+    "Transport permit registration is not allowed because the location address does not "
+    + "match the dealer/manufacturer lot address. "
 )
-PERMIT_MANUFACTURER_NAME_MISMATCH = "The current location manufacturer name must match the service agreement name. "
-EXNR_DATE_MISSING = "Non-residential exemptions require a destroyed/converted date (note expiryDateTime). "
+PERMIT_MANUFACTURER_NAME_MISMATCH = (
+    "Transport permit registration is not allowed because the manufacturer name does not match the service agreement. "
+)
+EXNR_DATE_MISSING = (
+    "Non-residential exemption requires a destroyed or converted date (expiryDateTime) to be specified. "
+)
 EXNR_REASON_MISSING = "Non-residential exemptions require one of the defined reason types (note nonResidentialReason). "
-EXNR_OTHER_MISSING = (
-    "Non-residential exemptions require an other description (note nonResidentialOther) if the "
-    + "reason type is OTHER. "
-)
-EXNR_OTHER_INVALID = (
-    "Non-residential exemptions other description (note nonResidentialOther) is not allowed with "
-    + "the request reason type. "
-)
+EXNR_OTHER_MISSING = "An 'other description' is required when the non-residential exemption reason type is OTHER. "
+EXNR_OTHER_INVALID = "An 'other description' is not allowed for the specified non-residential exemption reason type. "
 EXNR_DESTROYED_INVALID = (
-    "Non-residential exemption destroyed reason (note nonResidentialReason) is invalid. "
-    + "Allowed values are BURNT, DISMANTLED, DILAPIDATED, or OTHER. "
+    "The destroyed reason for non-residential exemption is invalid. Allowed values are "
+    + "BURNT, DISMANTLED, DILAPIDATED, or OTHER. "
 )
 EXNR_CONVERTED_INVALID = (
-    "Non-residential exemption converted reason (note nonResidentialReason) is invalid. "
-    + "Allowed values are OFFICE, STORAGE_SHED, BUNKHOUSE, or OTHER. "
+    "The converted reason for non-residential exemption is invalid. Allowed values are "
+    + "OFFICE, STORAGE_SHED, BUNKHOUSE, or OTHER. "
 )
-TRANS_DOC_TYPE_NOT_ALLOWED = "The transferDocumentType is only allowed with BC Registries staff TRANS registrations. "
+TRANS_DOC_TYPE_NOT_ALLOWED = "Only BC Registries staff can use transferDocumentType with non-TRANS registrations. "
 AMEND_PERMIT_QS_ADDRESS_INVALID = (
-    "Amend transport permit can only change the home location address street. "
-    + "City and province may not be modified. "
+    "Amendment of transport permit is not allowed: only the street address may be changed, not the city or province. "
 )
 PERMIT_ACTIVE_ACCOUNT_INVALID = (
-    "Create new transport permit request invalid: an active, non-expired transport "
-    + "permit created by another account exists. "
+    "Transport permit registration is not allowed because an active permit created by another account already exists. "
 )
 TRANS_DEALER_DOC_TYPE_INVALID = "QS dealers can only submit a TRANS transfer due to sale or gift. "
 QS_DEALER_INVALID = "No approved qualified supplier information found: supplier account set up invalid."
@@ -122,7 +131,7 @@ DEALER_TRANSFER_OWNER_INVALID = (
     "QS dealer transfer invalid:  either current owner group is not SOLE or the owner "
     + "name does not match the qualified supplier account name. "
 )
-TRANSFER_DATE_FUTURE = "The transfer date of execution (transferDate) cannot be in the future. "
+TRANSFER_DATE_FUTURE = "The transfer date of execution cannot be set in the future. "
 EXTEND_PERMIT_EXISTS_INVALID = "For non-BC Registries staff a transport permit can only be extended once. "
 EXTEND_PERMIT_INVALID = "Extend transport permit not allowed: no active tansport permit exists. "
 

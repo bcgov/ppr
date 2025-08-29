@@ -78,7 +78,7 @@ DOC_ID_EXISTS = 'UT000010'
 DOC_ID_VALID = '63166035'
 DOC_ID_INVALID_CHECKSUM = '63166034'
 INVALID_TEXT_CHARSET = 'TEST \U0001d5c4\U0001d5c6/\U0001d5c1 INVALID'
-INVALID_CHARSET_MESSAGE = 'The character set is not supported'
+INVALID_CHARSET_MESSAGE = 'Please use valid characters.'
 
 # testdata pattern is ({description}, {valid}, {staff}, {doc_id}, {message content}, {mhr_num})
 TEST_REG_DATA = [
@@ -249,7 +249,7 @@ TEST_EXEMPTION_DATA = [
     ('Valid staff PERMIT', True, True, DOC_ID_VALID, None, 'PS12345', '000931'),
     ('Valid non-staff active transport permit', True, False, None, None, 'PS12345', '000931'),
     ('Invalid EXEMPT', False, False, None, validator_utils.EXEMPT_EXRS_INVALID, 'PS12345', '000912'),
-    ('Invalid CANCELLED', False, False, None, validator_utils.STATE_NOT_ALLOWED, 'PS12345', '000913'),
+    ('Invalid CANCELLED', False, False, None, validator_utils.STATE_CANCELLED, 'PS12345', '000913'),
     ('Invalid note doc type', False, False, None, validator.NOTE_DOC_TYPE_INVALID, 'PS12345', '000900'),
     ('Invalid FROZEN TAXN', False, False, None, validator_utils.STATE_FROZEN_NOTE, 'PS12345', '000914'),
     ('Invalid FROZEN NCON', False, False, None, validator_utils.STATE_FROZEN_NOTE, 'PS12345', '000918'),

@@ -33,60 +33,64 @@ from mhr_api.utils import valid_charset
 from mhr_api.utils.logging import logger
 
 HOME_DESCRIPTION_MIN_YEAR: int = 1900
-DOC_ID_REQUIRED = "Document ID is required for staff registrations. "
-DOC_ID_EXISTS = "Document ID must be unique: provided value already exists. "
-DOC_ID_INVALID_CHECKSUM = "Document ID is invalid: checksum failed. "
-STATE_FROZEN_PAYMENT = "Registration not allowed: a previous registration with a pending payment exists. "
-STATE_NOT_ALLOWED = "The MH registration is not in a state where changes are allowed. "
-STATE_FROZEN_AFFIDAVIT = "A transfer to a beneficiary is pending after an AFFIDAVIT transfer. "
-STATE_FROZEN_NOTE = "Registration not allowed: this manufactured home has an active TAXN, NCON, or REST unit note. "
+DOC_ID_REQUIRED = "Document ID is mandatory for staff registrations. "
+DOC_ID_EXISTS = "The Document ID has already been used. It must be unique. "
+DOC_ID_INVALID_CHECKSUM = "The provided Document ID is invalid due to a checksum failure. "
+STATE_FROZEN_PAYMENT = "Registration is blocked due to a previous registration with a pending credit card payment. "
+STATE_NOT_ALLOWED = "Changes are not allowed due to the current state of the manufactured home. "
+STATE_CANCELLED = "Modifications are prohibited because the Manufactured Home (MH) status is marked as CANCELLED. "
+STATE_EXEMPT = "Modifications are not allowed because the MH status is EXEMPT. "
+STATE_ACTIVE_EXRE = (
+    "Modifications are not allowed because the MH status is ACTIVE and the document type is EXRE, "
+    + "which requires a different status."
+)
+STATE_FROZEN_AFFIDAVIT = (
+    "Transfer to a beneficiary is pending after an AFFIDAVIT transfer. New registration type must be TRANS. "
+)
+STATE_FROZEN_NOTE = "Registration is blocked due to an active TAXN, NCON, or REST unit note on the manufactured home. "
 STATE_FROZEN_PERMIT = "Registration not allowed: this manufactured home has an active transport permit. "
-STATE_FROZEN_EXEMPT = "Registration not allowed: this manufactured home has an active exemption registration. "
+STATE_FROZEN_EXEMPT = "Registration not allowed due to an active exemption registration on the home. "
 STATE_ACTIVE_PERMIT = (
-    "New transport permit registration not allowed: an active permit registration exists. "
+    " Transport permit registration is not allowed because an active permit already exists. "
     + "Staff or the account that created the active transport permit can resubmit with moveCompleted set to true. "
 )
-DRAFT_NOT_ALLOWED = "The draft for this registration is out of date: delete the draft and resubmit. "
-CHARACTER_SET_UNSUPPORTED = "The character set is not supported for {desc} value {value}. "
+DRAFT_NOT_ALLOWED = "The draft for this registration is outdated. Please delete the draft and resubmit. "
+CHARACTER_SET_UNSUPPORTED = "The {desc} contains unsupported characters ({value}). Please use valid characters. "
 PPR_LIEN_EXISTS = (
     "This registration is not allowed to complete as an outstanding Personal Property Registry lien "
     + "exists on the manufactured home. "
 )
 LOCATION_PID_INVALID = (
-    "Location PID verification failed: either the PID is invalid or the LTSA service is " + "unavailable. "
+    "Location PID verification failed: the PID is either invalid or the LTSA service is unavailable. "
 )
-SUBMITTING_REQUIRED = "Submitting Party is required for MH registrations. "
-DESCRIPTION_CSA_ENGINEER_REQUIRED = "Either a CSA number or engineer information is required for this registration. "
-DESCRIPTION_MAKE_MODEL_REQUIRED = "Either description make or description model is required. "
-DESCRIPTION_YEAR_INVALID = (
-    "Description manufactured home year invalid: it must be between 1900 and 1 year after " + "the current year. "
-)
-DESCRIPTION_YEAR_REQUIRED = "Description manufactured home year is required. "
+SUBMITTING_REQUIRED = "Submitting party information is required for MH registrations. "
+DESCRIPTION_CSA_ENGINEER_REQUIRED = "Either a CSA number or engineer information must be provided. "
+DESCRIPTION_MAKE_MODEL_REQUIRED = "Either the make or model of the manufactured home must be provided. "
+DESCRIPTION_YEAR_INVALID = "Manufactured home year must be between 1900 and one year after the current year. "
+DESCRIPTION_YEAR_REQUIRED = "Manufactured home year must be provided in the description. "
 DESCRIPTION_INVALID_IDENTICAL = "The new description cannot be identical to the existing description. "
 EXEMPT_EXNR_INVALID = "Registration not allowed: the home is exempt because of an existing non-residential exemption. "
-EXEMPT_EXRS_INVALID = "Residential exemption registration not allowed: the home is already exempt. "
-EXEMPT_PERMIT_INVALID = "Registration not allowed: the home is not exempt because of a transport permit location. "
-MHR_NUMBER_INVALID = "MHR number {mhr_num} either is greater than the existng maximum MHR number or already exists. "
-LOCATION_INVALID_IDENTICAL = "The new location cannot be identical to the existing location. "
-LOCATION_DEALER_REQUIRED = "Location dealer/manufacturer name is required for this registration. "
-LOCATION_PARK_NAME_REQUIRED = "Location park name is required for this registration. "
-LOCATION_PARK_PAD_REQUIRED = "Location park PAD is required for this registration. "
-LOCATION_STRATA_REQUIRED = "Location parcel ID or all of lot, plan, land district are required for this registration. "
-LOCATION_OTHER_REQUIRED = (
-    "Location parcel ID or all of lot, plan, land district or all of land district, district "
-    + "lot are required for this registration. "
+EXEMPT_EXRS_INVALID = "Residential exemption registration is not permitted because the MH status is EXEMPT. "
+EXEMPT_PERMIT_INVALID = "Registration is not allowed because the home is not exempt due to its location. "
+MHR_NUMBER_INVALID = "The MHR number {mhr_num} already exists and cannot be reused. "
+LOCATION_INVALID_IDENTICAL = (
+    "Registration is not allowed because the new location is identical to the existing location. "
 )
-BAND_NAME_REQUIRED = "The location Indian Reserve band name is required for this registration. "
-RESERVE_NUMBER_REQUIRED = "The location Indian Reserve number is required for this registration. "
+LOCATION_DEALER_REQUIRED = "Dealer/manufacturer name is required for MANUFACTURER location type. "
+LOCATION_PARK_NAME_REQUIRED = "Park name is required for MH_PARK location type. "
+LOCATION_PARK_PAD_REQUIRED = "Park PAD is required for MH_PARK location type. "
+LOCATION_STRATA_REQUIRED = "Parcel ID or lot, plan, and land district details are required for STRATA location type. "
+LOCATION_OTHER_REQUIRED = (
+    "Parcel ID or lot, plan, and land district or land district and district lot are required for OTHER location type. "
+)
+BAND_NAME_REQUIRED = "Indian Reserve band name is required for RESERVE location type. "
+RESERVE_NUMBER_REQUIRED = "Indian Reserve number is required for RESERVE location type. "
 LOCATION_MANUFACTURER_ALLOWED = (
     "Park name, PAD, band name, reserve number, parcel ID, and LTSA details are "
     + "not allowed with a MANUFACTURER location type. "
 )
-LOCATION_PARK_ALLOWED = (
-    "Dealer/manufacturer name, band name, reserve number, parcel ID, and LTSA details are "
-    + "not allowed with a MH_PARK location type. "
-)
-LOCATION_RESERVE_ALLOWED = "Dealer/manufacturer name, park name, and PAD are not allowed with a RESERVE location type. "
+LOCATION_PARK_ALLOWED = "Additional location details are not allowed with MH_PARK location type. "
+LOCATION_RESERVE_ALLOWED = "Additional location details are not allowed with RESERVE location type. "
 LOCATION_STRATA_ALLOWED = (
     "Dealer/manufacturer name, park name, PAD, band name, and reserve number are not allowed "
     + "with a STRATA location type. "
@@ -95,13 +99,17 @@ LOCATION_OTHER_ALLOWED = (
     "Dealer/manufacturer name, park name, PAD, band name, and reserve number are not allowed "
     + "with an OTHER location type. "
 )
-LOCATION_TAX_DATE_INVALID = "Location tax certificate date is invalid: it cannot be before the registration date. "
-LOCATION_TAX_DATE_INVALID_QS = (
-    "Location tax certificate date is invalid: it must be within the same year as the " + "current date. "
+LOCATION_TAX_DATE_INVALID = (
+    "Location tax certificate date is invalid: it must not be earlier than the registration date. "
 )
-LOCATION_TAX_CERT_REQUIRED = "Location tax certificate and tax certificate expiry date are required. "
-STATUS_CONFIRMATION_REQUIRED = "The land status confirmation is required for this registration. "
-CANCEL_PERMIT_INVALID = "Cancel Transport Permit not allowed: no active, non-expired transport permit exists. "
+LOCATION_TAX_DATE_INVALID_QS = "Location tax certificate date is invalid: it must be within the current calendar year. "
+LOCATION_TAX_CERT_REQUIRED = (
+    "Location tax certificate and its expiry date are required for transport permit registration. "
+)
+STATUS_CONFIRMATION_REQUIRED = "Land status confirmation is required for this registration. "
+CANCEL_PERMIT_INVALID = (
+    "Cancel Transport Permit is not allowed because there is no active, non-expired transport permit. "
+)
 PPR_REG_TYPE_ALL = " SA_TAX TA_TAX TM_TAX "
 PPR_REG_TYPE_GOV = " SA_GOV TA_GOV TM_GOV "
 PPR_REG_TYPE_EXEMPTION = PPR_REG_TYPE_ALL + PPR_REG_TYPE_GOV + " FR LT ML MN SG "
@@ -210,11 +218,13 @@ def validate_registration_state(  # pylint: disable=too-many-branches,too-many-r
             and reg.change_registrations
         ):
             return check_exempt_permit(reg, staff, error_msg)
-        elif (
-            reg.status_type == MhrRegistrationStatusTypes.CANCELLED
-            or doc_type is None
-            or doc_type
-            not in (MhrDocumentTypes.NPUB, MhrDocumentTypes.NCON, MhrDocumentTypes.NCAN, MhrDocumentTypes.NRED)
+        elif reg.status_type == MhrRegistrationStatusTypes.CANCELLED:
+            error_msg += STATE_CANCELLED
+        elif doc_type is None or doc_type not in (
+            MhrDocumentTypes.NPUB,
+            MhrDocumentTypes.NCON,
+            MhrDocumentTypes.NCAN,
+            MhrDocumentTypes.NRED,
         ):
             error_msg += STATE_NOT_ALLOWED
     elif reg.change_registrations:
@@ -254,7 +264,7 @@ def validate_registration_state_reregister(registration: MhrRegistration):
     """Validate registration state for re-register a cancelled/exempt home requests."""
     error_msg = ""
     if registration and registration.status_type and registration.status_type == MhrRegistrationStatusTypes.ACTIVE:
-        return STATE_NOT_ALLOWED
+        return STATE_ACTIVE_EXRE
     return error_msg
 
 
@@ -265,7 +275,7 @@ def validate_registration_state_exemption(registration: MhrRegistration, reg_typ
         if registration.status_type == MhrRegistrationStatusTypes.ACTIVE:
             return check_state_note(registration, staff, error_msg, reg_type)
         if registration.status_type == MhrRegistrationStatusTypes.CANCELLED:
-            error_msg += STATE_NOT_ALLOWED
+            error_msg += STATE_CANCELLED
         elif reg_type == MhrRegistrationTypes.EXEMPTION_RES:
             error_msg += EXEMPT_EXRS_INVALID
     return error_msg

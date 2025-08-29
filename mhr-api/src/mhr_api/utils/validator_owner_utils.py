@@ -23,28 +23,28 @@ from mhr_api.utils.logging import logger
 
 from .validator_utils import validate_individual_name, validate_text
 
-DELETE_GROUP_ID_INVALID = "The owner group with ID {group_id} is not active and cannot be changed. "
-DELETE_GROUP_ID_NONEXISTENT = "No owner group with ID {group_id} exists. "
-DELETE_GROUP_TYPE_INVALID = "The owner group tenancy type with ID {group_id} is invalid. "
+DELETE_GROUP_ID_INVALID = (
+    "The specified owner group ID {group_id} is not active or does not exist and cannot be modified. "
+)
+DELETE_GROUP_ID_NONEXISTENT = (
+    "The specified owner group ID {group_id} is not active or does not exist and cannot be modified. "
+)
+DELETE_GROUP_TYPE_INVALID = "The tenancy type for the owner group with ID {group_id} is invalid. "
 DELETE_GROUPS_MISSING = "The delete owner groups are required. "
 DELETE_GROUP_ID_MISSING = "Delete owner group ID is missing. "
-GROUP_INTEREST_MISMATCH = "The owner group interest numerator sum does not equal the interest common denominator. "
-GROUP_NUMERATOR_MISSING = "The owner group interest numerator is required and must be an integer greater than 0. "
-GROUP_DENOMINATOR_MISSING = "The owner group interest denominator is required and must be an integer greater than 0. "
+GROUP_INTEREST_MISMATCH = "Sum of interest numerators must equal the common denominator in COMMON tenancy. "
+GROUP_NUMERATOR_MISSING = "Interest numerator is missing or invalid. It must be a positive integer. "
+GROUP_DENOMINATOR_MISSING = "Interest denominator is missing or invalid. It must be a positive integer. "
 TENANCY_TYPE_NA_INVALID = "Tenancy type NA is not allowed when there is 1 active owner group with 1 owner. "
-TENANCY_TYPE_NA_INVALID2 = (
-    "Tenancy type NA is only allowed when all owners are ADMINISTRATOR, EXECUTOR, or TRUSTEE party types. "
-)
-OWNERS_JOINT_INVALID = "The owner group must contain at least 2 owners. "
-OWNERS_COMMON_INVALID = "Each COMMON owner group must contain exactly 1 owner. "
-OWNERS_COMMON_SOLE_INVALID = (
-    "SOLE owner group tenancy type is not allowed when there is more than 1 " + "owner group. Use COMMON instead. "
-)
+TENANCY_TYPE_NA_INVALID2 = "Tenancy type NA is only allowed for ADMINISTRATOR, EXECUTOR, or TRUSTEE party types. "
+OWNERS_JOINT_INVALID = "JOINT tenancy type requires at least two owners in the group. "
+OWNERS_COMMON_INVALID = "Each COMMON tenancy type must have exactly one owner in the group. "
+OWNERS_COMMON_SOLE_INVALID = "SOLE tenancy type is not allowed with multiple owner groups. Use COMMON instead. "
 GROUP_COMMON_INVALID = "More than 1 group is required with the Tenants in Common owner group type. "
-ADD_SOLE_OWNER_INVALID = "Only one sole owner and only one sole owner group can be added. "
-OWNER_DESCRIPTION_REQUIRED = "Owner description is required for the owner party type. "
-TRANSFER_PARTY_TYPE_INVALID = "Owner party type of administrator, executor, trustee not allowed for this registration. "
-TENANCY_PARTY_TYPE_INVALID = "Owner group tenancy type must be NA for executors, trustees, or administrators. "
+ADD_SOLE_OWNER_INVALID = "Only one sole owner and one sole owner group are allowed. "
+OWNER_DESCRIPTION_REQUIRED = "Owner party type description is required and cannot be empty. "
+TRANSFER_PARTY_TYPE_INVALID = "Administrator, executor, or trustee party types are not allowed for this registration. "
+TENANCY_PARTY_TYPE_INVALID = "Tenancy type must be NA for executors, trustees, or administrators. "
 GROUP_PARTY_TYPE_INVALID = (
     "For TRUSTEE, ADMINISTRATOR, or EXECUTOR, all owner party types within the group must be identical. "
 )
