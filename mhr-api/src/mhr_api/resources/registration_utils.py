@@ -627,11 +627,17 @@ def get_registration_report(  # pylint: disable=too-many-return-statements,too-m
         # No report in doc storage: generate, store.
         return new_registration_report(registration, report_data, report_type, token, response_status)
     except ReportException as report_err:
-        return resource_utils.service_exception_response("MHR reg report API error: " + str(report_err))
+        return resource_utils.service_exception_response(
+            f"An error occurred while generating the MHR registration report. {report_err}"
+        )
     except ReportDataException as report_data_err:
-        return resource_utils.service_exception_response("MHR reg report API data error: " + str(report_data_err))
+        return resource_utils.service_exception_response(
+            f"The report could not be generated due to invalid or missing data. {report_data_err}"
+        )
     except StorageException as storage_err:
-        return resource_utils.service_exception_response("MHR reg report storage API error: " + str(storage_err))
+        return resource_utils.service_exception_response(
+            f"The report could not be stored or retrieved due to a storage service error. {storage_err}"
+        )
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception, None, "Generate MHR registration report state.")
 

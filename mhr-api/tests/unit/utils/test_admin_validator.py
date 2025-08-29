@@ -406,7 +406,7 @@ TEST_REG_DATA = [
      validator_utils.SUBMITTING_REQUIRED),
     ('Invalid FROZEN', False, 'NRED', DOC_ID_VALID, '000917', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
     ('Invalid EXEMPT', False, 'REST', DOC_ID_VALID, '000912', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
-    ('Invalid CANCELLED', False, 'NRED', DOC_ID_VALID, '000913', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
+    ('Invalid CANCELLED', False, 'NRED', DOC_ID_VALID, '000913', 'PS12345', validator_utils.STATE_CANCELLED),
     ('Invalid doc id checksum', False, 'NRED', DOC_ID_INVALID_CHECKSUM, '000914', 'PS12345',
      validator.DOC_ID_INVALID_CHECKSUM),
     ('Invalid doc id exists', False, 'NRED', DOC_ID_EXISTS, '000914', 'PS12345', validator.DOC_ID_EXISTS)
@@ -430,8 +430,8 @@ TEST_NOTE_DATA_NOTICE = [
 ]
 # test data pattern is ({description}, {valid}, {mhr_num}, {account}, {message_content})
 TEST_DATA_EXRE = [
-    ('Invalid FROZEN', False, '000917', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
-    ('Invalid ACTIVE', False, '000914', 'PS12345', validator_utils.STATE_NOT_ALLOWED),
+    ('Invalid FROZEN', False, '000917', 'PS12345', validator_utils.STATE_ACTIVE_EXRE),
+    ('Invalid ACTIVE', False, '000914', 'PS12345', validator_utils.STATE_ACTIVE_EXRE),
     ('Valid CANCELLED', True, '000913', 'PS12345', None),
     ('Valid EXEMPT', True, '000912', 'PS12345', None),
     ('Valid no note', True, '000912', 'PS12345', None)

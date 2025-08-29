@@ -30,7 +30,7 @@ from mhr_api.utils.logging import logger
 bp = Blueprint("SEARCHES1", __name__, url_prefix="/api/v1/searches")  # pylint: disable=invalid-name
 
 VAL_ERROR = "Search request data validation errors."  # Validation error prefix
-VAL_ERROR_FIRST_MISSING = "Search owner individual first name is required."
+VAL_ERROR_FIRST_MISSING = "Search request is invalid because the search owner individual first name is missing."
 SAVE_ERROR_MESSAGE = "Account {0} search db save failed: {1}"
 
 

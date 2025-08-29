@@ -52,7 +52,7 @@ def get_account_manufacturer():
         manufacturer: MhrManufacturer = MhrManufacturer.find_by_account_id(account_id)
         if manufacturer:
             return jsonify(manufacturer.json), HTTPStatus.OK
-        logger.info(f"No manufacturer info found for account {account_id}.")
+        logger.info(f"No manufacturer information is available for the specified account {account_id}.")
         return resource_utils.not_found_error_response("manufacturer information", account_id)
 
     except DatabaseException as db_exception:
@@ -79,7 +79,7 @@ def post_account_manufacturer():
         logger.info(f"Creating manufacturer information for account id {account_id}.")
         manufacturer: MhrManufacturer = MhrManufacturer.find_by_account_id(account_id)
         if manufacturer:
-            msg: str = f"Manufacturer information already exists for account {account_id}."
+            msg: str = f"Manufacturer information already exists for the specified account {account_id}."
             logger.error(msg)
             return resource_utils.bad_request_response(msg)
         request_json = request.get_json(silent=True)

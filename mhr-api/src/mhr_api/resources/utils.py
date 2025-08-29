@@ -28,21 +28,21 @@ from mhr_api.utils.logging import logger
 
 # Resource error messages
 # Model business error messages in models.utils.py
-ACCOUNT_REQUIRED = "{code}: Account-Id header required."
-UNAUTHORIZED = "{code}: authorization failure submitting a request for {account_id}."
-UNAUTHORIZED_HELPDESK = "{code}: BCOL helpdesk users are not authorized to create {reg_type} registrations."
+ACCOUNT_REQUIRED = "{code}: The request is missing the required Account-Id header."
+UNAUTHORIZED = "{code}: The user {account_id} does not have the necessary role to submit this registration request."
+UNAUTHORIZED_HELPDESK = "{code}: Help desk users are not permitted to create this type of registration ({reg_type})."
 ACCOUNT_ACCESS = (
     "{code}: the account ID {account_id} cannot access statement information for " + "mhr number {mhr_num}."
 )
 STAFF_SEARCH_BCOL_FAS = "{code}: provide either a BCOL Account Number or a Routing Slip Number but not both."
 SBC_SEARCH_NO_PAYMENT = "{code}: provide either a BCOL Account Number or a Routing Slip Number."
-DATABASE = "{code}: {context} database error for {account_id}."
+DATABASE = "{code}: An error occurred while accessing the database for the given account ({account_id}). {context}."
 NOT_FOUND = "{code}: no {item} found for {key}."
-PATH_PARAM = "{code}: a {param_name} path parameter is required."
+PATH_PARAM = "{code}: A required path parameter {param_name} is missing from the request URL."
 PATH_MISMATCH = "{code}: the path value ({path_value}) does not match the data {description} value ({data_value})."
 REPORT = "{code}: error generating report. Detail: {detail}"
-DEFAULT = "{code}: error processing request."
-PAYMENT = "{code}:{status} payment error for account {account_id}."
+DEFAULT = "{code}: An unexpected error occurred while processing the request."
+PAYMENT = "{code}: A payment processing error occurred for the specified account ({account_id}). {status}."
 DUPLICATE_REGISTRATION_ERROR = "MH Registration {0} is already available to the account."
 
 CERTIFIED_PARAM = "certified"
