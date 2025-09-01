@@ -372,19 +372,22 @@ export const RegistrationFees = {
     showFeeDesc: false
   },
   [FeeSummaryTypes.PARTY_CODES]: {
-    filingFees: 0,
-    filingType: APIRegistrationTypes.MANUFACTURED_HOME_REGISTRATION,
-    filingTypeCode: FeeSummaryTypes.NEW_MHR,
+    filingFees: 50,
+    filingType: 'Create Party Codes',
+    filingTypeCode: FeeSummaryTypes.PARTY_CODES,
     futureEffectiveFees: 0,
     priorityFees: 0,
     processingFees: 0,
-    serviceFees: 0, // Staff Service Fee?
+    serviceFees: 0,
     tax: {
       gst: 0,
       pst: 0
     },
     total: 50,
-    waived: true
+    quantity: 1,
+    quantityDesc: '',
+    waived: false,
+    showFeeDesc: false
   },
   [FeeSummaryTypes.NO_FEE]: {
     filingFees: 0,

@@ -129,6 +129,9 @@ export default {
         // Exemptions
         residential_exemption: 'Residential Exemption',
         non_residential_exemption: 'Non-Residential Exemption',
+
+        // Party Code
+        party_code: 'Create Party Code(s)'
       },
       feeDesc: {
         // PPR Filing Types

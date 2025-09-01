@@ -51,19 +51,26 @@
               </ol>
               <ul class="ml-6 mt-4 list-disc">
                 <li>
-                  The party name used in the code should be the complete legal name of either a person or business. The address should be the mailing address of this person or business.
+                  The party name used in the code should be the complete legal name of either a person or business. The
+                  address should be the mailing address of this person or business.
                 </li>
                 <li>
-                  There can be only one party name used with your account, but you can have as many locations as you want, for example, if your business has multiple branches and you create registrations using the different branches.
+                  There can be only one party name used with your account, but you can have as many locations as you
+                  want, for example, if your business has multiple branches and you create registrations using the
+                  different branches.
                 </li>
                 <li>
-                  To create your code, you can use the default name that is associated with your BC Registries account, or you can change this to a custom name (remember \- this name will be the name that appears on your registrations and has legal implications).
+                  To create your code, you can use the default name that is associated with your BC Registries account,
+                  or you can change this to a custom name (remember \- this name will be the name that appears on your
+                  registrations and has legal implications).
                 </li>
                 <li>
-                  Once you have your name entered, select <em>Add a Location</em> to enter the address and email address for the code.
+                  Once you have your name entered, select <em>Add a Location</em> to enter the address and email address
+                  for the code.
                 </li>
                 <li>
-                  When you are done entering your location information, a party code will automatically be generated and displayed in your Locations table.
+                  When you are done entering your location information, a party code will automatically be generated and
+                  displayed in your Locations table.
                 </li>
                 <li>
                   Complete your code creation by reviewing and confirming the information in the code.
@@ -76,16 +83,22 @@
               <h4 class="mt-4">How to use a code</h4>
               <ul class="ml-6 list-disc">
                 <li>
-                  When you are creating registrations your default party code information will be displayed as the Registering Party. However, you can change this code by entering one of your party codes or your party name in the Registering Party selection field.
+                  When you are creating registrations your default party code information will be displayed as the
+                  Registering Party. However, you can change this code by entering one of your party codes or your party
+                  name in the Registering Party selection field.
                 </li>
                 <li>
-                  You can add yourself as a secured party in the same manner: by entering one of your party codes or your party name in the Secured Party selection field.
+                  You can add yourself as a secured party in the same manner: by entering one of your party codes or
+                  your party name in the Secured Party selection field.
                 </li>
                 <li>
-                  Third parties (e.g., a law firm) can similarly create registrations using your party code or party name to identify you as the Registering Party and/or Secured Party.
+                  Third parties (e.g., a law firm) can similarly create registrations using your party code or party
+                  name to identify you as the Registering Party and/or Secured Party.
                 </li>
                 <li>
-                  You can update your party name or mailing address, or email address in any active, prior registration in which a code was used simply by changing the information in the code. Registering Party and Secured Party information in discharged or expired registrations is not updated by party code changes.
+                  You can update your party name or mailing address, or email address in any active, prior registration
+                  in which a code was used simply by changing the information in the code. Registering Party and Secured
+                  Party information in discharged or expired registrations is not updated by party code changes.
                 </li>
               </ul>
 
@@ -100,7 +113,7 @@
 
         <!-- Party Codes Card -->
         <section>
-          <div class="px-6">
+          <div class="py-6">
             <div class="flex items-start justify-between">
               <div>
                 <h2 class="text-lg font-medium text-slate-800">Party Name Section</h2>
@@ -129,28 +142,67 @@
       <!-- Sidebar -->
       <div class="col-span-3 ml-4 mt-[30px]">
         <aside>
-          <ConnectFeeWidget />
+          <StickyContainer
+            :show-connect-fees="true"
+            :set-show-buttons="true"
+            :set-back-btn="showBackBtn"
+            :set-cancel-btn="'Cancel'"
+            :set-save-btn="''"
+            :set-submit-btn="reviewConfirmText"
+            :set-right-offset="true"
+            :set-show-fee-summary="true"
+            :set-err-msg="''"
+            :set-is-loading="false"
+            :set-show-connect-fees="true"
+            data-test-id="fee-summary"
+            @cancel="goToDash()"
+            @back="isReviewMode = false"
+            @submit="goToReview()"
+          />
         </aside>
       </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { SimpleHelpToggle } from '@/components/common'
+import { computed, onMounted } from 'vue'
+import { SimpleHelpToggle, StickyContainer } from '@/components/common'
 import { useConnectFeesHandler } from '@/composables'
 import { storeToRefs } from 'pinia'
 import { useConnectFeeStore } from '@/store/connectFee'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 
+const { goToDash } = useNavigation()
 const { setRegistrationFees } = useConnectFeesHandler()
 const { feeOptions, userSelectedPaymentMethod } = storeToRefs(useConnectFeeStore())
 
+const isReviewMode = ref(false)
+const reviewConfirmText = computed((): string => {
+  return isReviewMode.value ? 'Register Changes and Pay' : 'Review and Confirm'
+})
+const showBackBtn = computed((): string => {
+  return isReviewMode.value ? 'Back' : ''
+})
+
 onMounted(() => {
+  if (!getFeatureFlag('enable-manage-party-codes')) {
+    goToDash()
+    return
+  }
   setRegistrationFees(FeeSummaryTypes.PARTY_CODES)
 })
+
+const goToReview = () => {
+  if (isReviewMode.value) {
+    // already in review mode
+    // submit the change
+    return
+  }
+  isReviewMode.value = true
+}
+
 </script>
-<style scoped lang="scss">
+<style lang="scss" scoped>
 ol {
   list-style-type: revert;
 }
