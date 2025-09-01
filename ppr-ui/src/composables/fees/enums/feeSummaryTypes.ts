@@ -19,6 +19,7 @@ export enum FeeSummaryTypes {
   MHR_LOCATION_CHANGE = 'mhr_location_change',
   MHR_AMEND_TRANSPORT_PERMIT = 'mhr_amend_transport_permit',
   MHR_UNIT_NOTE = 'mhr_unit_note',
+  PARTY_CODES = 'party_code',
   RESIDENTIAL_EXEMPTION = 'residential_exemption',
   NON_RESIDENTIAL_EXEMPTION = 'non_residential_exemption',
   NO_FEE = 'no_fee',

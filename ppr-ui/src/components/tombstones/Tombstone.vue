@@ -1,6 +1,6 @@
 <template>
   <div class="bg-white">
-    <v-container class="py-8">
+    <v-container class="py-6">
       <TombstoneDynamic
         v-if="displayTombstoneDynamic"
         :is-mhr-information="displayMhrInformation"

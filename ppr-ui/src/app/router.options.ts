@@ -9,6 +9,7 @@ import {
   Dashboard,
   Exemptions,
   LengthTrust,
+  ManagePartyCodes,
   MHRSearch,
   MhrRegistration,
   MhrInformation,
@@ -131,6 +132,14 @@ export default <RouterConfig> {
       meta: {
         step: 4,
         label: 'Review and Confirm',
+        requiresAuth: true,
+      },
+    },
+    {
+      path: '/manage-party-codes',
+      name: RouteNames.MANAGE_PARTY_CODES,
+      component: ManagePartyCodes,
+      meta: {
         requiresAuth: true,
       },
     },

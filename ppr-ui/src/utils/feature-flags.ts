@@ -5,6 +5,7 @@ import { initialize } from 'launchdarkly-js-client-sdk'
  * Default feature flags in case LD env key is not defined (eg, local development).
  */
 export const defaultFlagSet: LDFlagSet = {
+  'enable-manage-party-codes': false,
   'banner-text': '' // by default, there is no banner text
 }
 /**
