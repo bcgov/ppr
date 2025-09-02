@@ -262,3 +262,21 @@ export const tombstoneBreadcrumbExemption: Array<BreadcrumbIF> = [
     to: { name: '' }
   }
 ]
+
+export const tombstoneBreadcrumbPartyCodes: Array<BreadcrumbIF> = [
+  {
+    disabled: false,
+    href: sessionStorage.getItem('REGISTRY_URL'),
+    text: 'Staff Dashboard'
+  },
+  {
+    disabled: false,
+    to: { name: RouteNames.DASHBOARD },
+    text: 'Staff Asset Registries'
+  },
+  {
+    disabled: true,
+    text: 'View and Manage Party Codes',
+    to: { name: '' }
+  }
+]

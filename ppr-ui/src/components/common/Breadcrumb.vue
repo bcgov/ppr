@@ -79,7 +79,7 @@ import {
   tombstoneBreadcrumbQsApplication,
   tombstoneBreadcrumbExemption,
   tombstoneBreadcrumbMhrCorrection,
-  tombstoneBreadcrumbMhrReRegistration
+  tombstoneBreadcrumbMhrReRegistration, tombstoneBreadcrumbPartyCodes
 } from '@/resources'
 import { RouteNames } from '@/enums'
 import { getRoleProductCode } from '@/utils'
@@ -198,6 +198,9 @@ export default defineComponent({
           exemptionBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`
           exemptionBreadcrumb[3].text = exemptionLabel.value
           return exemptionBreadcrumb
+        } else if (path?.includes('manage-party-codes')) {
+          const partyCodesCrumb = [...tombstoneBreadcrumbPartyCodes]
+          return partyCodesCrumb
         } else {
           const registrationBreadcrumb = [...tombstoneBreadcrumbRegistration]
           registrationBreadcrumb[1].text = roleBasedBreadcrumbTitle || registrationBreadcrumb[1].text

@@ -14,6 +14,7 @@ export enum RouteNames {
   HOME_LOCATION = 'home-location',
   LENGTH_TRUST = 'length-trust',
   LOGIN = 'login',
+  MANAGE_PARTY_CODES = 'manage-party-codes',
   MHRSEARCH = 'mhr-search',
   MHRSEARCH_CONFIRM = 'mhr-search-confirm',
   MHR_REGISTRATION = 'mhr-registration',

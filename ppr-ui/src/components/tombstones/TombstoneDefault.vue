@@ -1,160 +1,173 @@
 <template>
-  <v-row no-gutters>
-    <v-col
-      v-if="isRoleStaff"
-      class="staff-header-img"
-      cols="1"
-    />
-    <v-col
-      :cols="isRoleStaff ? '11' : '12'"
-      :class="isRoleStaff ? 'pl-4' : ''"
-    >
-      <div class="ma-0 pa-0">
-        <v-row
-          no-gutters
-          class="justify-space-between align-baseline"
-        >
-          <h1 class="tombstone-header">
-            {{ header }}
-          </h1>
-        </v-row>
-        <v-row
-          id="tombstone-user-info"
-          class="pt-1 tombstone-sub-header"
-          no-gutters
-        >
-          <v-col cols="7">
-            <v-row no-gutters>
-              <v-col
-                cols="auto"
-                class="pr-3"
-                style="border-right: thin solid #dee2e6"
-              >
-                <p>{{ userName }}</p>
-              </v-col>
-              <v-col
-                cols="auto"
-                class="pl-3"
-              >
-                <p>{{ accountName }}</p>
-              </v-col>
-            </v-row>
-          </v-col>
-          <v-col cols="5">
-            <!-- Qualified Suppler Access Btn -->
-            <v-row
-              v-if="isQsAccessEnabled"
-              no-gutters
-              justify="end"
-              class="mt-n8 mb-2"
-            >
-              <QsAccessBtn />
-            </v-row>
-            <v-row
-              no-gutters
-              justify="end"
-            >
-              <v-tooltip
-                location="top"
-                content-class="top-tooltip pa-5"
-                transition="fade-transition"
-              >
-                <template #activator="{ props }">
-                  <a
-                    :href="'https://www2.gov.bc.ca/gov/content/employment-business/business/managing-a-business/'
+  <div>
+    <div>
+      <div class="flex items-start">
+        <div :class="['flex-1']">
+          <div class="m-0 p-0">
+            <div class="flex justify-between items-baseline">
+              <h1 class="tombstone-header">
+                {{ header }}
+              </h1>
+              <div v-if="!isQsAccessEnabled" class="flex justify-end">
+                <v-tooltip
+                  location="top"
+                  content-class="pa-5"
+                  transition="fade-transition"
+                >
+                  <template #activator="{ props }">
+                    <a
+                      :href="'https://www2.gov.bc.ca/gov/content/employment-business/business/managing-a-business/'
                       +'permits-licences/news-updates/modernization-updates/modernization-resources#userguideacct'"
-                    class="text-decoration-none"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    v-bind="props"
-                  >
-                    <div>
-                      <v-row
-                        no-gutters
-                        class="align-center"
-                      >
-                        <v-icon
-                          :start="true"
-                          color="primary"
-                        >mdi-help-circle-outline</v-icon>
-                        <span class="text-primary">Help</span>
-                        <v-icon
-                          :end="true"
-                          color="primary"
-                          size="small"
-                        >mdi-open-in-new</v-icon>
-                      </v-row>
+                      class="text-decoration-none"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      v-bind="props"
+                    >
+                      <div>
+                        <v-row
+                          no-gutters
+                          class="align-center"
+                        >
+                          <v-icon
+                            :start="true"
+                            color="primary"
+                          >mdi-help-circle-outline</v-icon>
+                          <span class="text-primary">Help</span>
+                          <v-icon
+                            :end="true"
+                            color="primary"
+                            size="small"
+                          >mdi-open-in-new</v-icon>
+                        </v-row>
+                      </div>
+                    </a>
+                  </template>
+                  Learn how to use the BC Registries applications through step-by-step
+                  downloadable user guides and online help videos,
+                  or contact us to receive help by email or phone.
+                </v-tooltip>
+              </div>
+            </div>
+
+            <div id="tombstone-user-info" class="pt-1 tombstone-sub-header">
+              <div class="flex">
+                <div class="w-7/12">
+                  <div class="flex">
+                    <div class="pr-3" style="border-right: thin solid #dee2e6">
+                      <p>{{ userName }}</p>
                     </div>
-                  </a>
-                </template>
-                Learn how to use the BC Registries applications through step-by-step
-                downloadable user guides and online help videos,
-                or contact us to receive help by email or phone.
-              </v-tooltip>
-            </v-row>
-          </v-col>
-        </v-row>
+                    <div class="pl-3">
+                      <p>{{ accountName }}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div v-if="isQsAccessEnabled" class="w-5/12 flex flex-col items-end">
+                  <div class="mt-[-2rem] mb-2 w-full flex justify-end">
+                    <QsAccessBtn />
+                  </div>
+                  <div class="flex justify-end">
+                    <v-tooltip
+                      location="top"
+                      content-class="pa-5"
+                      transition="fade-transition"
+                    >
+                      <template #activator="{ props }">
+                        <a
+                          :href="'https://www2.gov.bc.ca/gov/content/employment-business/business/managing-a-business/'
+                      +'permits-licences/news-updates/modernization-updates/modernization-resources#userguideacct'"
+                          class="text-decoration-none"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          v-bind="props"
+                        >
+                          <div>
+                            <v-row
+                              no-gutters
+                              class="align-center"
+                            >
+                              <v-icon
+                                :start="true"
+                                color="primary"
+                              >mdi-help-circle-outline</v-icon>
+                              <span class="text-primary">Help</span>
+                              <v-icon
+                                :end="true"
+                                color="primary"
+                                size="small"
+                              >mdi-open-in-new</v-icon>
+                            </v-row>
+                          </div>
+                        </a>
+                      </template>
+                      Learn how to use the BC Registries applications through step-by-step
+                      downloadable user guides and online help videos,
+                      or contact us to receive help by email or phone.
+                    </v-tooltip>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </v-col>
-  </v-row>
+    </div>
+    <UButton
+      v-if="showPartyCodeBtn"
+      class="pl-0 mt-4"
+      variant="link"
+      icon="mdi-file-document-edit-outline"
+      @click="goToRoute(RouteNames.MANAGE_PARTY_CODES)"
+    >
+      View and Manage Party Codes
+    </UButton>
+  </div>
 </template>
-<script lang="ts">
-import {
-  computed,
-  defineComponent,
-  onMounted,
-  reactive,
-  toRefs
-} from 'vue'
+<script lang="ts" setup>
+import { computed, onMounted, ref } from 'vue'
 import { useStore } from '@/store/store'
 import { tombstoneTitles } from '@/resources'
-import { pacificDate, getRoleProductCode } from '@/utils'
+import { pacificDate, getFeatureFlag, getRoleProductCode } from '@/utils'
 import { storeToRefs } from 'pinia'
 import { QsAccessBtn } from '@/components/common'
 import { useUserAccess } from '@/composables/userAccess'
+import { RouteNames } from '@/enums'
 
-export default defineComponent({
-  name: 'TombstoneDefault',
-  components: { QsAccessBtn },
-  setup () {
-    const {
-      getAccountLabel,
-      getUserFirstName,
-      getUserLastName,
-      isRoleStaff,
-      isRoleStaffBcol,
-      isRoleStaffSbc,
-      getUserRoles,
-      getUserProductSubscriptionsCodes
-    } = storeToRefs(useStore())
-    const { isQsAccessEnabled } = useUserAccess()
+const {
+  isRoleStaffReg,
+  getAccountLabel,
+  getUserFirstName,
+  getUserLastName,
+  isRoleStaff,
+  isRoleStaffBcol,
+  isRoleStaffSbc,
+  getUserRoles,
+  getUserProductSubscriptionsCodes
+} = storeToRefs(useStore())
+const { isRouteName, goToRoute } = useNavigation()
+const route = useRoute()
 
-    const localState = reactive({
-      userName: computed((): string => {
-        return `${getUserFirstName.value} ${getUserLastName.value}`
-      }),
-      date: '',
-      header: computed((): string => {
-        return tombstoneTitles[getRoleProductCode(getUserRoles.value, getUserProductSubscriptionsCodes.value)]
-      }),
-      accountName: computed((): string => {
-        if (isRoleStaffBcol.value) return 'BC Online Help'
-        if (isRoleStaffSbc.value) return 'SBC Staff'
-        if (isRoleStaff.value) return 'BC Registries Staff'
-        return getAccountLabel.value
-      })
-    })
-    onMounted(() => {
-      const newDate = new Date()
-      localState.date = pacificDate(newDate)
-    })
+const showPartyCodeBtn = computed((): boolean => {
+  return Boolean(isRoleStaffReg?.value) && isRouteName(RouteNames.DASHBOARD) &&
+    getFeatureFlag('enable-manage-party-codes')
+})
+const { isQsAccessEnabled } = useUserAccess()
+const userName = computed((): string => {
+  return `${getUserFirstName.value} ${getUserLastName.value}`
+})
+const date = ref('')
+const header = computed((): string => {
+  return tombstoneTitles[getRoleProductCode(getUserRoles.value, getUserProductSubscriptionsCodes.value)]
+})
+const accountName = computed((): string => {
+  if (isRoleStaffBcol.value) return 'BC Online Help'
+  if (isRoleStaffSbc.value) return 'SBC Staff'
+  if (isRoleStaff.value) return 'BC Registries Staff'
+  return getAccountLabel.value
+})
 
-    return {
-      isRoleStaff,
-      isQsAccessEnabled,
-      ...toRefs(localState)
-    }
-  }
+onMounted(() => {
+  date.value = pacificDate(new Date())
 })
 </script>
 
