@@ -85,10 +85,11 @@
           code, you can look up the party code or name.
         </p>
 
-        <PartySearch
-          is-mhr-party-search
-          class="mb-8 rounded-all"
-          @select-item="handlePartySelect"
+        <PartySelectMethod
+          class="mt-4 mb-8 w-full"
+          is-transfer
+          @party="handlePartySelect($event)"
+          @owner="handlePartySelect($event)"
         />
 
         <FormCard
@@ -211,7 +212,6 @@ import {
 } from '@/resources'
 import { ConfirmCompletion } from '@/components/mhrTransfers'
 import { ListRequirements } from '@/components/userAccess/ReviewConfirm'
-import { PartySearch } from '@/components/parties/party'
 import {
   AccountInfo,
   Attention,
@@ -227,13 +227,14 @@ import { useExemptions, usePayment } from '@/composables'
 import { parseSubmittingPartyToAccountInfo, yyyyMmDdToPacificDate } from '@/utils'
 import { TransportPermitDetails } from '@/components/mhrTransportPermits'
 import CautionBox from '@/components/common/CautionBox.vue'
+import PartySelectMethod from '@/components/parties/PartySelectMethod.vue'
 
 export default defineComponent({
   name: 'ExemptionReview',
   components: {
+    PartySelectMethod,
     FolioOrReferenceNumber,
     AccountInfo,
-    PartySearch,
     Attention,
     CertifyInformation,
     ConfirmCompletion,
@@ -317,7 +318,10 @@ export default defineComponent({
         businessName: party.businessName,
         address: party.address,
         emailAddress: party.emailAddress,
-        phoneNumber: party.contact.phoneNumber ? `${party.contact.areaCode}${party.contact.phoneNumber}` : '',
+        phoneNumber: party.phoneNumber || (
+          party.contact?.phoneNumber
+            ? `${party.contact.areaCode}${party.contact.phoneNumber}`
+            : ''),
         phoneExtension: ''
       }
       setMhrExemptionValue({ key: 'submittingParty', value: partyState })
