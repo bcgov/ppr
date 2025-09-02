@@ -212,7 +212,6 @@ import {
 } from '@/resources'
 import { ConfirmCompletion } from '@/components/mhrTransfers'
 import { ListRequirements } from '@/components/userAccess/ReviewConfirm'
-import { PartySearch } from '@/components/parties/party'
 import {
   AccountInfo,
   Attention,
@@ -236,7 +235,6 @@ export default defineComponent({
     PartySelectMethod,
     FolioOrReferenceNumber,
     AccountInfo,
-    PartySearch,
     Attention,
     CertifyInformation,
     ConfirmCompletion,

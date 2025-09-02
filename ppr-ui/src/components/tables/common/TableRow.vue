@@ -683,7 +683,6 @@ export default defineComponent({
     <template
       v-for="(header, index) in headers"
       :key="index"
-      :ref="header.value + 'Ref'"
     >
     <!-- registrationNumber -->
     <td
