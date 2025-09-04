@@ -410,7 +410,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         return count
 
     @classmethod
-    def find_all_by_account_id(cls, params: AccountRegistrationParams, new_feature_enabled: bool):
+    def find_all_by_account_id(cls, params: AccountRegistrationParams):
         # pylint: disable=too-many-locals
         """Return a summary list of recent registrations belonging to an account.
 
@@ -426,9 +426,9 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         registrations_json = []
         try:
             if params.from_ui:
-                return Registration.find_all_by_account_id_filter(params, new_feature_enabled)
+                return Registration.find_all_by_account_id_filter(params)
             if registration_utils.api_account_reg_filter(params):
-                return Registration.find_all_by_account_id_api_filter(params, new_feature_enabled)
+                return Registration.find_all_by_account_id_api_filter(params)
 
             results = db.session.execute(
                 text(registration_utils.QUERY_ACCOUNT_REGISTRATIONS),
@@ -484,12 +484,12 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         return results_json
 
     @classmethod
-    def find_all_by_account_id_filter(cls, params: AccountRegistrationParams, new_feature_enabled: bool):
+    def find_all_by_account_id_filter(cls, params: AccountRegistrationParams):
         # pylint: disable=too-many-locals
         """Return a summary list of registrations belonging to an account applying filters."""
         results_json = []
         count = Registration.get_account_reg_count(params.account_id)
-        query = registration_utils.build_account_reg_query(params, new_feature_enabled)
+        query = registration_utils.build_account_reg_query(params)
         query_params = registration_utils.build_account_query_params(params)
         results = db.session.execute(text(query), query_params)
         rows = results.fetchall()
@@ -504,7 +504,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         return results_json
 
     @classmethod
-    def find_all_by_account_id_api_filter(cls, params: AccountRegistrationParams, new_feature_enabled: bool):
+    def find_all_by_account_id_api_filter(cls, params: AccountRegistrationParams):
         """Return a summary list of registrations belonging to an api account applying filters."""
         results_json = []
         # Restrict filter to client ref id, reg number, or timestamp range.
@@ -514,7 +514,7 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
         params.registration_type = None
         params.status_type = None
         params.registering_name = None
-        query = registration_utils.build_account_reg_query(params, new_feature_enabled)
+        query = registration_utils.build_account_reg_query(params)
         query_params = registration_utils.build_account_query_params(params, True)
         results = db.session.execute(text(query), query_params)
         rows = results.fetchall()
@@ -538,11 +538,18 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
             return result
         cl_type: RegistrationType = None
         transitioned: bool = False
+        results = []
         try:
-            results = db.session.execute(
-                text(registration_utils.QUERY_ACCOUNT_ADD_REGISTRATION),
-                {"query_account": account_id, "query_reg_num": registration_num},
-            )
+            if is_staff_account(account_id):
+                results = db.session.execute(
+                    text(registration_utils.QUERY_ACCOUNT_ADD_REGISTRATION_STAFF),
+                    {"query_account": account_id, "query_reg_num": registration_num},
+                )
+            else:
+                results = db.session.execute(
+                    text(registration_utils.QUERY_ACCOUNT_ADD_REGISTRATION),
+                    {"query_account": account_id, "query_reg_num": registration_num},
+                )
             rows = results.fetchall()
             if rows is not None:
                 for row in rows:
