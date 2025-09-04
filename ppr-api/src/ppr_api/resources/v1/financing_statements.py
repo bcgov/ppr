@@ -15,13 +15,13 @@
 # pylint: disable=too-many-return-statements
 from http import HTTPStatus
 
-from flask import Blueprint, current_app, g, jsonify, request
+from flask import Blueprint, current_app, jsonify, request
 from flask_cors import cross_origin
 from registry_schemas import utils as schema_utils
 
 from ppr_api.callback.utils.exceptions import ReportDataException
 from ppr_api.exceptions import BusinessException, DatabaseException
-from ppr_api.models import AccountBcolId, EventTracking, FinancingStatement, Registration, User, UserExtraRegistration
+from ppr_api.models import AccountBcolId, EventTracking, FinancingStatement, Registration, UserExtraRegistration
 from ppr_api.models import utils as model_utils
 from ppr_api.models.registration_utils import (
     AccountRegistrationParams,
@@ -573,14 +573,6 @@ def get_registrations():
         account_id = resource_utils.get_account_id(request)
         if account_id is None:
             return resource_utils.account_required_response()
-        # Set feature flag value
-        username = "anonymous"
-        user = User.find_by_jwt_token(g.jwt_oidc_token_info, account_id)
-        if user and user.username:
-            username = user.username
-        new_feature_enabled = current_app.extensions["featureflags"].variation(
-            "enable-new-feature-api", {"key": username}, False
-        )
         # Verify request JWT and account ID
         if not authorized(account_id, jwt):
             return resource_utils.unauthorized_error_response(account_id)
@@ -599,7 +591,7 @@ def get_registrations():
             account_id=account_id, collapse=collapse_param, account_name=account_name, sbc_staff=sbc_staff
         )
         params = resource_utils.get_account_registration_params(request, params)
-        statement_list = Registration.find_all_by_account_id(params, new_feature_enabled)
+        statement_list = Registration.find_all_by_account_id(params)
         return jsonify(statement_list), HTTPStatus.OK
     except DatabaseException as db_exception:  # noqa: B902; return nicer error
         return resource_utils.db_exception_response(

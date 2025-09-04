@@ -198,7 +198,7 @@ def test_account_reg_base_query(session, reg_num, reg_type, client_ref, register
     params.status_type = status
     params.start_date_time = start_ts
     params.end_date_time = end_ts
-    query = registration_utils.build_account_reg_base_query(params, True)
+    query = registration_utils.build_account_reg_base_query(params)
     if params.registration_number:
         assert query.find(registration_utils.QUERY_ACCOUNT_REG_NUM_CLAUSE) != -1
     if params.registration_type:
@@ -261,7 +261,7 @@ def test_account_reg_query(session, reg_num, reg_type, client_ref, registering, 
     params.status_type = status
     params.start_date_time = start_ts
     params.end_date_time = end_ts
-    query = registration_utils.build_account_reg_query(params, True)
+    query = registration_utils.build_account_reg_query(params)
     # current_app.logger.debug('reg query:')
     # current_app.logger.debug('\n' + query)
     if params.registration_number:
@@ -376,7 +376,7 @@ def test_find_all_by_account_id_filter(session, reg_num, reg_type, client_ref, r
     if start_ts and end_ts:
         params.start_date_time = start_ts
         params.end_date_time = model_utils.format_ts(model_utils.now_ts())
-    statement_list = Registration.find_all_by_account_id_filter(params, True)
+    statement_list = Registration.find_all_by_account_id_filter(params)
     assert statement_list
     assert statement_list[0]['totalRegistrationCount']
     for statement in statement_list:
@@ -453,7 +453,7 @@ def test_find_all_by_account_id_api_filter(session, reg_num, client_ref, start_t
     if start_ts and end_ts:
         params.start_date_time = start_ts
         params.end_date_time = model_utils.format_ts(model_utils.now_ts())
-    statement_list = Registration.find_all_by_account_id_api_filter(params, True)
+    statement_list = Registration.find_all_by_account_id_api_filter(params)
     assert statement_list
     assert 'totalRegistrationCount' not in statement_list[0]
     for statement in statement_list:

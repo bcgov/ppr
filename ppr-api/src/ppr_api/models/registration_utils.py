@@ -158,14 +158,15 @@ ORDER BY registration_ts DESC
 FETCH FIRST :max_results_size ROWS ONLY
 """
 
-QUERY_ACCOUNT_ADD_REGISTRATION = """
+QUERY_ACCOUNT_ADD_BASE = """
 SELECT r.registration_number, r.registration_ts, r.registration_type, r.registration_type_cl,
-       rt.registration_desc, r.base_reg_number, fs.state_type AS state, vr.doc_storage_url,
+       rt.registration_desc, r.base_reg_number, fs.state_type AS state,
+       (SELECT vr.doc_storage_url
+          FROM verification_reports vr
+         WHERE r.id = vr.registration_id) as doc_storage_url,
        CASE WHEN fs.life = 99 THEN -99
             ELSE CAST(EXTRACT(day from (fs.expire_date - (now() at time zone 'utc'))) AS INT) END expire_days,
-       (SELECT MAX(r2.registration_ts)
-          FROM registrations r2
-         WHERE r2.financing_id = r.financing_id) AS last_update_ts,
+       (SELECT MAX(r2.registration_ts) FROM registrations r2 WHERE r2.financing_id = r.financing_id) AS last_update_ts,
        (SELECT CASE WHEN p.business_name IS NOT NULL THEN p.business_name
                     WHEN p.branch_id IS NOT NULL THEN (SELECT name FROM client_codes WHERE id = p.branch_id)
                     WHEN p.middle_initial IS NOT NULL THEN p.first_name || ' ' || p.middle_initial || ' ' || p.last_name
@@ -202,33 +203,32 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
                                                 sc.registration_id_end > r.id)))) AS vehicle_count,
        r.ver_bypassed as locked_status,
        CASE WHEN r.account_id IN ('ppr_staff', 'helpdesk')
-            THEN (SELECT u.account_id
-                    FROM users u
-                   WHERE r.user_id = u.username
-                ORDER BY u.id DESC
-                FETCH FIRST 1 ROWS ONLY)
+            THEN (SELECT u.account_id FROM users u WHERE r.user_id = u.username ORDER BY u.id DESC
+                  FETCH FIRST 1 ROWS ONLY)
             ELSE NULL END staff_account_id,
-       CASE WHEN r.account_id != '0'
-            THEN (SELECT d.document_number
-                   FROM drafts d
-                  WHERE r.draft_id = d.id)
+       CASE WHEN r.account_id != '0' THEN (SELECT d.document_number FROM drafts d WHERE r.draft_id = d.id)
             ELSE NULL END draft_number
-  FROM registrations r
-    INNER JOIN registration_types rt
-    ON r.registration_type = rt.registration_type
-    INNER JOIN financing_statements fs
-    ON fs.id = r.financing_id
-        AND fs.id IN (SELECT fs2.id
-                    FROM financing_statements fs2, registrations r2
-                    WHERE fs2.id = r2.financing_id AND r2.registration_number = :query_reg_num)
-        AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
-    LEFT OUTER JOIN verification_reports vr ON r.id=vr.registration_id
- WHERE NOT EXISTS (SELECT r3.id FROM registrations r3
+  FROM registrations r, registration_types rt, financing_statements fs
+  WHERE r.registration_type = rt.registration_type
+   AND fs.id = r.financing_id
+   AND fs.id IN (SELECT fs2.id
+                   FROM financing_statements fs2, registrations r2
+                  WHERE fs2.id = r2.financing_id
+                    AND r2.registration_number = :query_reg_num)
+"""
+QUERY_ACCOUNT_ADD_REGISTRATION_STAFF = QUERY_ACCOUNT_ADD_BASE + " ORDER BY r.registration_ts DESC"
+QUERY_ACCOUNT_ADD_REGISTRATION = (
+    QUERY_ACCOUNT_ADD_BASE
+    + """
+   AND (fs.expire_date IS NULL OR fs.expire_date > ((now() at time zone 'utc') - interval '30 days'))
+   AND NOT EXISTS (SELECT r3.id
+                     FROM registrations r3
                     WHERE r3.financing_id = fs.id
                       AND r3.registration_type_cl = 'DISCHARGE'
                       AND r3.registration_ts < ((now() at time zone 'utc') - interval '30 days'))
-ORDER BY r.registration_ts DESC
+ ORDER BY r.registration_ts DESC
 """
+)
 QUERY_ACCOUNT_REG_DEFAULT_ORDER = " ORDER BY registration_ts DESC"
 QUERY_ACCOUNT_CHANGE_DEFAULT_ORDER = " ORDER BY arv2.registration_ts DESC"
 QUERY_ACCOUNT_REG_LIMIT = " LIMIT :page_size OFFSET :page_offset"
@@ -466,26 +466,22 @@ def get_account_change_query_order(params: AccountRegistrationParams) -> str:
     return order_by
 
 
-def build_account_reg_base_query(params: AccountRegistrationParams, new_feature_enabled: bool) -> str:
+def build_account_reg_base_query(params: AccountRegistrationParams) -> str:
     """Build the account registration base query from the provided parameters."""
     base_query: str = model_utils.QUERY_ACCOUNT_BASE_REG_BASE
     if params.start_date_time and params.end_date_time:
         base_query = model_utils.QUERY_ACCOUNT_BASE_REG_SUBQUERY
         base_query += build_reg_date_clause(params, True)
+    if is_staff_account(params.account_id):
+        base_query = base_query.replace("account_registration_vw", "account_registration_staff_vw")
     if params.registration_number:
         base_query += QUERY_ACCOUNT_REG_NUM_CLAUSE
     if params.registration_type:
         base_query += QUERY_ACCOUNT_REG_TYPE_CLAUSE
     if params.client_reference_id:
-        if new_feature_enabled:
-            base_query += QUERY_ACCOUNT_CLIENT_REF_CLAUSE_NEW
-        else:
-            base_query += QUERY_ACCOUNT_CLIENT_REF_CLAUSE
+        base_query += QUERY_ACCOUNT_CLIENT_REF_CLAUSE_NEW
     if params.registering_name:
-        if new_feature_enabled:
-            base_query += QUERY_ACCOUNT_REG_NAME_CLAUSE_NEW
-        else:
-            base_query += QUERY_ACCOUNT_REG_NAME_CLAUSE
+        base_query += QUERY_ACCOUNT_REG_NAME_CLAUSE_NEW
     if params.status_type:
         base_query += QUERY_ACCOUNT_STATUS_CLAUSE
     return base_query
@@ -504,6 +500,8 @@ def build_reg_date_clause(params: AccountRegistrationParams, base_query: bool) -
 def build_account_change_base_query(params: AccountRegistrationParams) -> str:
     """Build the account change registration base query from the provided parameters."""
     base_query: str = model_utils.QUERY_ACCOUNT_CHANGE_REG_BASE
+    if is_staff_account(params.account_id):
+        base_query = base_query.replace("account_registration_vw", "account_registration_staff_vw")
     if not params.registration_number and not params.client_reference_id:
         base_query += QUERY_ACCOUNT_CHANGE_REG_CLASS_CLAUSE
     if params.registration_number:
@@ -524,9 +522,9 @@ def build_account_change_base_query(params: AccountRegistrationParams) -> str:
     return base_query
 
 
-def build_account_reg_query(params: AccountRegistrationParams, new_feature_enabled: bool) -> str:
+def build_account_reg_query(params: AccountRegistrationParams) -> str:
     """Build the account registration query from the provided parameters."""
-    base_query: str = build_account_reg_base_query(params, new_feature_enabled)
+    base_query: str = build_account_reg_base_query(params)
     order_by: str = get_account_reg_query_order(params)
     query: str
     if params.start_date_time and params.end_date_time:
@@ -548,6 +546,8 @@ def build_account_change_query(params: AccountRegistrationParams, base_json: dic
             else:
                 reg_nums += ",'" + reg["registrationNumber"] + "'"
         query: str = model_utils.QUERY_ACCOUNT_CHANGE_REG_FILTER.replace("BASE_REG_LIST", reg_nums)
+        if is_staff_account(params.account_id):
+            query = query.replace("account_registration_vw", "account_registration_staff_vw")
         return query
 
     base_query: str = build_account_change_base_query(params)
