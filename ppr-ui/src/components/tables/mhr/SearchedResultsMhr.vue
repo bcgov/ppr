@@ -96,13 +96,11 @@
             <thead>
               <tr>
                 <th
-                  v-for="(header, index) in headers"
-                  :key="header.value"
-                  :class="header.class"
+                  v-if="!isReviewMode"
+                  class="column-xxs"
                 >
                   <!-- First Header -->
                   <!-- Search selection checkbox -->
-                  <template v-if="index === 0 && !isReviewMode">
                     <v-tooltip
                       location="top"
                       content-class="top-tooltip"
@@ -115,7 +113,6 @@
                             v-model="selectAll"
                             class="header-checkbox ma-0 pa-0 align-start"
                             hide-details
-                            :label="headerSlotLabel"
                           />
                         </span>
                       </template>
@@ -123,39 +120,56 @@
                         Select this to include all manufactured homes.
                       </div>
                     </v-tooltip>
-                  </template>
-
+                </th>
+                <th
+                  v-for="(header, index) in headers"
+                  :key="header.value"
+                  :class="header.class"
+                >
                   <!-- Last Header -->
                   <!-- Lien selection checkbox -->
-                  <template v-else-if="index === 9 && !isReviewMode">
+                  <span v-if="index === 9 && !isReviewMode">
                     <v-checkbox
                       id="select-all-lien-checkbox"
                       v-model="selectAllLien"
-                      class="header-checkbox ma-0 pa-0 align-start"
+                      class="header-checkbox ma-0 pa-0 align-start "
                       label="Include lien information for all selections"
                       :disabled="selectedMatchesLength === 0"
                       hide-details
                     />
-                  </template>
+                  </span>
 
                   <!-- Standard Headers -->
-                  <template v-else>
+                  <span
+                    v-else
+                    class="flex"
+                    @click="sortTable(header.value, header.sortable)"
+                  >
                     <span
                       v-if="header.value === 'ownerName'"
-                      :class="index === 0 && 'pl-8'"
+                      class="pr-2"
                     >
                       {{ ownerOrOrgHeader }} Name
                     </span>
                     <span
                       v-else-if="header.value === 'ownerStatus'"
                       :class="index === 0 && 'pl-8'"
+                      class="pr-2"
                     >
                       {{ ownerOrOrgHeader }} Status
                     </span>
-                    <span v-else>
+                    <span 
+                      v-else
+                      class="pr-2"
+                    >
                       {{ header.text }}
                     </span>
-                  </template>
+                    <SortingIcon
+                      v-if="header.sortable && sortOptions.sortBy === header.value"
+                      :sort-asc="sortOptions.isAsc"
+                      color="primary"
+                    />
+                  </span>
                 </th>
               </tr>
             </thead>
@@ -173,52 +187,25 @@
               >
                 <!-- Name search -->
                 <template v-if="isOwnerOrOrgSearch">
-                  <td>
-                    <v-checkbox
-                      v-model="item.selected"
-                      :label="isReviewMode ? getOwnerName(item) + ' ' + getOwnerCount(item) : getOwnerName(item) "
-                      :ripple="false"
-                      hide-details
-                      class="align-start"
-                      @click="onSelectionCheckboxClick(item)"
-                    />
-                  </td>
                   <template v-if="!isReviewMode">
-                    <td>{{ getOwnerStatusText(item) }}</td>
-                    <td>{{ item.mhrNumber }}</td>
-                    <td>{{ item.status }}</td>
-                    <td>{{ item.manufacturerName }}</td>
-                    <td>{{ item.baseInformation.year || '-' }}</td>
-                    <td>{{ item.baseInformation.make || '-' }} / {{ item.baseInformation.model || '-' }}</td>
-                    <td>{{ item.homeLocation }}</td>
-                    <td>{{ item.serialNumber }}</td>
-                    <td class="lien-col">
-                      <v-tooltip
-                        location="top"
-                        content-class="top-tooltip"
-                        transition="fade-transition"
-                      >
-                        <template #activator="{ props }">
-                          <span v-bind="props">
-                            <v-checkbox
-                              v-model="item.includeLienInfo"
-                              class="align-start"
-                              :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
-                              :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
-                              :ripple="false"
-                              hide-details
-                            />
-                          </span>
-                        </template>
-                        <div class="pt-2 pb-2">
-                          Select this to include a Personal Property Registry (PPR) lien search for the manufactured
-                          home for an additional fee.
-                          You must have the manufactured home selected before you can include the home's lien search.
-                        </div>
-                      </v-tooltip>
-                    </td>
+                    <SearchedResultsMhrTableRow
+                      :headers="headers"
+                      :item="item"
+                      @on-selection-checkbox-click="onSelectionCheckboxClick($event)"
+                      @set-include-lien-info="setIncludeLienInfo($event)"
+                    />
                   </template>
                   <template v-else>
+                    <td>
+                      <v-checkbox
+                        v-model="item.selected"
+                        :label="getOwnerName(item) + ' ' + getOwnerCount(item)"
+                        :ripple="false"
+                        hide-details
+                        class="align-start"
+                        @click="onSelectionCheckboxClick(item)"
+                      />
+                    </td>
                     <template v-if="hasMultipleSelections(item.mhrNumber)">
                       <template v-if="isFirstSelectionOfMultiples(item.mhrNumber, item.id)">
                         <td>
@@ -324,71 +311,44 @@
 
                 <!-- Mhr number search -->
                 <template v-if="searchType === UIMHRSearchTypes.MHRMHR_NUMBER">
-                  <td v-if="hasMultipleSelections(item.mhrNumber) && isReviewMode">
-                    <v-tooltip
-                      location="top"
-                      content-class="top-tooltip"
-                      transition="fade-transition"
-                    >
-                      <template #activator="{ props }">
-                        <span
-                          v-bind="props"
-                          class="mhr-number"
-                        >
-                          <u>{{ item.mhrNumber }}</u>
-                        </span>
-                      </template>
-                      <div class="pt-2 pb-2">
-                        Multiple selections in the same registration are displayed together.
-                      </div>
-                    </v-tooltip>
-                  </td>
-                  <td v-else>
-                    <v-checkbox
-                      v-model="item.selected"
-                      class="align-start"
-                      :label="item.mhrNumber"
-                      :ripple="false"
-                      hide-details
-                      @click="onSelectionCheckboxClick(item)"
-                    />
-                  </td>
+                  
                   <template v-if="!isReviewMode">
-                    <td>{{ item.status }}</td>
-                    <td>{{ getOwnerName(item) }}</td>
-                    <td>{{ getOwnerStatusText(item) }}</td>
-                    <td>{{ item.manufacturerName }}</td>
-                    <td>{{ item.baseInformation.year || '-' }}</td>
-                    <td>{{ item.baseInformation.make || '-' }} / {{ item.baseInformation.model || '-' }}</td>
-                    <td>{{ item.homeLocation }}</td>
-                    <td>{{ item.serialNumber }}</td>
-                    <td class="lien-col">
+                    <SearchedResultsMhrTableRow
+                      :headers="headers"
+                      :item="item"
+                      @on-selection-checkbox-click="onSelectionCheckboxClick($event)"
+                    />
+                  </template>
+                  <template v-else>
+                    <td v-if="hasMultipleSelections(item.mhrNumber)">
                       <v-tooltip
                         location="top"
                         content-class="top-tooltip"
                         transition="fade-transition"
                       >
                         <template #activator="{ props }">
-                          <span v-bind="props">
-                            <v-checkbox
-                              v-model="item.includeLienInfo"
-                              class="align-start"
-                              :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
-                              :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
-                              :ripple="false"
-                              hide-details
-                            />
+                          <span
+                            v-bind="props"
+                            class="mhr-number"
+                          >
+                            <u>{{ item.mhrNumber }}</u>
                           </span>
                         </template>
                         <div class="pt-2 pb-2">
-                          Select this to include a Personal Property Registry (PPR) lien search for the manufactured
-                          home for an additional fee.
-                          You must have the manufactured home selected before you can include the home's lien search.
+                          Multiple selections in the same registration are displayed together.
                         </div>
                       </v-tooltip>
                     </td>
-                  </template>
-                  <template v-else>
+                    <td v-else>
+                      <v-checkbox
+                        v-model="item.selected"
+                        class="align-start"
+                        :label="item.mhrNumber"
+                        :ripple="false"
+                        hide-details
+                        @click="onSelectionCheckboxClick(item)"
+                      />
+                    </td>
                     <td>{{ getOwnerName(item) }}</td>
                     <td>
                       {{ item.baseInformation.year || '-' }} / {{ item.baseInformation.make || '-' }} /
@@ -426,54 +386,27 @@
 
                 <!-- Serial number search -->
                 <template v-if="searchType === UIMHRSearchTypes.MHRSERIAL_NUMBER">
-                  <td :class="item.selected && !isReviewMode ? 'selected-row' : ''">
-                    <v-checkbox
-                      v-model="item.selected"
-                      class="align-start"
-                      :label="item.activeCount > 1
-                        ? `${item.serialNumber} (${item.activeCount})`
-                        : `${item.serialNumber}`"
-                      :ripple="false"
-                      hide-details
-                      @click="onSelectionCheckboxClick(item)"
-                    />
-                  </td>
+                  
                   <template v-if="!isReviewMode">
-                    <td>{{ item.mhrNumber }}</td>
-                    <td>{{ item.status }}</td>
-                    <td>{{ getOwnerName(item) }}</td>
-                    <td>{{ getOwnerStatusText(item) }}</td>
-                    <td>{{ item.manufacturerName }}</td>
-                    <td>{{ item.baseInformation.year || '-' }}</td>
-                    <td>{{ item.baseInformation.make || '-' }} / {{ item.baseInformation.model || '-' }}</td>
-                    <td>{{ item.homeLocation }}</td>
-                    <td class="lien-col">
-                      <v-tooltip
-                        location="top"
-                        content-class="top-tooltip"
-                        transition="fade-transition"
-                      >
-                        <template #activator="{ props }">
-                          <span v-bind="props">
-                            <v-checkbox
-                              v-model="item.includeLienInfo"
-                              class="align-start"
-                              :label="`${!isReviewMode ? 'Include lien' : 'Lien'} information`"
-                              :disabled="isReviewMode ? hasMhrNumberSelected(item.mhrNumber) : !item.selected"
-                              :ripple="false"
-                              hide-details
-                            />
-                          </span>
-                        </template>
-                        <div class="pt-2 pb-2">
-                          Select this to include a Personal Property Registry (PPR) lien search for the manufactured
-                          home for an additional fee.
-                          You must have the manufactured home selected before you can include the home's lien search.
-                        </div>
-                      </v-tooltip>
-                    </td>
+                    <SearchedResultsMhrTableRow
+                      :headers="headers"
+                      :item="item"
+                      @on-selection-checkbox-click="onSelectionCheckboxClick($event)"
+                    />
                   </template>
                   <template v-else>
+                    <td>
+                      <v-checkbox
+                        v-model="item.selected"
+                        class="align-start"
+                        :label="item.activeCount > 1
+                          ? `${item.serialNumber} (${item.activeCount})`
+                          : `${item.serialNumber}`"
+                        :ripple="false"
+                        hide-details
+                        @click="onSelectionCheckboxClick(item)"
+                      />
+                    </td>
                     <td class="font-weight-bold">
                       {{ item.mhrNumber }}
                     </td>
@@ -547,17 +480,21 @@ import {
   mhSearchSerialNumberHeaders,
   mhSearchSerialNumberHeadersReview
 } from '@/resources'
-import type { BaseHeaderIF, ManufacturedHomeSearchResultIF } from '@/interfaces'
+import type { BaseHeaderIF, ManufacturedHomeSearchResultIF, SortOptionIF } from '@/interfaces'
 import { FolioNumber } from '@/components/common'
+import { SortingIcon } from '../common'
+import { SearchedResultsMhrTableRow } from '@/components/tables/mhr'
 import { RouteNames, UIMHRSearchTypeMap, UIMHRSearchTypes, UIMHRSearchTypeValues } from '@/enums'
-import { cloneDeep, uniqBy, filter, sortBy, groupBy } from 'lodash'
+import { cloneDeep, uniqBy, filter, sortBy, groupBy, orderBy } from 'lodash'
 import { storeToRefs } from 'pinia'
 import { useNavigation } from '@/composables'
 
 export default defineComponent({
   name: 'SearchedResultsMhr',
   components: {
-    FolioNumber
+    FolioNumber,
+    SortingIcon,
+    SearchedResultsMhrTableRow
   },
   props: {
     isReviewMode: {
@@ -571,14 +508,16 @@ export default defineComponent({
     const {
       // Actions
       setSelectedManufacturedHomes,
-      setFolioOrReferenceNumber
+      setFolioOrReferenceNumber,
+      setMhrSearchResultSortOption,
     } = useStore()
     const {
       // Getters
       getManufacturedHomeSearchResults,
       getFolioOrReferenceNumber,
       getSearchedType,
-      getSelectedManufacturedHomes
+      getSelectedManufacturedHomes,
+      getMhrSearchResultSortOption
     } = storeToRefs(useStore())
 
     const localState = reactive({
@@ -682,6 +621,9 @@ export default defineComponent({
       }),
       isOwnerOrOrgSearch: computed((): boolean => {
         return [UIMHRSearchTypes.MHROWNER_NAME, UIMHRSearchTypes.MHRORGANIZATION_NAME].includes(localState.searchType)
+      }),
+      sortOptions: computed((): SortOptionIF => {
+        return getMhrSearchResultSortOption.value
       })
     })
 
@@ -758,6 +700,12 @@ export default defineComponent({
       }
     }
 
+    const setIncludeLienInfo = (item: ManufacturedHomeSearchResultIF): void => {
+      filter(localState.results, { mhrNumber: item.mhrNumber })
+      .forEach((result: ManufacturedHomeSearchResultIF) => {
+        item.includeLienInfo = !item.includeLienInfo
+      })
+    }
     const getOwnerStatus = (ownerStatus: string): string => {
       if (ownerStatus === 'PREVIOUS') {
         if (ownerStatus === 'PREVIOUS') return 'HISTORICAL'
@@ -801,6 +749,18 @@ export default defineComponent({
       setFolioOrReferenceNumber(folioOrReference)
     }
 
+    const sortTable = (header: string, sortable: boolean) => {
+      if (!sortable) { return }
+      const isAsc = header === localState.sortOptions.sortBy 
+                              ? !localState.sortOptions.isAsc
+                              : false
+      localState.results = orderBy(localState.results, header, isAsc ? 'asc' : 'desc')
+      setMhrSearchResultSortOption({
+          sortBy: header, 
+          isAsc: isAsc
+        })
+    }
+
     onMounted(async () => {
       const resp = getManufacturedHomeSearchResults.value
       if (!resp) goToDash()
@@ -812,11 +772,19 @@ export default defineComponent({
         // includeLienInfo needs to be initialized because it doesn't exist in the DB/results response
         return result.includeLienInfo !== true ? { ...result, includeLienInfo: false } : result
       })
-      // sort the results on the Review screen
+
       if (props.isReviewMode) {
-        const sortedResults = sortBy(localState.results, UIMHRSearchTypeValues.MHRMHR_NUMBER)
-        localState.groupedResults = groupBy(sortedResults, UIMHRSearchTypeValues.MHRMHR_NUMBER)
-        localState.results = sortedResults
+        let sortedResults
+        if (localState.sortOptions.sortBy === '') {
+          sortedResults = sortBy(localState.results, UIMHRSearchTypeValues.MHRMHR_NUMBER)
+          setMhrSearchResultSortOption({
+            sortBy: UIMHRSearchTypeValues.MHRMHR_NUMBER,
+            isAsc: true
+          })
+        } else {
+          sortedResults = localState.results
+        }
+        localState.groupedResults = groupBy(localState.results, UIMHRSearchTypeValues.MHRMHR_NUMBER)
       }
 
       localState.totalResultsLength = resp.totalResultsSize
@@ -868,6 +836,7 @@ export default defineComponent({
       updateFolioOrReference,
       getItemClass,
       onSelectionCheckboxClick,
+      sortTable,
       ...toRefs(localState)
     }
   }

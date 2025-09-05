@@ -544,53 +544,55 @@ export const mhRegistrationTableHeaders: Array<BaseHeaderIF> = [
 export const mhSearchNameHeaders: Array<BaseHeaderIF> = [
   {
     class: 'column-md',
-    sortable: false,
+    sortable: true,
     text: 'Owner Name',
     value: 'ownerName'
   },
   {
     class: 'column-mds',
-    sortable: false,
+    sortable: true,
     text: 'Owner Status',
     value: 'ownerStatus'
   },
   {
     class: 'column-sm',
-    sortable: false,
+    sortable: true,
     text: 'Registration Number',
     value: 'mhrNumber'
   },
   {
     class: 'column-sm',
-    sortable: false,
+    sortable: true,
     text: 'Current Registration Status',
     value: 'status'
   },
   {
     class: 'column-md',
-    sortable: false,
+    sortable: true,
     text: 'Manufacturer',
     value: 'manufacturerName'
   },
   {
     class: 'column-xs',
-    sortable: false,
+    sortable: true,
     text: 'Year',
     value: 'year'
   },
   {
     class: 'column-sm',
-    sortable: false,
+    sortable: true,
     text: 'Make/Model',
     value: 'makeModel'
   },
   {
     class: 'column-sm',
+    sortable: true,
     text: 'Home Location',
     value: 'homeLocation'
   },
   {
     class: 'column-sm',
+    sortable: true,
     text: 'Serial Number',
     value: 'serialNumber'
   },
@@ -605,53 +607,55 @@ export const mhSearchNameHeaders: Array<BaseHeaderIF> = [
 export const mhSearchSerialNumberHeaders: Array<BaseHeaderIF> = [
   {
     class: 'column-md',
-    sortable: false,
+    sortable: true,
     text: 'Serial Number',
     value: 'serialNumber'
   },
   {
     class: 'column-mds',
-    sortable: false,
+    sortable: true,
     text: 'Registration Number',
     value: 'mhrNumber'
   },
   {
     class: 'column-mds',
-    sortable: false,
+    sortable: true,
     text: 'Current Registration Status',
     value: 'status'
   },
   {
     class: 'column-md',
+    sortable: true,
     text: 'Owner Name',
     value: 'ownerName'
   },
   {
     class: 'column-mds',
-    sortable: false,
+    sortable: true,
     text: 'Owner Status',
     value: 'ownerStatus'
   },
   {
     class: 'column-md',
-    sortable: false,
+    sortable: true,
     text: 'Manufacturer',
     value: 'manufacturerName'
   },
   {
     class: 'column-xs',
-    sortable: false,
+    sortable: true,
     text: 'Year',
     value: 'year'
   },
   {
     class: 'column-mds',
-    sortable: false,
+    sortable: true,
     text: 'Make/Model',
     value: 'makeModel'
   },
   {
     class: 'column-mds',
+    sortable: true,
     text: 'Home Location',
     value: 'homeLocation'
   },
@@ -666,13 +670,13 @@ export const mhSearchSerialNumberHeaders: Array<BaseHeaderIF> = [
 export const mhSearchMhrNumberHeaders: Array<BaseHeaderIF> = [
   {
     class: 'column-mdl',
-    sortable: false,
+    sortable: true,
     text: 'Registration Number',
     value: 'mhrNumber'
   },
   {
     class: 'column-mds',
-    sortable: false,
+    sortable: true,
     text: 'Current Registration Status',
     value: 'status'
   },
@@ -683,36 +687,37 @@ export const mhSearchMhrNumberHeaders: Array<BaseHeaderIF> = [
   },
   {
     class: 'column-mds',
-    sortable: false,
+    sortable: true,
     text: 'Owner Status',
     value: 'ownerStatus'
   },
   {
     class: 'column-md',
-    sortable: false,
+    sortable: true,
     text: 'Manufacturer',
     value: 'manufacturerName'
   },
   {
     class: 'column-xs',
-    sortable: false,
+    sortable: true,
     text: 'Year',
     value: 'year'
   },
   {
     class: 'column-mds',
-    sortable: false,
+    sortable: true,
     text: 'Make/Model',
-    value: 'make'
+    value: 'makeModel'
   },
   {
     class: 'column-mds',
+    sortable: true,
     text: 'Home Location',
     value: 'homeLocation'
   },
   {
     class: 'column-mds',
-    sortable: false,
+    sortable: true,
     text: 'Serial Number',
     value: 'serialNumber'
   },
@@ -727,29 +732,31 @@ export const mhSearchMhrNumberHeaders: Array<BaseHeaderIF> = [
 export const mhSearchNameHeadersReview: Array<BaseHeaderIF> = [
   {
     class: 'column-mdl',
-    sortable: false,
+    sortable: true,
     text: 'Owner Name',
     value: 'ownerName'
   },
   {
     class: 'column-sm',
-    sortable: false,
+    sortable: true,
     text: 'Registration Number',
     value: 'mhrNumber'
   },
   {
     class: 'column-md',
-    sortable: false,
+    sortable: true,
     text: 'Year/Make/Model',
     value: 'yearMakeModel'
   },
   {
     class: 'column-sm',
+    sortable: true,
     text: 'Home Location',
     value: 'homeLocation'
   },
   {
     class: 'column-sm',
+    sortable: true,
     text: 'Serial Number',
     value: 'serialNumber'
   },
@@ -764,29 +771,31 @@ export const mhSearchNameHeadersReview: Array<BaseHeaderIF> = [
 export const mhSearchSerialNumberHeadersReview: Array<BaseHeaderIF> = [
   {
     class: 'column-md',
+    sortable: true,
     text: 'Serial Number',
     value: 'serialNumber'
   },
   {
     class: 'column-mds',
-    sortable: false,
+    sortable: true,
     text: 'Registration Number',
     value: 'mhrNumber'
   },
   {
     class: 'column-md',
-    sortable: false,
+    sortable: true,
     text: 'Owner Name',
     value: 'ownerName'
   },
   {
     class: 'column-md',
-    sortable: false,
+    sortable: true,
     text: 'Year/Make/Model',
     value: 'yearMakeModel'
   },
   {
     class: 'column-mds',
+    sortable: true,
     text: 'Home Location',
     value: 'homeLocation'
   },
@@ -801,29 +810,31 @@ export const mhSearchSerialNumberHeadersReview: Array<BaseHeaderIF> = [
 export const mhSearchMhrNumberHeadersReview: Array<BaseHeaderIF> = [
   {
     class: 'column-mdl',
-    sortable: false,
+    sortable: true,
     text: 'Registration Number',
     value: 'mhrNumber'
   },
   {
     class: 'column-md',
-    sortable: false,
+    sortable: true,
     text: 'Owner Name',
     value: 'ownerName'
   },
   {
     class: 'column-md',
-    sortable: false,
+    sortable: true,
     text: 'Year/Make/Model',
     value: 'yearMakeModel'
   },
   {
     class: 'column-mds',
+    sortable: true,
     text: 'Home Location',
     value: 'homeLocation'
   },
   {
     class: 'column-mds',
+    sortable: true,
     text: 'Serial Number',
     value: 'serialNumber'
   },

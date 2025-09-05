@@ -35,6 +35,7 @@ import type {
   RegTableNewItemI,
   SearchResponseIF,
   SearchTypeIF,
+  SortOptionIF,
   StateModelIF,
   SubmittingPartyIF,
   TransferTypeSelectIF,
@@ -912,6 +913,11 @@ export const useStore = defineStore('assetsStore', () => {
     return state.value.mhrInformation.changePermit
   })
 
+  // get MHR search result table sort option
+  const getMhrSearchResultSortOption = computed((): SortOptionIF => {
+    return state.value.mhrSearchResultSortOption
+  })
+
   /** Actions **/
   function resetNewRegistration () {
     state.value.registration.registrationNumber = null
@@ -1572,6 +1578,10 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.mhrExemptionValidation[key] = value
   }
 
+  function setMhrSearchResultSortOption (value: SortOptionIF) {
+    state.value.mhrSearchResultSortOption = value
+  }
+
   return {
     // User-related getters
     getAccountModel,
@@ -1670,6 +1680,7 @@ export const useStore = defineStore('assetsStore', () => {
     getSearchedValue,
     getSearchHistory,
     getSearchHistoryLength,
+    getMhrSearchResultSortOption,
 
     // Vehicle Collateral getter
     getVehicleCollateral,
@@ -1837,6 +1848,7 @@ export const useStore = defineStore('assetsStore', () => {
     setSearchedValue,
     setSearching,
     setSearchCertified,
+    setMhrSearchResultSortOption,
     setUserInfo,
     setUserSettings,
     setVehicleCollateral,

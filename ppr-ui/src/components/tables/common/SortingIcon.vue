@@ -3,7 +3,7 @@
     <v-icon
       v-if="sortAsc"
       size="small"
-      color="black"
+      :color="color"
       data-test-id="down-arrow-icon"
       aria-label="Sort Ascending Button"
       @click="emitSort(true)"
@@ -13,7 +13,7 @@
     <v-icon
       v-else
       size="small"
-      color="black"
+      :color="color"
       data-test-id="up-arrow-icon"
       aria-label="Sort Descending Button"
       @click="emitSort(false)"
@@ -33,6 +33,10 @@ export default defineComponent({
     sortAsc: {
       type: Boolean,
       default: false
+    },
+    color: {
+      type: String,
+      default: 'black'
     }
   },
   emits: ['sortEvent'],
