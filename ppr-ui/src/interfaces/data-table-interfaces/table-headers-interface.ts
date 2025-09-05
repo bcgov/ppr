@@ -9,6 +9,7 @@ export interface BaseHeaderIF {
     width?: string
     fixed?: boolean
     display?: boolean
+    subHeaders?: Array<string>
 }
 export interface TableHeadersIF {
     [APISearchTypes.AIRCRAFT]?: Array<BaseHeaderIF>

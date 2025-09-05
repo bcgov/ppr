@@ -183,14 +183,14 @@ export const searchHistoryTableHeadersStaff: Array<BaseHeaderIF> = [
   {
     class: 'column-md',
     sortable: false,
-    text: 'Type',
-    value: 'UISearchType'
+    text: 'Search Type or Category',
+    value: 'typeAndRegistry'
   },
   {
-    class: 'column-md',
+    class: 'column-sm',
     sortable: false,
-    text: 'Registry',
-    value: 'registry'
+    text: 'Folio Number',
+    value: 'searchQuery.clientReferenceId'
   },
   {
     class: 'column-lg',
@@ -205,29 +205,18 @@ export const searchHistoryTableHeadersStaff: Array<BaseHeaderIF> = [
     value: 'username'
   },
   {
-    class: 'column-sm text-center',
-    sortable: false,
-    text: 'Matches Found',
-    value: 'totalResultsSize'
-  },
-  {
-    class: 'column-sm text-center',
-    sortable: false,
-    text: 'Exact Matches',
-    value: 'exactResultsSize'
-  },
-  {
-    class: 'column-sm text-center',
-    sortable: false,
-    text: 'Matches Selected',
-    value: 'selectedResultsSize'
-  },
-  {
     class: 'column-mds text-center',
     sortable: false,
     text: 'Download Report',
     value: 'pdf'
-  }
+  },
+  {
+    class: 'column-lg text-center',
+    sortable: false,
+    text: 'Matches',
+    value: 'matches',
+    subHeaders: ['Found', 'Exact', 'Selected']
+  } 
 ]
 
 export const vehicleTableHeaders: Array<BaseHeaderIF> = [

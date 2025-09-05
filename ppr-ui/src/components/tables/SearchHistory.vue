@@ -19,8 +19,12 @@ import _ from 'lodash' // eslint-disable-line
 import { ErrorCategories } from '@/enums'
 import { useTableFeatures } from '@/composables'
 import { storeToRefs } from 'pinia'
+import AriaLabel from './AriaLabel.vue'
 
 export default defineComponent({
+  components: {
+    AriaLabel
+  },
   props: {
     searchAdded: { type: Boolean, default: false },
     searchAddedId: { type: String, default: '' }
@@ -317,7 +321,23 @@ export default defineComponent({
                 class="px-1 py-0 table-header"
                 :class="header.class"
               >
+              <template v-if="header.value==='matches'">
+                <v-row>
+                  <v-col>{{header.text}}</v-col>
+                </v-row>
+                <v-row>
+                  <v-col
+                    v-for="subHeader in header.subHeaders"
+                    :key="subHeader"
+                    class="font-light"
+                  >
+                    {{ subHeader }}
+                  </v-col>
+                </v-row>
+              </template>
+              <template v-else>
                 {{ header.text }}
+              </template>
                 <!-- Date Sort Icon/Button -->
                 <SortingIcon
                   v-if="header.sortable"
@@ -334,7 +354,12 @@ export default defineComponent({
               :key="item.searchId"
               :class="{ 'added-search-effect': ((searchAdded && index === 0) || (item.searchId === searchAddedId)) }"
             >
-              <td>
+            <template
+              v-for="header in headers"
+              :key="header"
+            >
+              <!-- Search Value -->
+              <td v-if="header.value==='searchQuery.criteria.value'">
                 <v-icon
                   class="pl-4 pr-2 mt-n1"
                   color="#212529"
@@ -347,95 +372,77 @@ export default defineComponent({
                 </v-icon>
                 <span class="pl-2" aria-hidden="true">{{ displaySearchValue(item.searchQuery) }}</span>
               </td>
-              <td>
-                  <span
-                    class="aria-label-only"
-                    aria-hidden="false"
-                  >
-                    {{ headers[1].text }}
-                  </span>
-                {{ isPprSearch(item) ? displayType(item.searchQuery.type) : displayMhrType(item.searchQuery.type) }}
-              </td>
-              <td>
-                  <span
-                    class="aria-label-only"
-                    aria-hidden="false"
-                  >
-                    {{ headers[2].text }}
-                  </span>
+              <!-- Search Type or Category -->
+              <td v-if="header.value==='typeAndRegistry'">
+                <v-row>
+                  <AriaLabel :aria-text="header.text" />
                 <span v-if="isPprSearch(item)">Personal Property</span>
                 <span v-else>Manufactured Homes</span>
+                </v-row>
+                <v-row>
+                  <AriaLabel :aria-text="header.text" />
+                  {{ isPprSearch(item) ? displayType(item.searchQuery.type) : displayMhrType(item.searchQuery.type) }}
+                </v-row>
               </td>
-              <td>
-                  <span
-                    class="aria-label-only"
-                    aria-hidden="false"
-                  >
-                    {{ headers[3].text }}
-                  </span>
+              <td v-if="header.value==='searchQuery.clientReferenceId'">
+                <AriaLabel :aria-text="header.text" />
+                {{ item.searchQuery.clientReferenceId || '-' }}
+              </td>
+              <!-- Date/Time (Pacific time) -->
+              <td v-if="header.value==='searchDateTime'">
+                <AriaLabel :aria-text="header.text" />
                 <span v-if="!item.inProgress || isSearchOwner(item)">
                     {{ displayDate(item.searchDateTime) }}
-                  </span>
+                </span>
                 <span v-else>Pending</span>
               </td>
-              <td>
-                <span
-                  class="aria-label-only"
-                  aria-hidden="false"
-                >
-                  {{ headers[4].text }}
-                </span>
-                {{ isStaff ? item.username : item.searchQuery.clientReferenceId || '-' }}
+              <td v-if="header.value==='username'">
+                <AriaLabel :aria-text="header.text" />
+                {{ item.username }}
               </td>
-              <td class="text-center">
-                <span
-                  class="aria-label-only"
-                  aria-hidden="false"
+              <td v-if="header.value==='matches'">
+              <v-row>
+                <v-col
+                  class="text-center"
                 >
-                  {{ headers[5].text }}
-                </span>
-                <span v-if="!item.inProgress || isSearchOwner(item)">
-                  {{ item.totalResultsSize }}
-                </span>
-                <span
-                  v-else
-                  role="img"
-                  aria-label="None"
-                >-</span>
-              </td>
-              <td class="text-center">
-                <span
-                  class="aria-label-only"
-                  aria-hidden="false"
-                >
-                  {{ headers[6].text }}
-                </span>
-                <span v-if="(!item.inProgress || isSearchOwner(item)) && item.exactResultsSize >= 0">
-                  {{ item.exactResultsSize }}
-                </span>
-                <span
-                  v-else
-                  role="img"
-                  aria-label="None"
-                >-</span>
-              </td>
-              <td class="text-center">
-                <span
-                  class="aria-label-only"
-                  aria-hidden="false"
-                >
-                  {{ headers[7].text }}
-                </span>
-                <span v-if="!item.inProgress || isSearchOwner(item)">
-                  {{ item.selectedResultsSize }}
-                </span>
-                <span
-                  v-else
-                  role="img"
-                  aria-label="None"
-                >-</span>
-              </td>
-              <td class="text-center">
+                  <AriaLabel :aria-text="header.text" />
+                  <span v-if="!item.inProgress || isSearchOwner(item)">
+                    {{ item.totalResultsSize }}
+                  </span>
+                  <span
+                    v-else
+                    role="img"
+                    aria-label="None"
+                  >-</span>
+                </v-col>
+                <v-col class="text-center">
+                  <AriaLabel :aria-text="header.text" />
+                  <span v-if="(!item.inProgress || isSearchOwner(item)) && item.exactResultsSize >= 0">
+                    {{ item.exactResultsSize }}
+                  </span>
+                  <span
+                    v-else
+                    role="img"
+                    aria-label="None"
+                  >-</span>
+                </v-col>
+                <v-col class="text-center">
+                  <AriaLabel :aria-text="header.text" />
+                  <span v-if="!item.inProgress || isSearchOwner(item)">
+                    {{ item.selectedResultsSize }}
+                  </span>
+                  <span
+                    v-else
+                    role="img"
+                    aria-label="None"
+                  >-</span>
+                </v-col>
+            </v-row>
+            </td>
+              <td
+              v-if="header.value==='pdf'"
+              class="text-center"
+              >
                 <v-btn
                   v-if="item.paymentPending"
                   class="resume-pay-btn px-6"
@@ -525,6 +532,7 @@ export default defineComponent({
                   </div>
                 </v-tooltip>
               </td>
+            </template>
             </tr>
             </tbody>
             <tbody v-else>
@@ -601,5 +609,8 @@ export default defineComponent({
 }
 .aria-label-only {
   display: none
+}
+.v-col {
+  padding: 0;
 }
 </style>
