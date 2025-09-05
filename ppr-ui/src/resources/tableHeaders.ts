@@ -546,22 +546,22 @@ export const mhSearchNameHeaders: Array<BaseHeaderIF> = [
     class: 'column-md',
     sortable: true,
     text: 'Owner Name',
-    value: 'ownerName'
+    value: 'ownerName.first'
   },
   {
-    class: 'column-mds',
+    class: 'column-mdm',
     sortable: true,
     text: 'Owner Status',
     value: 'ownerStatus'
   },
   {
-    class: 'column-sm',
+    class: 'column-mds',
     sortable: true,
     text: 'Registration Number',
     value: 'mhrNumber'
   },
   {
-    class: 'column-sm',
+    class: 'column-mds',
     sortable: true,
     text: 'Current Registration Status',
     value: 'status'
@@ -576,28 +576,28 @@ export const mhSearchNameHeaders: Array<BaseHeaderIF> = [
     class: 'column-xs',
     sortable: true,
     text: 'Year',
-    value: 'year'
+    value: 'baseInformation.year'
   },
   {
-    class: 'column-sm',
+    class: 'column-mds',
     sortable: true,
     text: 'Make/Model',
-    value: 'makeModel'
+    value: 'baseInformation.make'
   },
   {
-    class: 'column-sm',
+    class: 'column-mds',
     sortable: true,
     text: 'Home Location',
     value: 'homeLocation'
   },
   {
-    class: 'column-sm',
+    class: 'column-mds',
     sortable: true,
     text: 'Serial Number',
     value: 'serialNumber'
   },
   {
-    class: 'lien-info',
+    class: 'lien-info column-md',
     sortable: false,
     text: '',
     value: 'edit'
@@ -627,10 +627,10 @@ export const mhSearchSerialNumberHeaders: Array<BaseHeaderIF> = [
     class: 'column-md',
     sortable: true,
     text: 'Owner Name',
-    value: 'ownerName'
+    value: 'ownerName.first'
   },
   {
-    class: 'column-mds',
+    class: 'column-mdm',
     sortable: true,
     text: 'Owner Status',
     value: 'ownerStatus'
@@ -645,13 +645,13 @@ export const mhSearchSerialNumberHeaders: Array<BaseHeaderIF> = [
     class: 'column-xs',
     sortable: true,
     text: 'Year',
-    value: 'year'
+    value: 'baseInformation.year'
   },
   {
     class: 'column-mds',
     sortable: true,
     text: 'Make/Model',
-    value: 'makeModel'
+    value: 'baseInformation.make'
   },
   {
     class: 'column-mds',
@@ -660,7 +660,7 @@ export const mhSearchSerialNumberHeaders: Array<BaseHeaderIF> = [
     value: 'homeLocation'
   },
   {
-    class: 'lien-info',
+    class: 'lien-info column-md',
     sortable: false,
     text: '',
     value: 'edit'
@@ -683,10 +683,10 @@ export const mhSearchMhrNumberHeaders: Array<BaseHeaderIF> = [
   {
     class: 'column-mds',
     text: 'Owner Name',
-    value: 'ownerName'
+    value: 'ownerName.first'
   },
   {
-    class: 'column-mds',
+    class: 'column-mdm',
     sortable: true,
     text: 'Owner Status',
     value: 'ownerStatus'
@@ -701,13 +701,13 @@ export const mhSearchMhrNumberHeaders: Array<BaseHeaderIF> = [
     class: 'column-xs',
     sortable: true,
     text: 'Year',
-    value: 'year'
+    value: 'baseInformation.year'
   },
   {
     class: 'column-mds',
     sortable: true,
     text: 'Make/Model',
-    value: 'makeModel'
+    value: 'baseInformation.make'
   },
   {
     class: 'column-mds',
@@ -722,7 +722,7 @@ export const mhSearchMhrNumberHeaders: Array<BaseHeaderIF> = [
     value: 'serialNumber'
   },
   {
-    class: 'lien-info',
+    class: 'lien-info column-md',
     sortable: false,
     text: '',
     value: 'edit'
@@ -734,10 +734,10 @@ export const mhSearchNameHeadersReview: Array<BaseHeaderIF> = [
     class: 'column-mdl',
     sortable: true,
     text: 'Owner Name',
-    value: 'ownerName'
+    value: 'ownerName.first'
   },
   {
-    class: 'column-sm',
+    class: 'column-mds',
     sortable: true,
     text: 'Registration Number',
     value: 'mhrNumber'
@@ -746,22 +746,22 @@ export const mhSearchNameHeadersReview: Array<BaseHeaderIF> = [
     class: 'column-md',
     sortable: true,
     text: 'Year/Make/Model',
-    value: 'yearMakeModel'
+    value: 'baseInformation.make'
   },
   {
-    class: 'column-sm',
+    class: 'column-mds',
     sortable: true,
     text: 'Home Location',
     value: 'homeLocation'
   },
   {
-    class: 'column-sm',
+    class: 'column-mds',
     sortable: true,
     text: 'Serial Number',
     value: 'serialNumber'
   },
   {
-    class: 'lien-info',
+    class: 'lien-info column-md',
     sortable: false,
     text: '',
     value: 'edit'
@@ -785,13 +785,13 @@ export const mhSearchSerialNumberHeadersReview: Array<BaseHeaderIF> = [
     class: 'column-md',
     sortable: true,
     text: 'Owner Name',
-    value: 'ownerName'
+    value: 'ownerName.first'
   },
   {
     class: 'column-md',
     sortable: true,
     text: 'Year/Make/Model',
-    value: 'yearMakeModel'
+    value: 'baseInformation.make'
   },
   {
     class: 'column-mds',
@@ -800,7 +800,7 @@ export const mhSearchSerialNumberHeadersReview: Array<BaseHeaderIF> = [
     value: 'homeLocation'
   },
   {
-    class: 'lien-info',
+    class: 'lien-info column-md',
     sortable: false,
     text: '',
     value: 'edit'
@@ -818,13 +818,13 @@ export const mhSearchMhrNumberHeadersReview: Array<BaseHeaderIF> = [
     class: 'column-md',
     sortable: true,
     text: 'Owner Name',
-    value: 'ownerName'
+    value: 'ownerName.first'
   },
   {
     class: 'column-md',
     sortable: true,
     text: 'Year/Make/Model',
-    value: 'yearMakeModel'
+    value: 'baseInformation.make'
   },
   {
     class: 'column-mds',
@@ -839,7 +839,7 @@ export const mhSearchMhrNumberHeadersReview: Array<BaseHeaderIF> = [
     value: 'serialNumber'
   },
   {
-    class: 'lien-info',
+    class: 'lien-info column-md',
     sortable: false,
     text: '',
     value: 'edit'
