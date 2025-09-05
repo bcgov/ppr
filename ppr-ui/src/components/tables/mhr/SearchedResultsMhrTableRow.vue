@@ -12,7 +12,7 @@
       v-for="header in headers"
       :key="header.value"
     >
-      <td v-if="header.value === 'ownerName'">
+      <td v-if="header.value === 'ownerName.first'">
         {{ getOwnerName(item) }}
       </td>
       <td v-else-if="header.value === 'ownerStatus'">
@@ -27,10 +27,10 @@
       <td v-else-if="header.value === 'manufacturerName'">
         {{ item.manufacturerName }}
       </td>
-      <td v-else-if="header.value === 'year'">
+      <td v-else-if="header.value === 'baseInformation.year'">
         {{ item.baseInformation.year || '-' }}
       </td>
-      <td v-else-if="header.value === 'makeModel'">
+      <td v-else-if="header.value === 'baseInformation.make'">
         {{ item.baseInformation.make || '-' }} / {{ item.baseInformation.model || '-' }}
       </td>
       <td v-else-if="header.value === 'homeLocation'">

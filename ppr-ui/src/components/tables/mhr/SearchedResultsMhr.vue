@@ -146,7 +146,7 @@
                     @click="sortTable(header.value, header.sortable)"
                   >
                     <span
-                      v-if="header.value === 'ownerName'"
+                      v-if="header.value === 'ownerName.first'"
                       class="pr-2"
                     >
                       {{ ownerOrOrgHeader }} Name
