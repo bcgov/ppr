@@ -20,3 +20,8 @@ export interface SearchTypeIF {
   icon?: string
   color?: string
 }
+
+export interface SortOptionIF {
+  sortBy: string
+  isAsc: boolean
+}

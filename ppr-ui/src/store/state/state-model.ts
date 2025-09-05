@@ -148,6 +148,10 @@ export const stateModel: StateModelIF = {
     searchCertified: false
   },
   selectedManufacturedHomes: [],
+  mhrSearchResultSortOption: {
+    sortBy: '',
+    asc: false
+  },
   isStaffClientPayment: false,
   staffPayment: null,
   unsavedChanges: false,

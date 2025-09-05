@@ -16,6 +16,7 @@ import type {
   RegistrationTypeIF,
   SearchResponseIF,
   SearchTypeIF,
+  SortOptionIF,
   RegTableDataI,
   UserInfoIF,
   MhrRegistrationIF,
@@ -89,6 +90,7 @@ export interface StateModelIF {
     searchCertified: boolean
   }
   selectedManufacturedHomes: ManufacturedHomeSearchResultIF[]
+  mhrSearchResultSortOption: SortOptionIF
   isStaffClientPayment: boolean
   staffPayment: StaffPaymentIF
   unsavedChanges: boolean // used for cancel flows
