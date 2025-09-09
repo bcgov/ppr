@@ -317,6 +317,17 @@ def is_transfer_due_to_death(reg_type: str) -> bool:
     )
 
 
+def is_staff_review_registration(reg_doc_type: str, group: str) -> bool:
+    """Return if the registration or document type is QS submitted and to be reviewed by staff."""
+    if not group:
+        return reg_doc_type and reg_doc_type in (MhrRegistrationTypes.TRANS_WILL, MhrDocumentTypes.WILL)
+    return (
+        group == QUALIFIED_USER_GROUP
+        and reg_doc_type
+        and reg_doc_type in (MhrRegistrationTypes.TRANS_WILL, MhrDocumentTypes.WILL)
+    )
+
+
 def is_transfer_due_to_death_staff(reg_type: str) -> bool:
     """Return if the registration type is a type of Transfer Due to Death."""
     return reg_type and reg_type in (

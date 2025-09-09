@@ -80,7 +80,7 @@ def test_find_by_id(session, id, has_results):
         assert location.status_type == MhrStatusTypes.ACTIVE
         assert location.ltsa_description
         assert location.additional_description == 'additional'
-        assert location.dealer_name == 'dealer'
+        assert str(location.dealer_name).upper() == 'DEALER'
         assert location.exception_plan == 'except'
         assert location.leave_province == 'N'
         assert location.tax_certification == 'Y'

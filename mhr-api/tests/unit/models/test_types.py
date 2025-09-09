@@ -135,3 +135,13 @@ def test_mhr_location_type(session):
     for result in results:
         assert result.location_type in type_tables.MhrLocationTypes
         assert result.location_type_desc
+
+
+def test_mhr_review_status_type(session):
+    """Assert that MhrReviewStatusType.find_all() contains all expected elements."""
+    results = type_tables.MhrReviewStatusType.find_all()
+    assert results
+    assert len(results) >= 5
+    for result in results:
+        assert result.status_type in type_tables.MhrReviewStatusTypes
+        assert result.status_type_desc

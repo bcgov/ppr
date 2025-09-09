@@ -280,6 +280,18 @@ class MhrRegistrationStatusTypes(BaseEnum):
     HISTORICAL = "HISTORICAL"
 
 
+class MhrReviewStatusTypes(BaseEnum):
+    """Render an Enum of the MHR staff registration review status types."""
+
+    PAY_PENDING = "PAY_PENDING"
+    PAY_CANCELLED = "PAY_CANCELLED"
+    NEW = "NEW"
+    IN_REVIEW = "IN_REVIEW"
+    ON_HOLD = "ON_HOLD"  # May not be needed: waiting on more info from client.
+    APPROVED = "APPROVED"
+    DECLINED = "DECLINED"
+
+
 class MhrRegistrationTypes(BaseEnum):
     """Render an Enum of the MHR registration types."""
 
@@ -455,6 +467,25 @@ class MhrRegistrationType(db.Model):  # pylint: disable=too-few-public-methods
     def find_all(cls):
         """Return all the type records."""
         return db.session.query(MhrRegistrationType).all()
+
+
+class MhrReviewStatusType(db.Model):  # pylint: disable=too-few-public-methods
+    """This class defines the model for the mhr_review_status_types table."""
+
+    __tablename__ = "mhr_review_status_types"
+
+    status_type = db.mapped_column(
+        "status_type", PG_ENUM(MhrReviewStatusTypes, name="mhr_review_status_type"), primary_key=True
+    )
+    status_type_desc = db.mapped_column("status_type_desc", db.String(100), nullable=False)
+
+    # Relationships -
+    # review = db.relationship("MhrReviewRegistration", back_populates="reg_type")
+
+    @classmethod
+    def find_all(cls):
+        """Return all the type records."""
+        return db.session.query(MhrReviewStatusType).all()
 
 
 class MhrStatusType(db.Model):  # pylint: disable=too-few-public-methods

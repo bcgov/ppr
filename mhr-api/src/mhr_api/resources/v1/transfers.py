@@ -38,7 +38,6 @@ from mhr_api.services.authz import (
     is_reg_staff_account,
     is_staff,
 )
-from mhr_api.services.payment import TransactionTypes
 from mhr_api.services.payment.exceptions import SBCPaymentException
 from mhr_api.utils.auth import jwt
 from mhr_api.utils.logging import logger
@@ -90,10 +89,10 @@ def post_transfers(mhr_number: str):  # pylint: disable=too-many-return-statemen
         # Get current owners before updating for batch JSON.
         current_owners = reg_utils.get_active_owners(current_reg)
         # Set up the registration, pay, and save the data.
-        registration = reg_utils.pay_and_save_transfer(
-            request, current_reg, request_json, account_id, group, TransactionTypes.TRANSFER
-        )
-        if registration.reg_json and registration.reg_json.get("paymentPending"):
+        registration = reg_utils.pay_and_save_transfer(request, current_reg, request_json, account_id, group)
+        if registration.reg_json and (
+            registration.reg_json.get("paymentPending") or registration.reg_json.get("reviewPending")
+        ):
             return jsonify(registration.reg_json), HTTPStatus.ACCEPTED
         logger.debug(f"building transfer response json for {mhr_number}")
         registration.change_registrations = current_reg.change_registrations
