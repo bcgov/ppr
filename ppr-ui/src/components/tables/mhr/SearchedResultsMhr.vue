@@ -317,6 +317,7 @@
                       :headers="headers"
                       :item="item"
                       @on-selection-checkbox-click="onSelectionCheckboxClick($event)"
+                      @set-include-lien-info="setIncludeLienInfo($event)"
                     />
                   </template>
                   <template v-else>
@@ -392,6 +393,7 @@
                       :headers="headers"
                       :item="item"
                       @on-selection-checkbox-click="onSelectionCheckboxClick($event)"
+                      @set-include-lien-info="setIncludeLienInfo($event)"
                     />
                   </template>
                   <template v-else>
@@ -677,33 +679,23 @@ export default defineComponent({
     }
 
     const onSelectionCheckboxClick = (item: ManufacturedHomeSearchResultIF): void => {
-      if (props.isReviewMode) {
-        // for review-only mode, clicking on a search result checkbox
-        // will set same selected state for all of the results within same group (results with unique mhrNumber)
-        const selectedState = item.selected as boolean
-        // filter unique results based on mhrNumber
-        filter(localState.results, { mhrNumber: item.mhrNumber })
-          .forEach((result: ManufacturedHomeSearchResultIF) => {
-            // set selected for each result
-            result.selected = !selectedState
-            if (!result.selected) {
-              result.includeLienInfo = false
-            }
-          })
-      } else {
-        if (!item.selected) {
-          item.includeLienInfo = false
-        }
-        if (item.selected && localState.selectAllLien) {
-          item.includeLienInfo = true
-        }
-      }
+      // will set same selected state for all of the results within same group (results with unique mhrNumber)
+      const selectedState = item.selected as boolean
+      // filter unique results based on mhrNumber
+      filter(localState.results, { mhrNumber: item.mhrNumber })
+        .forEach((result: ManufacturedHomeSearchResultIF) => {
+          // set selected for each result
+          result.selected = !selectedState
+          if (!result.selected) {
+            result.includeLienInfo = false
+          }
+        })
     }
 
     const setIncludeLienInfo = (item: ManufacturedHomeSearchResultIF): void => {
       filter(localState.results, { mhrNumber: item.mhrNumber })
       .forEach((result: ManufacturedHomeSearchResultIF) => {
-        item.includeLienInfo = !item.includeLienInfo
+        result.includeLienInfo = !result.includeLienInfo
       })
     }
     const getOwnerStatus = (ownerStatus: string): string => {
@@ -837,6 +829,7 @@ export default defineComponent({
       getItemClass,
       onSelectionCheckboxClick,
       sortTable,
+      setIncludeLienInfo,
       ...toRefs(localState)
     }
   }
