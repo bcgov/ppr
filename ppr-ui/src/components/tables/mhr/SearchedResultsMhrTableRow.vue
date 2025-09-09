@@ -56,7 +56,7 @@
                 :disabled="!item.selected"
                 :ripple="false"
                 hide-details
-                @click="setIncludeLienInfo"
+                @click="setIncludeLienInfo(item)"
               />
             </span>
           </template>
