@@ -339,6 +339,27 @@ class SBCPaymentClient(BaseClient):
         return data
 
     @staticmethod
+    def create_payment_client_data(transaction_info, client_reference_id=None):
+        """Build the payment-request body formatted as JSON."""
+        data = copy.deepcopy(PAYMENT_REQUEST_TEMPLATE)
+        filing_type = TRANSACTION_TO_FILING_TYPE[transaction_info["transactionType"]]
+        data["filingInfo"]["filingTypes"][0]["filingTypeCode"] = filing_type
+        if transaction_info["quantity"] != 1:
+            data["filingInfo"]["filingTypes"][0]["quantity"] = transaction_info["quantity"]
+        if "transactionId" in transaction_info:
+            data["filingInfo"]["filingIdentifier"] = transaction_info["transactionId"]
+        else:
+            del data["filingInfo"]["filingIdentifier"]
+        if client_reference_id:
+            data["filingInfo"]["folioNumber"] = client_reference_id
+        else:
+            del data["filingInfo"]["folioNumber"]
+        # Add priority filing type
+        if transaction_info.get("priority"):
+            data["filingInfo"]["filingTypes"].append(PRIORITY_FILING_TYPE)
+        return data
+
+    @staticmethod
     def create_payment_staff_data(transaction_info, client_reference_id=None):
         """Build the payment-request body formatted as JSON."""
         data = copy.deepcopy(PAYMENT_REQUEST_TEMPLATE)
@@ -419,6 +440,19 @@ class SBCPaymentClient(BaseClient):
         invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data)
         # logger.debug(invoice_data)
         return SBCPaymentClient.build_pay_reference(invoice_data, self.api_url)
+
+    def create_payment_client(self, transaction_info, client_reference_id=None):
+        """Submit a client registration payment request for the MHR API transaction."""
+        logger.debug("Setting up client registration data.")
+        data = SBCPaymentClient.create_payment_client_data(transaction_info, client_reference_id)
+        data = self.update_payload_data(data, transaction_info.get("transactionId"))
+        logger.info("client registration create payment payload: ")
+        logger.info(json.dumps(data))
+        invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data)
+        pay_ref = SBCPaymentClient.build_pay_reference(invoice_data, self.api_url)
+        if transaction_info.get("priority"):
+            pay_ref["priority"] = True
+        return pay_ref
 
     def create_payment_search(self, selections, mhr_id=None, client_reference_id=None, staff_gov=False):
         """Submit a non-staff payment search request for the MHR API transaction."""

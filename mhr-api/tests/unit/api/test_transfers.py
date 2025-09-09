@@ -26,7 +26,8 @@ from registry_schemas.example_data.mhr import TRANSFER
 from mhr_api.models import MhrRegistration, MhrRegistrationReport, MhrDocument
 from mhr_api.models.type_tables import MhrRegistrationTypes
 from mhr_api.services.authz import BCOL_HELP_ROLE, MHR_ROLE, STAFF_ROLE, COLIN_ROLE, REQUEST_EXEMPTION_RES, \
-                                   TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY, REQUEST_TRANSPORT_PERMIT
+                                   TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY, REQUEST_TRANSPORT_PERMIT, \
+                                   REGISTER_MH
 from tests.unit.services.utils import create_header, create_header_account
 from tests.unit.utils.test_transfer_data import (
     TRAND_DELETE_GROUPS,
@@ -43,6 +44,7 @@ MOCK_AUTH_URL = 'https://test.api.connect.gov.bc.ca/mockTarget/auth/api/v1/'
 MOCK_PAY_URL = 'https://test.api.connect.gov.bc.ca/mockTarget/pay/api/v1/'
 DOC_ID_VALID = '63166035'
 DEALER_ROLES = [MHR_ROLE,REQUEST_TRANSPORT_PERMIT]
+MANUFACTURER_ROLES = [MHR_ROLE, TRANSFER_SALE_BENEFICIARY, REQUEST_TRANSPORT_PERMIT, REGISTER_MH]
 QUALIFIED_USER = [MHR_ROLE, REQUEST_EXEMPTION_RES, TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY]
 
 
@@ -72,7 +74,9 @@ TEST_CREATE_TRANS_DEATH_DATA = [
      MhrRegistrationTypes.TRANS_ADMIN),
     ('Invalid TRANS_AFFIDAVIT non-staff', '000921', [MHR_ROLE, TRANSFER_DEATH_JT], HTTPStatus.BAD_REQUEST, 'PS12345',
      MhrRegistrationTypes.TRANS_AFFIDAVIT),
-    ('Invalid TRANS_WILL non-staff', '000921', [MHR_ROLE, TRANSFER_DEATH_JT], HTTPStatus.BAD_REQUEST, 'PS12345',
+    ('Invalid TRANS_WILL non-staff', '000921', MANUFACTURER_ROLES, HTTPStatus.UNAUTHORIZED, 'PS12345',
+     MhrRegistrationTypes.TRANS_WILL),
+    ('Valid TRANS_WILL non-staff', '000921', QUALIFIED_USER, HTTPStatus.ACCEPTED, 'PS12345',
      MhrRegistrationTypes.TRANS_WILL),
     ('Valid TRANS_ADMIN staff', '000921', [MHR_ROLE, STAFF_ROLE, TRANSFER_DEATH_JT], HTTPStatus.CREATED, 'PS12345',
      MhrRegistrationTypes.TRANS_ADMIN),
@@ -197,6 +201,8 @@ def test_create_transfer_death(session, client, jwt, desc, mhr_num, roles, statu
         reg_report: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(doc.registration_id)
         assert reg_report
         assert reg_report.batch_registration_data
+    elif response.status_code == HTTPStatus.ACCEPTED:
+        assert response.json.get("reviewPending")
 
 
 @pytest.mark.parametrize('desc,mhr_num,roles,status,account,tran_doc_type', TEST_CREATE_DATA_TRANSFER)

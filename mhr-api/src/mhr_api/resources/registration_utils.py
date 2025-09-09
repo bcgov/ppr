@@ -33,16 +33,18 @@ from mhr_api.models import utils as model_utils
 from mhr_api.models.registration_utils import (
     get_document_description,
     get_registration_description,
+    is_staff_review_registration,
     save_admin,
     save_cancel_note,
 )
 from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationStatusTypes, MhrRegistrationTypes
 from mhr_api.reports import get_pdf
-from mhr_api.resources import cc_payment_utils
+from mhr_api.resources import cc_payment_utils, staff_review_utils
 from mhr_api.resources import utils as resource_utils
 from mhr_api.services.authz import STAFF_ROLE, is_reg_staff_account
 from mhr_api.services.document_storage.storage_service import DocumentTypes, GoogleStorageService
 from mhr_api.services.notify import Notify
+from mhr_api.services.payment import TransactionTypes
 from mhr_api.services.payment.exceptions import SBCPaymentException
 from mhr_api.services.payment.payment import Payment
 from mhr_api.services.queue_service import GoogleQueueService
@@ -135,8 +137,9 @@ def pay(req: request, request_json: dict, account_id: str, trans_type: str, tran
         details = get_pay_details_doc(MhrDocumentTypes.AMEND_PERMIT)
     details = set_cc_payment(req, details)
     if not is_reg_staff_account(account_id):
+        payment_info = build_client_payment(req, account_id, trans_type, 1, trans_id)
         payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id, details=details)
-        pay_ref = payment.create_payment(trans_type, 1, trans_id, client_ref, False)
+        pay_ref = payment.create_payment_client(payment_info, client_ref)
     else:
         payment_info = build_staff_payment(req, trans_type, 1, trans_id)
         payment = Payment(jwt=jwt.get_token_auth_header(), account_id=None, details=details)
@@ -199,9 +202,7 @@ def pay_and_save_registration(  # pylint: disable=too-many-arguments,too-many-po
         raise DatabaseException(db_exception) from db_exception
 
 
-def pay_and_save_transfer(  # pylint: disable=too-many-arguments,too-many-positional-arguments
-    req: request, current_reg: MhrRegistration, request_json, account_id: str, user_group: str, trans_type: str
-):
+def pay_and_save_transfer(req: request, current_reg: MhrRegistration, request_json, account_id: str, user_group: str):
     """Set up the registration statement, pay, and save the data."""
     # Charge a fee.
     token: dict = g.jwt_oidc_token_info
@@ -209,11 +210,18 @@ def pay_and_save_transfer(  # pylint: disable=too-many-arguments,too-many-positi
     request_json["affirmByName"] = get_affirmby(token)
     if not request_json.get("registrationType"):
         request_json["registrationType"] = MhrRegistrationTypes.TRANS
-    payment, pay_ref = pay(req, request_json, account_id, trans_type, current_reg.mhr_number)
+    payment, pay_ref = pay(req, request_json, account_id, TransactionTypes.TRANSFER, current_reg.mhr_number)
     if pay_ref.get("ccPayment"):
         logger.info("Payment response CC method.")
+        if is_staff_review_registration(request_json.get("registrationType"), user_group):
+            request_json["reviewPending"] = True
         request_json = setup_cc_draft(request_json, pay_ref, account_id, token.get("username", None), user_group)
         return cc_payment_utils.save_change_cc_draft(current_reg, request_json)
+    if is_staff_review_registration(request_json.get("registrationType"), user_group):
+        logger.info("Setting up staff review registration")
+        request_json = setup_staff_review(request_json, pay_ref, account_id, token.get("username", None), user_group)
+        return staff_review_utils.save_review_registration(current_reg, request_json)
+
     invoice_id = pay_ref["invoiceId"]
     # Try to save the registration: failure throws an exception.
     try:
@@ -280,6 +288,15 @@ def pay_and_save_exemption(  # pylint: disable=too-many-arguments,too-many-posit
 
 def setup_cc_draft(json_data: dict, pay_ref: dict, account_id: str, username: str, usergroup: str) -> dict:
     """Set common draft properties from request information."""
+    json_data["payment"] = pay_ref
+    json_data["accountId"] = account_id
+    json_data["username"] = username if username else ""
+    json_data["usergroup"] = usergroup if usergroup else ""
+    return json_data
+
+
+def setup_staff_review(json_data: dict, pay_ref: dict, account_id: str, username: str, usergroup: str) -> dict:
+    """Set common staff review properties from request information."""
     json_data["payment"] = pay_ref
     json_data["accountId"] = account_id
     json_data["username"] = username if username else ""
@@ -452,6 +469,25 @@ def build_staff_payment(req: request, trans_type: str, quantity: int = 1, transa
 
     if resource_utils.ROUTING_SLIP_PARAM in payment_info or resource_utils.BCOL_NUMBER_PARAM in payment_info:
         payment_info["waiveFees"] = False
+    logger.debug(payment_info)
+    return payment_info
+
+
+def build_client_payment(req: request, account_id: str, trans_type: str, quantity: int = 1, transaction_id: str = None):
+    """Extract client payment information from request parameters."""
+    payment_info = {
+        "transactionType": trans_type,
+        "quantity": quantity,
+        "waiveFees": False,
+        "accountId": account_id,
+    }
+    if transaction_id:
+        payment_info["transactionId"] = transaction_id
+    priority = req.args.get(resource_utils.PRIORITY_PARAM)
+    if priority is not None and isinstance(priority, bool) and priority:
+        payment_info[resource_utils.PRIORITY_PARAM] = True
+    elif priority is not None and isinstance(priority, str) and priority.lower() in ["true", "1", "y", "yes"]:
+        payment_info[resource_utils.PRIORITY_PARAM] = True
     logger.debug(payment_info)
     return payment_info
 

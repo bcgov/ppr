@@ -40,7 +40,7 @@ TEST_DESCRIPTION = MhrDescription(id=1,
                                   square_feet=2000,
                                   year_made=2015,
                                   circa='N',
-                                  manufacturer_name='manufacturer',
+                                  manufacturer_name='MANUFACTURER',
                                   make='make',
                                   model='model',
                                   engineer_name='engineerName',
@@ -68,7 +68,7 @@ def test_find_by_id(session, id, has_results):
         assert description.engineer_date
         assert description.make == 'make'
         assert description.model == 'model'
-        assert description.manufacturer_name == 'manufacturer'
+        assert str(description.manufacturer_name).upper() == 'MANUFACTURER'
         assert description.rebuilt_remarks == 'rebuilt'
         assert description.other_remarks == 'other'
     else:

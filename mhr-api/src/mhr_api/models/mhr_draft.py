@@ -104,6 +104,7 @@ SELECT d.draft_number, d.create_ts, d.registration_type,
   FROM mhr_drafts d, mhr_registration_types rt
  WHERE d.account_id = :query_account
    AND d.registration_type = rt.registration_type
+   AND LEFT(d.draft_number, 2) != 'PR'
    AND NOT EXISTS (SELECT r.draft_id FROM mhr_registrations r WHERE r.draft_id = d.id)
    AND NOT EXISTS (SELECT mer.id
                      FROM mhr_extra_registrations mer
@@ -159,6 +160,7 @@ QUERY_ACCOUNT_FILTER_BY = {
     reg_utils.MANUFACTURER_NAME_PARAM: FILTER_MANUFACTURER,
 }
 DRAFT_PAY_PENDING_PREFIX = "P"  # Special draft number when payment pending.
+DRAFT_STAFF_REVIEW_PREFIX = "PR"  # Special draft number when staff review in incomplete.
 
 
 class MhrDraft(db.Model):

@@ -35,6 +35,8 @@ from .mhr_party import MhrParty
 from .mhr_qualified_supplier import MhrQualifiedSupplier
 from .mhr_registration import MhrRegistration
 from .mhr_registration_report import MhrRegistrationReport
+from .mhr_review_registration import MhrReviewRegistration
+from .mhr_review_step import MhrReviewStep
 from .mhr_section import MhrSection
 from .mhr_service_agreement import MhrServiceAgreement
 from .party import Party
@@ -52,6 +54,7 @@ from .type_tables import (
     MhrPartyType,
     MhrRegistrationStatusType,
     MhrRegistrationType,
+    MhrReviewStatusType,
     MhrStatusType,
     MhrTenancyType,
     PartyType,
@@ -85,6 +88,7 @@ __all__ = (
     "MhrParty",
     "MhrRegistration",
     "MhrRegistrationReport",
+    "MhrReviewRegistration",
     "MhrDocumentType",
     "MhrLocationType",
     "MhrNoteStatusType",
@@ -94,6 +98,8 @@ __all__ = (
     "MhrQualifiedSupplier",
     "MhrRegistrationStatusType",
     "MhrRegistrationType",
+    "MhrReviewStatusType",
+    "MhrReviewStep",
     "MhrSection",
     "MhrStatusType",
     "MhrServiceAgreement",

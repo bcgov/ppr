@@ -168,7 +168,11 @@ def validate_transfer(registration: MhrRegistration, json_data, staff: bool, gro
     error_msg = ""
     try:
         logger.info(f"Validating transfer staff={staff}, group={group}")
-        if not staff and reg_utils.is_transfer_due_to_death_staff(json_data.get("registrationType")):
+        if (
+            not staff
+            and reg_utils.is_transfer_due_to_death_staff(json_data.get("registrationType"))
+            and not reg_utils.is_staff_review_registration(json_data.get("registrationType"), group)
+        ):
             return REG_STAFF_ONLY
         if staff:
             error_msg += validator_utils.validate_doc_id(json_data, True)

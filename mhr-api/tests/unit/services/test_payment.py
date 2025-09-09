@@ -47,6 +47,10 @@ PAY_DETAILS_REGISTRATION = {
     'label': 'MH Registration Type:',
     'value': 'New MH Registration'
 }
+PAY_DETAILS_TRANSFER = {
+    'label': 'MH Registration Type:',
+    'value': 'Transfer Registration'
+}
 PAY_DETAILS_CC = {
     'label': 'CC TEST',
     'value': 'UNIT TESTING',
@@ -217,6 +221,13 @@ TEST_TRANS_TYPE_DATA = [
     (TransactionTypes.TRANSPORT_PERMIT, 'TRAPP'),
     (TransactionTypes.CANCEL_PERMIT, 'MHROT'),
     (TransactionTypes.AMEND_PERMIT, 'MHROT')
+]
+# testdata pattern is ({type}, {trans_id}, {client_id}, {account_id}, {priority}, {cc})
+TEST_PAYMENT_DATA_CLIENT = [
+    (TransactionTypes.TRANSFER, '108234', 'UT-00001', 'PS12345', False, False),
+    (TransactionTypes.TRANSFER, '108234', 'UT-00001', 'PS12345', True, False),
+    (TransactionTypes.TRANSFER, '108234', 'UT-00001', 'PS12345', False, True),
+    (TransactionTypes.TRANSFER, '108234', 'UT-00001', 'PS12345', True, True),
 ]
 
 
@@ -557,6 +568,85 @@ def test_create_payment_data_staff(client, jwt, type, trans_id, client_id, routi
         assert data["details"][1].get("value") == trans_id
     else:
         assert len(data.get("details")) == 1
+
+
+@pytest.mark.parametrize('trans_type,trans_id,client_id,account_id,priority,cc',
+                         TEST_PAYMENT_DATA_CLIENT)
+def test_create_payment_data_client(client, jwt, trans_type, trans_id, client_id, account_id, priority, cc):
+    """Assert that the client payment payment-request body is as expected for a pay transaction type."""
+    transaction_info = {
+        'transactionType': trans_type,
+        'quantity': 1,
+        'accountId': account_id
+    }
+    if priority:
+        transaction_info['priority'] = True
+    if trans_id:
+        transaction_info['transactionId'] = trans_id
+
+    token = helper_create_jwt(jwt, [MHR_ROLE])
+    details: dict = PAY_DETAILS_TRANSFER if not cc else PAY_DETAILS_CC
+    pay_client = SBCPaymentClient(jwt=token, account_id='PS12345', details=details)
+ 
+    # test
+    data = pay_client.create_payment_client_data(transaction_info, client_id)
+    data = pay_client.update_payload_data(data, transaction_info.get("transactionId"))
+    # check
+    assert data
+    assert not data['filingInfo']['filingTypes'][0]['priority']
+    if priority:
+        assert len(data['filingInfo']['filingTypes']) == 2
+        assert data['filingInfo']['filingTypes'][1]['filingTypeCode'] == 'PRIMH'
+        assert data['filingInfo']['filingTypes'][1]['priority']
+    else:
+        assert len(data['filingInfo']['filingTypes']) == 1
+    if trans_id:
+        assert data['filingInfo']['filingIdentifier'] == trans_id
+    else:
+        assert 'filingIdentifier' not in data['filingInfo']
+    if client_id:
+        assert data['filingInfo']['folioNumber'] == client_id
+    else:
+        assert 'folioNumber' not in data['filingInfo']
+    assert data['businessInfo']['corpType'] == 'MHR'
+    if cc:
+        assert data.get("paymentInfo") == CC_REQUEST_PAYMENT_INFO
+    else:
+        assert not data.get("paymentInfo")
+    if transaction_info.get("transactionId"):
+        assert len(data.get("details")) == 2
+        assert data["details"][1].get("value") == trans_id
+    else:
+        assert len(data.get("details")) == 1
+
+
+@pytest.mark.parametrize('trans_type,trans_id,client_id,account_id,priority,cc',
+                         TEST_PAYMENT_DATA_CLIENT)
+def test_client_registration_client_mock(client, jwt, trans_type, trans_id, client_id, account_id, priority, cc):
+    """Assert that a client submitted pay-api client works as expected with the mock service endpoint."""
+    # setup
+    token = helper_create_jwt(jwt, [MHR_ROLE, STAFF_ROLE])
+    details: dict = PAY_DETAILS_TRANSFER if not cc else PAY_DETAILS_CC
+    pay_client = SBCPaymentClient(jwt=token, account_id=account_id, details=details)
+    pay_client.api_url = MOCK_URL_NO_KEY
+    transaction_info = {
+        'transactionType': trans_type,
+        'quantity': 1,
+        'accountId': account_id
+    }
+    if priority:
+        transaction_info['priority'] = True
+    if trans_id:
+        transaction_info['transactionId'] = trans_id
+
+    # test
+    pay_data = pay_client.create_payment_client(transaction_info, client_id)
+
+    # print(pay_data)
+    # check
+    assert pay_data
+    assert pay_data['invoiceId']
+    assert pay_data['receipt']
 
 
 @pytest.mark.parametrize('type,trans_id,client_id,routing_slip,bcol_num,dat_num,waive_fees,priority,cc',

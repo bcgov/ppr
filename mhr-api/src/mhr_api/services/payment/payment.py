@@ -145,3 +145,25 @@ class Payment:
             raise sbc_err
         except Exception as err:  # noqa: B902; wrapping exception
             raise SBCPaymentException(err) from err
+
+    def create_payment_client(self, transaction_info, client_reference_id=None):
+        """Submit a client payment request for the transaction_info.
+
+        Payment info transaction type is one of the Payment TransactionTypes.
+        Client reference ID if present maps to the pay api folio number.
+        Details label and value if they exist will show up on the account transaction report.
+        Payment may hava priority set.
+        Eventually replace create_payment with this function.
+        """
+        try:
+            api_instance = SBCPaymentClient(self.jwt, transaction_info.get("accountId"), self.api_key, self.details)
+            if self.api_url:
+                api_instance.api_url = self.api_url
+            api_response = api_instance.create_payment_client(transaction_info, client_reference_id)
+            logger.debug(api_response)
+            return api_response
+
+        except SBCPaymentException as sbc_err:
+            raise sbc_err
+        except Exception as err:  # noqa: B902; wrapping exception
+            raise SBCPaymentException(err) from err
