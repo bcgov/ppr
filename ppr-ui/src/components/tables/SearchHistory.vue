@@ -5,10 +5,11 @@ import {
   nextTick,
   reactive,
   toRefs,
-  watch
+  watch,
+  onMounted
 } from 'vue'
 import { useStore } from '@/store/store'
-import type { SearchCriteriaIF, SearchResponseIF } from '@/interfaces'
+import type { SearchCriteriaIF, SearchResponseIF, SearchTypeIF } from '@/interfaces'
 import { MHRSearchTypes, searchHistoryTableHeaders, searchHistoryTableHeadersStaff, SearchTypes } from '@/resources'
 import { convertDate } from '@/utils'
 import { searchPDF, submitSelected, successfulPPRResponses } from '@/utils/ppr-api-helper'
@@ -16,14 +17,16 @@ import { searchMhrPDF, delayActions } from '@/utils/mhr-api-helper'
 import { useSearch } from '@/composables/useSearch'
 import { cloneDeep } from 'lodash' // eslint-disable-line
 import _ from 'lodash' // eslint-disable-line
-import { ErrorCategories } from '@/enums'
+import { ErrorCategories, FilterTypes } from '@/enums'
 import { useTableFeatures } from '@/composables'
 import { storeToRefs } from 'pinia'
 import AriaLabel from './AriaLabel.vue'
+import SearchBarList from '@/components/search/SearchBarList.vue'
 
 export default defineComponent({
   components: {
-    AriaLabel
+    AriaLabel,
+    SearchBarList
   },
   props: {
     searchAdded: { type: Boolean, default: false },
@@ -50,6 +53,10 @@ export default defineComponent({
         }
         return tableHeaders
       }),
+      selectedSearchType: null,
+      showDatePicker: false,
+      dateTxt: '',
+      filters: {},
       hasBothRoles: computed((): boolean => {
         return hasPprRole.value && hasMhrRole.value
       }),
@@ -68,6 +75,11 @@ export default defineComponent({
         return !!getSearchHistory.value
       })
     })
+
+    onMounted(() => {
+      resetFilters()
+    })
+
     const { mapMhrSearchType } = useSearch()
     const { sortDates } = useTableFeatures()
     const displayDate = (searchDate: string): string => {
@@ -260,6 +272,26 @@ export default defineComponent({
       }, 300)
     }
 
+    const returnSearchSelection = (selection: SearchTypeIF) => {
+      localState.selectedSearchType = selection
+    }
+
+    const updateDateRange = (dates: { endDate: Date, startDate: Date }) => {
+      if (!(dates.endDate && dates.startDate)) localState.dateTxt = ''
+      else localState.dateTxt = 'Custom'
+      localState.showDatePicker = false
+    }
+    const resetFilters = () => {
+      localState.headers.forEach(header => {
+        if(header.filter) {
+          localState.filters[header.value] = ''
+        }
+      })
+    }
+    const clearFilters = () => {
+      resetFilters()
+    }
+
     /** Scroll to event on added search **/
     watch(() => [props.searchAdded, props.searchAddedId], async () => {
       if (props.searchAdded) {
@@ -274,6 +306,10 @@ export default defineComponent({
         await scrollToAddedSearch(index)
       }
     }, { immediate: true })
+
+    watch(() => localState.filters, (val) => {
+      console.log(localState.filters, "from watch", val)
+    }, {deep: true})
 
     return {
       ...toRefs(localState),
@@ -290,7 +326,11 @@ export default defineComponent({
       refreshRow,
       retrySearch,
       dateSortHandler,
-      goToPay
+      goToPay,
+      returnSearchSelection,
+      updateDateRange,
+      FilterTypes,
+      clearFilters
     }
   }
 })
@@ -303,9 +343,15 @@ export default defineComponent({
   >
     <v-row
       no-gutters
-      class="pt-4"
     >
       <v-col cols="12">
+        <RangeDatePicker
+          v-if="showDatePicker"
+          id="ranged-date-picker"
+          ref="datePicker"
+          @submit="updateDateRange($event)"
+        />
+
         <v-table
           v-if="searchHistory"
           id="search-history-table"
@@ -318,7 +364,7 @@ export default defineComponent({
               <th
                 v-for="header in headers"
                 :key="header.value"
-                class="px-1 py-0 table-header"
+                class="px-1 py-1 table-header"
                 :class="header.class"
               >
               <template v-if="header.value==='matches'">
@@ -336,7 +382,7 @@ export default defineComponent({
                 </v-row>
               </template>
               <template v-else>
-                {{ header.text }}
+                    {{ header.text }}
               </template>
                 <!-- Date Sort Icon/Button -->
                 <SortingIcon
@@ -344,6 +390,76 @@ export default defineComponent({
                   :sort-asc="sortAsc"
                   @sort-event="dateSortHandler(searchHistory, 'searchDateTime', $event)"
                 />
+              </th>
+            </tr>
+            <tr>
+              <th
+                v-for="header in headers"
+                :key="header.value"
+                class="px-1 py-1 table-header"
+                :class="header.class"
+              >
+                <v-row no-gutters class="py-2">
+                  <v-col>
+                    <v-tooltip
+                      text="tooltip text hahaha"
+                      location="bottom"
+                    >
+                      <template v-slot:activator="{props}">
+                        <v-text-field
+                          v-if="header.filter && header.filter.type === FilterTypes.TEXT_FIELD"
+                          v-bind="props"
+                          v-model="filters[header.value]"
+                          variant="filled"
+                          color="primary"
+                          single-line
+                          :hide-details="true"
+                          type="text"
+                          :label="header.filter.text"
+                          density="compact"
+                          clearable
+                          persistent-clear
+                        />
+                        <SearchBarList
+                          v-if="header.filter && header.filter.type === FilterTypes.SELECT"
+                          v-bind="props"
+                          :is-table-filter="true"
+                          :default-selected-search-type="selectedSearchType"
+                          :filter-label="header.filter.text"
+                          @selected="returnSearchSelection($event)"
+                        />
+                        <v-text-field
+                          v-if="header.filter && header.filter.type === FilterTypes.DATE_PICKER"
+                          v-bind="props"
+                          v-model="dateTxt"
+                          append-inner-icon="mdi-calendar"
+                          density="compact"
+                          clearable
+                          variant="filled"
+                          color="primary"
+                          hide-details
+                          :label="header.filter.text"
+                          single-line
+                          persistent-clear
+                          @click="showDatePicker = true"
+                        />  
+                      </template>
+                    </v-tooltip>
+                    <v-btn
+                      v-if="header.value==='pdf'"
+                      class="registration-action ma-0"
+                      color="primary"
+                      :ripple="false"
+                      variant="outlined"
+                      @click="clearFilters()"
+                    >
+                      Clear Filters
+                      <v-icon size="18" class="pl-3 pt-1">
+                        mdi-close
+                      </v-icon>
+                    </v-btn>
+                  </v-col>
+                </v-row>
               </th>
             </tr>
             </thead>
@@ -376,8 +492,10 @@ export default defineComponent({
               <td v-if="header.value==='typeAndRegistry'">
                 <v-row>
                   <AriaLabel :aria-text="header.text" />
-                <span v-if="isPprSearch(item)">Personal Property</span>
-                <span v-else>Manufactured Homes</span>
+                <strong>
+                  <span v-if="isPprSearch(item)">Personal Property</span>
+                  <span v-else>Manufactured Homes</span>
+                </strong>
                 </v-row>
                 <v-row>
                   <AriaLabel :aria-text="header.text" />
@@ -400,7 +518,10 @@ export default defineComponent({
                 <AriaLabel :aria-text="header.text" />
                 {{ item.username }}
               </td>
-              <td v-if="header.value==='matches'">
+              <td
+                v-if="header.value==='matches'"
+                class="matches"
+              >
               <v-row>
                 <v-col
                   class="text-center"
@@ -517,7 +638,6 @@ export default defineComponent({
                       v-else
                       color="primary"
                       size="20"
-                      class="ml-5"
                       v-bind="props"
                       tabindex="0"
                       role="img"
@@ -595,6 +715,12 @@ export default defineComponent({
   font-size: 0.875rem;
 }
 :deep(#search-history-table) {
+  // th {
+  //   height: 5rem;
+  // }
+  :deep(.v-input__control)   {
+    height: 45px;
+  }
   td {
     text-overflow: initial;
     white-space: initial;
@@ -611,6 +737,10 @@ export default defineComponent({
   display: none
 }
 .v-col {
+  padding: 0;
+}
+.matches {
+  background-color: $ghostWhite !important;
   padding: 0;
 }
 </style>

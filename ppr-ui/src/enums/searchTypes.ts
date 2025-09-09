@@ -41,6 +41,12 @@ export enum UIMHRSearchTypeValues {
   MHRSERIAL_NUMBER = 'serialNumber'
 }
 
+export enum FilterTypes {
+  TEXT_FIELD = 'TEXT_FIELD',
+  SELECT = 'SELECT',
+  DATE_PICKER = 'DATE_PICKER'
+}
+
 export const UIMHRSearchTypeMap = {
   [UIMHRSearchTypes.MHRMHR_NUMBER]: UIMHRSearchTypeValues.MHRMHR_NUMBER,
   [UIMHRSearchTypes.MHROWNER_NAME]: UIMHRSearchTypeValues.MHROWNER_NAME,

@@ -1,4 +1,4 @@
-import { APISearchTypes } from '@/enums'
+import { APISearchTypes, FilterTypes } from '@/enums'
 import type { BaseHeaderIF, TableHeadersIF } from '@/interfaces'
 
 export const searchTableHeaders: TableHeadersIF = {
@@ -178,31 +178,51 @@ export const searchHistoryTableHeadersStaff: Array<BaseHeaderIF> = [
     class: 'column-md',
     sortable: false,
     text: 'Search Value',
-    value: 'searchQuery.criteria.value'
+    value: 'searchQuery.criteria.value',
+    filter: {
+      text: 'Search Value',
+      type: FilterTypes.TEXT_FIELD
+    }
   },
   {
     class: 'column-md',
     sortable: false,
     text: 'Search Type or Category',
-    value: 'typeAndRegistry'
+    value: 'typeAndRegistry',
+    filter: {
+      text: 'Search Category',
+      type: FilterTypes.SELECT
+    }
   },
   {
-    class: 'column-sm',
+    class: 'column-mds',
     sortable: false,
     text: 'Folio Number',
-    value: 'searchQuery.clientReferenceId'
+    value: 'searchQuery.clientReferenceId',
+    filter: {
+      text: 'Folio Number',
+      type: FilterTypes.TEXT_FIELD
+    }
   },
   {
     class: 'column-lg',
     sortable: true,
     text: 'Date/Time (Pacific time)',
-    value: 'searchDateTime'
+    value: 'searchDateTime',
+    filter: {
+      text: 'Date',
+      type: FilterTypes.DATE_PICKER
+    }
   },
   {
     class: 'column-mds',
     sortable: false,
     text: 'Username',
-    value: 'username'
+    value: 'username',
+    filter: {
+      text: 'Username',
+      type: FilterTypes.TEXT_FIELD
+    }
   },
   {
     class: 'column-mds text-center',
@@ -211,7 +231,7 @@ export const searchHistoryTableHeadersStaff: Array<BaseHeaderIF> = [
     value: 'pdf'
   },
   {
-    class: 'column-lg text-center',
+    class: 'column-lg text-center matches',
     sortable: false,
     text: 'Matches',
     value: 'matches',
