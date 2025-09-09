@@ -12,7 +12,7 @@
       v-for="header in headers"
       :key="header.value"
     >
-      <td v-if="header.value === 'ownerName.first'">
+      <td v-if="header.value === 'ownerName'">
         {{ getOwnerName(item) }}
       </td>
       <td v-else-if="header.value === 'ownerStatus'">

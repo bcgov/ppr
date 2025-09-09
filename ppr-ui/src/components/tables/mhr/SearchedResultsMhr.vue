@@ -146,7 +146,7 @@
                     @click="sortTable(header.value, header.sortable)"
                   >
                     <span
-                      v-if="header.value === 'ownerName.first'"
+                      v-if="header.value === 'ownerName'"
                       class="pr-2"
                     >
                       {{ ownerOrOrgHeader }} Name
@@ -746,7 +746,13 @@ export default defineComponent({
       const isAsc = header === localState.sortOptions.sortBy 
                               ? !localState.sortOptions.isAsc
                               : false
-      localState.results = orderBy(localState.results, header, isAsc ? 'asc' : 'desc')
+
+      localState.results = orderBy(
+        localState.results, 
+        // if it's ownerName column, sort by full name.
+        header === 'ownerName' ? result => getOwnerName(result) : header, 
+        isAsc ? 'asc' : 'desc'
+      )
       setMhrSearchResultSortOption({
           sortBy: header, 
           isAsc: isAsc

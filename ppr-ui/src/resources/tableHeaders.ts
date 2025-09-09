@@ -546,7 +546,7 @@ export const mhSearchNameHeaders: Array<BaseHeaderIF> = [
     class: 'column-md',
     sortable: true,
     text: 'Owner Name',
-    value: 'ownerName.first'
+    value: 'ownerName'
   },
   {
     class: 'column-mdm',
@@ -627,7 +627,7 @@ export const mhSearchSerialNumberHeaders: Array<BaseHeaderIF> = [
     class: 'column-md',
     sortable: true,
     text: 'Owner Name',
-    value: 'ownerName.first'
+    value: 'ownerName'
   },
   {
     class: 'column-mdm',
@@ -683,7 +683,7 @@ export const mhSearchMhrNumberHeaders: Array<BaseHeaderIF> = [
   {
     class: 'column-mds',
     text: 'Owner Name',
-    value: 'ownerName.first'
+    value: 'ownerName'
   },
   {
     class: 'column-mdm',
@@ -734,7 +734,7 @@ export const mhSearchNameHeadersReview: Array<BaseHeaderIF> = [
     class: 'column-mdl',
     sortable: true,
     text: 'Owner Name',
-    value: 'ownerName.first'
+    value: 'ownerName'
   },
   {
     class: 'column-mds',
@@ -746,7 +746,7 @@ export const mhSearchNameHeadersReview: Array<BaseHeaderIF> = [
     class: 'column-md',
     sortable: true,
     text: 'Year/Make/Model',
-    value: 'baseInformation.make'
+    value: 'baseInformation.year'
   },
   {
     class: 'column-mds',
@@ -785,13 +785,13 @@ export const mhSearchSerialNumberHeadersReview: Array<BaseHeaderIF> = [
     class: 'column-md',
     sortable: true,
     text: 'Owner Name',
-    value: 'ownerName.first'
+    value: 'ownerName'
   },
   {
     class: 'column-md',
     sortable: true,
     text: 'Year/Make/Model',
-    value: 'baseInformation.make'
+    value: 'baseInformation.year'
   },
   {
     class: 'column-mds',
@@ -818,13 +818,13 @@ export const mhSearchMhrNumberHeadersReview: Array<BaseHeaderIF> = [
     class: 'column-md',
     sortable: true,
     text: 'Owner Name',
-    value: 'ownerName.first'
+    value: 'ownerName'
   },
   {
     class: 'column-md',
     sortable: true,
     text: 'Year/Make/Model',
-    value: 'baseInformation.make'
+    value: 'baseInformation.year'
   },
   {
     class: 'column-mds',
