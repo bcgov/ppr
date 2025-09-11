@@ -188,7 +188,7 @@ export const searchHistoryTableHeadersStaff: Array<BaseHeaderIF> = [
     class: 'column-md',
     sortable: false,
     text: 'Search Type or Category',
-    value: 'typeAndRegistry',
+    value: 'searchQuery.type',
     filter: {
       text: 'Search Category',
       type: FilterTypes.SELECT
@@ -225,7 +225,7 @@ export const searchHistoryTableHeadersStaff: Array<BaseHeaderIF> = [
     }
   },
   {
-    class: 'column-mds text-center',
+    class: 'column-md text-center',
     sortable: false,
     text: 'Download Report',
     value: 'pdf'

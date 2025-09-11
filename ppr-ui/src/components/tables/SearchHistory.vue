@@ -11,8 +11,8 @@ import {
 import { useStore } from '@/store/store'
 import type { SearchCriteriaIF, SearchResponseIF, SearchTypeIF } from '@/interfaces'
 import { MHRSearchTypes, searchHistoryTableHeaders, searchHistoryTableHeadersStaff, SearchTypes } from '@/resources'
-import { convertDate } from '@/utils'
-import { searchPDF, submitSelected, successfulPPRResponses } from '@/utils/ppr-api-helper'
+import { convertDate, dateToYyyyMmDd, convertDateToLongFormat } from '@/utils'
+import { searchPDF, searchHistory, submitSelected, successfulPPRResponses } from '@/utils/ppr-api-helper'
 import { searchMhrPDF, delayActions } from '@/utils/mhr-api-helper'
 import { useSearch } from '@/composables/useSearch'
 import { cloneDeep } from 'lodash' // eslint-disable-line
@@ -35,6 +35,11 @@ export default defineComponent({
   emits: ['error', 'retry'],
   setup (props, { emit }) {
     const { goToPay } = useNavigation()
+    const {
+      // Actions
+      setSearchHistory
+    } = useStore()
+
     const {
       getSearchHistory,
       getUserUsername,
@@ -73,6 +78,9 @@ export default defineComponent({
       ),
       isSearchHistory: computed((): boolean => {
         return !!getSearchHistory.value
+      }),
+      tableFiltersActive: computed((): boolean => {
+        return Object.values(localState.filters).some(v => !!v)
       })
     })
 
@@ -231,6 +239,22 @@ export default defineComponent({
         'icon to see if your PDF is ready to download. </p>' +
         'Note: Large documents may take up to 20 minutes to generate.'
     }
+    const getTooltipTxt = (header: string): string => {
+      if(header === 'searchDateTime'){
+        return `
+          ${convertDateToLongFormat(localState.filters['startDate'])}
+           - ${convertDateToLongFormat(localState.filters['endDate'])}
+        `
+      } else if (header == 'searchQuery.type') {
+        return localState.filters[header] ? localState.filters[header].searchTypeUI : ''
+      }
+      return localState.filters[header]
+    }
+    const showTooltip = (header: string): boolean => {
+      return header === 'searchDateTime' 
+      ? !!localState.filters['startDate']
+      :!!localState.filters[header]
+    }
     const isPDFAvailable = (item: SearchResponseIF): boolean => {
       const now = new Date()
       const nowDate = new Date(now.toDateString())
@@ -272,21 +296,38 @@ export default defineComponent({
       }, 300)
     }
 
-    const returnSearchSelection = (selection: SearchTypeIF) => {
-      localState.selectedSearchType = selection
+    const returnSearchSelection = (header: string, selection: SearchTypeIF) => {
+      localState.filters[header] = selection
     }
 
     const updateDateRange = (dates: { endDate: Date, startDate: Date }) => {
-      if (!(dates.endDate && dates.startDate)) localState.dateTxt = ''
-      else localState.dateTxt = 'Custom'
+      if (!(dates.endDate && dates.startDate)) {
+        localState.dateTxt = ''
+        localState.filters['startDate'] = ''
+        localState.filters['endDate'] = ''
+      }
+      else {
+        localState.dateTxt = 'Custom'
+
+        localState.filters['startDate'] = dateToYyyyMmDd(dates.startDate)
+        localState.filters['endDate'] = dateToYyyyMmDd(dates.endDate)
+      }
       localState.showDatePicker = false
     }
     const resetFilters = () => {
       localState.headers.forEach(header => {
         if(header.filter) {
-          localState.filters[header.value] = ''
+          if(header.value === 'searchDateTime') {
+            localState.filters['startDate'] = ''
+            localState.filters['endDate'] = ''
+          } else if (header.filter.type === FilterTypes.SELECT) {
+            localState.filters[header.value] = null
+          }else {
+            localState.filters[header.value] = ''
+          }
         }
       })
+      localState.dateTxt =  ''
     }
     const clearFilters = () => {
       resetFilters()
@@ -307,9 +348,14 @@ export default defineComponent({
       }
     }, { immediate: true })
 
-    watch(() => localState.filters, (val) => {
-      console.log(localState.filters, "from watch", val)
-    }, {deep: true})
+    watch(() => localState.filters, async () => {
+      const resp = await searchHistory(localState.filters)
+      if (!resp || resp?.error) {
+        setSearchHistory(null)
+      } else {
+        setSearchHistory(resp?.searches)
+      }
+    }, {deep: true, immediate: false})
 
     return {
       ...toRefs(localState),
@@ -320,6 +366,8 @@ export default defineComponent({
       downloadPDF,
       generateReport,
       getTooltipTxtPdf,
+      getTooltipTxt,
+      showTooltip,
       isPDFAvailable,
       isPprSearch,
       isSearchOwner,
@@ -330,7 +378,7 @@ export default defineComponent({
       returnSearchSelection,
       updateDateRange,
       FilterTypes,
-      clearFilters
+      clearFilters,
     }
   }
 })
@@ -402,13 +450,12 @@ export default defineComponent({
                 <v-row no-gutters class="py-2">
                   <v-col>
                     <v-tooltip
-                      text="tooltip text hahaha"
                       location="bottom"
+                      :disabled="!showTooltip(header.value)"
                     >
-                      <template v-slot:activator="{props}">
+                      <template #activator="{props}">
                         <v-text-field
                           v-if="header.filter && header.filter.type === FilterTypes.TEXT_FIELD"
-                          v-bind="props"
                           v-model="filters[header.value]"
                           variant="filled"
                           color="primary"
@@ -419,18 +466,18 @@ export default defineComponent({
                           density="compact"
                           clearable
                           persistent-clear
+                          v-bind="props"
                         />
                         <SearchBarList
                           v-if="header.filter && header.filter.type === FilterTypes.SELECT"
-                          v-bind="props"
                           :is-table-filter="true"
-                          :default-selected-search-type="selectedSearchType"
+                          :default-selected-search-type="filters[header.value]"
                           :filter-label="header.filter.text"
-                          @selected="returnSearchSelection($event)"
+                          v-bind="props"
+                          @selected="returnSearchSelection(header.value, $event)"
                         />
                         <v-text-field
                           v-if="header.filter && header.filter.type === FilterTypes.DATE_PICKER"
-                          v-bind="props"
                           v-model="dateTxt"
                           append-inner-icon="mdi-calendar"
                           density="compact"
@@ -441,12 +488,14 @@ export default defineComponent({
                           :label="header.filter.text"
                           single-line
                           persistent-clear
+                          v-bind="props"
                           @click="showDatePicker = true"
                         />  
                       </template>
+                      <span>{{ getTooltipTxt(header.value)}}</span>
                     </v-tooltip>
                     <v-btn
-                      v-if="header.value==='pdf'"
+                      v-if="header.value==='pdf' && tableFiltersActive"
                       class="registration-action ma-0"
                       color="primary"
                       :ripple="false"
@@ -489,7 +538,7 @@ export default defineComponent({
                 <span class="pl-2" aria-hidden="true">{{ displaySearchValue(item.searchQuery) }}</span>
               </td>
               <!-- Search Type or Category -->
-              <td v-if="header.value==='typeAndRegistry'">
+              <td v-if="header.value==='searchQuery.type'">
                 <v-row>
                   <AriaLabel :aria-text="header.text" />
                 <strong>

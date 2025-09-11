@@ -74,7 +74,7 @@
   </v-select>
 </template>
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, nextTick } from 'vue'
+import { computed, defineComponent, defineExpose, reactive, ref, toRefs, nextTick, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { MHRSearchTypes, SearchTypes } from '@/resources'
 import { APISearchTypes, UISearchTypes, FilterTypes } from '@/enums'
@@ -208,12 +208,17 @@ export default defineComponent({
         localState.displayGroup = { 1: false, 2: false }
       }
     }
-
     const clear = () => {
       localState.selectedSearchType = null
       emit('selected', null)
     }
 
+    watch(() => props.defaultSelectedSearchType, () => {
+      localState.selectedSearchType = props.defaultSelectedSearchType
+    })
+    defineExpose({
+      clear,
+    })
     return {
       updateSelections,
       searchSelect,

@@ -14,6 +14,7 @@ import type {
   SearchCriteriaIF,
   SearchResponseIF,
   SearchResultIF,
+  SearchHistoryFilterIF,
   UserSettingsIF,
   SearchPartyIF,
   DebtorNameIF,
@@ -49,7 +50,12 @@ const UIFilterToApiFilter = {
   regNum: 'registrationNumber',
   regType: 'registrationType',
   startDate: 'startDateTime',
-  status: 'statusType'
+  status: 'statusType',
+  // Search history table
+  'searchQuery.criteria.value': 'criteria',
+  'searchQuery.type': 'type',
+  'searchQuery.clientReferenceId': 'clientReferenceId',
+  username: 'username'
 }
 
 // add sorting params for registration history/draft api calls
@@ -98,6 +104,31 @@ function addSortParams (url: string, sortOptions: RegistrationSortIF): string {
     }
   }
   return url
+}
+
+const getSearchHistoryQueryString = (filters: SearchHistoryFilterIF) => {
+  const sanitizedOptions: Record<string, any> = {};
+
+  for (const [uiKey, value] of Object.entries(filters)) {
+    let finalValue: any
+
+    if (uiKey === 'searchQuery.type') {
+      finalValue = value?.searchTypeAPI.replace(/-/g, "_")
+    } else {
+      finalValue = value
+    }
+
+    // skip empty, null, or undefined values
+    if (finalValue !== undefined && finalValue !== null && finalValue !== '') {
+      const apiKey = UIFilterToApiFilter[uiKey]
+      if (apiKey) {
+        sanitizedOptions[apiKey] = finalValue;
+      }
+    }
+  }
+  const queryString = new URLSearchParams(sanitizedOptions).toString();
+
+  return `&${queryString}&sortCriteriaName=searchDateTime&sortDirection=ascending`;
 }
 
 // Create default request base URL and headers.
@@ -330,11 +361,15 @@ export async function searchPDF (searchId: string): Promise<any> {
 }
 
 // Get user search history
-export async function searchHistory (): Promise<SearchHistoryResponseIF> {
+export async function searchHistory (filters: SearchHistoryFilterIF): Promise<SearchHistoryResponseIF> {
+  let queryString = ''
+  if (filters && Object.keys(filters).length > 0) {
+     queryString = getSearchHistoryQueryString(filters)
+  }
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
   return axios
-    .get<Array<SearchResponseIF>>('search-history?from_ui=true', config)
+    .get<Array<SearchResponseIF>>(`search-history?from_ui=true${queryString}`, config)
     .then(response => {
       const data = response?.data
       if (!data) {
