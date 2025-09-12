@@ -37,11 +37,13 @@ export default defineComponent({
     const { goToPay } = useNavigation()
     const {
       // Actions
-      setSearchHistory
+      setSearchHistory,
+      setIsSearchHistoryFiltering
     } = useStore()
 
     const {
       getSearchHistory,
+      getIsSearchHistoryFiltering,
       getUserUsername,
       isRoleStaff,
       hasPprRole,
@@ -61,6 +63,7 @@ export default defineComponent({
       selectedSearchType: null,
       showDatePicker: false,
       dateTxt: '',
+      isLoading: false,
       filters: {},
       hasBothRoles: computed((): boolean => {
         return hasPprRole.value && hasMhrRole.value
@@ -348,14 +351,65 @@ export default defineComponent({
       }
     }, { immediate: true })
 
-    watch(() => localState.filters, async () => {
-      const resp = await searchHistory(localState.filters)
-      if (!resp || resp?.error) {
-        setSearchHistory(null)
-      } else {
-        setSearchHistory(resp?.searches)
-      }
-    }, {deep: true, immediate: false})
+    /**
+     * - Determines whether API call should be triggered
+     * - Skips initial mount and unnecessary cases
+     */
+    watch(
+      () => ({ ...localState.filters }),
+      async (newFilters, oldFilters) => {
+        // Skip on initial load (oldFilters is empty object)
+        if (Object.keys(oldFilters).length === 0) {
+          return
+        }
+
+        // Find which filters have changed
+        const changedFilters = Object.keys(newFilters).filter(
+          key => newFilters[key] !== oldFilters[key]
+        )
+
+        // Multiple filters cleared at once
+        if (changedFilters.length > 1) {
+          setIsSearchHistoryFiltering(true)
+        } else {
+          // Single filter change
+          const changedKey = changedFilters[0]
+          // If the changed filter is an input field
+          if (
+            ['searchQuery.criteria.value', 'searchQuery.clientReferenceId', 'username']
+              .includes(changedKey)
+          ) {
+            if (!newFilters[changedKey]) {
+              // Input cleared individually
+              setIsSearchHistoryFiltering(true)
+            } else if ([1, 2, 3].includes(newFilters[changedKey].length)) {
+              // Ignore short input (1–3 chars) to avoid unnecessary API calls
+              return
+            } else {
+              // Valid input length
+              setIsSearchHistoryFiltering(true)
+            }
+          } else {
+            // Non-input filter always triggers
+            setIsSearchHistoryFiltering(true)
+          }
+        }
+
+        // Finally, call API if conditions are met
+        if (getIsSearchHistoryFiltering) {
+          localState.isLoading = true
+          const resp = await searchHistory(newFilters)
+          if (!resp || resp?.error) {
+            setSearchHistory(null)
+          } else {
+
+            setSearchHistory(resp?.searches)
+          }
+          localState.isLoading = false
+        }
+      },
+      { deep: true, immediate: false }
+    )
 
     return {
       ...toRefs(localState),
@@ -500,6 +554,7 @@ export default defineComponent({
                       color="primary"
                       :ripple="false"
                       variant="outlined"
+                      :disabled="isLoading"
                       @click="clearFilters()"
                     >
                       Clear Filters
@@ -512,7 +567,17 @@ export default defineComponent({
               </th>
             </tr>
             </thead>
-
+            <tr v-if="isLoading">
+              <td
+                class="text-center"
+                :colspan="headers.length"
+              >
+                <v-progress-linear
+                  indeterminate
+                  color="primary"
+                />
+              </td>
+            </tr>
             <tbody v-if="searchHistory.length > 0">
             <tr
               v-for="(item, index) in searchHistory"

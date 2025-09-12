@@ -145,7 +145,9 @@ export const stateModel: StateModelIF = {
     searchedType: null,
     searchedValue: '',
     searching: false,
-    searchCertified: false
+    searchCertified: false,
+    // Use this flag to avoid the first item being colored green
+    IsSearchHistoryFiltering: false
   },
   selectedManufacturedHomes: [],
   isStaffClientPayment: false,

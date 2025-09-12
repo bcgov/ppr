@@ -121,56 +121,55 @@ export const searchHistoryTableHeaders: Array<BaseHeaderIF> = [
     class: 'column-md',
     sortable: false,
     text: 'Search Value',
-    value: 'searchQuery.criteria.value'
+    value: 'searchQuery.criteria.value',
+    filter: {
+      text: 'Search Value',
+      type: FilterTypes.TEXT_FIELD
+    }
   },
   {
     class: 'column-md',
     sortable: false,
-    text: 'Type',
-    value: 'UISearchType'
+    text: 'Search Type or Category',
+    value: 'searchQuery.type',
+    filter: {
+      text: 'Search Category',
+      type: FilterTypes.SELECT
+    }
   },
   {
-    class: 'column-md',
-    sortable: false,
-    text: 'Registry',
-    value: 'registry'
-  },
-  {
-    class: 'column-mdl',
+    class: 'column-lg',
     sortable: true,
     text: 'Date/Time (Pacific time)',
-    value: 'searchDateTime'
+    value: 'searchDateTime',
+    filter: {
+      text: 'Date',
+      type: FilterTypes.DATE_PICKER
+    }
   },
   {
-    class: 'column-sm',
+    class: 'column-mds',
     sortable: false,
     text: 'Folio',
-    value: 'searchQuery.clientReferenceId'
+    value: 'searchQuery.clientReferenceId',
+    filter: {
+      text: 'Folio',
+      type: FilterTypes.TEXT_FIELD
+    }
   },
   {
-    class: 'column-sm text-center',
-    sortable: false,
-    text: 'Matches Found',
-    value: 'totalResultsSize'
-  },
-  {
-    class: 'column-sm text-center',
-    sortable: false,
-    text: 'Exact Matches',
-    value: 'exactResultsSize'
-  },
-  {
-    class: 'column-sm text-center',
-    sortable: false,
-    text: 'Matches Selected',
-    value: 'selectedResultsSize'
-  },
-  {
-    class: 'column-mds text-center',
+    class: 'column-md text-center',
     sortable: false,
     text: 'Download Report',
     value: 'pdf'
-  }
+  },
+  {
+    class: 'column-lg text-center matches',
+    sortable: false,
+    text: 'Matches',
+    value: 'matches',
+    subHeaders: ['Found', 'Exact', 'Selected']
+  } 
 ]
 
 export const searchHistoryTableHeadersStaff: Array<BaseHeaderIF> = [
@@ -236,7 +235,7 @@ export const searchHistoryTableHeadersStaff: Array<BaseHeaderIF> = [
     text: 'Matches',
     value: 'matches',
     subHeaders: ['Found', 'Exact', 'Selected']
-  } 
+  }
 ]
 
 export const vehicleTableHeaders: Array<BaseHeaderIF> = [

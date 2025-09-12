@@ -333,6 +333,9 @@ export const useStore = defineStore('assetsStore', () => {
   const getSearchHistory = computed<SearchResponseIF[]>(() => {
     return state.value.search.searchHistory
   })
+  const getIsSearchHistoryFiltering = computed<boolean>(() => {
+    return state.value.search.IsSearchHistoryFiltering
+  })
   const getSearchHistoryLength = computed<number>((): number => {
     return state.value.search.searchHistoryLength
   })
@@ -1168,6 +1171,10 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.search.searchHistoryLength = searchHistory?.length || 0
   }
 
+  function setIsSearchHistoryFiltering(isLoading: boolean) {
+    state.value.search.IsSearchHistoryFiltering = isLoading
+  }
+
   function setSearchResults (searchResults: SearchResponseIF) {
     state.value.search.searchResults = searchResults
   }
@@ -1669,6 +1676,7 @@ export const useStore = defineStore('assetsStore', () => {
     getSearchedType,
     getSearchedValue,
     getSearchHistory,
+    getIsSearchHistoryFiltering,
     getSearchHistoryLength,
 
     // Vehicle Collateral getter
@@ -1830,6 +1838,7 @@ export const useStore = defineStore('assetsStore', () => {
     setRegistrationTypeOtherDesc,
     setSearchDebtorName,
     setSearchHistory,
+    setIsSearchHistoryFiltering,
     setSearchResults,
     setManufacturedHomeSearchResults,
     setSelectedManufacturedHomes,

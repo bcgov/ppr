@@ -86,7 +86,8 @@ export interface StateModelIF {
     searchedType: SearchTypeIF
     searchedValue: string
     searching: boolean
-    searchCertified: boolean
+    searchCertified: boolean,
+    IsSearchHistoryFiltering: boolean
   }
   selectedManufacturedHomes: ManufacturedHomeSearchResultIF[]
   isStaffClientPayment: boolean
