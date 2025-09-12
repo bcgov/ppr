@@ -302,6 +302,7 @@ export default defineComponent({
       setCurrentRegistrationsTab,
       setRegTableNewItem,
       setSearchHistory,
+      setIsSearchHistoryFiltering,
       setSearchResults,
       setMhrDraftNumber,
       setMhrGenerateDocId,
@@ -325,6 +326,7 @@ export default defineComponent({
       getUserSettings,
       getAccountId,
       getSearchHistory,
+      getIsSearchHistoryFiltering,
       getUserServiceFee,
       getRegTableBaseRegs,
       getRegTableDraftsBaseReg,
@@ -428,6 +430,8 @@ export default defineComponent({
         setSearchHistory(null)
       } else {
         setSearchHistory(resp?.searches)
+
+        setIsSearchHistoryFiltering(false)
       }
     }
 
@@ -599,12 +603,16 @@ export default defineComponent({
       localState.snackbarMsg = 'Your search was successfully added to your table.'
       localState.toggleSnackbar = !localState.toggleSnackbar
       if (searchId) localState.searchAddedId = searchId
-      else localState.toggleSearchAdded = !localState.toggleSearchAdded
+      else{
+        if(!getIsSearchHistoryFiltering) localState.toggleSearchAdded = !localState.toggleSearchAdded
+      }
 
       // Remove search added styling after timeout
       setTimeout(() => {
         if (searchId) localState.searchAddedId = ''
-        else localState.toggleSearchAdded = !localState.toggleSearchAdded
+        else {
+          if(!getIsSearchHistoryFiltering) localState.toggleSearchAdded = !localState.toggleSearchAdded
+        }
       }, 5000)
     }
 

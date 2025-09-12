@@ -5,7 +5,7 @@
     v-model="selectedSearchType"
     class="search-bar-type-select"
     :class="{ 'wide-menu' : !isSingleSearchOption }"
-    :error-messages="categoryMessage ? categoryMessage : ''"
+    
     variant="filled"
     color="primary"
     :items="optionsList"
@@ -13,10 +13,15 @@
     item-value="searchTypeAPI"
     :label="searchTypeLabel"
     return-object
+    :density="isTableFilter ? 'compact' : 'default'"
+    :clearable="isTableFilter"
+    :persistent-clear="isTableFilter"
+    :single-line="isTableFilter"
     :menu-props="isSingleSearchOption
       ? { bottom: true, offsetY: true }
       : { maxHeight: 400, offset: -55 }"
     @focus="updateSelections()"
+    @click:clear="clear()"
   >
     <template #item="{ props, item }">
       <!-- Grouped List Items -->
@@ -69,10 +74,10 @@
   </v-select>
 </template>
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, nextTick } from 'vue'
+import { computed, defineComponent, reactive, ref, toRefs, nextTick, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { MHRSearchTypes, SearchTypes } from '@/resources'
-import { APISearchTypes, UISearchTypes } from '@/enums'
+import { APISearchTypes, UISearchTypes, FilterTypes } from '@/enums'
 import type { SearchTypeIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
 
@@ -84,6 +89,14 @@ export default defineComponent({
       default: () => {}
     },
     defaultCategoryMessage: {
+      type: String,
+      default: ''
+    },
+    isTableFilter: {
+      type: Boolean,
+      default: false
+    },
+    filterLabel: {
       type: String,
       default: ''
     }
@@ -111,6 +124,9 @@ export default defineComponent({
         return props.defaultCategoryMessage
       }),
       searchTypeLabel: computed((): string => {
+        if (props.isTableFilter) {
+          return props.filterLabel
+        }
         if (!localState.selectedSearchType) {
           return 'Select a search category'
         }
@@ -192,13 +208,21 @@ export default defineComponent({
         localState.displayGroup = { 1: false, 2: false }
       }
     }
+    const clear = () => {
+      localState.selectedSearchType = null
+      emit('selected', null)
+    }
 
+    watch(() => props.defaultSelectedSearchType, () => {
+      localState.selectedSearchType = props.defaultSelectedSearchType
+    })
     return {
       updateSelections,
       searchSelect,
       mhrSearchHeaderRef,
       selectSearchType,
       toggleGroup,
+      clear,
       ...toRefs(localState)
     }
   }
@@ -218,5 +242,8 @@ export default defineComponent({
 }
 :deep(.search-list-header-row:hover) {
   cursor: pointer!important;
+}
+:deep(#search-select-messages) {
+  display: none;
 }
 </style>

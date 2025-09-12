@@ -5,22 +5,29 @@ import {
   nextTick,
   reactive,
   toRefs,
-  watch
+  watch,
+  onMounted
 } from 'vue'
 import { useStore } from '@/store/store'
-import type { SearchCriteriaIF, SearchResponseIF } from '@/interfaces'
+import type { SearchCriteriaIF, SearchResponseIF, SearchTypeIF } from '@/interfaces'
 import { MHRSearchTypes, searchHistoryTableHeaders, searchHistoryTableHeadersStaff, SearchTypes } from '@/resources'
-import { convertDate } from '@/utils'
-import { searchPDF, submitSelected, successfulPPRResponses } from '@/utils/ppr-api-helper'
+import { convertDate, dateToYyyyMmDd, convertDateToLongFormat } from '@/utils'
+import { searchPDF, searchHistory, submitSelected, successfulPPRResponses } from '@/utils/ppr-api-helper'
 import { searchMhrPDF, delayActions } from '@/utils/mhr-api-helper'
 import { useSearch } from '@/composables/useSearch'
 import { cloneDeep } from 'lodash' // eslint-disable-line
 import _ from 'lodash' // eslint-disable-line
-import { ErrorCategories } from '@/enums'
+import { ErrorCategories, FilterTypes } from '@/enums'
 import { useTableFeatures } from '@/composables'
 import { storeToRefs } from 'pinia'
+import AriaLabel from './AriaLabel.vue'
+import SearchBarList from '@/components/search/SearchBarList.vue'
 
 export default defineComponent({
+  components: {
+    AriaLabel,
+    SearchBarList
+  },
   props: {
     searchAdded: { type: Boolean, default: false },
     searchAddedId: { type: String, default: '' }
@@ -29,7 +36,14 @@ export default defineComponent({
   setup (props, { emit }) {
     const { goToPay } = useNavigation()
     const {
+      // Actions
+      setSearchHistory,
+      setIsSearchHistoryFiltering
+    } = useStore()
+
+    const {
       getSearchHistory,
+      getIsSearchHistoryFiltering,
       getUserUsername,
       isRoleStaff,
       hasPprRole,
@@ -46,6 +60,11 @@ export default defineComponent({
         }
         return tableHeaders
       }),
+      selectedSearchType: null,
+      showDatePicker: false,
+      dateTxt: '',
+      isLoading: false,
+      filters: {},
       hasBothRoles: computed((): boolean => {
         return hasPprRole.value && hasMhrRole.value
       }),
@@ -62,8 +81,16 @@ export default defineComponent({
       ),
       isSearchHistory: computed((): boolean => {
         return !!getSearchHistory.value
+      }),
+      tableFiltersActive: computed((): boolean => {
+        return Object.values(localState.filters).some(v => !!v)
       })
     })
+
+    onMounted(() => {
+      resetFilters()
+    })
+
     const { mapMhrSearchType } = useSearch()
     const { sortDates } = useTableFeatures()
     const displayDate = (searchDate: string): string => {
@@ -215,6 +242,22 @@ export default defineComponent({
         'icon to see if your PDF is ready to download. </p>' +
         'Note: Large documents may take up to 20 minutes to generate.'
     }
+    const getTooltipTxt = (header: string): string => {
+      if(header === 'searchDateTime'){
+        return `
+          ${convertDateToLongFormat(localState.filters['startDate'])}
+           - ${convertDateToLongFormat(localState.filters['endDate'])}
+        `
+      } else if (header == 'searchQuery.type') {
+        return localState.filters[header] ? localState.filters[header].searchTypeUI : ''
+      }
+      return localState.filters[header]
+    }
+    const showTooltip = (header: string): boolean => {
+      return header === 'searchDateTime' 
+      ? !!localState.filters['startDate']
+      :!!localState.filters[header]
+    }
     const isPDFAvailable = (item: SearchResponseIF): boolean => {
       const now = new Date()
       const nowDate = new Date(now.toDateString())
@@ -256,6 +299,43 @@ export default defineComponent({
       }, 300)
     }
 
+    const returnSearchSelection = (header: string, selection: SearchTypeIF) => {
+      localState.filters[header] = selection
+    }
+
+    const updateDateRange = (dates: { endDate: Date, startDate: Date }) => {
+      if (!(dates.endDate && dates.startDate)) {
+        localState.dateTxt = ''
+        localState.filters['startDate'] = ''
+        localState.filters['endDate'] = ''
+      }
+      else {
+        localState.dateTxt = 'Custom'
+
+        localState.filters['startDate'] = dateToYyyyMmDd(dates.startDate)
+        localState.filters['endDate'] = dateToYyyyMmDd(dates.endDate)
+      }
+      localState.showDatePicker = false
+    }
+    const resetFilters = () => {
+      localState.headers.forEach(header => {
+        if(header.filter) {
+          if(header.value === 'searchDateTime') {
+            localState.filters['startDate'] = ''
+            localState.filters['endDate'] = ''
+          } else if (header.filter.type === FilterTypes.SELECT) {
+            localState.filters[header.value] = null
+          }else {
+            localState.filters[header.value] = ''
+          }
+        }
+      })
+      localState.dateTxt =  ''
+    }
+    const clearFilters = () => {
+      resetFilters()
+    }
+
     /** Scroll to event on added search **/
     watch(() => [props.searchAdded, props.searchAddedId], async () => {
       if (props.searchAdded) {
@@ -271,6 +351,66 @@ export default defineComponent({
       }
     }, { immediate: true })
 
+    /**
+     * - Determines whether API call should be triggered
+     * - Skips initial mount and unnecessary cases
+     */
+    watch(
+      () => ({ ...localState.filters }),
+      async (newFilters, oldFilters) => {
+        // Skip on initial load (oldFilters is empty object)
+        if (Object.keys(oldFilters).length === 0) {
+          return
+        }
+
+        // Find which filters have changed
+        const changedFilters = Object.keys(newFilters).filter(
+          key => newFilters[key] !== oldFilters[key]
+        )
+
+        // Multiple filters cleared at once
+        if (changedFilters.length > 1) {
+          setIsSearchHistoryFiltering(true)
+        } else {
+          // Single filter change
+          const changedKey = changedFilters[0]
+          // If the changed filter is an input field
+          if (
+            ['searchQuery.criteria.value', 'searchQuery.clientReferenceId', 'username']
+              .includes(changedKey)
+          ) {
+            if (!newFilters[changedKey]) {
+              // Input cleared individually
+              setIsSearchHistoryFiltering(true)
+            } else if ([1, 2, 3].includes(newFilters[changedKey].length)) {
+              // Ignore short input (1–3 chars) to avoid unnecessary API calls
+              return
+            } else {
+              // Valid input length
+              setIsSearchHistoryFiltering(true)
+            }
+          } else {
+            // Non-input filter always triggers
+            setIsSearchHistoryFiltering(true)
+          }
+        }
+
+        // Finally, call API if conditions are met
+        if (getIsSearchHistoryFiltering) {
+          localState.isLoading = true
+          const resp = await searchHistory(newFilters)
+          if (!resp || resp?.error) {
+            setSearchHistory(null)
+          } else {
+
+            setSearchHistory(resp?.searches)
+          }
+          localState.isLoading = false
+        }
+      },
+      { deep: true, immediate: false }
+    )
+
     return {
       ...toRefs(localState),
       displayDate,
@@ -280,13 +420,19 @@ export default defineComponent({
       downloadPDF,
       generateReport,
       getTooltipTxtPdf,
+      getTooltipTxt,
+      showTooltip,
       isPDFAvailable,
       isPprSearch,
       isSearchOwner,
       refreshRow,
       retrySearch,
       dateSortHandler,
-      goToPay
+      goToPay,
+      returnSearchSelection,
+      updateDateRange,
+      FilterTypes,
+      clearFilters,
     }
   }
 })
@@ -299,9 +445,15 @@ export default defineComponent({
   >
     <v-row
       no-gutters
-      class="pt-4"
     >
       <v-col cols="12">
+        <RangeDatePicker
+          v-if="showDatePicker"
+          id="ranged-date-picker"
+          ref="datePicker"
+          @submit="updateDateRange($event)"
+        />
+
         <v-table
           v-if="searchHistory"
           id="search-history-table"
@@ -314,10 +466,26 @@ export default defineComponent({
               <th
                 v-for="header in headers"
                 :key="header.value"
-                class="px-1 py-0 table-header"
+                class="px-1 py-1 table-header"
                 :class="header.class"
               >
-                {{ header.text }}
+              <template v-if="header.value==='matches'">
+                <v-row>
+                  <v-col>{{header.text}}</v-col>
+                </v-row>
+                <v-row>
+                  <v-col
+                    v-for="subHeader in header.subHeaders"
+                    :key="subHeader"
+                    class="font-light"
+                  >
+                    {{ subHeader }}
+                  </v-col>
+                </v-row>
+              </template>
+              <template v-else>
+                    {{ header.text }}
+              </template>
                 <!-- Date Sort Icon/Button -->
                 <SortingIcon
                   v-if="header.sortable"
@@ -326,15 +494,102 @@ export default defineComponent({
                 />
               </th>
             </tr>
+            <tr>
+              <th
+                v-for="header in headers"
+                :key="header.value"
+                class="px-1 py-1 table-header"
+                :class="header.class"
+              >
+                <v-row no-gutters class="py-2">
+                  <v-col>
+                    <v-tooltip
+                      location="bottom"
+                      :disabled="!showTooltip(header.value)"
+                    >
+                      <template #activator="{props}">
+                        <v-text-field
+                          v-if="header.filter && header.filter.type === FilterTypes.TEXT_FIELD"
+                          v-model="filters[header.value]"
+                          variant="filled"
+                          color="primary"
+                          single-line
+                          :hide-details="true"
+                          type="text"
+                          :label="header.filter.text"
+                          density="compact"
+                          clearable
+                          persistent-clear
+                          v-bind="props"
+                        />
+                        <SearchBarList
+                          v-if="header.filter && header.filter.type === FilterTypes.SELECT"
+                          :is-table-filter="true"
+                          :default-selected-search-type="filters[header.value]"
+                          :filter-label="header.filter.text"
+                          v-bind="props"
+                          @selected="returnSearchSelection(header.value, $event)"
+                        />
+                        <v-text-field
+                          v-if="header.filter && header.filter.type === FilterTypes.DATE_PICKER"
+                          v-model="dateTxt"
+                          append-inner-icon="mdi-calendar"
+                          density="compact"
+                          clearable
+                          variant="filled"
+                          color="primary"
+                          hide-details
+                          :label="header.filter.text"
+                          single-line
+                          persistent-clear
+                          v-bind="props"
+                          @click="showDatePicker = true"
+                        />  
+                      </template>
+                      <span>{{ getTooltipTxt(header.value)}}</span>
+                    </v-tooltip>
+                    <v-btn
+                      v-if="header.value==='pdf' && tableFiltersActive"
+                      class="registration-action ma-0"
+                      color="primary"
+                      :ripple="false"
+                      variant="outlined"
+                      :disabled="isLoading"
+                      @click="clearFilters()"
+                    >
+                      Clear Filters
+                      <v-icon size="18" class="pl-3 pt-1">
+                        mdi-close
+                      </v-icon>
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </th>
+            </tr>
             </thead>
-
+            <tr v-if="isLoading">
+              <td
+                class="text-center"
+                :colspan="headers.length"
+              >
+                <v-progress-linear
+                  indeterminate
+                  color="primary"
+                />
+              </td>
+            </tr>
             <tbody v-if="searchHistory.length > 0">
             <tr
               v-for="(item, index) in searchHistory"
               :key="item.searchId"
               :class="{ 'added-search-effect': ((searchAdded && index === 0) || (item.searchId === searchAddedId)) }"
             >
-              <td>
+            <template
+              v-for="header in headers"
+              :key="header"
+            >
+              <!-- Search Value -->
+              <td v-if="header.value==='searchQuery.criteria.value'">
                 <v-icon
                   class="pl-4 pr-2 mt-n1"
                   color="#212529"
@@ -347,95 +602,82 @@ export default defineComponent({
                 </v-icon>
                 <span class="pl-2" aria-hidden="true">{{ displaySearchValue(item.searchQuery) }}</span>
               </td>
-              <td>
-                  <span
-                    class="aria-label-only"
-                    aria-hidden="false"
-                  >
-                    {{ headers[1].text }}
-                  </span>
-                {{ isPprSearch(item) ? displayType(item.searchQuery.type) : displayMhrType(item.searchQuery.type) }}
+              <!-- Search Type or Category -->
+              <td v-if="header.value==='searchQuery.type'">
+                <v-row>
+                  <AriaLabel :aria-text="header.text" />
+                <strong>
+                  <span v-if="isPprSearch(item)">Personal Property</span>
+                  <span v-else>Manufactured Homes</span>
+                </strong>
+                </v-row>
+                <v-row>
+                  <AriaLabel :aria-text="header.text" />
+                  {{ isPprSearch(item) ? displayType(item.searchQuery.type) : displayMhrType(item.searchQuery.type) }}
+                </v-row>
               </td>
-              <td>
-                  <span
-                    class="aria-label-only"
-                    aria-hidden="false"
-                  >
-                    {{ headers[2].text }}
-                  </span>
-                <span v-if="isPprSearch(item)">Personal Property</span>
-                <span v-else>Manufactured Homes</span>
+              <td v-if="header.value==='searchQuery.clientReferenceId'">
+                <AriaLabel :aria-text="header.text" />
+                {{ item.searchQuery.clientReferenceId || '-' }}
               </td>
-              <td>
-                  <span
-                    class="aria-label-only"
-                    aria-hidden="false"
-                  >
-                    {{ headers[3].text }}
-                  </span>
+              <!-- Date/Time (Pacific time) -->
+              <td v-if="header.value==='searchDateTime'">
+                <AriaLabel :aria-text="header.text" />
                 <span v-if="!item.inProgress || isSearchOwner(item)">
                     {{ displayDate(item.searchDateTime) }}
-                  </span>
+                </span>
                 <span v-else>Pending</span>
               </td>
-              <td>
-                <span
-                  class="aria-label-only"
-                  aria-hidden="false"
-                >
-                  {{ headers[4].text }}
-                </span>
-                {{ isStaff ? item.username : item.searchQuery.clientReferenceId || '-' }}
+              <td v-if="header.value==='username'">
+                <AriaLabel :aria-text="header.text" />
+                {{ item.username }}
               </td>
-              <td class="text-center">
-                <span
-                  class="aria-label-only"
-                  aria-hidden="false"
+              <td
+                v-if="header.value==='matches'"
+                class="matches"
+              >
+              <v-row>
+                <v-col
+                  class="text-center"
                 >
-                  {{ headers[5].text }}
-                </span>
-                <span v-if="!item.inProgress || isSearchOwner(item)">
-                  {{ item.totalResultsSize }}
-                </span>
-                <span
-                  v-else
-                  role="img"
-                  aria-label="None"
-                >-</span>
-              </td>
-              <td class="text-center">
-                <span
-                  class="aria-label-only"
-                  aria-hidden="false"
-                >
-                  {{ headers[6].text }}
-                </span>
-                <span v-if="(!item.inProgress || isSearchOwner(item)) && item.exactResultsSize >= 0">
-                  {{ item.exactResultsSize }}
-                </span>
-                <span
-                  v-else
-                  role="img"
-                  aria-label="None"
-                >-</span>
-              </td>
-              <td class="text-center">
-                <span
-                  class="aria-label-only"
-                  aria-hidden="false"
-                >
-                  {{ headers[7].text }}
-                </span>
-                <span v-if="!item.inProgress || isSearchOwner(item)">
-                  {{ item.selectedResultsSize }}
-                </span>
-                <span
-                  v-else
-                  role="img"
-                  aria-label="None"
-                >-</span>
-              </td>
-              <td class="text-center">
+                  <AriaLabel :aria-text="header.text" />
+                  <span v-if="!item.inProgress || isSearchOwner(item)">
+                    {{ item.totalResultsSize }}
+                  </span>
+                  <span
+                    v-else
+                    role="img"
+                    aria-label="None"
+                  >-</span>
+                </v-col>
+                <v-col class="text-center">
+                  <AriaLabel :aria-text="header.text" />
+                  <span v-if="(!item.inProgress || isSearchOwner(item)) && item.exactResultsSize >= 0">
+                    {{ item.exactResultsSize }}
+                  </span>
+                  <span
+                    v-else
+                    role="img"
+                    aria-label="None"
+                  >-</span>
+                </v-col>
+                <v-col class="text-center">
+                  <AriaLabel :aria-text="header.text" />
+                  <span v-if="!item.inProgress || isSearchOwner(item)">
+                    {{ item.selectedResultsSize }}
+                  </span>
+                  <span
+                    v-else
+                    role="img"
+                    aria-label="None"
+                  >-</span>
+                </v-col>
+            </v-row>
+            </td>
+              <td
+              v-if="header.value==='pdf'"
+              class="text-center"
+              >
                 <v-btn
                   v-if="item.paymentPending"
                   class="resume-pay-btn px-6"
@@ -510,7 +752,6 @@ export default defineComponent({
                       v-else
                       color="primary"
                       size="20"
-                      class="ml-5"
                       v-bind="props"
                       tabindex="0"
                       role="img"
@@ -525,6 +766,7 @@ export default defineComponent({
                   </div>
                 </v-tooltip>
               </td>
+            </template>
             </tr>
             </tbody>
             <tbody v-else>
@@ -587,6 +829,12 @@ export default defineComponent({
   font-size: 0.875rem;
 }
 :deep(#search-history-table) {
+  // th {
+  //   height: 5rem;
+  // }
+  :deep(.v-input__control)   {
+    height: 45px;
+  }
   td {
     text-overflow: initial;
     white-space: initial;
@@ -601,5 +849,12 @@ export default defineComponent({
 }
 .aria-label-only {
   display: none
+}
+.v-col {
+  padding: 0;
+}
+.matches {
+  background-color: $ghostWhite !important;
+  padding: 0;
 }
 </style>
