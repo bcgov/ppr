@@ -48,7 +48,8 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
     setMhrRegistrationDocumentId,
     setMhrRegistrationSubmittingParty,
     setMhrRegistrationHomeOwnerGroups,
-    setMhrRegistrationOwnLand
+    setMhrRegistrationOwnLand,
+    setIsRegTableDataLoading
   } = useStore()
   const {
     // Getters
@@ -377,10 +378,12 @@ export const useNewMhrRegistration = (isMhrCorrections: boolean = false) => {
   }
 
   const fetchMhRegistrations = debounce(async (sortOptions: RegistrationSortIF = null): Promise<void> => {
+    setIsRegTableDataLoading(true)
     const draftFilings = await getMhrDrafts(sortOptions)
     const myMhrHistory = await mhrRegistrationHistory(true, sortOptions)
     const filteredMhrHistory = addHistoryDraftsToMhr(myMhrHistory, draftFilings, sortOptions)
     setMhrTableHistory(filteredMhrHistory)
+    setIsRegTableDataLoading(false)
   }, 10)
 
   const mhrDraftHandler = async (): Promise<MhrDraftIF> => {
