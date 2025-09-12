@@ -25,4 +25,5 @@ export interface RegTableDataI {
   mhSortOptions: RegistrationSortIF
   sortPage: number
   totalRowCount: number
+  isRegTableDataLoading: boolean
 }

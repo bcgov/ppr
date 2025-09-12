@@ -135,7 +135,7 @@ export default defineComponent({
       getRegTableBaseRegs, getRegTableDraftsBaseReg, isMhrRegistration, isMhrManufacturerRegistration,
       getRegTableTotalRowCount, getStateModel, getRegTableDraftsChildReg, hasMorePages, getRegTableNewItem,
       getRegTableSortOptions, getRegTableSortPage, getUserSettings, getMhRegTableBaseRegs, isRoleStaffReg,
-      isRoleQualifiedSupplier, getRegTableMhSortOptions, hasDrsEnabled
+      isRoleQualifiedSupplier, getRegTableMhSortOptions, hasDrsEnabled, getIsRegTableDataLoading
     } = storeToRefs(useStore())
 
     const {
@@ -204,6 +204,9 @@ export default defineComponent({
           return [...getMhRegTableBaseRegs.value]
         }
         return []
+      }),
+      isRegTableLoading: computed((): boolean => {
+        return localState.myRegDataLoading || localState.myRegDataAdding || getIsRegTableDataLoading
       }),
       myRegAddInvalid: computed((): boolean => {
         const maxLength = props.isMhr ? 6 : 7
@@ -1116,6 +1119,7 @@ export default defineComponent({
       getRegTableMhSortOptions,
       getMhRegTableBaseRegs,
       hasMorePages,
+      getIsRegTableDataLoading,
       myRegSort,
       myRegActionHandler,
       myRegActionDialogHandler,
@@ -1333,7 +1337,7 @@ export default defineComponent({
               :is-ppr="isPpr"
               :is-mhr="isMhr"
               :set-headers="myRegHeaders"
-              :set-loading="myRegDataLoading || myRegDataAdding"
+              :set-loading="isRegTableLoading"
               :set-more-pages="hasMorePages"
               :set-new-reg-item="getRegTableNewItem"
               :set-registration-history="myRegistrations"

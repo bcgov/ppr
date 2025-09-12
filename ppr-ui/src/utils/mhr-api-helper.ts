@@ -29,6 +29,9 @@ import { addTimestampToDate } from '@/utils'
 import { trim } from 'lodash'
 import type { AxiosError } from 'axios'
 
+let mhrRegistrationController: AbortController | null = null
+let draftsAbortController: AbortController | null = null
+
 // Create default request base URL and headers.
 function getDefaultConfig (): object {
   const url = sessionStorage.getItem('MHR_API_URL')
@@ -343,27 +346,35 @@ export async function submitMhrRegistration (
  * @param sortOptions // Used to sort the registration results
  * @returns MhRegistrationSummaryIF
  */
-export async function mhrRegistrationHistory (withCollapse: boolean = false, sortOptions: RegistrationSortIF = null) {
+
+export async function mhrRegistrationHistory(
+  withCollapse: boolean = false,
+  sortOptions: RegistrationSortIF = null
+) {
   try {
+    // Cancel previous request if exists
+    if (mhrRegistrationController) {
+      mhrRegistrationController.abort()
+    }
+    mhrRegistrationController = new AbortController()
+
     let path = withCollapse ? 'registrations?collapse=true' : 'registrations'
     if (sortOptions) {
       path = addSortParams(path, sortOptions)
     }
 
-    const result = await axios.get(path, getDefaultConfig())
+    const result = await axios.get(path, {
+      ...getDefaultConfig(),
+      signal: mhrRegistrationController.signal, // attach abort signal
+    })
+
     if (!result?.data) {
       throw new Error('Invalid API response')
     }
 
     return result.data.map(item => ({ ...item, expand: false }))
   } catch (error: any) {
-    return {
-      error: {
-        category: ErrorCategories.REGISTRATION_CREATE,
-        statusCode: error?.response?.status || StatusCodes.NOT_FOUND,
-        msg: error?.response?.data?.errorMessage || 'Unknown Error'
-      }
-    }
+    return []
   }
 }
 
@@ -722,25 +733,34 @@ export async function updateMhrDraft (
 }
 
 // Get all existing drafts
-export async function getMhrDrafts (sortOptions?): Promise<Array<MhrDraftIF>|any> {
-  let path = 'drafts'
-  if (sortOptions) {
-    path = addSortParams(
-      path + '?',
-      sortOptions)
+export async function getMhrDrafts(sortOptions?): Promise<Array<MhrDraftIF> | any> {
+  try {
+    // Abort any previous drafts request
+    if (draftsAbortController) {
+      draftsAbortController.abort()
+    }
+
+    // Create a new controller for this request
+    draftsAbortController = new AbortController()
+
+    let path = 'drafts'
+    if (sortOptions) {
+      path = addSortParams(path + '?', sortOptions)
+    }
+
+    const response = await axios.get<Array<MhrDraftIF>>(path, {
+      ...getDefaultConfig(),
+      signal: draftsAbortController.signal
+    })
+
+    const data: Array<MhrDraftIF> = response?.data
+    if (!data) {
+      throw new Error('Invalid API response')
+    }
+    return data
+  } catch (error: any) {
+    return []
   }
-  return axios
-    .get<Array<MhrDraftIF>>(path, getDefaultConfig())
-    .then(response => {
-      const data: Array<MhrDraftIF> = response?.data
-      if (!data) {
-        throw new Error('Invalid API response')
-      }
-      return data
-    })
-    .catch(() => {
-      // Continue
-    })
 }
 
 // Get an existing draft by id.
