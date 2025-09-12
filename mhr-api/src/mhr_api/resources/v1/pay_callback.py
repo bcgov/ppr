@@ -185,10 +185,10 @@ def update_draft(draft: MhrDraft):
         del draft_json["reviewPending"]
     draft.draft = draft_json
     draft_num: str = str(draft.draft_number)
-    if draft_num.startswith(DRAFT_PAY_PENDING_PREFIX):
-        draft.draft_number = draft_num[1:]
-    elif draft_num.startswith(DRAFT_STAFF_REVIEW_PREFIX):
+    if draft_num.startswith(DRAFT_STAFF_REVIEW_PREFIX):
         draft.draft_number = draft_num[2:]
+    elif draft_num.startswith(DRAFT_PAY_PENDING_PREFIX):
+        draft.draft_number = draft_num[1:]
     draft.save()
     logger.info(f"Updated draft id={draft.id} number={draft.draft_number} userid={draft.user_id}")
     return {}, HTTPStatus.OK
