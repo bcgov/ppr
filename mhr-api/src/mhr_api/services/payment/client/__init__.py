@@ -175,7 +175,7 @@ class BaseClient:
     def call_api(  # pylint: disable=too-many-positional-arguments,too-many-arguments
         self,
         method,
-        relative_path,
+        relative_path: str,
         data=None,
         token=None,
         include_account: bool = True,
@@ -202,9 +202,9 @@ class BaseClient:
 
             if response is not None:
                 if self.account_id:
-                    logger.info("Account " + self.account_id + " pay api response=" + response.text)
+                    logger.info(f"Account {self.account_id} pay status={response.status_code} response={response.text}")
                 else:
-                    logger.info("Pay api response=" + response.text)
+                    logger.info(f"Pay api status={response.status_code} response={response.text}")
             if not response.ok:
                 raise ApiRequestError(response, str(response.status_code) + ": " + response.text)
             if method == HttpVerbs.DELETE:
@@ -212,7 +212,11 @@ class BaseClient:
             response_json = json.loads(response.text)
             pay_method: str = response_json.get("paymentMethod", "")
             invoice_status: str = response_json.get("statusCode", "")
-            if method == HttpVerbs.POST and not self.valid_payment_status(pay_method, invoice_status, data):
+            if (
+                method == HttpVerbs.POST
+                and not relative_path.endswith("refunds")
+                and not self.valid_payment_status(pay_method, invoice_status, data)
+            ):
                 logger.error(f"Invalid response payload status code {invoice_status} for payment method {pay_method}")
                 msg: str = INVALID_STATUS_MSG.format(pay_method=pay_method, invoice_status=invoice_status)
                 error_json = INVALID_STATUS_JSON

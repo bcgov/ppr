@@ -113,7 +113,9 @@ TEST_ID_DATA = [
 def test_find_by_id(session, pay_ref, account_id, username, draft_json, mhr_num, reg_type, test_id):
     """Assert that find mhr review registrations by id contains all expected elements."""
     json_data = copy.deepcopy(draft_json)
-    json_data["payment"] = copy.deepcopy(pay_ref)
+    payment = copy.deepcopy(pay_ref)
+    payment["invoiceId"] = str(test_id)
+    json_data["payment"] = payment
     draft: MhrDraft = MhrDraft(id=test_id,
                                draft_number="UT123434",
                                create_ts=model_utils.now_ts(),
@@ -133,14 +135,22 @@ def test_find_by_id(session, pay_ref, account_id, username, draft_json, mhr_num,
     assert test_reg.registration_type == reg_type
     assert test_reg.mhr_number == mhr_num
     assert test_reg.user_id == username
-    assert test_reg.pay_invoice_id == int(pay_ref.get("invoiceId"))
+    assert test_reg.pay_invoice_id == int(payment.get("invoiceId"))
     assert test_reg.pay_path == pay_ref.get("receipt")
     assert test_reg.priority == pay_ref.get("priority", False)
     assert test_reg.document_type
     assert test_reg.submitting_name
     assert test_reg.registration_data
     assert test_reg.status_type == MhrReviewStatusTypes.NEW
-
+    test_reg2 = MhrReviewRegistration.find_by_invoice_id(test_id)
+    assert test_reg2
+    assert test_reg2.account_id == account_id
+    assert test_reg2.draft_id == test_id
+    assert test_reg2.registration_type == reg_type
+    assert test_reg2.mhr_number == mhr_num
+    assert test_reg2.user_id == username
+    assert test_reg2.pay_invoice_id == int(payment.get("invoiceId"))
+ 
 
 @pytest.mark.parametrize('pay_ref,account_id,username,draft_json,mhr_num,reg_type,test_id', TEST_ID_DATA)
 def test_find_by_mhr_num(session, pay_ref, account_id, username, draft_json, mhr_num, reg_type, test_id):

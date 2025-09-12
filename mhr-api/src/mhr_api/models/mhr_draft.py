@@ -379,6 +379,18 @@ class MhrDraft(db.Model):
         return draft
 
     @classmethod
+    def find_by_id(cls, draft_id: int):
+        """Return a draft statement by draft id."""
+        draft = None
+        if draft_id:
+            try:
+                draft = db.session.query(MhrDraft).filter(MhrDraft.id == draft_id).one_or_none()
+            except Exception as db_exception:  # noqa: B902; return nicer error
+                logger.error(f"DB find_by_id exception: {db_exception}")
+                raise DatabaseException(db_exception) from db_exception
+        return draft
+
+    @classmethod
     def delete(cls, draft_number: str = None):
         """Delete a draft statement by document ID."""
         draft = None

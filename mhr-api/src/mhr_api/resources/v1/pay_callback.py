@@ -19,10 +19,15 @@ from flask import Blueprint, request
 from flask_cors import cross_origin
 
 from mhr_api.exceptions import DatabaseException
-from mhr_api.models import EventTracking, MhrDraft, MhrRegistration, SearchResult
-from mhr_api.models.mhr_draft import DRAFT_PAY_PENDING_PREFIX
+from mhr_api.models import EventTracking, MhrDraft, MhrRegistration, MhrReviewRegistration, SearchResult
+from mhr_api.models.mhr_draft import DRAFT_PAY_PENDING_PREFIX, DRAFT_STAFF_REVIEW_PREFIX
 from mhr_api.models.registration_json_utils import cleanup_owner_groups, sort_owner_groups
-from mhr_api.models.type_tables import MhrOwnerStatusTypes, MhrRegistrationStatusTypes, MhrRegistrationTypes
+from mhr_api.models.type_tables import (
+    MhrOwnerStatusTypes,
+    MhrRegistrationStatusTypes,
+    MhrRegistrationTypes,
+    MhrReviewStatusTypes,
+)
 from mhr_api.reports.v2.report_utils import ReportTypes
 from mhr_api.resources import cc_payment_utils
 from mhr_api.resources import registration_utils as reg_utils
@@ -52,6 +57,8 @@ PAY_CANCELLED_MSG = "Payment status cancelled/deleted: draft reverted."
 PAY_NO_REG_MSG = "Change no MH found for MHR#={mhr_num}."
 PAY_REG_SUCCESS_MSG = "Registration created reg_id={reg_id} MHR#={mhr_num}."
 PAY_SEARCH_SUCCESS_MSG = "Search set to completed for search id={search_id}."
+STAFF_REVIEW_PAY_CANCELLED = {"statusType": MhrReviewStatusTypes.PAY_CANCELLED.value}
+STAFF_REVIEW_PAY_NEW = {"statusType": MhrReviewStatusTypes.NEW.value}
 
 
 @bp.route("/<string:invoice_id>", methods=["POST", "OPTIONS"])
@@ -93,7 +100,7 @@ def post_payment_callback(invoice_id: str):  # pylint: disable=too-many-return-s
             return pay_callback_error("04", invoice_id, HTTPStatus.NOT_FOUND, error_msg)
         logger.info(f"Request valid for invoice id={invoice_id} draft id={draft.id}, creating registration.")
         cc_payment_utils.track_event("09", invoice_id, HTTPStatus.OK, f"Draft id={draft.id}")
-        return complete_registration(draft, base_reg, request_json)
+        return complete_registration(draft, base_reg, request_json, invoice_id)
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception, None, "POST pay callback event")
     except Exception as default_err:  # noqa: B902; return nicer default error
@@ -162,7 +169,8 @@ def update_registration_status(draft: MhrDraft, base_reg: MhrRegistration):
 def update_draft(draft: MhrDraft):
     """Update the draft to post registration state instead of payment pending."""
     draft_json = draft.draft
-    draft.user_id = draft_json.get("username", None)
+    if not draft_json.get("reviewPending"):
+        draft.user_id = draft_json.get("username", None)
     if draft_json.get("username"):
         del draft_json["username"]
     if draft_json.get("usergroup"):
@@ -173,10 +181,14 @@ def update_draft(draft: MhrDraft):
         del draft_json["status"]
     if "paymentPending" in draft_json:
         del draft_json["paymentPending"]
+    if "reviewPending" in draft_json:
+        del draft_json["reviewPending"]
     draft.draft = draft_json
     draft_num: str = str(draft.draft_number)
     if draft_num.startswith(DRAFT_PAY_PENDING_PREFIX):
         draft.draft_number = draft_num[1:]
+    elif draft_num.startswith(DRAFT_STAFF_REVIEW_PREFIX):
+        draft.draft_number = draft_num[2:]
     draft.save()
     logger.info(f"Updated draft id={draft.id} number={draft.draft_number} userid={draft.user_id}")
     return {}, HTTPStatus.OK
@@ -273,7 +285,7 @@ def queue_transfer(draft: MhrDraft, current_reg: MhrRegistration, new_reg: MhrRe
     queue_report(new_reg, draft, response_json, ReportTypes.MHR_TRANSFER, current_json)
 
 
-def complete_registration(draft: MhrDraft, base_reg: MhrRegistration, request_json: dict):
+def complete_registration(draft: MhrDraft, base_reg: MhrRegistration, request_json: dict, invoice_id: str):
     """Process the registration based on the payload status and draft registration type."""
     invoice_id: str = draft.user_id
     try:
@@ -283,7 +295,18 @@ def complete_registration(draft: MhrDraft, base_reg: MhrRegistration, request_js
         logger.info(f"Completing registration for pay status={status} reg_type={reg_type}")
         if request_json.get("statusCode") in (StatusCodes.CANCELLED.value, StatusCodes.DELETED.value):
             cc_payment_utils.track_event("05", draft.user_id, HTTPStatus.OK, PAY_CANCELLED_MSG)
+            if str(draft.draft_number).startswith(DRAFT_STAFF_REVIEW_PREFIX):
+                review_reg: MhrReviewRegistration = MhrReviewRegistration.find_by_invoice_id(int(invoice_id))
+                if review_reg:
+                    logger.info(f"Cancelled/deleted payment updating staff review reg id={review_reg.id}")
+                    review_reg.save_update(STAFF_REVIEW_PAY_CANCELLED, "System Pay API Callback")
             return update_draft(draft)
+        if str(draft.draft_number).startswith(DRAFT_STAFF_REVIEW_PREFIX):
+            review_reg: MhrReviewRegistration = MhrReviewRegistration.find_by_invoice_id(int(invoice_id))
+            if review_reg:
+                logger.info(f"Completed payment updating staff review reg id={review_reg.id}")
+                review_reg.save_update(STAFF_REVIEW_PAY_NEW, "System Pay API Callback")
+                return {}, HTTPStatus.OK
         new_reg: MhrRegistration = None
         if reg_type == MhrRegistrationTypes.MHREG:
             new_reg = cc_payment_utils.create_new_registration(draft)

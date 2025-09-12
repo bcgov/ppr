@@ -59,7 +59,7 @@ class MhrReviewStep(db.Model):
     def json(self) -> dict:
         """Return the note as a json object."""
         step = {
-            "createDateTime": model_utils.format_ts(self.registration.registration_ts),
+            "createDateTime": model_utils.format_ts(self.create_ts),
             "statusType": self.status_type,
             "staffNote": self.staff_note if self.staff_note else "",
             "username": self.username if self.username else "",
