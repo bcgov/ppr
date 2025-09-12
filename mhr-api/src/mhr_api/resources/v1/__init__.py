@@ -31,6 +31,7 @@ from .permits import bp as permits_bp
 from .qualified_supplier import bp as qualified_supplier_bp
 from .registration_report_callback import bp as registration_report_callback_bp
 from .registrations import bp as registrations_bp
+from .review_registrations import bp as review_bp
 from .search_history import bp as search_history_bp
 from .search_report_callback import bp as search_report_callback_bp
 from .search_results import bp as search_result_bp
@@ -66,6 +67,7 @@ class V1Endpoint:
         self.app.register_blueprint(permits_bp)
         self.app.register_blueprint(qualified_supplier_bp)
         self.app.register_blueprint(registrations_bp)
+        self.app.register_blueprint(review_bp)
         self.app.register_blueprint(searches_bp)
         self.app.register_blueprint(search_history_bp)
         self.app.register_blueprint(search_result_bp)

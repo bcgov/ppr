@@ -15,17 +15,27 @@
 import copy
 
 from sqlalchemy.dialects.postgresql import ENUM as PG_ENUM
+from sqlalchemy.sql import text
 
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import utils as model_utils
 from mhr_api.models.mhr_registration import REG_TO_DOC_TYPE
+from mhr_api.models.registration_utils import AccountRegistrationParams
 from mhr_api.utils.logging import logger
 
 from .db import db
 from .mhr_draft import MhrDraft
+from .mhr_review_step import MhrReviewStep
 from .type_tables import MhrDocumentTypes, MhrRegistrationTypes, MhrReviewStatusTypes
 
 # from .mhr_review_step import MhrReviewStep
+
+
+QUERY_REVIEW_DEFAULT = """select rr.id as review_id, rr.create_ts, rr.mhr_number, rr.status_type, rr.document_id,
+       rr.priority, rr.registration_type, rr.submitting_name, rr.assignee_name, dt.document_type_desc
+  from mhr_review_registrations rr, mhr_document_types dt
+ where rr.document_type = dt.document_type """
+DEFAULT_SORT_ORDER = " order by rr.priority desc, rr.create_ts asc"
 
 
 class MhrReviewRegistration(db.Model):
@@ -79,14 +89,16 @@ class MhrReviewRegistration(db.Model):
     @property
     def json(self) -> dict:
         """Return the registration information as a json object."""
-        result = {
-            "mhrNumber": self.mhr_number,
-            "createDateTime": model_utils.format_ts(self.registration_ts),
-            "registrationType": self.registration_type,
-            "status": self.status_type,
-            "priority": self.priority,
-            "documentDescription": self.document_type.document_type_desc,
-        }
+        result = copy.deepcopy(self.registration_data)
+        result["status"] = self.status_type
+        result["assigneeName"] = self.assignee_name
+        if self.document_id:
+            result["documentId"] = self.document_id
+        steps = []
+        if self.review_steps:
+            for step in self.review_steps:
+                steps.append(step.json)
+        result["reviewSteps"] = steps
         return result
 
     def save(self):
@@ -98,13 +110,77 @@ class MhrReviewRegistration(db.Model):
             logger.error(f"DB mhr review registration save exception: {db_exception}")
             raise DatabaseException(db_exception) from db_exception
 
+    def save_update(self, request_json: dict, username: str):
+        """Render an updated record of mhr review registration information to the local cache."""
+        try:
+            new_status: str = request_json.get("statusType")
+            change_msg: str = f"Current status={self.status_type.value}, new status={new_status}."
+            if request_json.get("payRefund"):
+                change_msg += request_json.get("payRefund")
+            if not self.document_id and request_json.get("documentId"):
+                change_msg += f" Adding document ID {self.document_id}"
+                self.document_id = request_json.get("documentId")
+            if self.status_type != MhrReviewStatusTypes.NEW.value and new_status == MhrReviewStatusTypes.NEW.value:
+                change_msg += f" Removing assignee {self.assignee_name}."
+                self.assignee_name = None
+            if new_status == MhrReviewStatusTypes.IN_REVIEW.value and self.status_type.value != new_status:
+                if request_json.get("assigneeName"):
+                    self.assignee_name = request_json.get("assigneeName")
+                else:
+                    self.assignee_name = username
+                change_msg += f" Setting assignee {self.assignee_name}."
+            if self.status_type.value != new_status:
+                self.status_type = new_status
+            step: MhrReviewStep = MhrReviewStep(
+                review_registration_id=self.id,
+                create_ts=model_utils.now_ts(),
+                status_type=new_status,
+                username=username,
+                change_note=change_msg,
+                staff_note=request_json.get("staffNote", None),
+                client_note=request_json.get("clientNote", None),
+            )
+            db.session.add(step)
+            db.session.add(self)
+            db.session.commit()
+        except Exception as db_exception:  # noqa: B902; just logging
+            logger.error(f"DB mhr review registration save update exception: {db_exception}")
+            raise DatabaseException(db_exception) from db_exception
+
+    def is_approved(self, new_status: str) -> bool:
+        """Is a review update transitioning from IN_REVIEW to APPROVED."""
+        return self.status_type == MhrReviewStatusTypes.IN_REVIEW and new_status == MhrReviewStatusTypes.APPROVED.value
+
+    def is_declined(self, new_status: str) -> bool:
+        """Is a review update transitioning from IN_REVIEW to DECLINED."""
+        return self.status_type == MhrReviewStatusTypes.IN_REVIEW and new_status == MhrReviewStatusTypes.DECLINED.value
+
     @classmethod
     def find_by_id(cls, reg_id: int):
         """Return the mhr review registration record matching the id."""
         reg = None
         if reg_id:
-            reg = db.session.query(MhrReviewRegistration).filter(MhrReviewRegistration.id == reg_id).one_or_none()
+            try:
+                reg = db.session.query(MhrReviewRegistration).filter(MhrReviewRegistration.id == reg_id).one_or_none()
+            except Exception as db_exception:  # noqa: B902; return nicer error
+                logger.error(f"MhrReviewRegistration.find_by_id exception: {db_exception}")
+                raise DatabaseException(db_exception) from db_exception
+        return reg
 
+    @classmethod
+    def find_by_invoice_id(cls, invoice_id: int):
+        """Return the mhr review registration record matching the payment invoice id."""
+        reg = None
+        if invoice_id:
+            try:
+                reg = (
+                    db.session.query(MhrReviewRegistration)
+                    .filter(MhrReviewRegistration.pay_invoice_id == invoice_id)
+                    .one_or_none()
+                )
+            except Exception as db_exception:  # noqa: B902; return nicer error
+                logger.error(f"MhrReviewRegistration.find_by_invoice_id exception: {db_exception}")
+                raise DatabaseException(db_exception) from db_exception
         return reg
 
     @classmethod
@@ -123,6 +199,31 @@ class MhrReviewRegistration(db.Model):
                 logger.error(f"MhrReviewRegistration.find_by_mhr_number exception: {db_exception}")
                 raise DatabaseException(db_exception) from db_exception
         return regs
+
+    @classmethod
+    def find_all(cls, params: AccountRegistrationParams):
+        """Return a summary list of staff review registrations."""
+        registrations = []
+        try:
+            query = text(MhrReviewRegistration.build_review_query(params))
+            if params.has_filter() and params.filter_reg_start_date and params.filter_reg_end_date:
+                start_ts = model_utils.search_ts(params.filter_reg_start_date, True)
+                end_ts = model_utils.search_ts(params.filter_reg_end_date, False)
+                logger.info(f"Coming soon start_ts={start_ts} end_ts={end_ts}")
+                # result = db.session.execute(
+                #    query, {"query_value1": params.account_id, "query_start": start_ts, "query_end": end_ts}
+                # )
+                result = db.session.execute(query)
+            else:
+                result = db.session.execute(query)
+            rows = result.fetchall()
+            if rows is not None:
+                for row in rows:
+                    registrations.append(MhrReviewRegistration.__build_summary(row))
+            return registrations
+        except Exception as db_exception:  # noqa: B902; return nicer error
+            logger.error(f"find_all exception: {db_exception}.")
+            raise DatabaseException(db_exception) from db_exception
 
     @staticmethod
     def create_from_json(json_data: dict, draft: MhrDraft):
@@ -157,3 +258,47 @@ class MhrReviewRegistration(db.Model):
             review_reg.submitting_name = sub_name
         review_reg.registration_data = copy.deepcopy(json_data)
         return review_reg
+
+    @classmethod
+    def build_review_query(cls, params: AccountRegistrationParams) -> str:
+        """Build the staff review registration summary query."""
+        query_text: str = QUERY_REVIEW_DEFAULT
+        if not params.has_filter() and not params.has_sort():
+            query_text += DEFAULT_SORT_ORDER
+            return query_text
+        # order_clause: str = ""
+        if params.has_filter():
+            logger.debug("filter coming")
+            # query_text = build_account_query_filter(query_text, params)
+        if params.has_sort():
+            logger.debug("sort coming")
+            # order_clause = QUERY_ACCOUNT_ORDER_BY.get(params.sort_criteria)
+            # if params.sort_criteria == REG_TS_PARAM:
+            # if params.sort_direction and params.sort_direction == SORT_ASCENDING:
+            #    order_clause = order_clause.replace(ACCOUNT_SORT_DESCENDING, ACCOUNT_SORT_ASCENDING)
+            # elif params.sort_direction and params.sort_direction == SORT_ASCENDING:
+            # order_clause += ACCOUNT_SORT_ASCENDING
+            # else:
+            # order_clause += ACCOUNT_SORT_DESCENDING
+            # query_text += order_clause
+        else:  # Default sort order if filter but no sorting specified.
+            query_text += DEFAULT_SORT_ORDER
+        # logger.info(query_text)
+        return query_text
+
+    @classmethod
+    def __build_summary(cls, row):
+        """Build a single registration summary from query result."""
+        summary = {
+            "reviewId": str(row[0]),
+            "createDateTime": model_utils.format_ts(row[1]),
+            "mhrNumber": str(row[2]),
+            "statusType": str(row[3]),
+            "documentId": str(row[4]) if row[4] else "",
+            "priority": bool(row[5]),
+            "registrationType": str(row[6]),
+            "submittingName": str(row[7]) if row[7] else "",
+            "assigneeName": str(row[8]) if row[8] else "",
+            "registrationDescription": str(row[9]),
+        }
+        return summary
