@@ -639,6 +639,9 @@ export const useStore = defineStore('assetsStore', () => {
   const hasMorePages = computed<boolean>(() => {
     return state.value.registrationTable.sortHasMorePages
   })
+  const getIsRegTableDataLoading = computed<boolean>(() => {
+    return state.value.registrationTable.isRegTableDataLoading
+  })
   const getMhrHomeSections = computed<HomeSectionIF[]>(() => {
     return state.value.mhrRegistration.description.sections
   })
@@ -1293,6 +1296,10 @@ export const useStore = defineStore('assetsStore', () => {
     state.value.registrationTable.totalRowCount = count
   }
 
+  function setIsRegTableDataLoading (isRegTableDataLoading: boolean) {
+    state.value.registrationTable.isRegTableDataLoading = isRegTableDataLoading
+  }
+
   function setUnsavedChanges (unsavedChanges: boolean) {
     state.value.unsavedChanges = unsavedChanges
   }
@@ -1727,6 +1734,7 @@ export const useStore = defineStore('assetsStore', () => {
     getRegTableSortPage,
     getRegTableTotalRowCount,
     hasMorePages,
+    getIsRegTableDataLoading,
 
     // MHR-related getters
     getMhrHomeSections,
@@ -1877,6 +1885,7 @@ export const useStore = defineStore('assetsStore', () => {
     setRegTableSortOptions,
     setRegTableSortPage,
     setRegTableTotalRowCount,
+    setIsRegTableDataLoading,
     setUnsavedChanges,
     setCurrentRegistrationsTab,
 

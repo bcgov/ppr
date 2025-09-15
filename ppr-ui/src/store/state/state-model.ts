@@ -133,7 +133,8 @@ export const stateModel: StateModelIF = {
       status: ''
     },
     sortPage: 1,
-    totalRowCount: 0
+    totalRowCount: 0,
+    isRegTableDataLoading: false
   },
   // PPR and MHR Search Request State
   search: {
