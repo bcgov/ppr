@@ -1123,6 +1123,8 @@ def __get_reg_type_filter(filter_value: str, collapse: bool) -> dict:
         if filter_value in (doc_rec.document_type_desc, doc_rec.document_type):
             doc_type = doc_rec.document_type
             break
+    if doc_type == "missing":
+        return ""
     if collapse:
         return REG_FILTER_REG_TYPE_COLLAPSE.replace("?", doc_type)
     return REG_FILTER_REG_TYPE.replace("?", doc_type)

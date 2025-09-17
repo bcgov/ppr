@@ -98,9 +98,11 @@ QUERY_REG_ID_PKEY = """
 select nextval('mhr_registration_id_seq') AS reg_id
 """
 QUERY_ACCOUNT_REG_BASE = """
-SELECT mhr_number, status_type, registration_ts, submitting_name, client_reference_id, registration_type, owner_names,
+SELECT arv.mhr_number, status_type, registration_ts, submitting_name, client_reference_id, registration_type,
+       owner_names,
        registering_name, document_id, document_registration_number, last_doc_type, note_status, note_expiry,
-       cancel_doc_type, frozen_doc_type, account_id, document_type_desc, ppr_lien_type, document_type, doc_storage_url,
+       cancel_doc_type, frozen_doc_type, arv.account_id, document_type_desc, ppr_lien_type, document_type,
+       doc_storage_url,
        (SELECT COUNT(mer.id)
           FROM mhr_extra_registrations mer
          WHERE mer.mhr_number = arv.mhr_number
@@ -150,6 +152,26 @@ ORDER BY registration_ts
 """
 )
 QUERY_ACCOUNT_DEFAULT = (
+    "SELECT * FROM ("
+    + QUERY_ACCOUNT_REG_BASE
+    + """ LEFT JOIN mhr_extra_registrations mer on mer.mhr_number = arv.mhr_number
+ WHERE (:query_value1 = mer.account_id AND mer.mhr_number = arv.mhr_number AND mer.removed_ind IS NULL)
+UNION ("""
+    + QUERY_ACCOUNT_REG_BASE
+    + """
+ WHERE arv.account_id = :query_value1
+    AND arv.mhr_number in (SELECT DISTINCT mr.mhr_number
+                           FROM mhr_registrations mr
+                          WHERE mr.account_id = :query_value1
+                            AND mr.registration_type = 'MHREG'
+                            AND NOT EXISTS (select mer2.id
+                                             from mhr_extra_registrations mer2
+                                            where mer2.mhr_number = mr.mhr_number
+                                              AND mer2.account_id = mr.account_id
+                                              AND mer2.removed_ind = 'Y'))
+)) as q WHERE q.mhr_number IS NOT NULL """
+)
+QUERY_ACCOUNT_DEFAULT2 = (
     QUERY_ACCOUNT_REG_BASE
     + """
  WHERE mhr_number IN (SELECT DISTINCT mer.mhr_number
@@ -168,76 +190,82 @@ QUERY_ACCOUNT_DEFAULT = (
                                                AND mer.removed_ind = 'Y')))
 """
 )
-REG_ORDER_BY_DATE = " ORDER BY registration_ts DESC"
-REG_ORDER_BY_MHR_NUMBER = " ORDER BY mhr_number"
-REG_ORDER_BY_REG_TYPE = " ORDER BY document_type"
-REG_ORDER_BY_STATUS = " ORDER BY status_type"
-REG_ORDER_BY_SUBMITTING_NAME = " ORDER BY submitting_name"
-REG_ORDER_BY_CLIENT_REF = " ORDER BY client_reference_id"
-REG_ORDER_BY_USERNAME = " ORDER BY registering_name"
-REG_ORDER_BY_OWNER_NAME = " ORDER BY owner_names"
-REG_ORDER_BY_EXPIRY_DAYS = " ORDER BY mhr_number"
-REG_ORDER_BY_DOCUMENT_ID = " ORDER BY document_id"
-REG_ORDER_BY_MANUFACTURER_NAME = " ORDER BY manufacturer_name"
-REG_ORDER_BY_CIVIC_ADDRESS = " ORDER BY civic_address"
-REG_FILTER_REG_TYPE = " AND document_type = '?'"
+REG_ORDER_BY_DATE = " ORDER BY q.registration_ts DESC"
+REG_ORDER_BY_MHR_NUMBER = " ORDER BY q.mhr_number"
+REG_ORDER_BY_REG_TYPE = " ORDER BY q.document_type"
+REG_ORDER_BY_STATUS = " ORDER BY q.status_type"
+REG_ORDER_BY_SUBMITTING_NAME = " ORDER BY q.submitting_name"
+REG_ORDER_BY_CLIENT_REF = " ORDER BY q.client_reference_id"
+REG_ORDER_BY_USERNAME = " ORDER BY q.registering_name"
+REG_ORDER_BY_OWNER_NAME = " ORDER BY q.owner_names"
+REG_ORDER_BY_EXPIRY_DAYS = " ORDER BY q.mhr_number"
+REG_ORDER_BY_DOCUMENT_ID = " ORDER BY q.document_id"
+REG_ORDER_BY_MANUFACTURER_NAME = " ORDER BY q.manufacturer_name"
+REG_ORDER_BY_CIVIC_ADDRESS = " ORDER BY q.civic_address"
+REG_FILTER_REG_TYPE = " AND q.document_type = '?'"
 REG_FILTER_REG_TYPE_COLLAPSE = """
- AND mhr_number IN (SELECT DISTINCT r2.mhr_number
-                      FROM mhr_registrations r2, mhr_documents d2
-                     WHERE r2.id = d2.registration_id
-                       AND d2.document_type = '?')
+ AND q.mhr_number IN (SELECT DISTINCT r2.mhr_number
+                        FROM mhr_registrations r2, mhr_documents d2
+                       WHERE r2.id = d2.registration_id
+                         AND r2.mhr_number = q.mhr_number
+                         AND d2.document_type = '?')
 """
-REG_FILTER_MHR = " AND mhr_number = '?'"
-REG_FILTER_STATUS = " AND status_type = '?'"
+REG_FILTER_MHR = " AND q.mhr_number = '?'"
+REG_FILTER_STATUS = " AND q.status_type = '?'"
 REG_FILTER_STATUS_COLLAPSE = """
- AND mhr_number IN (SELECT DISTINCT r2.mhr_number
-                      FROM mhr_registrations r2
-                     WHERE arv.mhr_number = r2.mhr_number
-                       AND r2.registration_type IN ('MHREG', 'MHREG_CONVERSION')
-                       AND r2.status_type = '?')
+ AND q.mhr_number IN (SELECT DISTINCT r2.mhr_number
+                        FROM mhr_registrations r2
+                       WHERE q.mhr_number = r2.mhr_number
+                         AND r2.registration_type IN ('MHREG', 'MHREG_CONVERSION')
+                         AND r2.status_type = '?')
 """
-REG_FILTER_SUBMITTING_NAME = " AND submitting_name LIKE '%?%'"
+REG_FILTER_SUBMITTING_NAME = " AND position('?' in q.submitting_name) > 0"
 REG_FILTER_SUBMITTING_NAME_COLLAPSE = """
- AND mhr_number IN (SELECT DISTINCT arv2.mhr_number
-                      FROM mhr_account_reg_vw arv2
-                     WHERE arv2.submitting_name LIKE '%?%')
+ AND q.mhr_number IN (SELECT DISTINCT arv2.mhr_number
+                        FROM mhr_account_reg_vw arv2
+                       WHERE q.mhr_number = arv2.mhr_number
+                         AND position('?' in arv2.submitting_name) > 0)
 """
-REG_FILTER_CLIENT_REF = " AND UPPER(client_reference_id) LIKE '%?%'"
+REG_FILTER_CLIENT_REF = " AND position('?' in UPPER(q.client_reference_id)) > 0"
 REG_FILTER_CLIENT_REF_COLLAPSE = """
- AND mhr_number IN (SELECT DISTINCT r2.mhr_number
-                      FROM mhr_registrations r2
-                     WHERE arv.mhr_number = r2.mhr_number
-                       AND UPPER(r2.client_reference_id) LIKE '%?%')
+ AND q.mhr_number IN (SELECT DISTINCT r2.mhr_number
+                        FROM mhr_registrations r2
+                       WHERE q.mhr_number = r2.mhr_number
+                         AND position('?' in UPPER(r2.client_reference_id)) > 0)
 """
-REG_FILTER_USERNAME = " AND registering_name LIKE '%?%'"
+REG_FILTER_USERNAME = " AND position('?' in q.registering_name) > 0"
 REG_FILTER_USERNAME_COLLAPSE = """
- AND EXISTS (SELECT r2.id
-               FROM mhr_registrations r2, users u
-              WHERE r2.mhr_number = arv.mhr_number
-                AND r2.user_id IS NOT NULL
-                AND r2.user_id = u.username
-                AND TRIM(UPPER(u.firstname || ' ' || u.lastname)) LIKE '%?%')
+ AND q.mhr_number IN (SELECT r2.mhr_number
+                        FROM mhr_registrations r2, users u
+                       WHERE r2.mhr_number = q.mhr_number
+                         AND r2.user_id IS NOT NULL
+                         AND r2.user_id != ''
+                         AND r2.user_id = u.username
+                         AND u.firstname IS NOT NULL AND u.lastname IS NOT NULL
+                         AND position('?' in TRIM(UPPER(u.firstname || ' ' || u.lastname))) > 0)
 """
 REG_FILTER_DATE = " AND registration_ts BETWEEN :query_start AND :query_end"
 REG_FILTER_DATE_COLLAPSE = """
- AND mhr_number IN (SELECT DISTINCT r2.mhr_number
-                      FROM mhr_registrations r2
-                     WHERE arv.mhr_number = r2.mhr_number
-                       AND r2.registration_ts BETWEEN :query_start AND :query_end)
+ AND q.mhr_number IN (SELECT DISTINCT r2.mhr_number
+                        FROM mhr_registrations r2
+                       WHERE q.mhr_number = r2.mhr_number
+                         AND r2.registration_ts BETWEEN :query_start AND :query_end)
 """
-REG_FILTER_DOCUMENT_ID = " AND document_id LIKE '?%'"
+REG_FILTER_DOCUMENT_ID = " AND position('?' in q.document_id) > 0"
 REG_FILTER_DOCUMENT_ID_COLLAPSE = """
- AND mhr_number IN (SELECT DISTINCT r2.mhr_number
-                      FROM mhr_registrations r2, mhr_documents d2
-                     WHERE r2.id = d2.registration_id
-                       AND d2.document_id LIKE '?%')
+ AND q.mhr_number IN (SELECT DISTINCT r2.mhr_number
+                        FROM mhr_registrations r2, mhr_documents d2
+                       WHERE q.mhr_number = r2.mhr_number
+                         AND r2.id = d2.registration_id
+                         AND position('?' in d2.document_id) > 0)
 """
-REG_FILTER_MANUFACTURER_NAME = " AND manufacturer_name LIKE '%?%'"
+REG_FILTER_MANUFACTURER_NAME = " AND position('?' in q.manufacturer_name) > 0"
 REG_FILTER_MANUFACTURER_NAME_COLLAPSE = """
- AND mhr_number IN (SELECT DISTINCT arv2.mhr_number
-                      FROM mhr_account_reg_vw arv2
-                     WHERE arv2.manufacturer_name LIKE '%?%')
+ AND q.mhr_number IN (SELECT DISTINCT arv2.mhr_number
+                        FROM mhr_account_reg_vw arv2
+                       WHERE q.mhr_number = arv2.mhr_number
+                         AND position('?' in arv2.manufacturer_name) > 0)
 """
 ACCOUNT_SORT_DESCENDING = " DESC"
 ACCOUNT_SORT_ASCENDING = " ASC"
-DEFAULT_SORT_ORDER = " ORDER BY registration_ts DESC"
+DEFAULT_SORT_ORDER = " ORDER BY q.registration_ts DESC"
