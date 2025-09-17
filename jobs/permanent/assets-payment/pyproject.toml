@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "assets-payment"
-version = "0.0.1"
+version = "0.0.2"
 description = ""
 authors = ["dlovett <doug@daxiom.com>"]
 license = "BSD 3"
