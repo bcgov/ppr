@@ -62,7 +62,7 @@ class SBCPaymentClient:
             logger.info(f"Submitting DELETE {url}")
             response = requests.request(HttpVerbs.DELETE.value, url, params=None, headers=headers, timeout=30.0)
             if response.text:
-                logger.info(f"Pay api response: {response.text}")
+                logger.info(f"Pay api status={response.status_code} response={response.text}")
             return response.status_code
         except Exception as err:
             logger.error(f"call_api error: {str(err)}")

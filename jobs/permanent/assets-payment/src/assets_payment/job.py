@@ -26,6 +26,8 @@ from assets_payment.services.notify import Notify
 from assets_payment.services.payment_client import SBCPaymentClient
 from assets_payment.utils.logging import logger
 
+DRAFT_STAFF_REVIEW_PREFIX = "PR"
+DRAFT_PAY_PENDING_PREFIX = "P"
 PPR_TRACKING_TYPE: str = "PPR_PAYMENT"
 MHR_TRACKING_TYPE: str = "MHR_PAYMENT"
 STATUS_TRACKING_TYPE: str = "PAYMENT_STATUS_JOB"
@@ -38,6 +40,7 @@ NOTIFY_STATUS_DATA = {
     "mhr_complete": -1,
     "mhr_errors": -1,
     "mhr_expired": -1,
+    "mhr_review_expired": -1,
 }
 
 STATUS_QUERY = """
@@ -84,7 +87,11 @@ SELECT (SELECT COUNT(e.id)
                             WHERE e2.key_id = e.key_id
                               AND e2.event_tracking_type = e.event_tracking_type
                               AND LEFT(e2.message, 2) IN ('05', '06', '07', '09'))
-          AND e.event_ts < (now() at time zone 'utc') - interval '{mhr_expiry_client} hours') AS mhr_expired
+          AND e.event_ts < (now() at time zone 'utc') - interval '{mhr_expiry_client} hours') AS mhr_expired,
+      (SELECT COUNT(r.id)
+         FROM mhr_review_registrations r
+        WHERE r.status_type = 'PAY_PENDING'
+          AND r.create_ts < (now() at time zone 'utc') - interval '{mhr_expiry_client} hours') as mhr_review_expired
 """
 MHR_EXPIRED_QUERY = """
 SELECT id, user_id, mhr_number
@@ -103,6 +110,19 @@ SELECT id, user_id, mhr_number
   AND e.event_ts < (now() at time zone 'utc') - interval '{expire_hours} hours')
  ORDER BY id
 """
+MHR_REVIEW_REG_QUERY = """
+SELECT id, mhr_number
+  FROM mhr_review_registrations
+ WHERE status_type = 'PAY_PENDING'
+  AND create_ts < (now() at time zone 'utc') - interval '{expire_hours} hours'
+ ORDER BY id
+"""
+UPDATE_MHR_REVIEW = """
+UPDATE mhr_review_registrations
+   SET status_type = 'PAY_CANCELLED'
+ WHERE status_type = 'PAY_PENDING'
+   AND create_ts < (now() at time zone 'utc') - interval '{expire_hours} hours'
+"""
 MHR_RESTORE_STATUS = """
 UPDATE mhr_registrations SET status_type = CAST(mhr_drafts.draft ->> 'status' AS mhr_registration_status_type)
   FROM mhr_drafts
@@ -115,7 +135,10 @@ UPDATE mhr_registrations SET status_type = CAST(mhr_drafts.draft ->> 'status' AS
 """
 MHR_UPDATE_DRAFT = """
 UPDATE mhr_drafts
-   SET user_id = NULL, draft_number = SUBSTR(draft_number, 2)
+   SET user_id = case when left(draft_number, 2) = 'PR' then user_id else null end,
+       draft_number = case when left(draft_number, 2) = 'PR'
+                           then substr(draft_number, 3)
+                           else substr(draft_number, 2) end
  WHERE id IN ({draft_ids})
    AND LEFT(draft_number, 1) = 'P'
 """
@@ -155,6 +178,12 @@ INSERT_EVENT: Final = """
 INSERT INTO event_tracking(id, key_id, event_ts, event_tracking_type, status, message)
   VALUES(nextval('event_tracking_id_seq'), {job_id}, CURRENT_TIMESTAMP  at time zone 'utc', '{tracking_type}',
          {job_status}, '{job_message}')
+"""
+INSERT_REVIEW_STEP: Final = """
+INSERT INTO mhr_review_steps
+     VALUES(nextval('mhr_review_step_id_seq'), CURRENT_TIMESTAMP  at time zone 'utc',
+            null, null, 'Current status=PAY_PENDING, new status=PAY_CANCELLED',
+            'System Expired Job', {review_id}, 'PAY_CANCELLED')
 """
 
 
@@ -219,6 +248,34 @@ def restore_mhr_draft(db_conn: psycopg2.extensions.connection, db_cursor: psycop
         logger.error(error_message)
 
 
+def update_mhr_review_reg(
+    db_conn: psycopg2.extensions.connection, db_cursor: psycopg2.extensions.cursor, config: Config
+):
+    """Update MHR expired cc payments staff registration review status type to PAY_CANCELLED."""
+    try:
+        if not db_conn or not db_cursor:
+            return
+        logger.info("Updating staff review registrations.")
+        review_ids: str = ""
+        review_id: int
+        sql_statement = MHR_REVIEW_REG_QUERY.format(expire_hours=config.MHR_EXPIRY_CLIENT_HOURS)
+        db_cursor.execute(sql_statement)
+        rows = db_cursor.fetchall()
+        for row in rows:
+            review_id: int = int(row[0])
+            review_ids += str(review_id) + ","
+            logger.info(f"Inserting into mhr_review_steps reivew ID={review_id}")
+            db_cursor.execute(INSERT_REVIEW_STEP.format(review_id=review_id))
+
+        db_cursor.execute(UPDATE_MHR_REVIEW.format(expire_hours=config.MHR_EXPIRY_CLIENT_HOURS))
+        db_conn.commit()
+        logger.info(f"mhr_review_registrations status type updated for ID's {review_ids}")
+    except (psycopg2.Error, Exception) as err:
+        db_conn.rollback()
+        error_message = f"Error attempting update mhr review registrations status {err}"
+        logger.error(error_message)
+
+
 def restore_ppr_status(
     db_conn: psycopg2.extensions.connection, db_cursor: psycopg2.extensions.cursor, reg_numbers: str, draft_ids: str
 ):
@@ -275,6 +332,7 @@ def run_status_query(
         status_data["mhr_complete"] = int(row[3])
         status_data["mhr_errors"] = int(row[4])
         status_data["mhr_expired"] = int(row[5])
+        status_data["mhr_review_expired"] = int(row[6])
         logger.info(f"Status query results: {str(status_data)}")
     except (psycopg2.Error, Exception) as err:
         error_message = f"Error attempting to run status query: {err}"
@@ -350,6 +408,10 @@ def cancel_mhr_expired(  # pylint: disable=too-many-locals
 ) -> dict:
     """Revert draft status and delete payment for expired ppr pending payment registrations."""
     cancel_count: int = 0
+    if status_data.get("mhr_review_expired", 0) > 0:
+        update_mhr_review_reg(db_conn, db_cursor, config)
+    else:
+        logger.info("No expired MHR review registrations to update.")
     if not status_data.get("mhr_expired") or status_data.get("mhr_expired") < 1:
         logger.info("No expired MHR pending payments to cancel")
         return cancel_count

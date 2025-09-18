@@ -120,10 +120,10 @@ SELECT COUNT(r.id)
 """
 FILTER_MHR_NUMBER = " AND mhr_number = '?'"
 FILTER_REG_TYPE = " AND registration_type_desc = '?'"
-FILTER_SUBMITTING_NAME = " AND submitting_party LIKE '%?%'"
-FILTER_CLIENT_REF = " AND UPPER(TRIM(clientReferenceId)) LIKE '%?%'"
-FILTER_USERNAME = " AND TRIM(UPPER(registering_name)) LIKE '%?%'"
-FILTER_MANUFACTURER = " AND TRIM(UPPER(manufacturer_name)) LIKE '%?%'"
+FILTER_SUBMITTING_NAME = " AND position('?' in submitting_party) > 0"
+FILTER_CLIENT_REF = " AND position('?' in TRIM(UPPER(clientReferenceId))) > 0"
+FILTER_USERNAME = " AND position('?' in TRIM(UPPER(registering_name))) > 0"
+FILTER_MANUFACTURER = " AND position('?' in TRIM(UPPER(manufacturer_name))) > 0"
 FILTER_DATE = " AND create_ts BETWEEN :query_start AND :query_end"
 
 ORDER_BY_DATE = " ORDER BY create_ts"
@@ -264,6 +264,7 @@ class MhrDraft(db.Model):
             query_text += order_clause
         else:  # Default sort order if filter but no sorting specified.
             query_text += QUERY_ACCOUNT_DRAFTS_DEFAULT_ORDER
+        # logger.info(query_text + QUERY_ACCOUNT_DRAFTS_LIMIT)
         return query_text + QUERY_ACCOUNT_DRAFTS_LIMIT
 
     @staticmethod
