@@ -87,7 +87,11 @@ SELECT (SELECT COUNT(e.id)
                             WHERE e2.key_id = e.key_id
                               AND e2.event_tracking_type = e.event_tracking_type
                               AND LEFT(e2.message, 2) IN ('05', '06', '07', '09'))
-          AND e.event_ts < (now() at time zone 'utc') - interval '{mhr_expiry_client} hours') AS mhr_expired
+          AND e.event_ts < (now() at time zone 'utc') - interval '{mhr_expiry_client} hours') AS mhr_expired,
+      (SELECT COUNT(r.id)
+         FROM mhr_review_registrations r
+        WHERE r.status_type = 'PAY_PENDING'
+          AND r.create_ts < (now() at time zone 'utc') - interval '{mhr_expiry_client} hours') as mhr_review_expired
 """
 MHR_EXPIRED_QUERY = """
 SELECT id, user_id, mhr_number
@@ -110,14 +114,14 @@ MHR_REVIEW_REG_QUERY = """
 SELECT id, mhr_number
   FROM mhr_review_registrations
  WHERE status_type = 'PAY_PENDING'
-  AND create_ts < (now() at time zone 'utc') - interval '{expire_hours} hours')
+  AND create_ts < (now() at time zone 'utc') - interval '{expire_hours} hours'
  ORDER BY id
 """
 UPDATE_MHR_REVIEW = """
 UPDATE mhr_review_registrations
    SET status_type = 'PAY_CANCELLED'
  WHERE status_type = 'PAY_PENDING'
-   AND create_ts < (now() at time zone 'utc') - interval '{expire_hours} hours')
+   AND create_ts < (now() at time zone 'utc') - interval '{expire_hours} hours'
 """
 MHR_RESTORE_STATUS = """
 UPDATE mhr_registrations SET status_type = CAST(mhr_drafts.draft ->> 'status' AS mhr_registration_status_type)
@@ -251,6 +255,7 @@ def update_mhr_review_reg(
     try:
         if not db_conn or not db_cursor:
             return
+        logger.info("Updating staff review registrations.")
         review_ids: str = ""
         review_id: int
         sql_statement = MHR_REVIEW_REG_QUERY.format(expire_hours=config.MHR_EXPIRY_CLIENT_HOURS)
@@ -327,6 +332,7 @@ def run_status_query(
         status_data["mhr_complete"] = int(row[3])
         status_data["mhr_errors"] = int(row[4])
         status_data["mhr_expired"] = int(row[5])
+        status_data["mhr_review_expired"] = int(row[6])
         logger.info(f"Status query results: {str(status_data)}")
     except (psycopg2.Error, Exception) as err:
         error_message = f"Error attempting to run status query: {err}"
@@ -402,6 +408,10 @@ def cancel_mhr_expired(  # pylint: disable=too-many-locals
 ) -> dict:
     """Revert draft status and delete payment for expired ppr pending payment registrations."""
     cancel_count: int = 0
+    if status_data.get("mhr_review_expired", 0) > 0:
+        update_mhr_review_reg(db_conn, db_cursor, config)
+    else:
+        logger.info("No expired MHR review registrations to update.")
     if not status_data.get("mhr_expired") or status_data.get("mhr_expired") < 1:
         logger.info("No expired MHR pending payments to cancel")
         return cancel_count
@@ -446,8 +456,6 @@ def cancel_mhr_expired(  # pylint: disable=too-many-locals
         status_data["mhr_error_ids"] = error_draft_ids
         restore_mhr_status(db_conn, db_cursor, mhr_numbers, draft_ids)
         restore_mhr_draft(db_conn, db_cursor, draft_ids)
-        if draft_ids.find(DRAFT_STAFF_REVIEW_PREFIX) > -1:
-            update_mhr_review_reg(db_conn, db_cursor, config)
     except (psycopg2.Error, Exception) as err:
         error_message = f"Error attempting to cancel MHR expired payments: {err}"
         logger.error(error_message)
