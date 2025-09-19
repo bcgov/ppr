@@ -55,7 +55,8 @@ const UIFilterToApiFilter = {
   'searchQuery.criteria.value': 'criteria',
   'searchQuery.type': 'type',
   'searchQuery.clientReferenceId': 'clientReferenceId',
-  username: 'username'
+  username: 'username',
+  searchDateTime: 'searchDateTime'
 }
 
 // add sorting params for registration history/draft api calls
@@ -114,7 +115,9 @@ const getSearchHistoryQueryString = (filters: SearchHistoryFilterIF) => {
 
     if (uiKey === 'searchQuery.type') {
       finalValue = value?.searchTypeAPI.replace(/-/g, "_")
-    } else {
+    } else if (uiKey === 'orderBy') {
+      finalValue = UIFilterToApiFilter[value]
+    }else {
       finalValue = value
     }
 
@@ -122,13 +125,13 @@ const getSearchHistoryQueryString = (filters: SearchHistoryFilterIF) => {
     if (finalValue !== undefined && finalValue !== null && finalValue !== '') {
       const apiKey = UIFilterToApiFilter[uiKey]
       if (apiKey) {
-        sanitizedOptions[apiKey] = finalValue;
+        sanitizedOptions[apiKey] = finalValue.trim()
       }
     }
   }
   const queryString = new URLSearchParams(sanitizedOptions).toString();
 
-  return `&${queryString}&sortCriteriaName=searchDateTime&sortDirection=ascending`;
+  return `&${queryString}`;
 }
 
 // Create default request base URL and headers.

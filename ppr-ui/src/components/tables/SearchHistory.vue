@@ -53,6 +53,7 @@ export default defineComponent({
     const localState = reactive({
       keyValue: 0,
       sortAsc: false,
+      sortBy: '',
       headers: computed((): Array<any> => {
         const tableHeaders = cloneDeep(searchHistoryTableHeaders)
         if (localState.isStaff) {
@@ -92,7 +93,6 @@ export default defineComponent({
     })
 
     const { mapMhrSearchType } = useSearch()
-    const { sortDates } = useTableFeatures()
     const displayDate = (searchDate: string): string => {
       const date = new Date(searchDate)
       return convertDate(date, true, false)
@@ -283,10 +283,13 @@ export default defineComponent({
         localState.keyValue += 1
       }
     }
-    /** Date sort handler to sort and change sort icon state **/
-    const dateSortHandler = (searchHistory: Array<SearchResponseIF>, dateType: string, reverse: boolean) => {
-      localState.sortAsc = !localState.sortAsc
-      sortDates(searchHistory, dateType, reverse)
+
+    const sortTable = (header, sortable) => {
+      if(!sortable) return
+      localState.sortAsc = header === localState.sortBy 
+                              ? !localState.sortAsc
+                              : false
+      localState.sortBy = header
     }
 
     /** Scroll to Search Table **/
@@ -331,9 +334,35 @@ export default defineComponent({
         }
       })
       localState.dateTxt =  ''
+      // Initialize sort options
+      localState.sortAsc = false
+      localState.sortBy = 'searchDateTime'
     }
     const clearFilters = () => {
       resetFilters()
+    }
+
+    const retrieveSearchHistory = async () => {
+      // Only proceed if filtering is active
+      if (getIsSearchHistoryFiltering) {
+        try {
+          localState.isLoading = true
+          const resp = await searchHistory({
+            ...localState.filters,
+            orderVal: localState.sortAsc ? 'ascending' : 'descending',
+            orderBy: localState.sortBy
+          })
+
+          if (!resp || resp?.error) {
+            setSearchHistory(null)
+          } else {
+            setSearchHistory(resp.searches)
+          }
+        } finally {
+          localState.isLoading = false
+          setIsSearchHistoryFiltering(false)
+        }
+      }
     }
 
     /** Scroll to event on added search **/
@@ -351,62 +380,31 @@ export default defineComponent({
       }
     }, { immediate: true })
 
+    watch(() => localState.dateTxt, () => {
+      if (localState.dateTxt === '' || localState.dateTxt === null) {
+        localState.filters['startDate'] = ''
+        localState.filters['endDate'] = ''
+      }
+    })
+
+    watch(() => [localState.sortBy, localState.sortAsc], () => {
+      setIsSearchHistoryFiltering(true)
+      retrieveSearchHistory()
+    })
+
     /**
      * - Determines whether API call should be triggered
      * - Skips initial mount and unnecessary cases
      */
-    watch(
-      () => ({ ...localState.filters }),
-      async (newFilters, oldFilters) => {
-        // Skip on initial load (oldFilters is empty object)
-        if (Object.keys(oldFilters).length === 0) {
-          return
-        }
+     watch(() => ({ ...localState.filters }), async (newFilters, oldFilters) => {
+        if (Object.keys(oldFilters).length === 0) return
 
-        // Find which filters have changed
         const changedFilters = Object.keys(newFilters).filter(
           key => newFilters[key] !== oldFilters[key]
         )
-
-        // Multiple filters cleared at once
-        if (changedFilters.length > 1) {
-          setIsSearchHistoryFiltering(true)
-        } else {
-          // Single filter change
-          const changedKey = changedFilters[0]
-          // If the changed filter is an input field
-          if (
-            ['searchQuery.criteria.value', 'searchQuery.clientReferenceId', 'username']
-              .includes(changedKey)
-          ) {
-            if (!newFilters[changedKey]) {
-              // Input cleared individually
-              setIsSearchHistoryFiltering(true)
-            } else if ([1, 2, 3].includes(newFilters[changedKey].length)) {
-              // Ignore short input (1–3 chars) to avoid unnecessary API calls
-              return
-            } else {
-              // Valid input length
-              setIsSearchHistoryFiltering(true)
-            }
-          } else {
-            // Non-input filter always triggers
-            setIsSearchHistoryFiltering(true)
-          }
-        }
-
-        // Finally, call API if conditions are met
-        if (getIsSearchHistoryFiltering) {
-          localState.isLoading = true
-          const resp = await searchHistory(newFilters)
-          if (!resp || resp?.error) {
-            setSearchHistory(null)
-          } else {
-
-            setSearchHistory(resp?.searches)
-          }
-          localState.isLoading = false
-        }
+        if (changedFilters.length === 0) return
+        setIsSearchHistoryFiltering(true)
+        retrieveSearchHistory()
       },
       { deep: true, immediate: false }
     )
@@ -427,7 +425,7 @@ export default defineComponent({
       isSearchOwner,
       refreshRow,
       retrySearch,
-      dateSortHandler,
+      sortTable,
       goToPay,
       returnSearchSelection,
       updateDateRange,
@@ -457,7 +455,7 @@ export default defineComponent({
         <v-table
           v-if="searchHistory"
           id="search-history-table"
-          height="25rem"
+          height="28rem"
           fixed-header
         >
           <template #default>
@@ -484,14 +482,14 @@ export default defineComponent({
                 </v-row>
               </template>
               <template v-else>
-                    {{ header.text }}
+                <span @click="sortTable(header.value, header.sortable)">
+                  {{ header.text }}
+                  <SortingIcon
+                    v-if="header.sortable && header.value === sortBy"
+                    :sort-asc="sortAsc"
+                  />
+                </span>
               </template>
-                <!-- Date Sort Icon/Button -->
-                <SortingIcon
-                  v-if="header.sortable"
-                  :sort-asc="sortAsc"
-                  @sort-event="dateSortHandler(searchHistory, 'searchDateTime', $event)"
-                />
               </th>
             </tr>
             <tr>
