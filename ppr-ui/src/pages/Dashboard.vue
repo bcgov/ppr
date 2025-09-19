@@ -425,12 +425,14 @@ export default defineComponent({
 
     const retrieveSearchHistory = async (): Promise<void> => {
       // get/set search history
-      const resp = await searchHistory()
+      const resp = await searchHistory({
+        orderVal: 'descending',
+        orderBy: 'searchDateTime'
+      })
       if (!resp || resp?.error) {
         setSearchHistory(null)
       } else {
         setSearchHistory(resp?.searches)
-
         setIsSearchHistoryFiltering(false)
       }
     }
