@@ -455,7 +455,7 @@ export default defineComponent({
         <v-table
           v-if="searchHistory"
           id="search-history-table"
-          height="25rem"
+          height="28rem"
           fixed-header
         >
           <template #default>
