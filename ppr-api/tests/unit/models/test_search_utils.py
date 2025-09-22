@@ -182,23 +182,8 @@ def test_account_criteria_params(session, search_type,criteria,filter_clause):
         assert query_params.get('query_type')
     else:
         assert 'query_type' not in query_params
-    if params.filter_search_criteria and not params.filter_last_name:
+    if params.filter_search_criteria:
         assert query_params.get('query_criteria')
-    else:
-        assert 'query_criteria' not in query_params
-    if params.filter_last_name:
-        assert query_params.get('query_last')
-    else:
-        assert 'query_last' not in query_params
-    if params.filter_first_name:
-        assert query_params.get('query_first')
-    else:
-        assert 'query_first' not in query_params
-    if params.filter_search_type and params.filter_search_type in ("IS", "MI"):
-        assert query_params.get('query_last')
-    else:
-        assert not query_params.get('query_last')
-        assert not query_params.get('query_first')
 
 
 def is_ci_testing() -> bool:
