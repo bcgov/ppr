@@ -119,7 +119,7 @@ export const searchTableHeaders: TableHeadersIF = {
 export const searchHistoryTableHeaders: Array<BaseHeaderIF> = [
   {
     class: 'column-md',
-    sortable: false,
+    sortable: true,
     text: 'Search Value',
     value: 'searchQuery.criteria.value',
     filter: {
@@ -129,7 +129,7 @@ export const searchHistoryTableHeaders: Array<BaseHeaderIF> = [
   },
   {
     class: 'column-md',
-    sortable: false,
+    sortable: true,
     text: 'Search Type or Category',
     value: 'searchQuery.type',
     filter: {
@@ -149,7 +149,7 @@ export const searchHistoryTableHeaders: Array<BaseHeaderIF> = [
   },
   {
     class: 'column-mds',
-    sortable: false,
+    sortable: true,
     text: 'Folio',
     value: 'searchQuery.clientReferenceId',
     filter: {
@@ -175,7 +175,7 @@ export const searchHistoryTableHeaders: Array<BaseHeaderIF> = [
 export const searchHistoryTableHeadersStaff: Array<BaseHeaderIF> = [
   {
     class: 'column-md',
-    sortable: false,
+    sortable: true,
     text: 'Search Value',
     value: 'searchQuery.criteria.value',
     filter: {
@@ -185,7 +185,7 @@ export const searchHistoryTableHeadersStaff: Array<BaseHeaderIF> = [
   },
   {
     class: 'column-md',
-    sortable: false,
+    sortable: true,
     text: 'Search Type or Category',
     value: 'searchQuery.type',
     filter: {
@@ -195,7 +195,7 @@ export const searchHistoryTableHeadersStaff: Array<BaseHeaderIF> = [
   },
   {
     class: 'column-mds',
-    sortable: false,
+    sortable: true,
     text: 'Folio Number',
     value: 'searchQuery.clientReferenceId',
     filter: {
@@ -215,7 +215,7 @@ export const searchHistoryTableHeadersStaff: Array<BaseHeaderIF> = [
   },
   {
     class: 'column-mds',
-    sortable: false,
+    sortable: true,
     text: 'Username',
     value: 'username',
     filter: {

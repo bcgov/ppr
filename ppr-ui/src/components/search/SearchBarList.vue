@@ -77,7 +77,7 @@
 import { computed, defineComponent, reactive, ref, toRefs, nextTick, watch } from 'vue'
 import { useStore } from '@/store/store'
 import { MHRSearchTypes, SearchTypes } from '@/resources'
-import { APISearchTypes, UISearchTypes, FilterTypes } from '@/enums'
+import { APISearchTypes, UISearchTypes } from '@/enums'
 import type { SearchTypeIF } from '@/interfaces'
 import { storeToRefs } from 'pinia'
 

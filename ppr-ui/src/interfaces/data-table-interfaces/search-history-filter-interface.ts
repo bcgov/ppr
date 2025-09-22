@@ -1,9 +1,11 @@
 export interface SearchHistoryFilterIF {
-    endDate?: 'endDateTime',
-    startDate?: 'startDateTime',
-    'searchQuery.criteria.value'?: 'criteria',
-    'searchQuery.type'?: 'type',
-    'searchQuery.clientReferenceId'?: 'clientReferenceId',
-    username?: 'username'
+    endDate?: string
+    startDate?: string
+    'searchQuery.criteria.value'?: string
+    'searchQuery.type'?: string
+    'searchQuery.clientReferenceId'?: string
+    username?: string
+    orderVal?: string
+    orderBy?: string
   }
   
