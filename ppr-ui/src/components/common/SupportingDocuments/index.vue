@@ -1,10 +1,14 @@
 <script setup lang="ts">
 defineProps({
-  name: {
+  documentId: {
     type: String,
     required: true,
   }
 })
+
+// Future State: Pull in uploaded documents from API or passed via props depending on context
+// https://test.api.connect.gov.bc.ca/doc-dev/api/v1/searches/MHR?consumerDocumentId=xxxxxx
+// https://test.api.connect.gov.bc.ca/doc-dev/api/v1/searches/MHR?documentServiceId=xxxxx
 
 const showAddDocuments = ref(false)
 </script>
@@ -57,6 +61,3 @@ const showAddDocuments = ref(false)
     </div>
   </div>
 </template>
-
-<!-- https://test.api.connect.gov.bc.ca/doc-dev/api/v1/searches/MHR?consumerDocumentId=1000000310 -->
-<!-- https://test.api.connect.gov.bc.ca/doc-dev/api/v1/searches/MHR?documentServiceId=DS0000101369 -->
