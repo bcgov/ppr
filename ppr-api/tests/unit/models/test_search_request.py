@@ -88,6 +88,17 @@ INDIVIDUAL_DEBTOR_JSON = {
     },
     'clientReferenceId': 'T-SQ-IS-1'
 }
+INDIVIDUAL_DEBTOR_JSON2 = {
+    'type': 'INDIVIDUAL_DEBTOR',
+    'criteria': {
+        'debtorName': {
+            'last': 'Last',
+            'first': 'First',
+            'middle': 'Middle'
+        }
+    },
+    'clientReferenceId': 'T-SQ-IS-1'
+}
 BUSINESS_DEBTOR_JSON = {
     'type': 'BUSINESS_DEBTOR',
     'criteria': {
@@ -325,6 +336,17 @@ TEST_VALID_DATA = [
     ('BS', BUSINESS_DEBTOR_JSON),
     ('SS', SERIAL_NUMBER_JSON)
 ]
+# testdata pattern is ({search type}, {JSON data}, {search_value})
+TEST_SEARCH_VALUE_DATA = [
+    ('AC', AIRCRAFT_DOT_AC_JSON, 'CFYXW'),
+    ('AF', AIRCRAFT_DOT_AF_JSON, 'AF16031'),
+    ('RG', REGISTRATION_NUMBER_JSON, 'TEST0001'),
+    ('MH', MHR_NUMBER_JSON, '220000'),
+    ('IS', INDIVIDUAL_DEBTOR_JSON, 'TEST IND DEBTOR'),
+    ('IS', INDIVIDUAL_DEBTOR_JSON2, 'FIRST MIDDLE LAST'),
+    ('BS', BUSINESS_DEBTOR_JSON, 'TEST BUS 2 DEBTOR'),
+    ('SS', SERIAL_NUMBER_JSON, 'JU622994')
+]
 
 # testdata pattern is ({search type}, {JSON data})
 TEST_NONE_DATA = [
@@ -424,6 +446,13 @@ def test_search_no_account(session):
 
     assert query.id
     assert query.search_response
+
+
+@pytest.mark.parametrize('search_type,json_data,search_val', TEST_SEARCH_VALUE_DATA)
+def test_search_value(session, search_type, json_data, search_val):
+    """Assert that a valid search saves the expected search value."""
+    query = SearchRequest.create_from_json(json_data, 'PS12345', 'UNIT_TEST')
+    assert query.search_value == search_val
 
 
 @pytest.mark.parametrize('search_type,json_data', TEST_VALID_DATA)

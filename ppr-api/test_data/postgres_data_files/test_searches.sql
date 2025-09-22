@@ -1,10 +1,10 @@
 -- Existing completed registration number search on TEST0001 (search step 1 and 2)
 INSERT INTO search_requests(id, search_ts, search_type, api_criteria, search_response,
-                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size)
+                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size, search_value)
   VALUES(200000000, CURRENT_TIMESTAMP, 'RG',
          '{"type": "REGISTRATION_NUMBER", "criteria": {"value": "TEST0001"}, "clientReferenceId": "T-S-RG-001"}',
          '[{"matchType": "EXACT", "registrationNumber": "TEST0001", "baseRegistrationNumber": "TEST0001", "createDateTime": "2021-01-06T11:35:57+00:00", "registrationType": "SA"}]',
-         'PS12345', null, null, 'UT-SQ-RG-001', 1, 1)
+         'PS12345', null, null, 'UT-SQ-RG-001', 1, 1, 'TEST0001')
 ;
 INSERT INTO search_results(search_id, exact_match_count, similar_match_count, api_result, registrations)
    VALUES(200000000, 1, 0,
@@ -14,11 +14,11 @@ INSERT INTO search_results(search_id, exact_match_count, similar_match_count, ap
 
 -- Existing incomplete registration number search on TEST0001 (search step only)
 INSERT INTO search_requests(id, search_ts, search_type, api_criteria, search_response,
-                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size)
+                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size, search_value)
   VALUES(200000001, CURRENT_TIMESTAMP, 'RG',
          '{"type": "REGISTRATION_NUMBER", "criteria": {"value": "TEST0001"}, "clientReferenceId": "T-S-RG-002"}',
          '[{"matchType": "EXACT", "registrationNumber": "TEST0001", "baseRegistrationNumber": "TEST0001", "createDateTime": "2021-01-06T11:35:57+00:00", "registrationType": "SA"}]',
-         'PS12345', null, null, 'UT-SQ-RG-002', 1, 1)
+         'PS12345', null, null, 'UT-SQ-RG-002', 1, 1, 'TEST0001')
 ;
 INSERT INTO search_results(search_id, exact_match_count, similar_match_count, api_result, registrations)
    VALUES(200000001, 1, 0, null,
@@ -27,11 +27,11 @@ INSERT INTO search_results(search_id, exact_match_count, similar_match_count, ap
 
 -- Existing registration number search on TEST0012 (search step only). A financing statement with no other registrations
 INSERT INTO search_requests(id, search_ts, search_type, api_criteria, search_response,
-                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size)
+                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size, search_value)
   VALUES(200000002, CURRENT_TIMESTAMP, 'RG',
          '{"type": "REGISTRATION_NUMBER", "criteria": {"value": "TEST0012"}, "clientReferenceId": "T-S-RG-003"}',
          '[{"matchType": "EXACT", "registrationNumber": "TEST0012", "baseRegistrationNumber": "TEST0012", "createDateTime": "2021-01-06T11:35:57+00:00", "registrationType": "SA"}]',
-         'PS12345', null, null, 'UT-SQ-RG-003', 1, 1)
+         'PS12345', null, null, 'UT-SQ-RG-003', 1, 1, 'TEST0012')
 ;
 INSERT INTO search_results(search_id, exact_match_count, similar_match_count, api_result, registrations)
    VALUES(200000002, 1, 0, null,
@@ -40,11 +40,11 @@ INSERT INTO search_results(search_id, exact_match_count, similar_match_count, ap
 
 -- Existing registration number search on TEST0002 (search step only). A financing statement with a renewal.
 INSERT INTO search_requests(id, search_ts, search_type, api_criteria, search_response,
-                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size)
+                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size, search_value)
   VALUES(200000003, CURRENT_TIMESTAMP, 'RG',
          '{"type": "REGISTRATION_NUMBER", "criteria": {"value": "TEST0002"}, "clientReferenceId": "T-S-RG-004"}',
          '[{"matchType": "EXACT", "registrationNumber": "TEST0002", "baseRegistrationNumber": "TEST0002", "createDateTime": "2021-01-06T11:35:57+00:00", "registrationType": "SA"}]',
-         'PS12345', null, null, 'UT-SQ-RG-004', 1, 1)
+         'PS12345', null, null, 'UT-SQ-RG-004', 1, 1, 'TEST0002')
 ;
 INSERT INTO search_results(search_id, exact_match_count, similar_match_count, api_result, registrations)
    VALUES(200000003, 1, 0, null,
@@ -54,21 +54,21 @@ INSERT INTO search_results(search_id, exact_match_count, similar_match_count, ap
 
 -- Existing Business debtor search for autosave search selection update testing.
 INSERT INTO search_requests(id, search_ts, search_type, api_criteria, search_response,
-                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size)
+                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size, search_value)
   VALUES(200000004, CURRENT_TIMESTAMP, 'BS',
          '{"type": "BUSINESS_DEBTOR", "criteria": {"debtorName": {"business": "TEST BUS 2 DEBTOR"}}, "clientReferenceId": "T-S-DB-001"}',
          '[{"baseRegistrationNumber": "TEST0001", "matchType": "EXACT", "createDateTime": "2021-03-02T22:46:43+00:00", "registrationType": "SA", "debtor": {"businessName": "TEST BUS 2 DEBTOR", "partyId": 200000002}}, {"baseRegistrationNumber": "TEST0002", "matchType": "EXACT", "createDateTime": "2021-03-02T22:46:43+00:00", "registrationType": "RL", "debtor": {"businessName": "TEST BUS 2 DEBTOR", "partyId": 200000006}}, {"baseRegistrationNumber": "TEST0003", "matchType": "SIMILAR", "createDateTime": "2021-03-02T22:46:43+00:00", "registrationType": "RL", "debtor": {"businessName": "TEST BUS 3 DEBTOR", "partyId": 200000009}}]',
-         'PS12345', null, null, 'UT-SQ-MH-005', 1, 1)
+         'PS12345', null, null, 'UT-SQ-MH-005', 1, 1, 'TEST BUS 2 DEBTOR')
 ;
 
 
 -- Completed registration number search on TEST0012 to test get details: search ts in the future.
 INSERT INTO search_requests(id, search_ts, search_type, api_criteria, search_response,
-                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size)
+                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size, search_value)
   VALUES(200000005, CURRENT_TIMESTAMP + interval '365 days', 'RG',
          '{"type": "REGISTRATION_NUMBER", "criteria": {"value": "TEST0012"}, "clientReferenceId": "T-S-RG-003"}',
          '[{"matchType": "EXACT", "registrationNumber": "TEST0012", "baseRegistrationNumber": "TEST0012", "createDateTime": "2021-01-06T11:35:57+00:00", "registrationType": "SA"}]',
-         'PS12345', null, null, 'T-S-RG-003', 1, 1)
+         'PS12345', null, null, 'T-S-RG-003', 1, 1, 'TEST0012')
 ;
 INSERT INTO search_results(search_id, exact_match_count, similar_match_count, api_result, registrations)
    VALUES(200000005, 1, 0,
@@ -160,11 +160,11 @@ INSERT INTO search_results(search_id, exact_match_count, similar_match_count, ap
 
 -- Completed registration number search on TEST0012 to test get details: search ts too far in the past.
 INSERT INTO search_requests(id, search_ts, search_type, api_criteria, search_response,
-                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size)
+                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size, search_value)
   VALUES(200000006, CURRENT_TIMESTAMP - interval '32 days', 'RG',
          '{"type": "REGISTRATION_NUMBER", "criteria": {"value": "TEST0012"}, "clientReferenceId": "T-S-RG-003"}',
          '[{"matchType": "EXACT", "registrationNumber": "TEST0012", "baseRegistrationNumber": "TEST0012", "createDateTime": "2021-01-06T11:35:57+00:00", "registrationType": "SA"}]',
-         'PS12345', null, null, 'T-S-RG-003', 1, 1)
+         'PS12345', null, null, 'T-S-RG-003', 1, 1, 'TEST0012')
 ;
 INSERT INTO search_results(search_id, exact_match_count, similar_match_count, api_result, registrations)
    VALUES(200000006, 1, 1,
@@ -245,11 +245,11 @@ INSERT INTO search_results(search_id, exact_match_count, similar_match_count, ap
 
 -- Existing pending large search result report no tracking
 INSERT INTO search_requests(id, search_ts, search_type, api_criteria, search_response,
-                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size)
+                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size, search_value)
   VALUES(200000007, CURRENT_TIMESTAMP  at time zone 'utc', 'RG',
          '{"type": "REGISTRATION_NUMBER", "criteria": {"value": "TEST0001"}, "clientReferenceId": "T-S-RG-002"}',
          '[{"matchType": "EXACT", "registrationNumber": "TEST0001", "baseRegistrationNumber": "TEST0001", "createDateTime": "2021-01-06T11:35:57+00:00", "registrationType": "SA"}]',
-         'PS12345', null, null, 'UT-SQ-RG-002', 76, 76)
+         'PS12345', null, null, 'UT-SQ-RG-002', 76, 76, 'TEST0001')
 ;
 INSERT INTO search_results(search_id, exact_match_count, similar_match_count, api_result, registrations, callback_url, doc_storage_url)
    VALUES(200000007, 76, 0, '[{"matchType": "EXACT", "baseRegistrationNumber": "TEST0001"}]',
@@ -284,11 +284,11 @@ INSERT INTO search_results(search_id, exact_match_count, similar_match_count, ap
 
 -- Existing completed large search result report
 INSERT INTO search_requests(id, search_ts, search_type, api_criteria, search_response,
-                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size)
+                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size, search_value)
   VALUES(200000008, CURRENT_TIMESTAMP  at time zone 'utc', 'RG',
          '{"type": "REGISTRATION_NUMBER", "criteria": {"value": "TEST0001"}, "clientReferenceId": "T-S-RG-002"}',
          '[{"matchType": "EXACT", "registrationNumber": "TEST0001", "baseRegistrationNumber": "TEST0001", "createDateTime": "2021-01-06T11:35:57+00:00", "registrationType": "SA"}]',
-         'PS12345', null, null, 'UT-SQ-RG-002', 76, 76)
+         'PS12345', null, null, 'UT-SQ-RG-002', 76, 76, 'TEST0001')
 ;
 INSERT INTO search_results(search_id, exact_match_count, similar_match_count, api_result, registrations, callback_url, doc_storage_url)
    VALUES(200000008, 76, 0, '[{"matchType": "EXACT", "baseRegistrationNumber": "TEST0001"}]',
@@ -508,11 +508,11 @@ INSERT INTO search_results(search_id, exact_match_count, similar_match_count, ap
 
 -- Existing pending large search result report tracking errors
 INSERT INTO search_requests(id, search_ts, search_type, api_criteria, search_response,
-                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size)
+                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size, search_value)
   VALUES(200000009, CURRENT_TIMESTAMP  at time zone 'utc', 'RG',
          '{"type": "REGISTRATION_NUMBER", "criteria": {"value": "TEST0001"}, "clientReferenceId": "T-S-RG-002"}',
          '[{"matchType": "EXACT", "registrationNumber": "TEST0001", "baseRegistrationNumber": "TEST0001", "createDateTime": "2021-01-06T11:35:57+00:00", "registrationType": "SA"}]',
-         'PS12345', null, null, 'UT-SQ-RG-002', 76, 76)
+         'PS12345', null, null, 'UT-SQ-RG-002', 76, 76, 'TEST0001')
 ;
 INSERT INTO search_results(search_id, exact_match_count, similar_match_count, api_result, registrations, callback_url, doc_storage_url)
    VALUES(200000009, 76, 0, '[{"matchType": "EXACT", "baseRegistrationNumber": "TEST0001"}]',
@@ -522,11 +522,11 @@ INSERT INTO search_results(search_id, exact_match_count, similar_match_count, ap
 
 -- Existing pending large search result report tracking max errors exceeded
 INSERT INTO search_requests(id, search_ts, search_type, api_criteria, search_response,
-                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size)
+                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size, search_value)
   VALUES(200000010, CURRENT_TIMESTAMP  at time zone 'utc', 'RG',
          '{"type": "REGISTRATION_NUMBER", "criteria": {"value": "TEST0001"}, "clientReferenceId": "T-S-RG-002"}',
          '[{"matchType": "EXACT", "registrationNumber": "TEST0001", "baseRegistrationNumber": "TEST0001", "createDateTime": "2021-01-06T11:35:57+00:00", "registrationType": "SA"}]',
-         'PS12345', null, null, 'UT-SQ-RG-002', 76, 76)
+         'PS12345', null, null, 'UT-SQ-RG-002', 76, 76, 'TEST0001')
 ;
 INSERT INTO search_results(search_id, exact_match_count, similar_match_count, api_result, registrations, callback_url, doc_storage_url)
    VALUES(200000010, 76, 0, '[{"matchType": "EXACT", "baseRegistrationNumber": "TEST0001"}]',
@@ -558,11 +558,11 @@ INSERT INTO event_tracking(id, key_id, event_ts, event_tracking_type, status, me
 
 -- Existing notification large search result report no tracking.
 INSERT INTO search_requests(id, search_ts, search_type, api_criteria, search_response,
-                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size)
+                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size, search_value)
   VALUES(200000011, CURRENT_TIMESTAMP  at time zone 'utc', 'RG',
          '{"type": "REGISTRATION_NUMBER", "criteria": {"value": "TEST0001"}, "clientReferenceId": "T-S-RG-002"}',
          '[{"matchType": "EXACT", "registrationNumber": "TEST0001", "baseRegistrationNumber": "TEST0001", "createDateTime": "2021-01-06T11:35:57+00:00", "registrationType": "SA"}]',
-         'PS12345', null, null, 'UT-SQ-RG-002', 76, 76)
+         'PS12345', null, null, 'UT-SQ-RG-002', 76, 76, 'TEST0001')
 ;
 INSERT INTO search_results(search_id, exact_match_count, similar_match_count, api_result, registrations, callback_url, doc_storage_url)
    VALUES(200000011, 76, 0, '[]',
@@ -572,11 +572,11 @@ INSERT INTO search_results(search_id, exact_match_count, similar_match_count, ap
 
 -- Existing notification large search result report tracking max errors exceeded.
 INSERT INTO search_requests(id, search_ts, search_type, api_criteria, search_response,
-                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size)
+                         account_id, pay_invoice_id, pay_path, client_reference_id, total_results_size, returned_results_size, search_value)
   VALUES(200000012, CURRENT_TIMESTAMP  at time zone 'utc', 'RG',
          '{"type": "REGISTRATION_NUMBER", "criteria": {"value": "TEST0001"}, "clientReferenceId": "T-S-RG-002"}',
          '[{"matchType": "EXACT", "registrationNumber": "TEST0001", "baseRegistrationNumber": "TEST0001", "createDateTime": "2021-01-06T11:35:57+00:00", "registrationType": "SA"}]',
-         'PS12345', null, null, 'UT-SQ-RG-002', 76, 76)
+         'PS12345', null, null, 'UT-SQ-RG-002', 76, 76, 'TEST0001')
 ;
 INSERT INTO search_results(search_id, exact_match_count, similar_match_count, api_result, registrations, callback_url, doc_storage_url)
    VALUES(200000012, 76, 0, '[]',

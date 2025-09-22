@@ -63,6 +63,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
     returned_results_size = db.mapped_column("returned_results_size", db.Integer, nullable=True)
     user_id = db.mapped_column("user_id", db.String(1000), nullable=True)
     updated_selection = db.mapped_column("updated_selection", db.JSON, nullable=True)
+    search_value = db.mapped_column("search_value", db.String(320), nullable=True, index=True)
 
     pay_invoice_id = db.mapped_column("pay_invoice_id", db.Integer, nullable=True)
     pay_path = db.mapped_column("pay_path", db.String(256), nullable=True)
@@ -329,6 +330,16 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         if "clientReferenceId" in search_json and search_json["clientReferenceId"].strip() != "":
             new_search.client_reference_id = search_json["clientReferenceId"]
         new_search.user_id = user_id
+        if search_json["criteria"].get("value"):
+            new_search.search_value = str(search_json["criteria"]["value"]).upper().strip()
+        elif search_json["criteria"].get("ownerName"):
+            ind_name: str = ""
+            if search_json["criteria"]["ownerName"].get("first"):
+                ind_name = str(search_json["criteria"]["ownerName"].get("first")).strip()
+            if search_json["criteria"]["ownerName"].get("middle"):
+                ind_name += " " + str(search_json["criteria"]["ownerName"].get("middle")).strip()
+            ind_name += " " + str(search_json["criteria"]["ownerName"].get("last")).strip()
+            new_search.search_value = ind_name.upper()
         return new_search
 
     @staticmethod
