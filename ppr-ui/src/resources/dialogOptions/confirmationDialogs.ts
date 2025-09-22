@@ -141,3 +141,10 @@ export const manufacturedHomeDeliveredDialogOptions = (exemptionType: string = '
       upon filing the ${exemptionType}.`
   }
 }
+
+export const confirmCancelDialog: DialogOptionsIF = {
+  acceptText: 'Discard Changes',
+  cancelText: 'Keep Changes',
+  title: 'Cancel Adding Documents',
+  text: 'This will undo any changes you have made.'
+}

@@ -7,6 +7,7 @@
     <template #content>
       <dialog-content :set-base-text="setOptions.text" />
       <v-checkbox
+        v-if="!setHideCheckbox"
         v-model="preventDialog"
         class="dialog-checkbox pt-5 ma-0"
         :error-messages="updateFailed ? 'error' : ''"
@@ -53,6 +54,10 @@ export default defineComponent({
     setSettingOption: {
       type: String as () => SettingOptions,
       default: ''
+    },
+    setHideCheckbox: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['proceed'],
