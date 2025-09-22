@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { ConfirmationDialog } from '@/components/dialogs'
+import { confirmCancelDialog } from '@/resources/dialogOptions/confirmationDialogs'
+
 defineProps({
   documentId: {
     type: String,
@@ -11,9 +14,31 @@ defineProps({
 // https://test.api.connect.gov.bc.ca/doc-dev/api/v1/searches/MHR?documentServiceId=xxxxx
 
 const showAddDocuments = ref(false)
+const showConfirmCancelDialog = ref(false)
+const dialogHandler = (action: string) => {
+  if (action) {
+    showAddDocuments.value = false
+  }
+  showConfirmCancelDialog.value = false
+}
+const fileUploadToggle = (action: string) => {
+  if (showAddDocuments.value) {
+    showConfirmCancelDialog.value = true
+    return
+  }
+  if (action) {
+    showAddDocuments.value = !showAddDocuments.value
+  }
+}
 </script>
 <template>
   <div>
+    <ConfirmationDialog
+      :set-display="showConfirmCancelDialog"
+      :set-options="confirmCancelDialog"
+      :set-hide-checkbox="true"
+      @proceed="dialogHandler"
+    />
     <div
       :class="'font-bold text-gray-900 bg-bcGovColor-gray2 px-[1.4rem] py-[12px] rounded-t'"
     >
@@ -29,7 +54,7 @@ const showAddDocuments = ref(false)
             :icon="showAddDocuments ? 'i-mdi-close' : 'i-mdi-plus'"
             :label="showAddDocuments ? 'Cancel Adding Documents' : 'Add Documents'"
             data-cy="add-documents-button"
-            @click="showAddDocuments = !showAddDocuments"
+            @click="fileUploadToggle"
           />
         </div>
       </div>
