@@ -43,7 +43,7 @@ const showAddDocuments = ref(false)
       <FileUpload />
     </div>
 
-    <!-- List of Uploaded Documents -->
+    <!-- List of Uploaded Documents: Static placeholders - to be dynamic loop of all pulled or provided docs -->
     <div class="w-full border-t bg-white pa-6">
       <div class="flex items-center">
         <UIcon name="i-mdi-file-pdf-outline" class="text-primary size-[20px]" />
