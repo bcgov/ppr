@@ -11,7 +11,8 @@
         style="padding-top: 0.375rem;"
       >
         <v-row
-          v-if="!isMhrInformation && !isMhrCorrection && !isMhrReRegistration"
+          v-if="!isMhrInformation && !isMhrCorrection && !isMhrReRegistration &&
+          !isRouteName(RouteNames.MHR_QUEUE_TRANSFER)"
           justify="end"
           no-gutters
         >
@@ -37,7 +38,8 @@
           <MhrStatusCorrection />
         </v-row>
         <v-row
-          v-else-if="isMhrInformation || isMhrCorrection || isMhrReRegistration"
+          v-else-if="isMhrInformation || isMhrCorrection || isMhrReRegistration ||
+            isRouteName(RouteNames.MHR_QUEUE_TRANSFER)"
           justify="end"
           class="fs-16 pr-5"
           no-gutters
@@ -73,7 +75,8 @@
       </v-col>
     </v-row>
     <v-row
-      v-if="!isMhrInformation && !isMhrCorrection && !isMhrReRegistration"
+      v-if="!isMhrInformation && !isMhrCorrection && !isMhrReRegistration &&
+      !isRouteName(RouteNames.MHR_QUEUE_TRANSFER)"
       class="pt-1 tombstone-sub-header"
       no-gutters
     >
