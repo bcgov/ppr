@@ -317,6 +317,14 @@ TEST_VALID_DATA = [
     ('MI', OWNER_NAME_JSON2),
     ('MS', SERIAL_NUMBER_JSON),
 ]
+# testdata pattern is ({search type}, {JSON data}, {search_val})
+TEST_SEARCH_VALUE_DATA = [
+    ('MM', MHR_NUMBER_JSON, '000900'),
+    ('MO', ORG_NAME_JSON, 'CELESTIAL HEAVENLY HOMES'),
+    ('MI', OWNER_NAME_JSON, 'BOB MCKAY'),
+    ('MI', OWNER_NAME_JSON2, 'ROSE CHERYL RAMMOND'),
+    ('MS', SERIAL_NUMBER_JSON, '000060'),
+]
 # testdata pattern is ({search type}, {JSON data})
 TEST_NONE_DATA = [
     ('MM', MH_NONE_JSON),
@@ -419,6 +427,17 @@ def test_search_no_account(session):
 
     assert query.id
     assert query.search_response
+
+
+@pytest.mark.parametrize('search_type,json_data,search_val', TEST_SEARCH_VALUE_DATA)
+def test_search_value(session, search_type, json_data, search_val):
+    """Assert that a valid search returns the expected search valueresult."""
+    test_data = copy.deepcopy(json_data)
+    test_data['type'] = model_utils.TO_DB_SEARCH_TYPE[json_data['type']]
+    SearchRequest.validate_query(test_data)
+    # current_app.logger.info('type=' + str(json_data['type']))
+    query: SearchRequest = SearchRequest.create_from_json(json_data, 'PS12345', 'UNIT_TEST')
+    assert query.search_value == search_val
 
 
 @pytest.mark.parametrize('search_type,json_data', TEST_VALID_DATA)

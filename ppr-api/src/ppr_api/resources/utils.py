@@ -777,16 +777,6 @@ def set_search_params_criteria(params: AccountSearchParams) -> AccountSearchPara
             params.filter_search_type = None
         else:
             params.filter_search_type = search_utils.TO_FILTER_SEARCH_TYPE.get(params.filter_search_type)
-    if params.filter_search_type and params.filter_search_criteria and params.filter_search_type in ("MI", "IS"):
-        names = params.filter_search_criteria.split(" ")
-        if len(names) == 1:
-            params.filter_last_name = f"%{names[0]}%"
-        else:
-            params.filter_first_name = f"%{names[0]}%"
-            params.filter_last_name = f"%{names[1]}%"
-    if params.filter_search_criteria:
-        params.filter_search_criteria = f"%{params.filter_search_criteria}%"
-
     return params
 
 
@@ -813,15 +803,15 @@ def get_account_search_params(req: request, params: AccountSearchParams) -> Acco
     if params.filter_username:
         params.filter_username = params.filter_username.strip().upper()
         params.filter_username = remove_quotes(params.filter_username)
-        params.filter_username = f"%{params.filter_username}%"
     if params.filter_client_reference_id:
         params.filter_client_reference_id = params.filter_client_reference_id.strip().upper()
         params.filter_client_reference_id = remove_quotes(params.filter_client_reference_id)
-        params.filter_client_reference_id = f"%{params.filter_client_reference_id}%"
     if params.filter_start_date:
         params.filter_start_date = remove_quotes(params.filter_start_date)
     if params.filter_end_date:
         params.filter_end_date = remove_quotes(params.filter_end_date)
+    if params.filter_search_type:
+        params.filter_search_type = params.filter_search_type.upper()
     return set_search_params_criteria(params)
 
 

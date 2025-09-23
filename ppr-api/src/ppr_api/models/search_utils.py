@@ -63,7 +63,11 @@ TO_FILTER_SEARCH_TYPE = {
     "MHR_ORGANIZATION_NAME": "MO",
     "MHR_MHR_NUMBER": "MM",
     "MHR_SERIAL_NUMBER": "MS",
+    "PPR": "PPR",
+    "MHR": "MHR",
 }
+FILTER_SEARCH_TYPE_PPR = "PPR"
+FILTER_SEARCH_TYPE_MHR = "MHR"
 
 SEARCH_ORDER_BY_DATE = " ORDER BY search_ts"
 SEARCH_ORDER_BY_CLIENT_REF = " ORDER BY client_reference_id"
@@ -71,39 +75,13 @@ SEARCH_ORDER_BY_USERNAME = " ORDER BY username"
 SEARCH_ORDER_BY_SEARCH_TYPE = " ORDER BY search_type"
 SEARCH_ORDER_BY_SEARCH_CRITERIA = " ORDER BY search_criteria"
 SEARCH_ORDER_BY_DEFAULT = " ORDER BY search_ts DESC"
-SEARCH_FILTER_CLIENT_REF = " AND UPPER(client_reference_id) LIKE :query_client_ref"
-SEARCH_FILTER_USERNAME = " WHERE UPPER(username) LIKE :query_username"
+SEARCH_FILTER_CLIENT_REF = "  AND position(:query_client_ref in UPPER(client_reference_id)) > 0"
+SEARCH_FILTER_USERNAME = " WHERE position(:query_username in UPPER(username)) > 0"
 SEARCH_FILTER_DATE = " AND search_ts BETWEEN :query_start AND :query_end"
 SEARCH_FILTER_TYPE = " AND search_type = :query_type"
-SEARCH_FILTER_CRITERIA_DEFAULT = " AND UPPER(api_criteria -> 'criteria' ->> 'value') like :query_criteria"
-SEARCH_FILTER_CRITERIA_BS = " AND UPPER(api_criteria -> 'criteria' -> 'debtorName' ->> 'business') like :query_criteria"
-SEARCH_FILTER_CRITERIA_IS = """
- AND UPPER(api_criteria -> 'criteria' -> 'debtorName' ->> 'last') like :query_last
- AND UPPER(api_criteria -> 'criteria' -> 'debtorName' ->> 'first') like :query_first
-"""
-SEARCH_FILTER_CRITERIA_MI = """
- AND UPPER(api_criteria -> 'criteria' -> 'ownerName' ->> 'last') like :query_last
- AND UPPER(api_criteria -> 'criteria' -> 'ownerName' ->> 'first') like :query_first
-"""
-SEARCH_FILTER_CRITERIA_IS_LAST = " AND UPPER(api_criteria -> 'criteria' -> 'debtorName' ->> 'last') like :query_last"
-SEARCH_FILTER_CRITERIA_MI_LAST = " AND UPPER(api_criteria -> 'criteria' -> 'ownerName' ->> 'last') like :query_last"
-FILTER_SEARCH_CRITERIA = {
-    "AC": SEARCH_FILTER_CRITERIA_DEFAULT,
-    "MH": SEARCH_FILTER_CRITERIA_DEFAULT,
-    "RG": SEARCH_FILTER_CRITERIA_DEFAULT,
-    "SS": SEARCH_FILTER_CRITERIA_DEFAULT,
-    "MM": SEARCH_FILTER_CRITERIA_DEFAULT,
-    "MS": SEARCH_FILTER_CRITERIA_DEFAULT,
-    "MO": SEARCH_FILTER_CRITERIA_DEFAULT,
-    "BS": SEARCH_FILTER_CRITERIA_BS,
-    "IS": SEARCH_FILTER_CRITERIA_IS,
-    "MI": SEARCH_FILTER_CRITERIA_MI,
-}
-# Last name only
-FILTER_SEARCH_CRITERIA_LASTNAME = {
-    "IS": SEARCH_FILTER_CRITERIA_IS_LAST,
-    "MI": SEARCH_FILTER_CRITERIA_MI_LAST,
-}
+SEARCH_FILTER_TYPE_PPR = " AND search_type NOT IN ('MI', 'MO', 'MM', 'MS')"
+SEARCH_FILTER_TYPE_MHR = " AND search_type IN ('MI', 'MO', 'MM', 'MS')"
+SEARCH_FILTER_CRITERIA_DEFAULT = " AND position(:query_criteria in search_value) > 0"
 QUERY_ACCOUNT_ORDER_BY = {
     SEARCH_TS_PARAM: SEARCH_ORDER_BY_DATE,
     SEARCH_TYPE_PARAM: SEARCH_ORDER_BY_SEARCH_TYPE,
@@ -557,13 +535,13 @@ def build_account_query_filter(query_text: str, params: AccountSearchParams) -> 
         filter_type = query_filter[0]
         filter_value = query_filter[1]
         if filter_type and filter_value:
-            if filter_type == "criteria":
-                if not params.filter_search_type:
-                    filter_clause = SEARCH_FILTER_CRITERIA_DEFAULT
-                elif params.filter_search_type in ("IS", "MI") and not params.filter_first_name:
-                    filter_clause = FILTER_SEARCH_CRITERIA_LASTNAME.get(params.filter_search_type)
+            if filter_type == SEARCH_TYPE_PARAM:
+                if filter_value == FILTER_SEARCH_TYPE_MHR:
+                    filter_clause = SEARCH_FILTER_TYPE_MHR
+                elif filter_value == FILTER_SEARCH_TYPE_PPR:
+                    filter_clause = SEARCH_FILTER_TYPE_PPR
                 else:
-                    filter_clause = FILTER_SEARCH_CRITERIA.get(params.filter_search_type)
+                    filter_clause = QUERY_ACCOUNT_FILTER_BY.get(filter_type)
             elif filter_type != "username":
                 filter_clause = QUERY_ACCOUNT_FILTER_BY.get(filter_type)
             if filter_clause:
@@ -621,17 +599,15 @@ def build_account_query_params(
             # logger.info(f'start_ts={start_ts} end_ts={end_ts}')
             query_params["query_start"] = start_ts
             query_params["query_end"] = end_ts
-        if params.filter_search_type:
+        if params.filter_search_type and params.filter_search_type not in (
+            FILTER_SEARCH_TYPE_PPR,
+            FILTER_SEARCH_TYPE_MHR,
+        ):
             query_params["query_type"] = params.filter_search_type
         if params.filter_username:
             query_params["query_username"] = params.filter_username
         if params.filter_client_reference_id:
             query_params["query_client_ref"] = params.filter_client_reference_id
         if params.filter_search_criteria:
-            if not params.filter_last_name:
-                query_params["query_criteria"] = params.filter_search_criteria
-            else:
-                query_params["query_last"] = params.filter_last_name
-                if params.filter_first_name:
-                    query_params["query_first"] = params.filter_first_name
+            query_params["query_criteria"] = params.filter_search_criteria
     return query_params

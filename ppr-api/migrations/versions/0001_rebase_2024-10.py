@@ -277,12 +277,14 @@ def upgrade():
     sa.Column('updated_selection', sa.JSON(), nullable=True),
     sa.Column('pay_invoice_id', sa.Integer(), nullable=True),
     sa.Column('pay_path', sa.String(length=256), nullable=True),
+    sa.Column('search_value', sa.String(length=320), nullable=True),
     sa.ForeignKeyConstraint(['search_type'], ['search_types.search_type'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('search_requests', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_search_requests_account_id'), ['account_id'], unique=False)
         batch_op.create_index(batch_op.f('ix_search_requests_search_ts'), ['search_ts'], unique=False)
+        batch_op.create_index(batch_op.f('ix_search_requests_search_value'), ['search_value'], unique=False)
 
     op.create_table('user_profiles',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -3772,6 +3774,7 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
     op.drop_table('addresses')
     op.drop_table('user_profiles')
     with op.batch_alter_table('search_requests', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_search_requests_search_value'))
         batch_op.drop_index(batch_op.f('ix_search_requests_search_ts'))
         batch_op.drop_index(batch_op.f('ix_search_requests_account_id'))
 

@@ -68,6 +68,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
     returned_results_size = db.mapped_column("returned_results_size", db.Integer, nullable=True)
     user_id = db.mapped_column("user_id", db.String(1000), nullable=True)
     updated_selection = db.mapped_column("updated_selection", db.JSON, nullable=True)
+    search_value = db.mapped_column("search_value", db.String(320), nullable=True, index=True)
 
     pay_invoice_id = db.mapped_column("pay_invoice_id", db.Integer, nullable=True)
     pay_path = db.mapped_column("pay_path", db.String(256), nullable=True)
@@ -379,9 +380,9 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a search history summary list of searches executed by an account."""
         history_list = []
         query: str = search_utils.build_search_history_query(params)
-        # logger.info(query)
+        logger.info(query)
         query_params = search_utils.build_account_query_params(params)
-        # logger.info(query_params)
+        logger.info(query_params)
         rows = None
         from_ui: bool = params.from_ui is not None and params.from_ui
         count = SearchRequest.get_account_history_count(params.account_id)
@@ -424,6 +425,17 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         if "clientReferenceId" in search_json and search_json["clientReferenceId"].strip() != "":
             new_search.client_reference_id = search_json["clientReferenceId"]
         new_search.user_id = user_id
+        if search_json["criteria"].get("value"):
+            new_search.search_value = str(search_json["criteria"]["value"]).upper().strip()
+        elif search_json["criteria"].get("debtorName"):
+            if search_json["criteria"]["debtorName"].get("business"):
+                new_search.search_value = str(search_json["criteria"]["debtorName"].get("business")).upper().strip()
+            elif search_json["criteria"]["debtorName"].get("last"):
+                ind_name: str = str(search_json["criteria"]["debtorName"].get("first")).strip()
+                if search_json["criteria"]["debtorName"].get("middle"):
+                    ind_name += " " + str(search_json["criteria"]["debtorName"].get("middle")).strip()
+                ind_name += " " + str(search_json["criteria"]["debtorName"].get("last")).strip()
+                new_search.search_value = ind_name.upper()
         return new_search
 
     @staticmethod

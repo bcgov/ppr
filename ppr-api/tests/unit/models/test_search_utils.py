@@ -42,6 +42,8 @@ TEST_QUERY_ORDER_DATA = [
 TEST_QUERY_FILTER_DATA = [
     (None, None, None, None, None, None),
     ('RG', None, None, None, None, search_utils.SEARCH_FILTER_TYPE),
+    ('PPR', None, None, None, None, search_utils.SEARCH_FILTER_TYPE_PPR),
+    ('MHR', None, None, None, None, search_utils.SEARCH_FILTER_TYPE_MHR),
     (None, 'T-S-RG-003', None, None, None, search_utils.SEARCH_FILTER_CLIENT_REF),
     (None, None, 'TESTUSER', None, None, search_utils.SEARCH_FILTER_USERNAME),
     (None, None, None, 14, 1, search_utils.SEARCH_FILTER_DATE),
@@ -56,11 +58,11 @@ TEST_QUERY_CRITERIA_DATA = [
     ("MHR_SERIAL_NUMBER", "TEST", search_utils.SEARCH_FILTER_CRITERIA_DEFAULT),
     ("MHR_ORGANIZATION_NAME", "TEST", search_utils.SEARCH_FILTER_CRITERIA_DEFAULT),
     ("MHR_MHR_NUMBER", "TEST", search_utils.SEARCH_FILTER_CRITERIA_DEFAULT),
-    ("BUSINESS_DEBTOR", "TEST", search_utils.SEARCH_FILTER_CRITERIA_BS),
-    ("INDIVIDUAL_DEBTOR", "TEST", search_utils.SEARCH_FILTER_CRITERIA_IS_LAST),
-    ("MHR_OWNER_NAME", "TEST", search_utils.SEARCH_FILTER_CRITERIA_MI_LAST),
-    ("INDIVIDUAL_DEBTOR", "FNAME TEST", search_utils.SEARCH_FILTER_CRITERIA_IS),
-    ("MHR_OWNER_NAME", "FNAME TEST", search_utils.SEARCH_FILTER_CRITERIA_MI),
+    ("BUSINESS_DEBTOR", "TEST", search_utils.SEARCH_FILTER_CRITERIA_DEFAULT),
+    ("INDIVIDUAL_DEBTOR", "TEST", search_utils.SEARCH_FILTER_CRITERIA_DEFAULT),
+    ("MHR_OWNER_NAME", "TEST", search_utils.SEARCH_FILTER_CRITERIA_DEFAULT),
+    ("INDIVIDUAL_DEBTOR", "FNAME TEST", search_utils.SEARCH_FILTER_CRITERIA_DEFAULT),
+    ("MHR_OWNER_NAME", "FNAME TEST", search_utils.SEARCH_FILTER_CRITERIA_DEFAULT),
 ]
 
 @pytest.mark.parametrize('sort_criteria,sort_order,value', TEST_QUERY_ORDER_DATA)
@@ -137,7 +139,7 @@ def test_account_query_params(session, search_type,client_ref,username,start_ts,
     assert query_params.get('query_account')
     assert query_params.get('page_size')
     assert 'page_offset' in query_params
-    if params.filter_search_type:
+    if params.filter_search_type and params.filter_search_type not in ('PPR', 'MHR'):
         assert query_params.get('query_type')
     else:
         assert 'query_type' not in query_params
@@ -180,23 +182,8 @@ def test_account_criteria_params(session, search_type,criteria,filter_clause):
         assert query_params.get('query_type')
     else:
         assert 'query_type' not in query_params
-    if params.filter_search_criteria and not params.filter_last_name:
+    if params.filter_search_criteria:
         assert query_params.get('query_criteria')
-    else:
-        assert 'query_criteria' not in query_params
-    if params.filter_last_name:
-        assert query_params.get('query_last')
-    else:
-        assert 'query_last' not in query_params
-    if params.filter_first_name:
-        assert query_params.get('query_first')
-    else:
-        assert 'query_first' not in query_params
-    if params.filter_search_type and params.filter_search_type in ("IS", "MI"):
-        assert query_params.get('query_last')
-    else:
-        assert not query_params.get('query_last')
-        assert not query_params.get('query_first')
 
 
 def is_ci_testing() -> bool:
