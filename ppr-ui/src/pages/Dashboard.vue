@@ -260,6 +260,11 @@
           />
         </v-col>
       </v-row>
+      <v-row>
+        <v-col>
+          <QueueWrapper />
+        </v-col>
+      </v-row>
     </div>
   </v-container>
 </template>

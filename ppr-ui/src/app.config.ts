@@ -39,5 +39,11 @@ export default defineAppConfig({
         placeholder: 'text-bcGovColor-midGray',
       }
     },
+    table: {
+      slots: {
+        th: 'p-4',
+        td: 'p-4 h-[65px]'
+      }
+    }
   }
 })
