@@ -44,7 +44,8 @@ export enum UIMHRSearchTypeValues {
 export enum FilterTypes {
   TEXT_FIELD = 'TEXT_FIELD',
   SELECT = 'SELECT',
-  DATE_PICKER = 'DATE_PICKER'
+  DATE_PICKER = 'DATE_PICKER',
+  ACTIONS = 'ACTIONS'
 }
 
 export const UIMHRSearchTypeMap = {

@@ -28,6 +28,7 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { addTimestampToDate } from '@/utils'
 import { trim } from 'lodash'
 import type { AxiosError } from 'axios'
+import type { ReviewIF } from '@/interfaces/analyst-queue-interfaces/ReviewIF'
 
 let mhrRegistrationController: AbortController | null = null
 let draftsAbortController: AbortController | null = null
@@ -1059,6 +1060,27 @@ export async function getMhrHistory (mhrNumber: string): Promise<MhrHistoryRoIF>
   try {
     const response = await axios.get<MhrHistoryRoIF>(`registrations/history/${mhrNumber}`, getDefaultConfig())
     const data: MhrHistoryRoIF = response?.data
+    if (!data) {
+      throw new Error('Invalid API response')
+    }
+    return data
+  } catch (error: AxiosError | any) {
+    if (error.response && error.response.status === 404) {
+      console.error('Resource not found:', error.message)
+      // Handle 404 gracefully, returning null
+      return null
+    } else {
+      // Handle other errors differently if needed
+      console.error('API Error:', error.message)
+      throw error
+    }
+  }
+}
+
+export async function getReviews (): Promise<Array<ReviewIF> | any> {
+  try {
+    const response = await axios.get<Array<MhrHistoryRoIF>>(`reviews`, getDefaultConfig())
+    const data: Array<MhrHistoryRoIF> = response?.data
     if (!data) {
       throw new Error('Invalid API response')
     }

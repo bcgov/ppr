@@ -260,6 +260,11 @@
           />
         </v-col>
       </v-row>
+      <v-row v-if="isAnalystQueueEnabled">
+        <v-col>
+          <QueueWrapper />
+        </v-col>
+      </v-row>
     </div>
   </v-container>
 </template>
@@ -269,6 +274,7 @@ import { computed, defineComponent, onMounted, onBeforeMount, reactive, toRefs, 
 import { useRouter } from 'vue-router'
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
+import { getFeatureFlag } from '@/utils'
 import { APIMhrTypes, ProductStatus, RouteNames, SettingOptions } from '@/enums'
 import { searchHistory } from '@/utils/ppr-api-helper'
 import { getQualifiedSupplier, updateQualifiedSupplier } from '@/utils/mhr-api-helper'
@@ -398,6 +404,9 @@ export default defineComponent({
       }),
       pathAnchorId: computed((): string => {
         return (router.currentRoute.value?.params?.anchorId as string) || ''
+      }),
+      isAnalystQueueEnabled: computed((): boolean => {
+        return getFeatureFlag('enable-analyst-queue')
       })
     })
 
