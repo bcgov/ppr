@@ -4,7 +4,9 @@ import { storeToRefs } from 'pinia'
 import { useAnalystQueueStore } from '@/store/analystQueue'
 import { queueTableColumns } from '@/composables/analystQueue'
 
+const { setMhrInformation } = useStore()
 const { queueTableData } = storeToRefs(useAnalystQueueStore())
+const { goToRoute } = useNavigation()
 const { getQueueTabledata } = useAnalystQueueStore()
 const UBadge = resolveComponent('UBadge')
 const UButton = resolveComponent('UButton')
@@ -30,7 +32,7 @@ const columnsWithCellFunction = computed(() => {
           return h(UBadge, {
             as: 'div',
             class: 'size-full text-md text-center flex justify-center',
-            variant: 'subtle', 
+            variant: 'subtle',
             color
           }, () => row.getValue('statusType'))
         }
@@ -46,7 +48,7 @@ const columnsWithCellFunction = computed(() => {
             variant: 'solid',
             color: 'primary',
             onClick: () => {
-              // emit('row-action', row.original)
+              tableRowActionHandler(row.original)
             }
           }, () => 'Action')
         }
@@ -59,6 +61,11 @@ const columnsWithCellFunction = computed(() => {
 onMounted(async () => {
   await getQueueTabledata()
 })
+
+const tableRowActionHandler = (rowEvent) => {
+  setMhrInformation(rowEvent)
+  goToRoute(RouteNames.MHR_QUEUE_TRANSFER)
+}
 
 </script>
 <template>
@@ -88,7 +95,6 @@ onMounted(async () => {
         :sort="sort"
         :loading="loading"
         @update:sort="($event) => emit('update:sort', $event)"
-        @row:click="($event) => emit('row-click', $event)"
       >
         <!-- forward all provided slots to BaseTable -->
         <template v-for="(_, slotName) in $slots" #[slotName]="slotProps">
@@ -103,7 +109,7 @@ onMounted(async () => {
       </BaseTable>
     </div>
   </div>
-  
+
 </template>
 
 
