@@ -1,8 +1,15 @@
 <script setup lang="ts">
 import { HomeOwners } from '@/pages'
-import { TransferDetailsReview } from '@/components/mhrTransfers'
+import { getFeatureFlag } from '@/utils'
 import AccountInfo from '@/components/common/AccountInfo.vue'
+const { goToDash } = useNavigation()
 
+// On Mounted: route to dashboard if the feature flag is false
+onMounted(() => {
+  if (!getFeatureFlag('enable-analyst-queue')) {
+   goToDash()
+  }
+})
 </script>
 <template>
   <div class="mx-auto py-6">
@@ -40,7 +47,7 @@ import AccountInfo from '@/components/common/AccountInfo.vue'
 
         <section
           id="transfer-submitting-party"
-          class="submitting-party mt-2"
+          class="submitting-party mt-6"
         >
           <AccountInfo
             title="Submitting Party for this Change"
@@ -49,6 +56,10 @@ import AccountInfo from '@/components/common/AccountInfo.vue'
             :account-info="null"
 
           />
+        </section>
+
+        <section class="mt-6">
+          <SupportingDocuments />
         </section>
       </main>
     </div>
