@@ -29,6 +29,7 @@ from mhr_api.resources import staff_review_utils
 from mhr_api.resources import utils as resource_utils
 from mhr_api.resources.v1.transfers import set_owner_edit
 from mhr_api.services.authz import authorized, is_staff
+from mhr_api.services.doc_service import doc_id_lookup_staff
 from mhr_api.services.payment.exceptions import SBCPaymentException
 from mhr_api.services.payment.payment import Payment
 from mhr_api.utils.auth import jwt
@@ -85,6 +86,12 @@ def get_review_registrations(review_id: str):
         review_reg: MhrReviewRegistration = MhrReviewRegistration.find_by_id(review_id)
         if not review_reg:
             return resource_utils.not_found_error_response("Staff Review Registration", review_id)
+        if review_reg.document_id and request.args.get("includeDocuments", False):
+            reg_json = review_reg.json
+            reg_json["documents"] = doc_id_lookup_staff(
+                review_reg.document_id, account_id, request.headers.get("Authorization")
+            )
+            return jsonify(reg_json), HTTPStatus.OK
         return jsonify(review_reg.json), HTTPStatus.OK
     except BusinessException as exception:
         return resource_utils.business_exception_response(exception)
