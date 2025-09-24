@@ -70,6 +70,7 @@ def upgrade():
     sa.Column('client_note', sa.String(length=4000), nullable=True),
     sa.Column('change_note', sa.String(length=1000), nullable=True),
     sa.Column('username', sa.String(length=1000), nullable=True),
+    sa.Column('declined_reason_type', sa.String(length=20), nullable=True),
     sa.Column('review_registration_id', sa.Integer(), nullable=False),
     sa.Column('status_type', postgresql.ENUM('PAY_PENDING', 'PAY_CANCELLED', 'NEW', 'IN_REVIEW', 'ON_HOLD', 'APPROVED', 'DECLINED', name='mhr_review_status_type'), nullable=False),
     sa.ForeignKeyConstraint(['review_registration_id'], ['mhr_review_registrations.id'], ),

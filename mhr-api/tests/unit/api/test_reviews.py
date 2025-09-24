@@ -23,8 +23,9 @@ import pytest
 
 from mhr_api.services.authz import COLIN_ROLE, MHR_ROLE, STAFF_ROLE, QUALIFIED_USER_GROUP
 from mhr_api.models import MhrDraft, MhrReviewRegistration, MhrReviewStep, utils as model_utils
+from mhr_api.models.mhr_review_step import DeclinedReasonTypes
 from mhr_api.models.type_tables import MhrRegistrationTypes, MhrReviewStatusTypes
-from mhr_api.resources.v1.review_registrations import validate_status_type
+from mhr_api.resources.v1.review_registrations import validate_status_type, validate_review
 from mhr_api.utils.logging import logger
 
 from tests.unit.services.utils import create_header, create_header_account
@@ -108,6 +109,10 @@ TEST_DRAFT: MhrDraft = MhrDraft(id=191000000,
                                 mhr_number="000919")
 PAYLOAD_IN_REVIEW = { "statusType": "IN_REVIEW" }
 PAYLOAD_APPROVED = { "statusType": "APPROVED" }
+TEST_REVIEW: MhrReviewStep = MhrReviewStep(create_ts = model_utils.now_ts(),
+                                           staff_note="staff Note review",
+                                           username="first last",
+                                           status_type=MhrReviewStatusTypes.IN_REVIEW)
 
 
 # testdata pattern is ({desc}, {roles}, {status}, {has_account}, {test_id})
@@ -150,6 +155,35 @@ TEST_DATA_STATUS_TYPE = [
     ('Invalid NEW APPROVED', MhrReviewStatusTypes.NEW, MhrReviewStatusTypes.APPROVED.value, False),
     ('Invalid NEW DECLINED', MhrReviewStatusTypes.NEW, MhrReviewStatusTypes.DECLINED.value, False),
 ]
+# testdata pattern is ({desc}, {username}, {status}}, {reject_reason}, {staff_note} {valid})
+TEST_DATA_IN_REVIEW = [
+    ('Valid approved', "first last", MhrReviewStatusTypes.APPROVED.value, None, None, True),
+    ('Valid declined', "first last", MhrReviewStatusTypes.DECLINED.value, DeclinedReasonTypes.INCOMPLETE.value, None, True),
+    ('Invalid user', "joe staff", MhrReviewStatusTypes.APPROVED.value, None, None, False),
+    ('Declined no reason', "first last", MhrReviewStatusTypes.DECLINED.value, None, None, False),
+    ('Declined invalid reason', "first last", MhrReviewStatusTypes.DECLINED.value, "JUNK", None, False),
+    ('Declined other no note', "first last", MhrReviewStatusTypes.DECLINED.value, DeclinedReasonTypes.OTHER.value, None, False),
+    ('Valid declined other note', "first last", MhrReviewStatusTypes.DECLINED.value, DeclinedReasonTypes.OTHER.value, "note", True),
+ ]
+
+
+@pytest.mark.parametrize('desc,username,status,reason,note,valid', TEST_DATA_IN_REVIEW)
+def test_in_review(session, client, jwt, desc, username, status, reason, note, valid):
+    """Assert that validation of IN_REVIEW requests works as expected."""
+    review_reg = create_review_reg_in_review(191000000)
+    assert review_reg
+    test_json = {
+        "statusType": status
+    }
+    if reason:
+        test_json["declinedReasonType"] = reason
+    if note:
+        test_json["staffNote"] = note
+    error_msg: str = validate_review(test_json, review_reg, username)
+    if valid:
+        assert error_msg == ""
+    else:
+        assert error_msg != ""
 
 
 @pytest.mark.parametrize('desc,current,new_status,valid', TEST_DATA_STATUS_TYPE)
@@ -252,3 +286,24 @@ def create_review_reg(test_id: int) -> MhrReviewRegistration:
     review_reg.id = test_id
     review_reg.save()
     return review_reg
+
+
+def create_review_reg_in_review(test_id: int) -> MhrReviewRegistration:
+    """Create a review registration for testing."""
+    draft: MhrDraft = copy.deepcopy(TEST_DRAFT)
+    draft.id = test_id
+    json_data = copy.deepcopy(TEST_TRANSFER)
+    json_data["payment"] = copy.deepcopy(PAYREF)
+    json_data["payment"]["invoiceId"] = str(test_id)
+    draft.draft = json_data
+    review_reg: MhrReviewRegistration = MhrReviewRegistration.create_from_json(json_data, draft)
+    review_reg.id = test_id
+    review_reg.assignee_name = "first last"
+    review_reg.status_type = MhrReviewStatusTypes.IN_REVIEW
+    review_reg.save()
+    review_step = copy.deepcopy(TEST_REVIEW)
+    review_step.id = test_id
+    review_step.review_registration_id = review_reg.id
+    review_step.save()
+    new_reg = MhrReviewRegistration.find_by_id(review_reg.id)
+    return new_reg
