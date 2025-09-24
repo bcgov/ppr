@@ -14,6 +14,7 @@ import {
   MhrRegistration,
   MhrInformation,
   MhrHistory,
+  MhrQueueTransfer,
   ConfirmMHRSearch,
   ReviewConfirm,
   RenewRegistration,
@@ -246,6 +247,14 @@ export default <RouterConfig> {
       component: MhrHistory,
       meta: {
         requiresAuth: true,
+      },
+    },
+    {
+      path: '/mhr-queue-transfer',
+      name: RouteNames.MHR_QUEUE_TRANSFER,
+      component: MhrQueueTransfer,
+      meta: {
+        requiresAuth: false,
       },
     },
     {

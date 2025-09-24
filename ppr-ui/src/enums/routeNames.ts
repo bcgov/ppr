@@ -30,6 +30,7 @@ export enum RouteNames {
   MHR_INFORMATION = 'mhr-information',
   MHR_INFORMATION_NOTE = 'mhr-information-note',
   MHR_HISTORY = 'mhr-history',
+  MHR_QUEUE_TRANSFER = 'mhr-queue-transfer',
   RESIDENTIAL_EXEMPTION = 'residential-exemption',
   NON_RESIDENTIAL_EXEMPTION = 'non-residential-exemption',
   EXEMPTION_DETAILS = 'exemption-details',

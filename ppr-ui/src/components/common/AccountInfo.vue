@@ -6,7 +6,7 @@
     <h2 class="header mb-5">
       {{ title }}
       <v-tooltip
-        if="tooltipContent"
+        v-if="tooltipContent"
         location="top"
         content-class="top-tooltip pa-5"
         transition="fade-transition"
