@@ -21,6 +21,7 @@ import copy
 import pytest
 
 from mhr_api.models import MhrDraft, MhrReviewRegistration, MhrReviewStep, utils as model_utils
+from mhr_api.models.mhr_review_step import DeclinedReasonTypes
 from mhr_api.models.type_tables import MhrRegistrationTypes, MhrReviewStatusTypes
 
 
@@ -100,11 +101,42 @@ TEST_DRAFT: MhrDraft = MhrDraft(id=191000000,
                                 user_id="username",
                                 registration_type=MhrRegistrationTypes.TRANS_WILL,
                                 mhr_number="000919")
+TEST_REVIEW: MhrReviewStep = MhrReviewStep(create_ts = model_utils.now_ts(),
+                                           staff_note="staff Note review",
+                                           username="first last",
+                                           status_type=MhrReviewStatusTypes.IN_REVIEW)
 
 # testdata pattern is ({staff_note}, {client_note}, {change_note}, {username}, {status_type}, {test_id})
 TEST_ID_DATA = [
     ("staff note", "client", "change", "first last", MhrReviewStatusTypes.IN_REVIEW, 191000000),
 ]
+# testdata pattern is ({staff_note}, {username}, {status_type}, {reason_type}, {test_review_id})
+TEST_DECLINE_DATA = [
+    ("staff note", "first last", MhrReviewStatusTypes.DECLINED, DeclinedReasonTypes.OTHER, 191000000),
+]
+
+
+@pytest.mark.parametrize('staff_note,username,status_type,reason_type,test_id', TEST_DECLINE_DATA)
+def test_decline(session, staff_note, username, status_type, reason_type, test_id):
+    """Assert that find mhr review step by id contains all expected elements."""
+    review_reg: MhrReviewRegistration = create_review_reg()
+    review_step = copy.deepcopy(TEST_REVIEW)
+    review_step.id = test_id
+    review_step.review_registration_id = review_reg.id
+    review_step.save()
+    step_id: int = int(test_id) + 1
+    step: MhrReviewStep = MhrReviewStep(id=step_id,
+                                        create_ts = model_utils.now_ts(),
+                                        staff_note=staff_note,
+                                        username=username,
+                                        status_type=status_type,
+                                        declined_reason_type = reason_type,
+                                        review_registration_id=review_reg.id)
+    step.save()
+    test_step: MhrReviewStep = MhrReviewStep.find_by_id(step_id)
+    assert test_step.declined_reason_type
+    test_json = test_step.json
+    assert test_json.get("declinedReasonType") == DeclinedReasonTypes.OTHER.value
 
 
 @pytest.mark.parametrize('staff_note,client_note,change_note,username,status_type,test_id', TEST_ID_DATA)

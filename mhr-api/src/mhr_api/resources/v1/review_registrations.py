@@ -20,6 +20,7 @@ from flask_cors import cross_origin
 from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.models import MhrDraft, MhrRegistration, MhrReviewRegistration
 from mhr_api.models.mhr_draft import DRAFT_STAFF_REVIEW_PREFIX
+from mhr_api.models.mhr_review_step import DeclinedReasonTypes
 from mhr_api.models.registration_json_utils import sort_owner_groups
 from mhr_api.models.registration_utils import AccountRegistrationParams
 from mhr_api.models.type_tables import MhrOwnerStatusTypes, MhrRegistrationStatusTypes, MhrReviewStatusTypes
@@ -29,6 +30,7 @@ from mhr_api.resources import staff_review_utils
 from mhr_api.resources import utils as resource_utils
 from mhr_api.resources.v1.transfers import set_owner_edit
 from mhr_api.services.authz import authorized, is_staff
+from mhr_api.services.doc_service import doc_id_lookup_staff
 from mhr_api.services.payment.exceptions import SBCPaymentException
 from mhr_api.services.payment.payment import Payment
 from mhr_api.utils.auth import jwt
@@ -37,6 +39,13 @@ from mhr_api.utils.logging import logger
 bp = Blueprint("REVIEWS1", __name__, url_prefix="/api/v1/reviews")  # pylint: disable=invalid-name
 
 STATUS_CHANGE_INVALID = "Request payload statusType={status_type} is not allowed with the current state {current}."
+REVIEW_USER_INVALID = "In review only the assigned user can approve or decline. Change status to NEW and re-assign."
+REASON_TYPE_MISSING = "Declined reason type is required when declining/rejecting a registration."
+REASON_TYPE_INVALID = (
+    "Declined reason type {reason_type} is invalid. Allowed values are: "
+    + "NON_COMPLIANCE, INCOMPLETE, ERROR_ALTERATION, MISSING_SUBMISSION, or OTHER."
+)
+STAFF_NOTE_MISSING = "A staff note is required when declining a registration and the reason type is OTHER."
 
 
 @bp.route("", methods=["GET", "OPTIONS"])
@@ -85,6 +94,12 @@ def get_review_registrations(review_id: str):
         review_reg: MhrReviewRegistration = MhrReviewRegistration.find_by_id(review_id)
         if not review_reg:
             return resource_utils.not_found_error_response("Staff Review Registration", review_id)
+        if review_reg.document_id and request.args.get("includeDocuments", False):
+            reg_json = review_reg.json
+            reg_json["documents"] = doc_id_lookup_staff(
+                review_reg.document_id, account_id, request.headers.get("Authorization")
+            )
+            return jsonify(reg_json), HTTPStatus.OK
         return jsonify(review_reg.json), HTTPStatus.OK
     except BusinessException as exception:
         return resource_utils.business_exception_response(exception)
@@ -114,14 +129,15 @@ def update_review_registrations(review_id: str):
         if not review_reg:
             return resource_utils.not_found_error_response("Staff Review Registration", review_id)
         request_json = request.get_json(silent=True)
-        error_msg: str = validate_request_data(request_json, review_reg)
+        username: str = g.jwt_oidc_token_info.get("name")
+        error_msg: str = validate_request_data(request_json, review_reg, username)
         if error_msg:
             return resource_utils.bad_request_response(error_msg)
         if review_reg.is_approved(request_json.get("statusType")):
             approve_registration(review_id, review_reg)
         elif review_reg.is_declined(request_json.get("statusType")):
             decline_registration(review_id, review_reg, request_json)
-        review_reg.save_update(request_json, g.jwt_oidc_token_info.get("name"))
+        review_reg.save_update(request_json, username)
         return jsonify(review_reg.json), HTTPStatus.OK
     except BusinessException as exception:
         return resource_utils.business_exception_response(exception)
@@ -243,11 +259,12 @@ def queue_report(new_reg: MhrRegistration, draft: MhrDraft, response_json: dict,
     reg_utils.enqueue_registration_report(new_reg, response_json, report_type, current_json)
 
 
-def validate_request_data(request_json: dict, review_reg: MhrReviewRegistration) -> str:
+def validate_request_data(request_json: dict, review_reg: MhrReviewRegistration, username: str) -> str:
     """Verify update request payload data."""
     if not request_json:
         return "Update review registration invalid: no payload data."
     error_msg: str = validate_status_type(request_json, review_reg)
+    error_msg += validate_review(request_json, review_reg, username)
     return error_msg
 
 
@@ -281,4 +298,24 @@ def validate_status_type(request_json: dict, review_reg: MhrReviewRegistration) 
         MhrReviewStatusTypes.NEW.value,
     ):
         error_msg += STATUS_CHANGE_INVALID.format(status_type=status_type, current=current)
+    return error_msg
+
+
+def validate_review(request_json: dict, review_reg: MhrReviewRegistration, username: str) -> str:
+    """Verify request when registration is in review."""
+
+    error_msg: str = ""
+    status_type: str = request_json.get("statusType")
+    if not review_reg.is_approved(status_type) and not review_reg.is_declined(status_type):
+        return error_msg
+    if username != review_reg.assignee_name:
+        error_msg = REVIEW_USER_INVALID
+    if review_reg.is_declined(status_type):
+        reason_type: str = request_json.get("declinedReasonType", None)
+        if not reason_type:
+            error_msg += REASON_TYPE_MISSING
+        elif reason_type not in DeclinedReasonTypes:
+            error_msg += REASON_TYPE_INVALID.format(reason_type=reason_type)
+        elif reason_type == DeclinedReasonTypes.OTHER.value and not request_json.get("staffNote"):
+            error_msg += STAFF_NOTE_MISSING
     return error_msg

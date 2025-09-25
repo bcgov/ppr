@@ -16,10 +16,21 @@ from sqlalchemy.dialects.postgresql import ENUM as PG_ENUM
 
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import utils as model_utils
+from mhr_api.utils.base import BaseEnum
 from mhr_api.utils.logging import logger
 
 from .db import db
 from .type_tables import MhrReviewStatusTypes
+
+
+class DeclinedReasonTypes(BaseEnum):
+    """Render an Enum of the declined reason types."""
+
+    NON_COMPLIANCE = "NON_COMPLIANCE"
+    INCOMPLETE = "INCOMPLETE"
+    ERROR_ALTERATION = "ERROR_ALTERATION"
+    MISSING_SUBMISSION = "MISSING_SUBMISSION"
+    OTHER = "OTHER"
 
 
 class MhrReviewStep(db.Model):
@@ -33,6 +44,7 @@ class MhrReviewStep(db.Model):
     client_note = db.mapped_column("client_note", db.String(4000), nullable=True)
     change_note = db.mapped_column("change_note", db.String(1000), nullable=True)
     username = db.mapped_column("username", db.String(1000), nullable=True)
+    declined_reason_type = db.mapped_column("declined_reason_type", db.String(20), nullable=True)
 
     # parent keys
     review_registration_id = db.mapped_column(
@@ -66,6 +78,8 @@ class MhrReviewStep(db.Model):
             "clientNote": self.client_note if self.client_note else "",
             "changeNote": self.change_note if self.change_note else "",
         }
+        if self.status_type == MhrReviewStatusTypes.DECLINED:
+            step["declinedReasonType"] = self.declined_reason_type
         return step
 
     def save(self):

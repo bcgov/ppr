@@ -129,8 +129,6 @@ class MhrReviewRegistration(db.Model):
                 else:
                     self.assignee_name = username
                 change_msg += f" Setting assignee {self.assignee_name}."
-            if self.status_type.value != new_status:
-                self.status_type = new_status
             step: MhrReviewStep = MhrReviewStep(
                 review_registration_id=self.id,
                 create_ts=model_utils.now_ts(),
@@ -140,6 +138,11 @@ class MhrReviewRegistration(db.Model):
                 staff_note=request_json.get("staffNote", None),
                 client_note=request_json.get("clientNote", None),
             )
+            if self.is_declined(new_status):
+                step.declined_reason_type = request_json.get("declinedReasonType")
+                change_msg += f" Declined reason type: {step.declined_reason_type}."
+            if self.status_type.value != new_status:
+                self.status_type = new_status
             db.session.add(step)
             db.session.add(self)
             db.session.commit()
