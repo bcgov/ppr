@@ -1,20 +1,62 @@
 <script setup lang="ts">
 import { HomeOwners } from '@/pages'
-import { getFeatureFlag } from '@/utils'
+import { getFeatureFlag, parseSubmittingPartyToAccountInfo } from '@/utils'
 import AccountInfo from '@/components/common/AccountInfo.vue'
+import { getQueuedTransfer } from '@/utils/mhr-api-helper'
+import type { MhrTransferApiIF } from '@/interfaces'
+
 const { goToDash } = useNavigation()
+const { initDraftMhrInformation } = useMhrInformation()
+const {
+  getMhrInformation, isRoleStaffReg, getMhrTransferCurrentHomeOwnerGroups, getMhrAccountSubmittingParty
+} = storeToRefs(useStore())
+
+const isLoading = ref(false)
+const queueTransfer = ref(null)
 
 // On Mounted: route to dashboard if the feature flag is false
-onMounted(() => {
-  if (!getFeatureFlag('enable-analyst-queue')) {
+onMounted(async () => {
+  isLoading.value = true
+  if (!getFeatureFlag('enable-analyst-queue') || !getMhrInformation.value?.reviewId || !isRoleStaffReg.value) {
    goToDash()
   }
+  console.log(getMhrInformation.value)
+  queueTransfer.value = await getQueuedTransfer(getMhrInformation.value?.reviewId)
+  await initDraftMhrInformation(queueTransfer.value as MhrTransferApiIF)
+  isLoading.value = false
+
 })
+
+const mapToAccountInfo = (accountInfo: any) => {
+  return {
+    isBusinessAccount: !accountInfo.personName, // or set based on your logic
+    name: `${accountInfo.personName.first} ${accountInfo.personName.middle} ${accountInfo.personName.last}`.trim(),
+    mailingAddress: {
+      city: accountInfo.address.city,
+      country: accountInfo.address.country,
+      postalCode: accountInfo.address.postalCode,
+      region: accountInfo.address.region,
+      street: accountInfo.address.street
+    },
+    accountAdmin: {
+      email: accountInfo.emailAddress,
+      phone: accountInfo.phoneNumber,
+      phoneExtension: accountInfo.phoneExtension
+    }
+  }
+}
 </script>
 <template>
-  <div class="mx-auto py-6">
+  <div class="mx-auto pb-4">
+    <template v-if="isLoading">
+      <div class="fixed left-0 top-0 h-full w-full z-50 bg-gray-300 opacity-45" />
+      <UIcon
+        name="i-mdi-loading"
+        class="animate-spin text-[50px] text-blue-500 absolute top-40 left-[50%]"
+      />
+    </template>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12">
+    <div v-else class="grid grid-cols-1 lg:grid-cols-12">
       <!-- Main column -->
       <main class="lg:col-span-9 pr-2">
         <!-- Review Header -->
@@ -37,7 +79,7 @@ onMounted(() => {
           <HomeOwners
             is-mhr-transfer
             is-readonly-table
-            :current-home-owners="null"
+            :current-home-owners="getMhrTransferCurrentHomeOwnerGroups"
           />
         </section>
 
@@ -47,27 +89,25 @@ onMounted(() => {
 
         <section
           id="transfer-submitting-party"
-          class="submitting-party mt-6"
+          class="submitting-party mt-9"
         >
           <AccountInfo
             title="Submitting Party for this Change"
             tooltip-content="The default Submitting Party is based on your BC Registries
                        user account information. This information can be updated within your account settings."
-            :account-info="null"
+            is-queue-transfer
+            :account-info="parseSubmittingPartyToAccountInfo(getMhrAccountSubmittingParty)"
 
           />
         </section>
 
-        <section class="mt-6">
-          <SupportingDocuments />
+        <section class="my-9">
+          <UploadedDocuments :document-list="queueTransfer?.documents" />
         </section>
       </main>
     </div>
   </div>
 </template>
 <style lang="scss" scoped>
-ol {
-  list-style-type: revert;
-}
-
+@import '@/assets/styles/theme.scss';
 </style>

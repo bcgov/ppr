@@ -3,7 +3,22 @@
     id="account-info"
     role="region"
   >
-    <h2 class="header mb-5">
+    <div
+      v-if="isQueueTransfer"
+      :class="'font-bold text-gray-900 bg-bcGovColor-gray2 px-[1.4rem] py-[12px] rounded-t'"
+    >
+      <div class="flex justify-between">
+        <div class="flex">
+          <UIcon name="i-mdi-text-box" class="w-6 h-6" />
+          <div class="ml-2">Supporting Documents</div>
+        </div>
+      </div>
+    </div>
+
+    <h2
+      v-else
+      class="header mb-5"
+    >
       {{ title }}
       <v-tooltip
         v-if="tooltipContent"
@@ -63,7 +78,9 @@
                   {{ accountInfo.isBusinessAccount ? 'mdi-domain' : 'mdi-account' }}
                 </v-icon>
                 <span class="pt-1 font-weight-bold">
-                  {{ accountInfo.name }}
+                  {{ accountInfo.name ||
+                  accountInfo.accountAdmin?.firstName + ' ' + accountInfo.accountAdmin?.lastName
+                  }}
                 </span>
               </td>
               <td class="py-6">
@@ -74,12 +91,12 @@
                 />
               </td>
               <td class="py-6">
-                {{ accountInfo.accountAdmin.email }}
+                {{ accountInfo.accountAdmin?.email }}
               </td>
               <td class="py-6">
-                {{ toDisplayPhone(accountInfo.accountAdmin.phone) }}
-                <span v-if="accountInfo.accountAdmin.phoneExtension">
-                  Ext {{ accountInfo.accountAdmin.phoneExtension }}
+                {{ toDisplayPhone(accountInfo.accountAdmin?.phone) }}
+                <span v-if="accountInfo.accountAdmin?.phoneExtension">
+                  Ext {{ accountInfo.accountAdmin?.phoneExtension }}
                 </span>
               </td>
             </tr>
@@ -116,6 +133,10 @@ export default defineComponent({
     desc: {
       type: String,
       default: null
+    },
+    isQueueTransfer: {
+      type: Boolean,
+      default: false
     }
   },
   setup () {

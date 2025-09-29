@@ -1,26 +1,31 @@
 <script setup lang="ts">
 import { ConfirmationDialog } from '@/components/dialogs'
 import { confirmCancelDialog } from '@/resources/dialogOptions/confirmationDialogs'
+import type { DocumentSummary } from '@/interfaces'
 
-defineProps({
-  documentId: {
-    type: String,
-    required: true,
+/** Props for the uploaded documents list **/
+const props = defineProps({
+  documentList: {
+    type: Array<DocumentSummary>,
+    default: () => [],
+    required: false,
   }
 })
 
-// Future State: Pull in uploaded documents from API or passed via props depending on context
-// https://test.api.connect.gov.bc.ca/doc-dev/api/v1/searches/MHR?consumerDocumentId=xxxxxx
-// https://test.api.connect.gov.bc.ca/doc-dev/api/v1/searches/MHR?documentServiceId=xxxxx
-
+/** Controls visibility of the add documents section **/
 const showAddDocuments = ref(false)
+/** Controls visibility of the confirmation cancel dialog **/
 const showConfirmCancelDialog = ref(false)
+
+ /** Handles confirmation dialog actions **/
 const dialogHandler = (action: string) => {
   if (action) {
     showAddDocuments.value = false
   }
   showConfirmCancelDialog.value = false
 }
+
+/** Toggles file upload section and handles cancel confirmation **/
 const fileUploadToggle = (action: string) => {
   if (showAddDocuments.value) {
     showConfirmCancelDialog.value = true
@@ -29,6 +34,12 @@ const fileUploadToggle = (action: string) => {
   if (action) {
     showAddDocuments.value = !showAddDocuments.value
   }
+}
+
+/** Opens a PDF document in a new browser tab **/
+const downloadPdf = (url: string) => {
+  if (!url) return
+  window.open(url, '_blank')
 }
 </script>
 <template>
@@ -68,21 +79,20 @@ const fileUploadToggle = (action: string) => {
       <FileUpload />
     </div>
 
-    <!-- List of Uploaded Documents: Static placeholders - to be dynamic loop of all pulled or provided docs -->
-    <div class="w-full border-t bg-white pa-6">
-      <div class="flex items-center">
+    <!-- List of Uploaded Documents -->
+    <div
+      v-for="document in props.documentList"
+      :key="document.consumerFilename"
+      class="w-full border-t bg-white pa-6"
+    >
+      <div
+        class="flex items-center cursor-pointer"
+        @click="downloadPdf(document.documentURL)"
+      >
         <UIcon name="i-mdi-file-pdf-outline" class="text-primary size-[20px]" />
-        <span class="ml-2 text-[16px] italic text-primary">FileName_One.pdf</span>
+        <span class="ml-2 text-[16px] italic text-primary">{{document.consumerFilename}}</span>
       </div>
-      <span class="ml-7 text-gray-700 fs-14">123 mb</span>
-    </div>
-
-    <div class="w-full border-t bg-white pa-6">
-      <div class="flex items-center">
-        <UIcon name="i-mdi-file-pdf-outline" class="text-primary size-[20px]" />
-        <span class="ml-2 text-[16px] italic text-primary">FileName_Two.pdf</span>
-      </div>
-      <span class="ml-7 text-gray-700 fs-14">123 mb</span>
+      <span class="ml-7 text-gray-700 fs-14">{{document?.fileSize || '' }}</span>
     </div>
   </div>
 </template>
