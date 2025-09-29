@@ -179,6 +179,10 @@ export default defineComponent({
           const mhrInfoBreadcrumb = [...tombstoneBreadcrumbMhrInformation]
           mhrInfoBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`
           return mhrInfoBreadcrumb
+        } else if ([RouteNames.MHR_QUEUE_TRANSFER].includes(name as RouteNames)) {
+          const mhrInfoBreadcrumb = [...tombstoneBreadcrumbMhrInformation]
+          mhrInfoBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber} - Transfer Review`
+          return mhrInfoBreadcrumb
         } else if (isMhrCorrection.value) {
           const mhrCorrectionBreadcrumb = [...tombstoneBreadcrumbMhrCorrection]
           mhrCorrectionBreadcrumb[2].text = `MHR Number ${getMhrInformation.value.mhrNumber}`

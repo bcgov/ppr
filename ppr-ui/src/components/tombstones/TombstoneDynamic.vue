@@ -293,7 +293,7 @@ export default defineComponent({
 
         return isFrozenMhr.value || regStatus === MhApiStatusTypes.DRAFT
           ? MhUIStatusTypes.ACTIVE
-          : regStatus[0] + regStatus.toLowerCase().slice(1)
+          : regStatus[0] + regStatus.toLowerCase().slice(1).replace(/_/g, ' ')
       }),
       header: computed((): string => {
         const numberType = getRegistrationNumber.value ? 'Base' : 'Manufactured Home'

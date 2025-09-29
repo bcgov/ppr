@@ -1097,3 +1097,27 @@ export async function getReviews (): Promise<Array<ReviewIF> | any> {
     }
   }
 }
+
+export async function getQueuedTransfer (reviewId: string): Promise<Array<ReviewIF> | any> {
+  try {
+    const response = await axios.get<Array<MhrHistoryRoIF>>(
+      `reviews/${reviewId}?includeDocuments=true`,
+      getDefaultConfig()
+    )
+    const data: Array<MhrHistoryRoIF> = response?.data
+    if (!data) {
+      throw new Error('Invalid API response')
+    }
+    return data
+  } catch (error: AxiosError | any) {
+    if (error.response && error.response.status === 404) {
+      console.error('Resource not found:', error.message)
+      // Handle 404 gracefully, returning null
+      return null
+    } else {
+      // Handle other errors differently if needed
+      console.error('API Error:', error.message)
+      throw error
+    }
+  }
+}
