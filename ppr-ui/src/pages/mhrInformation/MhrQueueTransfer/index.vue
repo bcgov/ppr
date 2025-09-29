@@ -14,37 +14,19 @@ const {
 const isLoading = ref(false)
 const queueTransfer = ref(null)
 
-// On Mounted: route to dashboard if the feature flag is false
 onMounted(async () => {
   isLoading.value = true
+  // On Mounted: route to dashboard if the feature flag is false, no reviewId, or not staff
   if (!getFeatureFlag('enable-analyst-queue') || !getMhrInformation.value?.reviewId || !isRoleStaffReg.value) {
    goToDash()
   }
-  console.log(getMhrInformation.value)
+
+  // Fetch the queued transfer details and initialize the draft
   queueTransfer.value = await getQueuedTransfer(getMhrInformation.value?.reviewId)
   await initDraftMhrInformation(queueTransfer.value as MhrTransferApiIF)
   isLoading.value = false
 
 })
-
-const mapToAccountInfo = (accountInfo: any) => {
-  return {
-    isBusinessAccount: !accountInfo.personName, // or set based on your logic
-    name: `${accountInfo.personName.first} ${accountInfo.personName.middle} ${accountInfo.personName.last}`.trim(),
-    mailingAddress: {
-      city: accountInfo.address.city,
-      country: accountInfo.address.country,
-      postalCode: accountInfo.address.postalCode,
-      region: accountInfo.address.region,
-      street: accountInfo.address.street
-    },
-    accountAdmin: {
-      email: accountInfo.emailAddress,
-      phone: accountInfo.phoneNumber,
-      phoneExtension: accountInfo.phoneExtension
-    }
-  }
-}
 </script>
 <template>
   <div class="mx-auto pb-4">
