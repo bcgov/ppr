@@ -1,6 +1,8 @@
 import type { Moment } from 'moment';
 import moment from 'moment'
 import 'moment-timezone'
+import type { CalendarDate } from '@internationalized/date'
+import { today } from '@internationalized/date'
 
 const date = new Date()
 
@@ -183,7 +185,7 @@ export function yyyyMmDdToDate (dateStr: string): Date {
  */
 export function dateToYyyyMmDd (date: Date): string {
   // safety check
-  if (!isDate(date) || isNaN(date.getTime())) return null
+  if (!(date instanceof Date) || isNaN(date.getTime())) return null
   const localDate = date.toLocaleDateString('en-CA', {
     timeZone: 'America/Vancouver',
     month: 'numeric', // 12
@@ -213,7 +215,7 @@ export function yyyyMmDdToPacificDate (dateStr: string, longMonth = false, showW
  */
 export function dateToPacificDate (date: Date, longMonth = false, showWeekday = false): string {
   // safety check
-  if (!isDate(date) || isNaN(date.getTime())) return null
+  if (!(date instanceof Date) || isNaN(date.getTime())) return null
 
   let dateStr = date.toLocaleDateString('en-CA', {
     timeZone: 'America/Vancouver',
@@ -298,4 +300,42 @@ export const isWithinMinutes = (createDateTime: string, minuteDifferential: numb
  */
 export function convertToISO8601LastMinute(dateStr: string): string {
   return `${dateStr}T23:59:59+00:00`
+}
+
+/**
+ * This function calculates a previous date based on the given input format.
+ * The input format is a string like 'd-7', 'm-3', or 'y-1', where:
+ *  - 'd' stands for days (e.g., 'd-7' means 7 days ago)
+ *  - 'm' stands for months (e.g., 'm-3' means 3 months ago)
+ *  - 'y' stands for years (e.g., 'y-1' means 1 year ago)
+ * 
+ * @param {string} input - A string representing the time offset. It follows the pattern 'd-N', 'm-N', or 'y-N'
+ * 
+ * @returns {CalendarDate} - The calculated date based on the current date minus the provided time offset.
+ */
+export function calculatePreviousDate(input: string): CalendarDate {
+  // Extract the unit (d, m, y) and the amount (number)
+  const regex = /^([dmy])-([0-9]+)$/;
+  const match = input.match(regex);
+
+  if (!match) {
+    throw new Error("Invalid input format. Expected format: d-7, m-3, y-1, etc.");
+  }
+
+  const unit = match[1];
+  const amount = parseInt(match[2], 10);
+
+  // Get today's date as a CalendarDate
+  const currentDate = today();
+
+  switch (unit) {
+    case "d":
+      return currentDate.subtract({ days: amount });
+    case "m":
+      return currentDate.subtract({ months: amount });
+    case "y":
+      return currentDate.subtract({ years: amount });
+    default:
+      throw new Error("Invalid unit. Use 'd' for days, 'm' for months, or 'y' for years.");
+  }
 }

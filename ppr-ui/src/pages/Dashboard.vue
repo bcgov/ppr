@@ -260,7 +260,7 @@
           />
         </v-col>
       </v-row>
-      <v-row v-if="isAnalystQueueEnabled">
+      <v-row v-if="!isAnalystQueueEnabled">
         <v-col>
           <QueueWrapper />
         </v-col>

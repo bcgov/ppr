@@ -12,3 +12,16 @@ export interface ReviewIF {
     submittingName: string
     assigneeName: string
 }
+
+export interface DateRangeFilter {
+    start: {
+        year: number
+        month: number
+        day: number
+    }
+    end: {
+        year: number
+        month: number
+        day: number
+    }
+}
