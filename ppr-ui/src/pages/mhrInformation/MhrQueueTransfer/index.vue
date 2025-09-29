@@ -4,6 +4,7 @@ import { getFeatureFlag, parseSubmittingPartyToAccountInfo } from '@/utils'
 import AccountInfo from '@/components/common/AccountInfo.vue'
 import { getQueuedTransfer } from '@/utils/mhr-api-helper'
 import type { MhrTransferApiIF } from '@/interfaces'
+import AttentionReview from '@/components/common/AttentionReview.vue'
 
 const { goToDash } = useNavigation()
 const { initDraftMhrInformation } = useMhrInformation()
@@ -81,6 +82,10 @@ onMounted(async () => {
             :account-info="parseSubmittingPartyToAccountInfo(getMhrAccountSubmittingParty)"
 
           />
+        </section>
+
+        <section class="my-9">
+          <AttentionReview />
         </section>
 
         <section class="my-9">

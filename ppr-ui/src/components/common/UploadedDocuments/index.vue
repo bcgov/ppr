@@ -55,7 +55,7 @@ const downloadPdf = (url: string) => {
     >
       <div class="flex justify-between">
         <div class="flex">
-          <UIcon name="i-mdi-text-box" class="w-6 h-6" />
+          <UIcon name="i-mdi-text-box" class="w-6 h-6 text-blue-350" />
           <div class="ml-2">Supporting Documents</div>
         </div>
         <div>
