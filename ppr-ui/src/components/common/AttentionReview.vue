@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /** Props for the uploaded documents list **/
-const props = defineProps({
+defineProps({
   attentionReview: {
     type: () => {},
     default: () => {},
