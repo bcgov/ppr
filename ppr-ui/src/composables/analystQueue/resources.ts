@@ -1,14 +1,26 @@
 import { FilterTypes } from '@/enums'
 import { ReviewStatusTypes, ReviewRegTypes } from '@/composables/analystQueue/enums'
 
+const transformEnumToLabel = (enumValue: string): string => {
+  return enumValue
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ')
+}
+
 export const queueTableColumns = [
-    { id: 'registrationNumber',
+    { id: 'mhrNumber',
       header: 'Registration Number',
       accessorKey: 'mhrNumber',
       sortable: true,
       filter: {
         type: FilterTypes.TEXT_FIELD,
         placeholder: 'Registration Number',
+      },
+      meta: {
+        class: {
+          th: 'w-[200px]'
+        }
       }
     },
     { id: 'statusType',
@@ -19,11 +31,17 @@ export const queueTableColumns = [
         type: FilterTypes.SELECT,
         placeholder: 'Status',
         options: Object.values(ReviewStatusTypes).map(status => ({
-            label: status,
+            label: transformEnumToLabel(status),
             value: status
-        }))
+        })),
+      },
+      meta: {
+        class: {
+          th: 'w-[200px]'
+        }
       }
-    },{ id: 'registrationType',
+    },
+    { id: 'registrationType',
       header: 'Registration Type',
       accessorKey: 'registrationType',
       sortable: true,
@@ -31,36 +49,64 @@ export const queueTableColumns = [
         type: FilterTypes.SELECT,
         placeholder: 'Registration Type',
         options: Object.values(ReviewRegTypes).map(status => ({
-            label: status,
+            label: transformEnumToLabel(status),
             value: status
-        }))
+        })),
+      },
+      meta: {
+        class: {
+          th: 'w-[200px]'
+        }
       }
-    },{ id: 'dateSubmitted',
+    },
+    { id: 'createDateTime',
       header: 'Date Submitted',
-      accessorKey: 'submittingName',
+      accessorKey: 'createDateTime',
       sortable: true,
       filter: {
         type: FilterTypes.DATE_PICKER,
         placeholder: 'Date Submitted',
+      },
+      meta: {
+        class: {
+          th: 'w-[200px]'
+        }
       }
-    },{ id: 'submittingParty',
+    },
+    { id: 'submittingName',
       header: 'Submitting Party',
       accessorKey: 'submittingName',
       sortable: true,
       filter: {
         type: FilterTypes.TEXT_FIELD,
         placeholder: 'Submitting Party',
+      },
+      meta: {
+        class: {
+          th: 'w-[200px]'
+        }
       }
-    },{ id: 'assignee',
+    },
+    { id: 'assigneeName',
       header: 'Assignee',
       accessorKey: 'assigneeName',
       sortable: true,
       filter: {
         type: FilterTypes.SELECT,
-        placeholder: 'Assignee',
+        placeholder: 'Assignee'
+      },
+      meta: {
+        class: {
+          th: 'w-[200px]'
+        }
       }
-    },{ id: 'actions',
+    },
+    { id: 'actions',
       header: 'Actions',
-      accessorKey: 'actions'
+      accessorKey: 'actions',
+      isFixed: true,
+      filter: {
+        type: FilterTypes.ACTIONS
+      }
      }
   ]

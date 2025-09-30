@@ -1,26 +1,39 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-type Option = { label: string; value: any }
+import { computed, onMounted } from 'vue'
+import { FilterTypes } from '@/enums'
 
 const props = defineProps<{
-  type: FilterType
-  modelValue?: any
-  options?: Option[]
-  placeholder?: string
-  label?: string
-  sortable?: boolean
-  sortDirection?: 'asc' | 'desc' | undefined
+  columnData: any,
+  modelValue: string | number | undefined,
+  isSorted: string | boolean,
+  showClearFilterButton: boolean
 }>()
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: any): void
-  (e: 'toggle-sort'): void
-}>()
+const emit = defineEmits(['filterTable', 'toggleSort', 'resetFilter']) 
+const update = (value: any) => {
+  emit('filterTable', props.columnData.id, value)
+}
 
-const update = (value: any) => emit('update:modelValue', value)
+const cleanField = () => {
+  emit('filterTable', props.columnData.id, '')
+}
 
+const resetFilters = () => {
+  emit('resetFilter')
+}
+const filterValue = computed({
+  get: () => props.modelValue,
+  set: (value) => {
+    emit('filterTable', props.columnData.id, value)
+  }
+})
+
+const showXButton = computed(() => {
+  return !!props.modelValue
+})
 const sortIcon = computed(() => {
-  return 'i-mdi-arrow-up'
+  if(!props.isSorted) return
+  return props.isSorted === 'desc'? 'i-mdi-arrow-down' : 'i-mdi-arrow-up'
 })
 </script>
 
@@ -30,69 +43,88 @@ const sortIcon = computed(() => {
   >
     <div
       class="text-gray-600 text-sm"
-      :title="label || placeholder"
+      :title="columnData.header || columnData.filter.placeholder"
     >
       <div
-        class="flex items-center gap-1"
-        @click.stop="emit('toggle-sort')"
+        :class="[
+          'flex items-center gap-1',
+          columnData.id === 'actions' ? 'justify-center' : ''
+        ]"
+        @click.stop="emit('toggleSort')"
       >
-        <div class="truncate">{{ label || placeholder }}</div>
+        <div class="truncate">
+          {{ columnData.filter.placeholder || columnData.header }}
+        </div>
         <UIcon
-          v-if="sortable"
+          v-if="columnData.sortable && isSorted"
           :name="sortIcon"
           class="text-gray-500 cursor-pointer hover:text-gray-700"
         />
       </div>
     </div>
     <UInput
-      v-if="type === FilterTypes.TEXT_FIELD"
-      class="font-medium"
-      :placeholder="placeholder"
+      v-if="columnData.filter.type == FilterTypes.TEXT_FIELD"
       :model-value="modelValue"
+      :placeholder="columnData.filter.placeholder"
       size="lg"
+      :ui="{base: 'px-2 placeholder:text-bcGovGray-700 font-medium'}"
       @update:model-value="update"
     >
-    <template #trailing>
-      <UButton
-        v-show="true"
-        color="gray"
-        variant="link"
-        icon="i-mdi-cancel-circle text-primary"
-        :padded="false"
-      />
-    </template>
+      <template #trailing>
+        <UButton
+          v-if="showXButton"          
+          color="gray"
+          variant="link"
+          class="text-primary"
+          icon="i-mdi-cancel-circle"
+          :padded="false"
+          @click="cleanField"
+        />
+      </template>
     </UInput>
 
-    <USelect
-      v-else-if="type === FilterTypes.SELECT"
-      :items="options"
-      :model-value="modelValue"
-      :placeholder="placeholder"
-      size="lg"
-      class="custom-select font-medium"
-      :ui="{
-        base: 'text-base'
-      }"
-      @update:model-value="update"
+    <div 
+      v-else-if="columnData.filter.type === FilterTypes.SELECT"
+      class="relative w-full"
     >
-    <template #trailing>
-      <UButton
-        v-show="true"
-        variant="link"
-        icon="i-mdi-cancel-circle text-primary"
-        :padded="false"
-        
+      <USelect
+        :key="columnData.filter.key || 'select'"
+        :items="columnData.filter.options"
+        :model-value="modelValue"
+        :placeholder="columnData.filter.placeholder"
+        size="lg"
+        class="custom-select font-medium pr-8 w-full"
+        :ui="{ item: 'hover:text-blue-500 hover:bg-bcGovGray-100', placeholder: 'text-bcGovGray-700'}"
+        @update:model-value="update"
       />
-      <UIcon name="i-mdi-arrow-drop-down" class="w-5 h-5 " />
-    </template>
-    </USelect>
+      <UButton
+        v-if="showXButton"
+        variant="link"
+        class="text-primary absolute right-6 top-1/2 transform -translate-y-1/2 z-20"
+        icon="i-mdi-cancel-circle"
+        :padded="false"
+        @click="cleanField"
+      />
+    </div>
 
     <RangeDatePickerPreset
-      v-else-if="type === FilterTypes.DATE_PICKER"
-      :model-value="modelValue"
+      v-else-if="columnData.filter.type === FilterTypes.DATE_PICKER"
+      v-model="filterValue"
+      :placeholder="columnData.filter.placeholder"
       size="lg"
-      @update:model-value="update"
     />
+
+    <UButton
+      v-else-if="columnData.filter.type === FilterTypes.ACTIONS"
+      :class="{ 'opacity-0 pointer-events-none': !showClearFilterButton }"
+      size="md"
+      variant="outline"
+      class="px-2"
+      icon="i-mdi-cancel-circle"
+      @click="resetFilters()"
+    >
+      Clear Filter
+    </UButton>
   </div>
 </template>
 

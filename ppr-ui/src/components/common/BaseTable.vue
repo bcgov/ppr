@@ -11,58 +11,31 @@ const props = defineProps<{
   sort?: TableSort
   loading?: boolean
   ui?: Record<string, any>
+  columnVisibility?: object
 }>()
 
+const columnVisibility = computed(() => {
+  return props.columnVisibility
+})
+
+
 const emit = defineEmits<{
-  (e: 'update:sort', sort: TableSort): void
   (e: 'row-click', row: any): void
 }>()
 </script>
 
 <template>
   <UTable
+    v-model:column-visibility="columnVisibility"
     :columns="columns"
     :data="data"
     :sort="sort"
     :loading="loading"
     :ui="ui"
     sticky
-    @update:sort="($event) => emit('update:sort', $event)"
+    class="min-h-[400px]"
     @row:click="($event) => emit('row-click', $event)"
   >
-    <template
-      v-for="col in columns"
-      :key="col.id"
-      #[`${col.id}-header`]="slotProps"
-    >
-      <slot :name="`${col.id}-header`" v-bind="slotProps">
-        <BaseTableHeader
-          v-if="col.filter"
-          v-model="col.filter.model"
-          :type="col.filter.type"
-          :options="col.filter.options"
-          :placeholder="col.filter.placeholder || col.header"
-          :props="col.filter.props"
-          :sortable="col.sortable"
-          :sort-direction="col.sortDirection"
-        />
-        <div
-          v-else-if="col.id==='actions'"
-          class="flex flex-col gap-2 items-center"
-        >
-          <div> {{ col.header }} </div>
-          <UButton
-            size="md"
-            variant="outline"
-            class="px-2"
-            icon="i-mdi-cancel-circle"
-          >
-            Clear Filter
-          </UButton>
-          
-        </div>
-      </slot>
-    </template>
 
     <template
       v-for="col in columns"
@@ -83,19 +56,19 @@ const emit = defineEmits<{
   </UTable>
 </template>
 <style scoped>
-:deep(table) th:last-child,
-:deep(table) td:last-child {
-  display: table-cell;
-  position: sticky;
-  right: 0;
-  width: 160px;
-  max-width: 160px;
-  min-width: 160px;
-  text-align: center;
-  background-color: #fff;
+  :deep(table) th:last-child,
+  :deep(table) td:last-child {
+    display: table-cell;
+    position: sticky;
+    right: 0;
+    width: 160px;
+    max-width: 160px;
+    min-width: 160px;
+    text-align: center;
+    background-color: #fff;
 
-  border-left: 1px solid #dee2e6;
-  box-shadow: inset 1px 0 0 0 #adb5bd;
-}
+    border-left: 1px solid #dee2e6;
+    box-shadow: inset 1px 0 0 0 #adb5bd;
+  }
 
 </style>

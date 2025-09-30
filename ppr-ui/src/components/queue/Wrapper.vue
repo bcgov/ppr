@@ -1,60 +1,122 @@
 <script setup lang="ts">
-import { h, resolveComponent } from 'vue'
+import { h, resolveComponent, ref, computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAnalystQueueStore } from '@/store/analystQueue'
 import { queueTableColumns } from '@/composables/analystQueue'
+import { FilterTypes } from '@/enums'
 
 const { setMhrInformation } = useStore()
-const { queueTableData } = storeToRefs(useAnalystQueueStore())
 const { goToRoute } = useNavigation()
-const { getQueueTabledata } = useAnalystQueueStore()
+
+const { 
+  assignees, 
+  filteredQueueReviews,
+  columnsToShow,
+  columnFilters,
+  showClearFilterButton
+} = storeToRefs(useAnalystQueueStore())
+const { getQueueTabledata, toggleColumnsVisibility } = useAnalystQueueStore()
+
 const UBadge = resolveComponent('UBadge')
 const UButton = resolveComponent('UButton')
+const BaseTableHeader = resolveComponent('BaseTableHeader')
 const sort = ref({ column: 'dateSubmitted', direction: 'desc' })
 const loading = ref(false)
-const tableClass = ref('')
-const changeColumns = () => {}
+const columnVisibility = ref({})
+
+const changeColumns = (selected: Array<string>) => {
+  columnVisibility.value = queueTableColumns.reduce((result, col) => {
+  if (!col.isFixed && !selected.includes(col.id)) {
+    result[col.id] = false
+  }
+  return result
+}, {})
+}
+
+const filterTable = (columnId, filterValue) => {
+  columnFilters.value[columnId] = filterValue
+}
+
+const renderStatusChip = (col) => ({ row }) => {
+    const color = {
+      APPROVED: 'success' as const,
+      DECLINED: 'error' as const,
+      PAY_CANCELLED: 'neutral' as const,
+      NEW: 'warning' as const
+    }[row.getValue('statusType') as string]
+
+    return h(UBadge, {
+      as: 'div',
+      class: 'size-full text-md text-center flex justify-center',
+      variant: 'subtle', 
+      color
+    }, () => row.getValue('statusType'))
+  }
+
+const renderSortableHeader = (columnData) => ({ column }: any) => {
+  const isSorted = column.getIsSorted()
+
+  return h(BaseTableHeader, {
+    columnData: columnData,
+    isSorted: isSorted,
+    modelValue: columnFilters.value[columnData.id],
+    showClearFilterButton: showClearFilterButton.value,
+    onToggleSort: () => {
+      column.toggleSorting(column.getIsSorted() === 'asc')
+    },
+    onFilterTable: (columnId, value) => {
+      filterTable(columnId, value)
+    },
+    onResetFilter: () => {
+      columnFilters.value = {}
+    }
+  })
+}
 
 // Add cell function to statusType, actions column
 const columnsWithCellFunction = computed(() => {
-  return queueTableColumns.map(column => {
-    // status chip
+  return columnsToShow.value.map(column => {
     if (column.id === 'statusType') {
       return {
         ...column,
-        cell: ({ row }) => {
-          const color = {
-            APPROVED: 'success' as const,
-            DECLINED: 'error' as const,
-            PAY_CANCELLED: 'neutral' as const,
-            NEW: 'warning' as const
-          }[row.getValue('statusType') as string]
-          return h(UBadge, {
-            as: 'div',
-            class: 'size-full text-md text-center flex justify-center',
-            variant: 'subtle',
-            color
-          }, () => row.getValue('statusType'))
-        }
+        header: renderSortableHeader(column),
+        cell: renderStatusChip(column)
       }
     }
-    // Actions button
+    else if (column.id === 'assigneeName') {
+      return {
+        ...column,
+        header: renderSortableHeader({
+          ...column,
+          get filter() {
+            return {
+              ...column.filter,
+              options: assignees.value,
+            }
+          }
+        })
+      }
+    }
     else if (column.id === 'actions') {
       return {
         ...column,
-        cell: ({ row }) => {
-          return h(UButton, {
-            size: 'md',
-            variant: 'solid',
-            color: 'primary',
-            onClick: () => {
-              tableRowActionHandler(row.original)
-            }
-          }, () => 'Action')
-        }
+        header: renderSortableHeader(column),
+        cell: ({ row }) =>
+          h(UButton, {
+              size: 'md',
+              variant: 'solid',
+              color: 'primary',
+              onClick: () => {
+                tableRowActionHandler(row.original)
+              }
+            }, () => 'Action'
+          )
       }
     }
-    return column
+    return {
+      ...column,
+      header: renderSortableHeader(column),
+    }
   })
 })
 
@@ -74,13 +136,13 @@ const tableRowActionHandler = (rowEvent) => {
         class="font-bold text-gray-900 bg-bcGovColor-gray2 px-5 py-[18px] rounded-t"
       >
       <div class="flex justify-between items-center">
-        <span> MHR Queue ({{ queueTableData.length }}) </span>
+        <span> MHR Queue ({{ filteredQueueReviews?.length }}) </span>
         <div class="flex gap-4">
           <BaseMultiSelector
-            :options="columnsWithCellFunction"
-            class="w-[250px] font-light"
-            value-attribute="id"
-            option-attribute="header"
+            :options="queueTableColumns"
+            class="w-[200px] font-light"
+            value-key="id"
+            label-key="header"
             label="Column to Show"
             @change="changeColumns"
           />
@@ -88,13 +150,15 @@ const tableRowActionHandler = (rowEvent) => {
       </div>
     </div>
 
-    <div :class="tableClass">
+    <div>
       <BaseTable
         :columns="columnsWithCellFunction"
-        :data="queueTableData"
+        :data="filteredQueueReviews"
         :sort="sort"
         :loading="loading"
+        :column-visibility="columnVisibility"
         @update:sort="($event) => emit('update:sort', $event)"
+        @row:click="($event) => emit('row-click', $event)"
       >
         <!-- forward all provided slots to BaseTable -->
         <template v-for="(_, slotName) in $slots" #[slotName]="slotProps">
