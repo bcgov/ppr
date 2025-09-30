@@ -64,11 +64,21 @@ const showClearFilterButton = computed(() => {
 })
 
 const assignees = computed(() => {
-  return filteredQueueReviews.value.filter(review => review.assigneeName)
+  const uniqueAssignees = new Set()
+
+  return queueTableData.value
+    .filter(review => review.assigneeName && review.assigneeName.trim() !== '')
     .map(review => ({
       label: review.assigneeName,
       value: review.assigneeName
     }))
+    .filter(assignee => {
+      if (uniqueAssignees.has(assignee.value)) {
+        return false
+      }
+      uniqueAssignees.add(assignee.value)
+      return true
+    })
 })
 
  const toggleColumnsVisibility = (selected: Array<any>) => {

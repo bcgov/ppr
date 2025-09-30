@@ -65,9 +65,9 @@ const sortIcon = computed(() => {
     <UInput
       v-if="columnData.filter.type == FilterTypes.TEXT_FIELD"
       :model-value="modelValue"
-      class="font-medium"
       :placeholder="columnData.filter.placeholder"
       size="lg"
+      :ui="{base: 'px-2 placeholder:text-bcGovGray-700 font-medium'}"
       @update:model-value="update"
     >
       <template #trailing>
@@ -83,38 +83,29 @@ const sortIcon = computed(() => {
       </template>
     </UInput>
 
-    <USelect
+    <div 
       v-else-if="columnData.filter.type === FilterTypes.SELECT"
-      :items="columnData.filter.options"
-      :model-value="modelValue"
-      :placeholder="columnData.filter.placeholder"
-      size="lg"
-      class="custom-select font-medium"
-      :ui="{
-        base: 'text-base',
-        icon: {
-          trailing: {
-            pointer: ''
-          }
-        },
-        option: {
-          base: 'cursor-pointer hover:text-primary',
-        }
-      }"
-      @update:model-value="update"
+      class="relative w-full"
     >
-    <template #trailing>
+      <USelect
+        :key="columnData.filter.key || 'select'"
+        :items="columnData.filter.options"
+        :model-value="modelValue"
+        :placeholder="columnData.filter.placeholder"
+        size="lg"
+        class="custom-select font-medium pr-8 w-full"
+        :ui="{ item: 'hover:text-blue-500 hover:bg-bcGovGray-100', placeholder: 'text-bcGovGray-700'}"
+        @update:model-value="update"
+      />
       <UButton
         v-if="showXButton"
         variant="link"
-        class="text-primary"
+        class="text-primary absolute right-6 top-1/2 transform -translate-y-1/2 z-20"
         icon="i-mdi-cancel-circle"
         :padded="false"
-        @click.stop="cleanField"
+        @click="cleanField"
       />
-      <UIcon name="i-mdi-arrow-drop-down" class="w-5 h-5 " />
-    </template>
-    </USelect>
+    </div>
 
     <RangeDatePickerPreset
       v-else-if="columnData.filter.type === FilterTypes.DATE_PICKER"

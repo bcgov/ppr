@@ -22,7 +22,6 @@ const UButton = resolveComponent('UButton')
 const BaseTableHeader = resolveComponent('BaseTableHeader')
 const sort = ref({ column: 'dateSubmitted', direction: 'desc' })
 const loading = ref(false)
-const tableClass = ref('')
 const columnVisibility = ref({})
 
 const changeColumns = (selected: Array<string>) => {
@@ -72,13 +71,11 @@ const renderSortableHeader = (columnData) => ({ column }: any) => {
       columnFilters.value = {}
     }
   })
-
 }
 
 // Add cell function to statusType, actions column
 const columnsWithCellFunction = computed(() => {
   return columnsToShow.value.map(column => {
-    // status chip
     if (column.id === 'statusType') {
       return {
         ...column,
@@ -86,36 +83,35 @@ const columnsWithCellFunction = computed(() => {
         cell: renderStatusChip(column)
       }
     }
-    // Actions button
+    else if (column.id === 'assigneeName') {
+      return {
+        ...column,
+        header: renderSortableHeader({
+          ...column,
+          get filter() {
+            return {
+              ...column.filter,
+              options: assignees.value,
+            }
+          }
+        })
+      }
+    }
     else if (column.id === 'actions') {
       return {
         ...column,
         header: renderSortableHeader(column),
-        cell: ({ row }) => {
-          return h(UButton, {
-            size: 'md',
-            variant: 'solid',
-            color: 'primary',
-            onClick: () => {
-              tableRowActionHandler(row.original)
-            }
-          }, () => 'Action')
-        }
+        cell: ({ row }) =>
+          h(UButton, {
+              size: 'md',
+              variant: 'solid',
+              color: 'primary',
+              onClick: () => {
+                tableRowActionHandler(row.original)
+              }
+            }, () => 'Action'
+          )
       }
-    }
-    else if (column.id === 'assigneeName') {
-      return {
-      ...column,
-      filter: {
-        type: FilterTypes.SELECT,
-        placeholder: 'Assignee',
-        options: [{
-          label: 'a',
-          value: 'b'
-        }]
-      },
-      header: renderSortableHeader(column),
-    }
     }
     return {
       ...column,
@@ -145,8 +141,8 @@ const tableRowActionHandler = (rowEvent) => {
           <BaseMultiSelector
             :options="queueTableColumns"
             class="w-[200px] font-light"
-            value-attribute="id"
-            option-attribute="header"
+            value-key="id"
+            label-key="header"
             label="Column to Show"
             @change="changeColumns"
           />
@@ -154,14 +150,14 @@ const tableRowActionHandler = (rowEvent) => {
       </div>
     </div>
 
-    <div :class="tableClass">
+    <div>
       <BaseTable
         :columns="columnsWithCellFunction"
         :data="filteredQueueReviews"
         :sort="sort"
         :loading="loading"
-        @update:sort="($event) => emit('update:sort', $event)"
         :column-visibility="columnVisibility"
+        @update:sort="($event) => emit('update:sort', $event)"
         @row:click="($event) => emit('row-click', $event)"
       >
         <!-- forward all provided slots to BaseTable -->

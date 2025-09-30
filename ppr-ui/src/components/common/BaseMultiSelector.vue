@@ -7,11 +7,11 @@ const props = defineProps({
     type: Array as PropType<any>,
     required: true,
   },
-  valueAttribute: {
+  valueKey: {
     type: String,
     required: true,
   },
-  optionAttribute: {
+  labelKey: {
     type: String,
     required: true,
   },
@@ -30,25 +30,48 @@ const items = computed(() => {
 })
 
 const emit = defineEmits(['change']) 
+
+const handleCheckboxChange = (value: any, checked: boolean) => {
+  if (checked) {
+    // Add to selection if not already present
+    if (!selected.value.includes(value)) {
+      selected.value.push(value)
+    }
+  } else {
+    // Remove from selection
+    const index = selected.value.indexOf(value)
+    if (index > -1) {
+      selected.value.splice(index, 1)
+    }
+  }
+  emit('change', selected.value)
+}
+
 onMounted(() => {
   selected.value = props.options
     .filter(option => !option.isFixed)
-    .map(option => option[props.valueAttribute])
+    .map(option => option[props.valueKey])
 })
 </script>
 <template>
   <USelect
-    v-model="selected"
     class="text-gray-700 text-light"
     :placeholder="label"
     :items="items"
-    :value-key="valueAttribute"
-    :label-key="optionAttribute"
+    :value-key="valueKey"
+    :label-key="labelKey"
     size="lg"
     multiple
     trailing-icon="i-mdi-arrow-drop-down"
-    @update:model-value="emit('change', $event)"
   >
   <div v-if="label" class="px-2">{{ label }}</div>
+  <template #item="{item}">
+    <UCheckbox
+      :model-value="selected.includes(item[valueKey])"
+      :name="item[valueKey]"
+      :label="item[labelKey]"
+      @update:model-value="(checked) => handleCheckboxChange(item[valueKey], checked)"
+    />
+  </template>
   </USelect>
 </template>

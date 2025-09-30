@@ -88,6 +88,9 @@ watch(dateRange, (newValue) => {
         day: newValue.end.day
       }
     })
+  } else if (!newValue.start && !newValue.end) {
+    // Emit null when both dates are cleared
+    emit('update:modelValue', null)
   }
 }, { deep: true })
 </script>
@@ -97,10 +100,7 @@ watch(dateRange, (newValue) => {
     <UInput
       :size="size"
       :model-value="customLabel"
-      class="font-medium placeholder:bcGovGray-300"
-      :ui="{
-        base: 'text-left'
-      }"
+      :ui="{ base: 'text-left placeholder:text-bcGovGray-700 font-medium' }"
     >
       <template #trailing>
         <UButton

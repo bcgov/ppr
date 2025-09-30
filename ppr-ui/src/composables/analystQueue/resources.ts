@@ -16,6 +16,11 @@ export const queueTableColumns = [
       filter: {
         type: FilterTypes.TEXT_FIELD,
         placeholder: 'Registration Number',
+      },
+      meta: {
+        class: {
+          th: 'w-[200px]'
+        }
       }
     },
     { id: 'statusType',
@@ -28,9 +33,15 @@ export const queueTableColumns = [
         options: Object.values(ReviewStatusTypes).map(status => ({
             label: transformEnumToLabel(status),
             value: status
-        }))
+        })),
+      },
+      meta: {
+        class: {
+          th: 'w-[200px]'
+        }
       }
-    },{ id: 'registrationType',
+    },
+    { id: 'registrationType',
       header: 'Registration Type',
       accessorKey: 'registrationType',
       sortable: true,
@@ -40,33 +51,57 @@ export const queueTableColumns = [
         options: Object.values(ReviewRegTypes).map(status => ({
             label: transformEnumToLabel(status),
             value: status
-        }))
+        })),
+      },
+      meta: {
+        class: {
+          th: 'w-[200px]'
+        }
       }
-    },{ id: 'createDateTime',
+    },
+    { id: 'createDateTime',
       header: 'Date Submitted',
       accessorKey: 'createDateTime',
       sortable: true,
       filter: {
         type: FilterTypes.DATE_PICKER,
         placeholder: 'Date Submitted',
+      },
+      meta: {
+        class: {
+          th: 'w-[200px]'
+        }
       }
-    },{ id: 'submittingName',
+    },
+    { id: 'submittingName',
       header: 'Submitting Party',
       accessorKey: 'submittingName',
       sortable: true,
       filter: {
         type: FilterTypes.TEXT_FIELD,
         placeholder: 'Submitting Party',
+      },
+      meta: {
+        class: {
+          th: 'w-[200px]'
+        }
       }
-    },{ id: 'assigneeName',
+    },
+    { id: 'assigneeName',
       header: 'Assignee',
       accessorKey: 'assigneeName',
       sortable: true,
       filter: {
         type: FilterTypes.SELECT,
-        placeholder: 'Assignee',
+        placeholder: 'Assignee'
+      },
+      meta: {
+        class: {
+          th: 'w-[200px]'
+        }
       }
-    },{ id: 'actions',
+    },
+    { id: 'actions',
       header: 'Actions',
       accessorKey: 'actions',
       isFixed: true,
