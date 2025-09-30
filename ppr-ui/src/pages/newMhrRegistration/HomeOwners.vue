@@ -349,7 +349,7 @@
               Home Owners
             </h4>
             <span
-              v-if="(isMhrTransfer) && hasRemovedOwners"
+              v-if="isMhrTransfer && hasRemovedOwners"
               class="float-right hide-show-owners fs-14"
               @click="hideShowRemovedOwners()"
             >

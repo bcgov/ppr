@@ -112,8 +112,7 @@
                 </v-btn>
                 <!-- Actions drop down menu -->
                 <v-menu
-                  v-if="item.action !== ActionTypes.REMOVED"
-                  location="bottom right"
+                  v-if="item.action !== ActionTypes.REMOVED && isMhrCorrection"
                 >
                   <template #activator="{ props }">
                     <v-divider
