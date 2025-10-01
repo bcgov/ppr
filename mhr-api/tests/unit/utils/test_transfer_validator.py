@@ -151,77 +151,80 @@ TEST_TRANSFER_DATA_TRAND = [
      validator.TRAN_DEATH_QS_JOINT_REMOVE)
 ]
 
-# testdata pattern is ({description},{valid},{mhr_num},{account_id},{delete_groups},{add_groups},{message content},{staff})
+# testdata pattern is ({description},{valid},{mhr_num},{account_id},{delete_groups},{add_groups},{message content},{user_role})
 TEST_TRANSFER_DATA_ADMIN = [
-    ('Valid', True,  '000921', 'PS12345', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, None, True),
-    ('Valid delete ADMIN', True,  '000922', 'PS12345', ADMIN_DELETE_GROUPS1, ADMIN_ADD_GROUPS, None, True),
-    ('Invalid non-staff', False,  '000921', 'PS12345', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
-     validator.REG_STAFF_ONLY, False),
-    ('Valid party type EXECUTOR', True,  '000921', 'PS12345', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, None, True),
-    ('Valid party type TRUSTEE', True,  '000921', 'PS12345', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, None, True),
-    ('Valid party type ADMINISTRATOR', True,  '000921', 'PS12345', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, None, True),
+    ('Valid', True,  '000921', 'PS12345', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, None, STAFF_ROLE),
+    ('Valid QS lawyer', True,  '000921', 'PS12345', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, None, QUALIFIED_USER_GROUP),
+    ('Valid delete ADMIN', True,  '000922', 'PS12345', ADMIN_DELETE_GROUPS1, ADMIN_ADD_GROUPS, None, STAFF_ROLE),
+    ('Invalid QS dealer', False,  '000921', 'PS12345', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
+     validator.REG_STAFF_ONLY, DEALERSHIP_GROUP),
+    ('Valid party type EXECUTOR', True,  '000921', 'PS12345', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, None, STAFF_ROLE),
+    ('Valid party type TRUSTEE', True,  '000921', 'PS12345', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, None, STAFF_ROLE),
+    ('Valid party type ADMINISTRATOR', True,  '000921', 'PS12345', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS, None, STAFF_ROLE),
     ('Invalid party type add', False,  '000921', 'PS12345', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
-     validator.TRAN_ADMIN_NEW_OWNER, True),
+     validator.TRAN_ADMIN_NEW_OWNER, STAFF_ROLE),
     ('Invalid administrator missing', False,  '000921', 'PS12345', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
-     validator.TRAN_ADMIN_NEW_OWNER, True),
+     validator.TRAN_ADMIN_NEW_OWNER, STAFF_ROLE),
     ('Invalid no grant', False,  '000921', 'PS12345', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
-     validator.TRAN_ADMIN_GRANT, True),
+     validator.TRAN_ADMIN_GRANT, STAFF_ROLE),
     ('Invalid no death info', False,  '000921', 'PS12345', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
-     validator.TRAN_ADMIN_DEATH_CERT, True),
+     validator.TRAN_ADMIN_DEATH_CERT, STAFF_ROLE),
     ('Invalid add 2 groups', False,  '000921', 'PS12345', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
-     val_owner_utils.TRAN_DEATH_GROUP_COUNT, True),
+     val_owner_utils.TRAN_DEATH_GROUP_COUNT, STAFF_ROLE),
     ('Invalid delete 2 groups', False,  '000921', 'PS12345', ADMIN_DELETE_GROUPS, ADMIN_ADD_GROUPS,
-     val_owner_utils.TRAN_DEATH_GROUP_COUNT, True)
+     val_owner_utils.TRAN_DEATH_GROUP_COUNT, STAFF_ROLE)
 ]
-# testdata pattern is ({description},{valid},{mhr_num},{account_id},{delete_groups},{add_groups},{message content},{staff})
+# testdata pattern is ({description},{valid},{mhr_num},{account_id},{delete_groups},{add_groups},{message content},{user_role})
 TEST_TRANSFER_DATA_AFFIDAVIT = [
-    ('Valid', True,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
-    ('Invalid non-staff', False,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
-     validator.REG_STAFF_ONLY, False),
-    ('Valid party type EXECUTOR', True,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
-    ('Valid party type TRUSTEE', True,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
-    ('Valid party type ADMINISTRATOR', True,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
+    ('Valid', True,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS, None, STAFF_ROLE),
+    ('Valid QS lawyer', True,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS, None, QUALIFIED_USER_GROUP),
+    ('Invalid QS Dealer', False,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
+     validator.REG_STAFF_ONLY, DEALERSHIP_GROUP),
+    ('Valid party type EXECUTOR', True,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS, None, STAFF_ROLE),
+    ('Valid party type TRUSTEE', True,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS, None, STAFF_ROLE),
+    ('Valid party type ADMINISTRATOR', True,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS, None, STAFF_ROLE),
     ('Invalid party type add', False,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
-     validator.TRAN_AFFIDAVIT_NEW_OWNER, True),
+     validator.TRAN_AFFIDAVIT_NEW_OWNER, STAFF_ROLE),
     ('Invalid declared value', False,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
-     validator.TRAN_AFFIDAVIT_DECLARED_VALUE, True),
+     validator.TRAN_AFFIDAVIT_DECLARED_VALUE, STAFF_ROLE),
     ('Invalid executor missing', False,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS_INVALID,
-     validator.TRAN_AFFIDAVIT_NEW_OWNER, True),
+     validator.TRAN_AFFIDAVIT_NEW_OWNER, STAFF_ROLE),
     ('Invalid no death info', False,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
-     validator.TRAN_EXEC_DEATH_CERT, True),
+     validator.TRAN_EXEC_DEATH_CERT, STAFF_ROLE),
     ('Invalid no death cert number', False,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
-     validator.TRAN_DEATH_CERT_MISSING, True),
+     validator.TRAN_DEATH_CERT_MISSING, STAFF_ROLE),
     ('Invalid no death corp number', False,  '000920', 'PS12345', TRAND_DELETE_GROUPS, EXEC_ADD_GROUPS,
-     validator.TRAN_DEATH_CORP_NUM_MISSING, True),
+     validator.TRAN_DEATH_CORP_NUM_MISSING, STAFF_ROLE),
     ('Invalid no death date', False,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
-     validator.TRAN_DEATH_DATE_MISSING, True),
+     validator.TRAN_DEATH_DATE_MISSING, STAFF_ROLE),
     ('Invalid add 2 groups', False,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
-     val_owner_utils.TRAN_DEATH_GROUP_COUNT, True),
+     val_owner_utils.TRAN_DEATH_GROUP_COUNT, STAFF_ROLE),
     ('Invalid delete 2 groups', False,  '000921', 'PS12345', EXEC_DELETE_GROUPS, EXEC_ADD_GROUPS,
-     val_owner_utils.TRAN_DEATH_GROUP_COUNT, True)
+     val_owner_utils.TRAN_DEATH_GROUP_COUNT, STAFF_ROLE)
 ]
-# testdata pattern is ({description},{valid},{mhr_num},{account_id},{delete_groups},{add_groups},{message content},{staff})
+# testdata pattern is ({description},{valid},{mhr_num},{account_id},{delete_groups},{add_groups},{message content},{user_role})
 TEST_TRANSFER_DATA_WILL = [
-    ('Valid', True,  '000921', 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
-    ('Valid delete EXEC', True,  '000923', 'PS12345', WILL_DELETE_GROUPS3, EXEC_ADD_GROUPS, None, True),
-    ('Invalid non-staff', False,  '000921', 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS,
-     validator.REG_STAFF_ONLY, False),
-    ('Valid add owner', True,  '000921', 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
-    ('Valid party type EXECUTOR', True,  '000921', 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
-    ('Valid party type TRUSTEE', True,  '000921', 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
-    ('Valid party type ADMINISTRATOR', True,  '000921', 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS, None, True),
+    ('Valid', True,  '000921', 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS, None, STAFF_ROLE),
+    ('Valid QS lawyer', True,  '000921', 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS, None, QUALIFIED_USER_GROUP),
+    ('Valid delete EXEC', True,  '000923', 'PS12345', WILL_DELETE_GROUPS3, EXEC_ADD_GROUPS, None, STAFF_ROLE),
+    ('Invalid QS manufacturer', False,  '000921', 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS,
+     validator.REG_STAFF_ONLY, DEALERSHIP_GROUP),
+    ('Valid add owner', True,  '000921', 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS, None, STAFF_ROLE),
+    ('Valid party type EXECUTOR', True,  '000921', 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS, None, STAFF_ROLE),
+    ('Valid party type TRUSTEE', True,  '000921', 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS, None, STAFF_ROLE),
+    ('Valid party type ADMINISTRATOR', True,  '000921', 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS, None, STAFF_ROLE),
     ('Invalid party type add', False,  '000921', 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS,
-     validator.TRAN_WILL_NEW_OWNER, True),
+     validator.TRAN_WILL_NEW_OWNER, STAFF_ROLE),
     ('Invalid executor missing', False,  '000921', 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS_INVALID,
-     validator.TRAN_WILL_NEW_OWNER, True),
+     validator.TRAN_WILL_NEW_OWNER, STAFF_ROLE),
     ('Invalid no probate', False,  '000921', 'PS12345', WILL_DELETE_GROUPS1, EXEC_ADD_GROUPS,
-     validator.TRAN_WILL_PROBATE, True),
+     validator.TRAN_WILL_PROBATE, STAFF_ROLE),
     ('Invalid no death info', False,  '000921', 'PS12345', WILL_DELETE_GROUPS2, EXEC_ADD_GROUPS,
-     validator.TRAN_WILL_DEATH_CERT, True),
+     validator.TRAN_WILL_DEATH_CERT, STAFF_ROLE),
     ('Invalid add 2 groups', False,  '000921', 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS,
-     val_owner_utils.TRAN_DEATH_GROUP_COUNT, True),
+     val_owner_utils.TRAN_DEATH_GROUP_COUNT, STAFF_ROLE),
     ('Invalid delete 2 groups', False,  '000921', 'PS12345', WILL_DELETE_GROUPS, EXEC_ADD_GROUPS,
-     val_owner_utils.TRAN_DEATH_GROUP_COUNT, True)
+     val_owner_utils.TRAN_DEATH_GROUP_COUNT, STAFF_ROLE)
 ]
 # testdata pattern is ({description}, {valid}, {mhr_num}, {tenancy_type}, {add_group}, {message content})
 TEST_TRANSFER_DEATH_NA_DATA = [
@@ -496,12 +499,13 @@ def test_validate_transfer_trand(session, desc, valid, mhr_num, account_id, dele
             assert error_msg.find(message_content) != -1
 
 
-@pytest.mark.parametrize('desc,valid,mhr_num,account_id,delete_groups,add_groups,message_content,staff',
+@pytest.mark.parametrize('desc,valid,mhr_num,account_id,delete_groups,add_groups,message_content,user_role',
                          TEST_TRANSFER_DATA_ADMIN)
 def test_validate_transfer_admin(session, desc, valid, mhr_num, account_id, delete_groups, add_groups, message_content,
-                                 staff):
+                                 user_role):
     """Assert that MH transfer TRANS_ADMIN validation of owner groups works as expected."""
     # setup
+    staff: bool = user_role == STAFF_ROLE
     json_data = copy.deepcopy(TRANSFER)
     json_data['documentId'] = DOC_ID_VALID
     json_data['registrationType'] = MhrRegistrationTypes.TRANS_ADMIN
@@ -534,7 +538,7 @@ def test_validate_transfer_admin(session, desc, valid, mhr_num, account_id, dele
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
-    error_msg = validator.validate_transfer(registration, json_data, staff, STAFF_ROLE)
+    error_msg = validator.validate_transfer(registration, json_data, staff, user_role)
     if errors:
         current_app.logger.debug(errors)
     if valid:
@@ -545,13 +549,14 @@ def test_validate_transfer_admin(session, desc, valid, mhr_num, account_id, dele
             assert error_msg.find(message_content) != -1
 
 
-@pytest.mark.parametrize('desc,valid,mhr_num,account_id,delete_groups,add_groups,message_content,staff',
+@pytest.mark.parametrize('desc,valid,mhr_num,account_id,delete_groups,add_groups,message_content,user_role',
                          TEST_TRANSFER_DATA_AFFIDAVIT)
 def test_validate_transfer_affidavit(session, desc, valid, mhr_num, account_id, delete_groups, add_groups,
                                      message_content,
-                                     staff):
+                                     user_role):
     """Assert that MH transfer TRANS_AFFIDAVIT validation of owner groups works as expected."""
     # setup
+    staff: bool = user_role == STAFF_ROLE
     json_data = copy.deepcopy(TRANSFER)
     json_data['documentId'] = DOC_ID_VALID
     json_data['registrationType'] = MhrRegistrationTypes.TRANS_AFFIDAVIT
@@ -596,7 +601,7 @@ def test_validate_transfer_affidavit(session, desc, valid, mhr_num, account_id, 
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
-    error_msg = validator.validate_transfer(registration, json_data, staff, STAFF_ROLE)
+    error_msg = validator.validate_transfer(registration, json_data, staff, user_role)
     if errors:
         current_app.logger.debug(errors)
     if valid:
@@ -607,12 +612,13 @@ def test_validate_transfer_affidavit(session, desc, valid, mhr_num, account_id, 
             assert error_msg.find(message_content) != -1
 
 
-@pytest.mark.parametrize('desc,valid,mhr_num,account_id,delete_groups,add_groups,message_content,staff',
+@pytest.mark.parametrize('desc,valid,mhr_num,account_id,delete_groups,add_groups,message_content,user_role',
                          TEST_TRANSFER_DATA_WILL)
 def test_validate_transfer_will(session, desc, valid, mhr_num, account_id, delete_groups, add_groups, message_content,
-                                staff):
+                                user_role):
     """Assert that MH transfer TRANS_WILL validation of owner groups works as expected."""
     # setup
+    staff: bool = user_role == STAFF_ROLE
     json_data = copy.deepcopy(TRANSFER)
     json_data['documentId'] = DOC_ID_VALID
     json_data['registrationType'] = MhrRegistrationTypes.TRANS_WILL
@@ -640,7 +646,7 @@ def test_validate_transfer_will(session, desc, valid, mhr_num, account_id, delet
     valid_format, errors = schema_utils.validate(json_data, 'transfer', 'mhr')
     # Additional validation not covered by the schema.
     registration: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id, staff)
-    error_msg = validator.validate_transfer(registration, json_data, staff, STAFF_ROLE)
+    error_msg = validator.validate_transfer(registration, json_data, staff, user_role)
     current_app.logger.info(error_msg)
     if errors:
         current_app.logger.debug(errors)

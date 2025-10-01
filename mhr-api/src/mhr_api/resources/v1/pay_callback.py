@@ -78,6 +78,9 @@ def post_payment_callback(invoice_id: str):  # pylint: disable=too-many-return-s
         logger.info(f"pay callback request payload={request_json}")
         if not pay_status:
             return pay_callback_error("02", invoice_id, HTTPStatus.BAD_REQUEST, PAY_STATUS_MISSING_MSG)
+        elif pay_status == StatusCodes.REVERSED.value:
+            logger.warning(f"Ignoring pay status={pay_status} for invoice={invoice_id}: staff declined.")
+            return {}, HTTPStatus.OK
         elif pay_status not in ALLOWED_PAY_STATUS:
             error_msg: str = PAY_STATUS_INVALID_MSG.format(pay_status=pay_status)
             return pay_callback_error("02", invoice_id, HTTPStatus.BAD_REQUEST, error_msg)

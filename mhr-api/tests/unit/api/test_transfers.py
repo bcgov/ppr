@@ -70,14 +70,18 @@ TEST_CREATE_DATA = [
 ]
 # testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account}, {reg_type})
 TEST_CREATE_TRANS_DEATH_DATA = [
-    ('Invalid TRANS_ADMIN non-staff', '000921', [MHR_ROLE, TRANSFER_DEATH_JT], HTTPStatus.BAD_REQUEST, 'PS12345',
+    ('Invalid TRANS_ADMIN non-staff', '000921', MANUFACTURER_ROLES, HTTPStatus.UNAUTHORIZED, 'PS12345',
      MhrRegistrationTypes.TRANS_ADMIN),
-    ('Invalid TRANS_AFFIDAVIT non-staff', '000921', [MHR_ROLE, TRANSFER_DEATH_JT], HTTPStatus.BAD_REQUEST, 'PS12345',
+    ('Invalid TRANS_AFFIDAVIT non-staff', '000921', MANUFACTURER_ROLES, HTTPStatus.UNAUTHORIZED, 'PS12345',
      MhrRegistrationTypes.TRANS_AFFIDAVIT),
     ('Invalid TRANS_WILL non-staff', '000921', MANUFACTURER_ROLES, HTTPStatus.UNAUTHORIZED, 'PS12345',
      MhrRegistrationTypes.TRANS_WILL),
-    ('Valid TRANS_WILL non-staff', '000921', QUALIFIED_USER, HTTPStatus.ACCEPTED, 'PS12345',
-     MhrRegistrationTypes.TRANS_WILL),
+    ('Valid TRANS_ADMIN lawyer/notary', '000921', QUALIFIED_USER, HTTPStatus.ACCEPTED, 'PS12345',
+    MhrRegistrationTypes.TRANS_ADMIN),
+    ('Valid TRANS_AFFIDAVIT lawyer/notary', '000921', QUALIFIED_USER, HTTPStatus.ACCEPTED, 'PS12345',
+    MhrRegistrationTypes.TRANS_AFFIDAVIT),
+    ('Valid TRANS_WILL lawyer/notary', '000921', QUALIFIED_USER, HTTPStatus.ACCEPTED, 'PS12345',
+    MhrRegistrationTypes.TRANS_WILL),
     ('Valid TRANS_ADMIN staff', '000921', [MHR_ROLE, STAFF_ROLE, TRANSFER_DEATH_JT], HTTPStatus.CREATED, 'PS12345',
      MhrRegistrationTypes.TRANS_ADMIN),
     ('Valid TRAND staff', '000920', [MHR_ROLE, STAFF_ROLE, TRANSFER_DEATH_JT], HTTPStatus.CREATED, 'PS12345',

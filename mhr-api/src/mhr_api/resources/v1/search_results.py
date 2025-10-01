@@ -332,7 +332,11 @@ def pay(req: request, jwt_, search_detail: SearchResult, request_json: dict, pay
         details=get_payment_details(search_detail, request_json, req),
     )
     # Staff has special payment rules and setup.
-    if is_staff_account(account_id, jwt_) or is_bcol_help(account_id, jwt_):
+    if (
+        is_staff_account(account_id, jwt_)
+        or is_bcol_help(account_id, jwt_)
+        or is_sbc_office_account(jwt_.get_token_auth_header(), account_id, jwt_)
+    ):
         logger.info(f"Setting up reg staff search for {account_id}.")
         payment_info = build_staff_payment(request, account_id)
         # bcol help is no fee; reg staff can be no fee.
@@ -341,12 +345,7 @@ def pay(req: request, jwt_, search_detail: SearchResult, request_json: dict, pay
         # All staff roles including SBC can submit no fee searches.
         pay_ref = payment.create_payment_staff_search(request_json, payment_info, search_id, client_ref)
     else:
-        pay_ref = payment.create_payment_search(
-            request_json,
-            search_id,
-            client_ref,
-            is_sbc_office_account(jwt_.get_token_auth_header(), account_id),
-        )
+        pay_ref = payment.create_payment_search(request_json, search_id, client_ref, False)
     if pay_ref.get("ccPayment"):
         logger.info("Search result payment response CC method.")
         search_detail.score = SCORE_PAY_PENDING
