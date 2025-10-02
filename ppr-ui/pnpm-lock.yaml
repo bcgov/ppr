@@ -81,8 +81,8 @@ importers:
         specifier: ^1.6.2
         version: 1.9.0
       documents-common-base-layer:
-        specifier: 0.0.5
-        version: 0.0.5
+        specifier: 0.0.6
+        version: 0.0.6
       flush-promises:
         specifier: ^1.0.2
         version: 1.0.2
@@ -3868,8 +3868,8 @@ packages:
     resolution: {integrity: sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==}
     engines: {node: '>=6.0.0'}
 
-  documents-common-base-layer@0.0.5:
-    resolution: {integrity: sha512-nU9OloigSPBffLNzlsYgcfsgID1KUtk5pS2ZGoGMXQ2vifMHZqKKhDkvGz3BHuBy34nQHXBwjU+2eY5CCNZ0Jw==}
+  documents-common-base-layer@0.0.6:
+    resolution: {integrity: sha512-Rz6GBNDU7v96xzOE/LsLfPuutgB+5YGpxnw98RFijF5UYz5X09JYIS0Ljjq0OZNrX1emtNu4FOb8GUx3wZruaQ==}
 
   dom-accessibility-api@0.5.16:
     resolution: {integrity: sha512-X7BJ2yElsnOJ30pZF4uIIDfBEVgF4XEBxL9Bxhy6dnrm5hkzqmsWHGTiHqRiITNhMyFLyAiWndIJP7Z1NTteDg==}
@@ -12453,7 +12453,7 @@ snapshots:
     dependencies:
       esutils: 2.0.3
 
-  documents-common-base-layer@0.0.5: {}
+  documents-common-base-layer@0.0.6: {}
 
   dom-accessibility-api@0.5.16: {}
 
