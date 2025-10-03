@@ -28,7 +28,11 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { addTimestampToDate } from '@/utils'
 import { trim } from 'lodash'
 import type { AxiosError } from 'axios'
-import type { QueueDetailIF, QueueSummaryIF } from '@/composables/analystQueue/interfaces'
+import type { 
+  QueueDetailIF,
+  QueueSummaryIF,
+  QueueReviewUpdatePayloadIF
+} from '@/composables/analystQueue/interfaces'
 
 let mhrRegistrationController: AbortController | null = null
 let draftsAbortController: AbortController | null = null
@@ -1123,7 +1127,7 @@ export async function getQueuedTransfer (reviewId: string): Promise<QueueDetailI
 }
 
 export async function updateQueuedTransfer (
-  reviewId: string, payload: any
+  reviewId: string, payload: QueueReviewUpdatePayloadIF
 ): Promise<QueueDetailIF | any> {
   try {
     const response = await axios.patch<QueueDetailIF>(

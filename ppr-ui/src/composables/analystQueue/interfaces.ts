@@ -70,3 +70,8 @@ export interface QueueDetailIF {
     usergroup?: string
     username?: string
 }
+
+export interface QueueReviewUpdatePayloadIF {
+    statusType?: ReviewStatusTypes
+    assigneeName?: string
+}
