@@ -26,9 +26,12 @@ from flask import current_app
 from mhr_api.resources.v1.searches import validate_search, staff_update, VAL_ERROR_FIRST_MISSING
 from mhr_api.models.utils import format_ts, now_ts_offset
 from mhr_api.services.authz import COLIN_ROLE, MHR_ROLE, STAFF_ROLE
+from mhr_api.utils.logging import logger
 from tests.unit.services.utils import create_header, create_header_account
 
 
+SEARCH_ACCESS = [MHR_ROLE]
+STAFF_ACCESS = [MHR_ROLE, STAFF_ROLE]
 # Valid test search criteria
 MHR_NUMBER_JSON = {
     'type': 'MHR_NUMBER',
@@ -62,6 +65,13 @@ SERIAL_NUMBER_JSON = {
     },
     'clientReferenceId': 'T-SQ-MS-1'
 }
+SERIAL_NUMBER_WILD_JSON = {
+    'type': 'SERIAL_NUMBER',
+    'criteria': {
+        'value': '0060'
+    },
+    'clientReferenceId': 'T-SQ-MS-2'
+}
 SELECTED_JSON_NONE = []
 SELECTED_JSON = [
     {'baseInformation': {
@@ -92,12 +102,13 @@ SELECTED_JSON_INVALID = [
     'status': 'EXEMPT'}
 ]
 
-# testdata pattern is ({search_type}, {json_data})
+# testdata pattern is ({search_type}, {json_data} {access_role}, {wildcard})
 TEST_SEARCH_TYPE_DATA = [
-    ('MM', MHR_NUMBER_JSON),
-    ('MB', ORG_NAME_JSON),
-    ('MI', OWNER_NAME_JSON),
-    ('MS', SERIAL_NUMBER_JSON)
+    ('MM', MHR_NUMBER_JSON, SEARCH_ACCESS, False),
+    ('MB', ORG_NAME_JSON, SEARCH_ACCESS, False),
+    ('MI', OWNER_NAME_JSON, SEARCH_ACCESS, False),
+    ('MS', SERIAL_NUMBER_JSON, SEARCH_ACCESS, False),
+    ('MS', SERIAL_NUMBER_WILD_JSON, STAFF_ACCESS, True),
 ]
 
 # testdata pattern is ({desc}, {type}, {value}, {roles}, {account_id}, {status})
@@ -128,14 +139,14 @@ TEST_SELECTED_DATA = [
     ('Unauthorized', SELECTED_JSON, 200000004, [COLIN_ROLE], '1234', HTTPStatus.UNAUTHORIZED)
 ]
 
-# testdata pattern is ({first_name}, {staff}, {change_value})
+# testdata pattern is ({first_name}, {staff}, {change_value}, {wildcard})
 TEST_STAFF_UPDATE_DATA = [
-    ('J', True, 'J'),
-    ('', True, ''),
-    (None, True, ''),
-    ('J', False, 'J'),
-    ('', False, ''),
-    (None, False, None)
+    ('J', True, 'J', True),
+    ('', True, '', True),
+    (None, True, '', False),
+    ('J', False, 'J', False),
+    ('', False, '', False),
+    (None, False, None, False)
 ]
 
 # testdata pattern is ({first_name}, {staff}, {error_msg})
@@ -149,15 +160,16 @@ TEST_EXTRA_VALIDATION_DATA = [
 ]
 
 
-@pytest.mark.parametrize('search_type,json_data', TEST_SEARCH_TYPE_DATA)
-def test_search_valid(session, client, jwt, search_type, json_data):
+@pytest.mark.parametrize('search_type,json_data,access_role,wildcard', TEST_SEARCH_TYPE_DATA)
+def test_search_valid(session, client, jwt, search_type, json_data, access_role, wildcard):
     """Assert that valid search criteria returns a 201 status."""
-    rv = client.post('/api/v1/searches',
+    path = '/api/v1/searches' if not wildcard else '/api/v1/searches?wildcardSearch=true'
+    rv = client.post(path,
                      json=json_data,
-                     headers=create_header_account(jwt, [MHR_ROLE]),
+                     headers=create_header_account(jwt, access_role),
                      content_type='application/json')
     # check
-    current_app.logger.debug(rv.json)
+    # logger.info(rv.json)
     assert rv.status_code == HTTPStatus.CREATED
 
 
@@ -212,8 +224,8 @@ def test_put_selected(session, client, jwt, desc, json_data, search_id, roles, a
     assert rv.status_code == status
 
 
-@pytest.mark.parametrize('first_name,staff,change_value', TEST_STAFF_UPDATE_DATA)
-def test_staff_update(session, client, jwt, first_name, staff, change_value):
+@pytest.mark.parametrize('first_name,staff,change_value, wildcard', TEST_STAFF_UPDATE_DATA)
+def test_staff_update(session, client, jwt, first_name, staff, change_value, wildcard):
     """Assert that the conditional staff search update works as expected."""
     json_data = copy.deepcopy(OWNER_NAME_JSON)
     if first_name or first_name is not None:
@@ -222,13 +234,17 @@ def test_staff_update(session, client, jwt, first_name, staff, change_value):
         del json_data['criteria']['ownerName']['first']
 
     # check
-    result = staff_update(json_data, staff)
+    result = staff_update(json_data, staff, wildcard)
 
     # test
     if change_value or change_value == '':
         assert result['criteria']['ownerName']['first'] == change_value
     else:
         assert not result['criteria']['ownerName'].get('first')
+    if wildcard:
+        assert result.get('wildcardSearch')
+    else:
+        assert not result.get('wildcardSearch')
 
 
 @pytest.mark.parametrize('first_name,staff,err_msg', TEST_EXTRA_VALIDATION_DATA)
