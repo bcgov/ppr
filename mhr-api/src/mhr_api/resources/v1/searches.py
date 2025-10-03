@@ -32,6 +32,7 @@ bp = Blueprint("SEARCHES1", __name__, url_prefix="/api/v1/searches")  # pylint: 
 VAL_ERROR = "Search request data validation errors."  # Validation error prefix
 VAL_ERROR_FIRST_MISSING = "Search request is invalid because the search owner individual first name is missing."
 SAVE_ERROR_MESSAGE = "Account {0} search db save failed: {1}"
+WILDCARD_PARAM = "wildcardSearch"
 
 
 @bp.route("", methods=["POST", "OPTIONS"])
@@ -50,7 +51,8 @@ def post_searches():
             return resource_utils.unauthorized_error_response(account_id)
 
         request_json = request.get_json(silent=True)
-        request_json = staff_update(request_json, is_staff_account(account_id, jwt))
+        wildcard_search: bool = request.args.get(WILDCARD_PARAM)
+        request_json = staff_update(request_json, is_staff_account(account_id, jwt), wildcard_search)
         # Validate request against the schema.
         valid_format, errors = schema_utils.validate(request_json, "searchQuery", "mhr")
         extra_validation_msg = validate_search(request_json, is_staff_account(account_id, jwt))
@@ -121,10 +123,13 @@ def put_searches(search_id: str):
         return resource_utils.default_exception_response(default_exception)
 
 
-def staff_update(request_json: dict, reg_staff: bool) -> dict:
+def staff_update(request_json: dict, reg_staff: bool, wildcard_search: bool) -> dict:
     """Staff conditionally add owner first name to pass schema validation."""
     if not reg_staff:
         return request_json
+    if wildcard_search:
+        logger.info("Staff wildcard search enabled.")
+        request_json["wildcardSearch"] = True
     search_type: str = model_utils.TO_DB_SEARCH_TYPE[request_json.get("type")] if request_json.get("type") else ""
     if search_type == SearchRequest.SearchTypes.OWNER_NAME and request_json.get("criteria"):
         name = request_json["criteria"].get("ownerName")
