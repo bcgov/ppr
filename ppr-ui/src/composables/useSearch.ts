@@ -43,10 +43,14 @@ export const useSearch = () => {
    * @param isPPR search for active and historical statuses is search is for PPR
    * @returns array of search results
    */
-  const searchBusiness = async (searchValue: string): Promise<SearchResponseI> => {
+  const searchBusiness = async (searchValue: string, isPPR: boolean = false): Promise<SearchResponseI> => {
     if (!searchValue) return
     // basic params
     const params = { query: `value:${searchValue}`, categories: 'status:active', start: 0, rows: SEARCH_RESULT_SIZE }
+
+    // include all statuses for PPR business searches by removing categories filter
+    isPPR && delete params.categories
+
     // add search-api config stuff
     const config = getSearchConfig(params)
     return axios
