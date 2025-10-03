@@ -64,7 +64,17 @@ export const useAnalystQueueStore = defineStore('mhr/queue', () => {
 })
 
 const showClearFilterButton = computed(() => {
-  return queueTableData.value.length > filteredQueueReviews.value.length
+  return Object.values(columnFilters.value).some(value => {
+    if (value === null || value === undefined || value === '') return false
+    
+    // Check if it's a date range filter
+    if (value && typeof value === 'object' && 'start' in value && 'end' in value) {
+      const dateRangeValue = value as DateRangeFilterIF
+      return dateRangeValue.start && dateRangeValue.end
+    }
+    
+    return true
+  })
 })
 
 const assignees = computed(() => {
