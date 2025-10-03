@@ -15,7 +15,7 @@ const {
   columnFilters,
   showClearFilterButton
 } = storeToRefs(useAnalystQueueStore())
-const { getQueueTabledata, toggleColumnsVisibility } = useAnalystQueueStore()
+const { getQueueTabledata } = useAnalystQueueStore()
 
 const UBadge = resolveComponent('UBadge')
 const UButton = resolveComponent('UButton')

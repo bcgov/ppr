@@ -260,7 +260,7 @@
           />
         </v-col>
       </v-row>
-      <v-row v-if="isAnalystQueueEnabled" class="mt-8">
+      <v-row v-if="isAnalystQueueEnabled && isRoleStaffReg" class="mt-8">
         <v-col>
           <QueueWrapper />
         </v-col>

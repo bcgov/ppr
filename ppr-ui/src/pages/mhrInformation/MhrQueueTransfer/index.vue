@@ -12,15 +12,17 @@ const {
   getMhrInformation, isRoleStaffReg, getMhrTransferCurrentHomeOwnerGroups, getMhrAccountSubmittingParty
 } = storeToRefs(useStore())
 
+const { queueTransfer, reviewId } = storeToRefs(useAnalystQueueStore())
+
 const isLoading = ref(false)
-const queueTransfer = ref(null)
 
 onMounted(async () => {
   isLoading.value = true
   // On Mounted: route to dashboard if the feature flag is false, no reviewId, or not staff
-  if (!getFeatureFlag('enable-analyst-queue') || !getMhrInformation.value?.reviewId || !isRoleStaffReg.value) {
+  if (getFeatureFlag('enable-analyst-queue') || !getMhrInformation.value?.reviewId || !isRoleStaffReg.value) {
    goToDash()
   }
+  reviewId.value = getMhrInformation.value?.reviewId
 
   // Fetch the queued transfer details and initialize the draft
   queueTransfer.value = await getQueuedTransfer(getMhrInformation.value?.reviewId)
@@ -41,7 +43,7 @@ onMounted(async () => {
 
     <div v-else class="grid grid-cols-1 lg:grid-cols-12">
       <!-- Main column -->
-      <main class="lg:col-span-9 pr-2">
+      <main class="lg:col-span-9 pr-2 footer-view-container">
         <!-- Review Header -->
         <header class="review-header mt-10 rounded-top">
           <v-icon
@@ -93,6 +95,7 @@ onMounted(async () => {
         </section>
       </main>
     </div>
+    <QueueFooter />
   </div>
 </template>
 <style lang="scss" scoped>
