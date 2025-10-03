@@ -1,13 +1,17 @@
-import type { ReviewIF, DateRangeFilter } from "@/composables/analystQueue/interfaces"
+import type { DateRangeFilterIF, QueueDetailIF, QueueSummaryIF } from "@/composables/analystQueue/interfaces"
 import { queueTableColumns } from "@/composables/analystQueue/resources"
 import { getReviews } from "@/utils/mhr-api-helper"
 
 
 export const useAnalystQueueStore = defineStore('mhr/queue', () => {
-  const queueTableData = ref<Array<ReviewIF>>([])
+  // queueTable
+  const queueTableData = ref<Array<QueueSummaryIF>>([])
   const isQueueTableDataLoading = ref<boolean>(false)
   const columnsToShow = ref(queueTableColumns)
   const columnFilters = ref({})
+  // Review
+  const queueTransfer = ref<QueueDetailIF>(null)
+  const reviewId = ref<string>(null)
 
  const getQueueTabledata = async () => {
   isQueueTableDataLoading.value = true
@@ -23,7 +27,7 @@ export const useAnalystQueueStore = defineStore('mhr/queue', () => {
       const cell = row[key]
 
       if (value && typeof value === 'object' && 'start' in value && 'end' in value) {
-        const dateRangeValue = value as DateRangeFilter
+        const dateRangeValue = value as DateRangeFilterIF
         // Convert the date range to comparable format
         const filterStartDate = new Date(
           dateRangeValue.start.year,
@@ -94,6 +98,8 @@ const assignees = computed(() => {
     filteredQueueReviews,
     columnFilters,
     showClearFilterButton,
+    queueTransfer,
+    reviewId,
     getQueueTabledata,
     toggleColumnsVisibility
   }

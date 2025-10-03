@@ -28,7 +28,7 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { addTimestampToDate } from '@/utils'
 import { trim } from 'lodash'
 import type { AxiosError } from 'axios'
-import type { ReviewIF } from '@/interfaces/analyst-queue-interfaces/ReviewIF'
+import type { QueueDetailIF, QueueSummaryIF } from '@/composables/analystQueue/interfaces'
 
 let mhrRegistrationController: AbortController | null = null
 let draftsAbortController: AbortController | null = null
@@ -1077,7 +1077,7 @@ export async function getMhrHistory (mhrNumber: string): Promise<MhrHistoryRoIF>
   }
 }
 
-export async function getReviews (): Promise<Array<ReviewIF> | any> {
+export async function getReviews (): Promise<Array<QueueSummaryIF> | any> {
   try {
     const response = await axios.get<Array<MhrHistoryRoIF>>(`reviews`, getDefaultConfig())
     const data: Array<MhrHistoryRoIF> = response?.data
@@ -1098,13 +1098,40 @@ export async function getReviews (): Promise<Array<ReviewIF> | any> {
   }
 }
 
-export async function getQueuedTransfer (reviewId: string): Promise<Array<ReviewIF> | any> {
+export async function getQueuedTransfer (reviewId: string): Promise<QueueDetailIF | any> {
   try {
-    const response = await axios.get<Array<MhrHistoryRoIF>>(
+    const response = await axios.get<QueueDetailIF>(
       `reviews/${reviewId}?includeDocuments=true`,
       getDefaultConfig()
     )
-    const data: Array<MhrHistoryRoIF> = response?.data
+    const data: QueueDetailIF = response?.data
+    if (!data) {
+      throw new Error('Invalid API response')
+    }
+    return data
+  } catch (error: AxiosError | any) {
+    if (error.response && error.response.status === 404) {
+      console.error('Resource not found:', error.message)
+      // Handle 404 gracefully, returning null
+      return null
+    } else {
+      // Handle other errors differently if needed
+      console.error('API Error:', error.message)
+      throw error
+    }
+  }
+}
+
+export async function updateQueuedTransfer (
+  reviewId: string, payload: any
+): Promise<QueueDetailIF | any> {
+  try {
+    const response = await axios.patch<QueueDetailIF>(
+      `reviews/${reviewId}`,
+      payload,
+      getDefaultConfig()
+    )
+    const data: QueueDetailIF = response?.data
     if (!data) {
       throw new Error('Invalid API response')
     }
