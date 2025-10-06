@@ -143,6 +143,13 @@ SELECT mhr_number, status_type, registration_ts, city, serial_number, year_made,
  WHERE compressed_key = mhr_serial_compressed_key(:query_value)
   ORDER BY section_id 
 """
+SEARCH_SERIAL_WILD_QUERY = """
+SELECT mhr_number, status_type, registration_ts, city, serial_number, year_made, make, model, id, owner_info,
+       manufacturer_name, civic_address
+  FROM mhr_search_serial_vw
+ WHERE position(:query_value in serial_number) > 0
+  ORDER BY section_id 
+"""
 SEARCH_OWNER_BUS_QUERY = """
 SELECT mhr_number, status_type, registration_ts, city, serial_number, year_made, make, model, id,
        business_name, owner_status_type, manufacturer_name, civic_address
@@ -184,7 +191,9 @@ def search_by_serial_number(request_json):
     serial_num: str = request_json["criteria"]["value"]
     logger.info(f"search_by_serial_number search value={serial_num}.")
     try:
-        query = text(SEARCH_SERIAL_QUERY)
+        query_text: str = SEARCH_SERIAL_QUERY if not request_json.get("wildcardSearch") else SEARCH_SERIAL_WILD_QUERY
+        # logger.info(query_text)
+        query = text(query_text)
         result = db.session.execute(query, {"query_value": serial_num.strip()})
         return result
     except Exception as db_exception:  # noqa: B902; return nicer error

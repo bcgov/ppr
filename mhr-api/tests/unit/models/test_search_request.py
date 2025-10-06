@@ -140,6 +140,14 @@ SERIAL_NUMBER_JSON = {
     },
     'clientReferenceId': 'T-SQ-MS-1'
 }
+SERIAL_NUMBER_WILD_JSON = {
+    'type': 'SERIAL_NUMBER',
+    'wildcardSearch': True,
+    'criteria': {
+        'value': '000060'
+    },
+    'clientReferenceId': 'T-SQ-MS-2'
+}
 MS_INVALID_JSON = {
     'type': 'SERIAL_NUMBER',
     'criteria': {
@@ -316,6 +324,7 @@ TEST_VALID_DATA = [
     ('MI', OWNER_NAME_JSON),
     ('MI', OWNER_NAME_JSON2),
     ('MS', SERIAL_NUMBER_JSON),
+    ('MS', SERIAL_NUMBER_WILD_JSON),
 ]
 # testdata pattern is ({search type}, {JSON data}, {search_val})
 TEST_SEARCH_VALUE_DATA = [
@@ -324,6 +333,7 @@ TEST_SEARCH_VALUE_DATA = [
     ('MI', OWNER_NAME_JSON, 'BOB MCKAY'),
     ('MI', OWNER_NAME_JSON2, 'ROSE CHERYL RAMMOND'),
     ('MS', SERIAL_NUMBER_JSON, '000060'),
+    ('MS', SERIAL_NUMBER_WILD_JSON, '000060'),
 ]
 # testdata pattern is ({search type}, {JSON data})
 TEST_NONE_DATA = [
