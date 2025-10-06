@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { shallowRef, computed, watch, onMounted } from 'vue'
+import { shallowRef, computed, watch, onMounted, ref } from 'vue'
 import {
   CalendarDate,
   today,
@@ -31,22 +31,40 @@ const df = new DateFormatter('en-US', {
   day: 'numeric'
 })
 
-const dateRange = shallowRef({start: undefined, end: undefined})
-
-onMounted(() => {
-  // Initialize dateRange from modelValue if provided
-  if (props.modelValue && props.modelValue.start && props.modelValue.end) {
-    dateRange.value = {
-      start: new CalendarDate(
-        props.modelValue.start.year,
-        props.modelValue.start.month,
-        props.modelValue.start.day
-      ),
-      end: new CalendarDate(
-        props.modelValue.end.year,
-        props.modelValue.end.month,
-        props.modelValue.end.day
-      )
+const dateRange = computed({
+  get: () => {
+    if (props.modelValue && props.modelValue.start && props.modelValue.end) {
+      return {
+        start: new CalendarDate(
+          props.modelValue.start.year,
+          props.modelValue.start.month,
+          props.modelValue.start.day
+        ),
+        end: new CalendarDate(
+          props.modelValue.end.year,
+          props.modelValue.end.month,
+          props.modelValue.end.day
+        )
+      }
+    }
+    return { start: undefined, end: undefined }
+  },
+  set: (value) => {
+    if (value.start && value.end) {
+      emit('update:modelValue', {
+        start: {
+          year: value.start.year,
+          month: value.start.month,
+          day: value.start.day
+        },
+        end: {
+          year: value.end.year,
+          month: value.end.month,
+          day: value.end.day
+        }
+      })
+    } else {
+      emit('update:modelValue', null)
     }
   }
 })
@@ -54,8 +72,9 @@ onMounted(() => {
 const customLabel = computed(() => {
   if (dateRange.value.start) {
     if (dateRange.value.end) {
-      return `${df.format(dateRange.value.start.toDate(getLocalTimeZone()))}
-        - ${df.format(dateRange.value.end.toDate(getLocalTimeZone()))}`
+      const startDate = df.format(dateRange.value.start.toDate(getLocalTimeZone()))
+      const endDate = df.format(dateRange.value.end.toDate(getLocalTimeZone()))
+      return `${startDate} - ${endDate}`
     } else {
       return df.format(dateRange.value.start.toDate(getLocalTimeZone()))
     }
@@ -70,33 +89,22 @@ const handleSideBar = (option) => {
   }
 }
 
+const open = ref(false)
+
 const resetDateRange = () => {
   dateRange.value = { start: undefined, end: undefined }
 }
-// Watch for changes in dateRange and emit the updated value
-watch(dateRange, (newValue) => {
+
+watch(() => dateRange.value, (newValue) => {
   if (newValue.start && newValue.end) {
-    emit('update:modelValue', {
-      start: {
-        year: newValue.start.year,
-        month: newValue.start.month,
-        day: newValue.start.day
-      },
-      end: {
-        year: newValue.end.year,
-        month: newValue.end.month,
-        day: newValue.end.day
-      }
-    })
-  } else if (!newValue.start && !newValue.end) {
-    // Emit null when both dates are cleared
-    emit('update:modelValue', null)
+    // Close the popover when both dates are selected
+    open.value = false
   }
 }, { deep: true })
 </script>
 
 <template>
-  <UPopover>
+  <UPopover v-model:open="open">
     <UInput
       :size="size"
       :model-value="customLabel"

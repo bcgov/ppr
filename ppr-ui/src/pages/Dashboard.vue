@@ -665,6 +665,7 @@ export default defineComponent({
       emitError,
       saveResults,
       isNonBillable,
+      isRoleStaffReg,
       snackBarEvent,
       setSearchedType,
       setSearchedValue,
