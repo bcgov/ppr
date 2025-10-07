@@ -704,10 +704,18 @@ def get_account_registration_params(req: request, params: AccountRegistrationPar
     if start_ts and end_ts:
         params.start_date_time = start_ts
         params.end_date_time = end_ts
-    if params.sort_direction is not None:
+    if params.sort_direction:
         params.sort_direction = params.sort_direction.lower()
-    if params.registration_number is not None:
+    if params.registration_number:
         params.registration_number = params.registration_number.strip().upper()
+    if params.registration_type:
+        params.registration_type = params.registration_type.strip().upper()
+    if params.status_type:
+        params.status_type = params.status_type.strip().upper()
+    if params.client_reference_id:
+        params.client_reference_id = params.client_reference_id.strip().upper()
+    if params.registering_name:
+        params.registering_name = params.registering_name.strip().upper()
     return params
 
 

@@ -233,30 +233,30 @@ QUERY_ACCOUNT_REG_DEFAULT_ORDER = " ORDER BY registration_ts DESC"
 QUERY_ACCOUNT_CHANGE_DEFAULT_ORDER = " ORDER BY arv2.registration_ts DESC"
 QUERY_ACCOUNT_REG_LIMIT = " LIMIT :page_size OFFSET :page_offset"
 QUERY_ACCOUNT_REG_NUM_CLAUSE = """
- AND (arv.registration_number LIKE :reg_num || '%' OR
+ AND (position(:reg_num in arv.registration_number) > 0 OR
       EXISTS (SELECT arv2.financing_id
                 FROM account_registration_vw arv2
                WHERE arv2.financing_id = arv.financing_id
                  AND arv2.registration_type_cl NOT IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
-                 AND arv2.registration_number LIKE :reg_num || '%'))
+                 AND position(:reg_num in arv2.registration_number) > 0))
 """
-QUERY_ACCOUNT_CLIENT_REF_CLAUSE = " AND arv.client_reference_id LIKE '%' || :client_reference_id || '%'"
+QUERY_ACCOUNT_CLIENT_REF_CLAUSE = " AND position(:client_reference_id in UPPER(arv.client_reference_id)) > 0"
 QUERY_ACCOUNT_CLIENT_REF_CLAUSE_NEW = """
- AND (arv.client_reference_id ILIKE '%' || :client_reference_id || '%' OR
+ AND (position(:client_reference_id in UPPER(arv.client_reference_id)) > 0 OR
     EXISTS (SELECT arv2.financing_id
             FROM account_registration_vw arv2
             WHERE arv2.financing_id = arv.financing_id
                 AND arv2.registration_type_cl NOT IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
-                AND arv2.client_reference_id ILIKE :client_reference_id || '%'))
+                AND position(:client_reference_id in UPPER(arv2.client_reference_id)) > 0))
 """
-QUERY_ACCOUNT_REG_NAME_CLAUSE = " AND arv.registering_name LIKE '%' || :registering_name || '%'"
+QUERY_ACCOUNT_REG_NAME_CLAUSE = " AND position(:registering_name in UPPER(arv.registering_name)) > 0"
 QUERY_ACCOUNT_REG_NAME_CLAUSE_NEW = """
- AND (arv.registering_name ILIKE '%' || :registering_name || '%' OR
+ AND (position(:registering_name in UPPER(arv.registering_name)) > 0 OR
     EXISTS (SELECT arv2.financing_id
             FROM account_registration_vw arv2
             WHERE arv2.financing_id = arv.financing_id
                 AND arv2.registration_type_cl NOT IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')
-                AND arv2.registering_name ILIKE '%' || :registering_name || '%'))
+                AND position(:registering_name in UPPER(arv2.registering_name)) > 0))
 """
 QUERY_ACCOUNT_STATUS_CLAUSE = " AND arv.state = :status_type"
 QUERY_ACCOUNT_REG_TYPE_CLAUSE = " AND arv.registration_type = :registration_type"
