@@ -662,7 +662,6 @@ export default defineComponent({
     })
 
     return {
-      isRoleStaffReg,
       emitError,
       saveResults,
       isNonBillable,
@@ -673,6 +672,7 @@ export default defineComponent({
       qsMsgContent,
       hideStatusMsg,
       hideCcStatusMsg,
+      isRoleStaffReg,
       getUserServiceFee,
       setSearchDebtorName,
       redirectRegistryHome,
