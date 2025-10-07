@@ -92,7 +92,13 @@ const downloadPdf = (url: string) => {
         <UIcon name="i-mdi-file-pdf-outline" class="text-primary size-[20px]" />
         <span class="ml-2 text-[16px] italic text-primary">{{document.consumerFilename}}</span>
       </div>
-      <span class="ml-7 text-gray-700 fs-14">{{document?.fileSize || '' }}</span>
+      <span class="ml-7 text-gray-700 italic fs-14">{{document?.fileSize || '' }}</span>
+    </div>
+    <div
+      v-if="!props.documentList.length"
+      class="w-full border-t bg-white pa-6"
+    >
+      <span class="text-gray-700 text-[16px]">No documents uploaded.</span>
     </div>
   </div>
 </template>

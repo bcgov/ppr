@@ -260,7 +260,7 @@
           />
         </v-col>
       </v-row>
-      <v-row v-if="isAnalystQueueEnabled && isRoleStaffReg" class="mt-8">
+      <v-row v-if="isAnalystQueueEnabled" class="mt-8">
         <v-col>
           <QueueWrapper />
         </v-col>
@@ -406,7 +406,7 @@ export default defineComponent({
         return (router.currentRoute.value?.params?.anchorId as string) || ''
       }),
       isAnalystQueueEnabled: computed((): boolean => {
-        return getFeatureFlag('enable-analyst-queue')
+        return getFeatureFlag('enable-analyst-queue') && isRoleStaffReg.value
       })
     })
 

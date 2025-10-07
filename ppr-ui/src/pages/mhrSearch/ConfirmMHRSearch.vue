@@ -104,7 +104,7 @@
         >
           <aside>
             <StickyContainer
-              :show-connect-fees="!isRoleStaffReg"
+              show-connect-fees
               :set-err-msg="stickyComponentErrMsg"
               :set-right-offset="true"
               :set-show-buttons="true"
@@ -171,6 +171,7 @@ export default defineComponent({
     } = useStore()
     const {
       // Getters
+      isRoleStaff,
       isRoleStaffReg,
       isRoleStaffSbc,
       getStaffPayment,
@@ -184,7 +185,6 @@ export default defineComponent({
     const localState = reactive({
       dataLoaded: false,
       dataLoadError: false,
-      feeType: FeeSummaryTypes.MHR_SEARCH,
       options: notCompleteSearchDialog as DialogOptionsIF,
       showCancelDialog: false,
       showErrors: false,
@@ -193,6 +193,18 @@ export default defineComponent({
       staffPaymentValid: false,
       validating: false,
       paymentOption: StaffPaymentOptions.NONE,
+      feeType: computed(() => {
+        if (isRoleStaff.value && !getIsStaffClientPayment.value) return FeeSummaryTypes.NO_FEE_SEARCH
+        return isRoleStaff.value
+          ? FeeSummaryTypes.GOV_STAFF_MHR_SEARCH
+          : FeeSummaryTypes.MHR_SEARCH
+      }),
+      combinedFeeType: computed(() => {
+        if (isRoleStaff.value && !getIsStaffClientPayment.value) return FeeSummaryTypes.NO_FEE_SEARCH
+        return isRoleStaff.value
+          ? FeeSummaryTypes.GOV_STAFF_MHR_COMBINED_SEARCH
+          : FeeSummaryTypes.MHR_COMBINED_SEARCH
+      }),
       showErrorAlert: computed((): boolean => {
         return (!localState.validFolio || !localState.staffPaymentValid) && localState.showErrors
       }),
@@ -208,7 +220,7 @@ export default defineComponent({
           .length
         return searchQuantity > 0
           ? {
-            feeType: FeeSummaryTypes.MHR_COMBINED_SEARCH,
+            feeType: localState.combinedFeeType,
             quantity: searchQuantity
           }
           : null
@@ -370,11 +382,6 @@ export default defineComponent({
         return
       }
 
-      // Set Fees
-      feeOptions.value.showServiceFees = true
-      setRegistrationFees(localState.feeType)
-      setFeeQuantity(FeeSummaryTypes.MHR_SEARCH, localState.feeQuantity)
-
       // page is ready to view
       emitHaveData(true)
       localState.dataLoaded = true
@@ -385,14 +392,30 @@ export default defineComponent({
       emit('haveData', haveData)
     }
 
+    onMounted(() => {
+      // Set Fees
+      feeOptions.value.showServiceFees = true
+      setRegistrationFees(localState.feeType)
+      setFeeQuantity(localState.feeType, localState.feeQuantity)
+    })
+
     watch(() => props.appReady, (val: boolean) => {
       onAppReady(val)
     })
     watch(() => localState.feeQuantity, (count: number) => {
-      setFeeQuantity(FeeSummaryTypes.MHR_SEARCH, count)
+      setFeeQuantity(localState.feeType,
+        localState.feeType === FeeSummaryTypes.NO_FEE_SEARCH
+          ? 1
+          : count
+      )
     })
     watch(() => localState.combinedSearchFees, (comboSearch: any) => {
-      setRegistrationComboFees(FeeSummaryTypes.MHR_COMBINED_SEARCH, comboSearch?.quantity)
+      localState.feeType !== FeeSummaryTypes.NO_FEE_SEARCH  && setRegistrationComboFees(
+        localState.combinedFeeType,
+        comboSearch
+          ? comboSearch?.quantity
+          : null
+      )
     })
 
     return {

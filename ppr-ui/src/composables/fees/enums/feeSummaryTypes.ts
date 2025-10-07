@@ -4,7 +4,9 @@ export enum FeeSummaryTypes {
   NEW = 'new',
   RENEW = 'renew',
   MHR_SEARCH = 'manufactured_home_search',
+  GOV_STAFF_MHR_SEARCH = 'gov_manufactured_home_search',
   MHR_COMBINED_SEARCH = 'combined_home_search',
+  GOV_STAFF_MHR_COMBINED_SEARCH = 'gov_combined_home_search',
   NEW_MHR = 'new_mhr',
   MHR_RE_REGISTRATION = 'mhr_re_registration',
   MHR_STAFF_CORRECTION = 'mhr_staff_correction',
@@ -23,4 +25,5 @@ export enum FeeSummaryTypes {
   RESIDENTIAL_EXEMPTION = 'residential_exemption',
   NON_RESIDENTIAL_EXEMPTION = 'non_residential_exemption',
   NO_FEE = 'no_fee',
+  NO_FEE_SEARCH = 'no_fee'
 }
