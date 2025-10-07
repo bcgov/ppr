@@ -662,6 +662,7 @@ export default defineComponent({
     })
 
     return {
+      isRoleStaffReg,
       emitError,
       saveResults,
       isNonBillable,

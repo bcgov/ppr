@@ -89,6 +89,7 @@ export const useConnectFeesHandler = () => {
   })
 
   return {
+    waiveFees,
     setFeeQuantity,
     setRegistrationFees,
     setRegistrationFeeDesc,

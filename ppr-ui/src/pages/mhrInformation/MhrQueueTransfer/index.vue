@@ -19,7 +19,7 @@ const isLoading = ref(false)
 onMounted(async () => {
   isLoading.value = true
   // On Mounted: route to dashboard if the feature flag is false, no reviewId, or not staff
-  if (getFeatureFlag('enable-analyst-queue') || !getMhrInformation.value?.reviewId || !isRoleStaffReg.value) {
+  if (!getFeatureFlag('enable-analyst-queue') || !getMhrInformation.value?.reviewId || !isRoleStaffReg.value) {
    goToDash()
   }
   reviewId.value = getMhrInformation.value?.reviewId

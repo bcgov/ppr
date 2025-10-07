@@ -176,6 +176,24 @@ export const RegistrationFees = {
     waived: false,
     showFeeDesc: false
   },
+  [FeeSummaryTypes.GOV_STAFF_MHR_SEARCH]: {
+    filingFees: 10,
+    filingType: 'Manufactured Home Search',
+    filingTypeCode: FeeSummaryTypes.MHR_SEARCH,
+    futureEffectiveFees: 0,
+    priorityFees: 0,
+    processingFees: 0,
+    serviceFees: 0,
+    tax: {
+      gst: 0,
+      pst: 0
+    },
+    total: 10,
+    quantity: 1,
+    quantityDesc: '$10.00 each',
+    waived: false,
+    showFeeDesc: false
+  },
   [FeeSummaryTypes.MHR_COMBINED_SEARCH]: {
     filingFees: 12,
     filingType: 'Combined Home and Lien search',
@@ -191,6 +209,24 @@ export const RegistrationFees = {
     total: 12,
     quantity: 1,
     quantityDesc: '$12.00 each',
+    waived: false,
+    showFeeDesc: false
+  },
+  [FeeSummaryTypes.GOV_STAFF_MHR_COMBINED_SEARCH]: {
+    filingFees: 15,
+    filingType: 'Combined Home and Lien search',
+    filingTypeCode: FeeSummaryTypes.MHR_COMBINED_SEARCH,
+    futureEffectiveFees: 0,
+    priorityFees: 0,
+    processingFees: 0,
+    serviceFees: 0,
+    tax: {
+      gst: 0,
+      pst: 0
+    },
+    total: 15,
+    quantity: 1,
+    quantityDesc: '$15.00 each',
     waived: false,
     showFeeDesc: false
   },
@@ -402,6 +438,21 @@ export const RegistrationFees = {
       pst: 0
     },
     total: 50,
+    waived: true
+  },
+  [FeeSummaryTypes.NO_FEE_SEARCH]: {
+    filingFees: 0,
+    filingType: 'Manufactured Home Search',
+    filingTypeCode: FeeSummaryTypes.MHR_SEARCH,
+    futureEffectiveFees: 0,
+    priorityFees: 0,
+    processingFees: 0,
+    serviceFees: 0, // Staff Service Fee?
+    tax: {
+      gst: 0,
+      pst: 0
+    },
+    total: 0,
     waived: true
   }
 }
