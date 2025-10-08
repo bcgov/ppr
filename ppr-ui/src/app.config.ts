@@ -66,5 +66,11 @@ export default defineAppConfig({
         fileTrailingButton: ''
       }
     },
+    textarea: {
+      slots: {
+        base: 'text-gray-900 border-0 border-b-[1px] border-gray-500 ring-0 focus:ring-0 h-[125px]',
+        placeholder: 'placeholder-gray-700'
+      }
+    }
   }
 })
