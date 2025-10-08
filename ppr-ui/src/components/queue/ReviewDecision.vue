@@ -128,8 +128,6 @@ watch([isValidate, reviewDecision], () => {
          </div>
        </div>
      </div>
-
     </div>
-  
 </template>
 
