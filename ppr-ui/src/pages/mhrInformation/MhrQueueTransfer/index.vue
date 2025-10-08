@@ -12,7 +12,7 @@ const {
   getMhrInformation, isRoleStaffReg, getMhrTransferCurrentHomeOwnerGroups, getMhrAccountSubmittingParty
 } = storeToRefs(useStore())
 
-const { queueTransfer, reviewId } = storeToRefs(useAnalystQueueStore())
+const { queueTransfer, reviewId, isReviewable } = storeToRefs(useAnalystQueueStore())
 
 const isLoading = ref(false)
 
@@ -93,9 +93,13 @@ onMounted(async () => {
         <section class="my-9">
           <UploadedDocuments :document-list="queueTransfer?.documents" />
         </section>
+
+        <section v-if="isReviewable" class="my-9">
+          <QueueReviewDecision />
+        </section>
       </main>
     </div>
-    <QueueFooter />
+    <QueueFooter @go-to-dash="goToDash()" />
   </div>
 </template>
 <style lang="scss" scoped>

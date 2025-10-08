@@ -24,3 +24,11 @@ export enum ReviewStatusTypes {
     APPROVED = 'APPROVED',
     DECLINED = 'DECLINED',
 }
+
+export enum ReviewDecisionTypes {
+    NON_COMPLIANCE = 'NON_COMPLIANCE',
+    INCOMPLETE = 'INCOMPLETE',
+    ERROR_ALTERATION = 'ERROR_ALTERATION',
+    MISSING_SUBMISSION = 'MISSING_SUBMISSION',
+    OTHER = 'OTHER'
+}

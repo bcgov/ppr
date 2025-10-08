@@ -3,7 +3,8 @@ import { ReviewStatusTypes } from '@/composables';
 import { useAnalystQueueStore } from '@/store/analystQueue';
 import { updateQueuedTransfer } from '@/utils/mhr-api-helper'
 
-const { queueTransfer, reviewId } = storeToRefs(useAnalystQueueStore())
+const { queueTransfer, reviewId, isReviewable, isValidate, reviewDecision } = storeToRefs(useAnalystQueueStore())
+const { validateReviewDecision } = useAnalystQueueStore()
 
 const isAssigned = computed(() => {
   return !!queueTransfer.value?.assigneeName
@@ -11,9 +12,7 @@ const isAssigned = computed(() => {
 const assigneeName = computed(() => {
   return isAssigned.value ? queueTransfer.value?.assigneeName : 'None' 
 })
-const showAssignButton = computed(() => {
-  return [ReviewStatusTypes.NEW, ReviewStatusTypes.IN_REVIEW].includes(queueTransfer.value?.status)
-})
+
 const updateAssignee = async () => {
   if (isAssigned.value) {
     queueTransfer.value = await updateQueuedTransfer(
@@ -27,6 +26,23 @@ const updateAssignee = async () => {
     )
   }
 }
+
+const submitReview = async () => {
+  isValidate.value = true
+  if(!validateReviewDecision()) {
+    return
+  }
+  isValidate.value = false
+  // await updateQueuedTransfer(
+  //   reviewId.value, 
+  //   reviewDecision.value
+  // )
+  
+  // Navigate to dashboard after successful submission
+  emit('go-to-dash')
+}
+
+const emit = defineEmits(['go-to-dash']) 
 </script>
 
 <template>
@@ -40,7 +56,7 @@ const updateAssignee = async () => {
                 <strong>Assignee:</strong> {{ assigneeName }}
                </div>
               <UButton
-                v-if="showAssignButton"
+                v-if="isReviewable"
                 variant="outline"
                 color="primary"
                 size="md"
@@ -50,6 +66,17 @@ const updateAssignee = async () => {
                 {{ isAssigned ? 'Unassign' : 'Assign to Me'}}
               </UButton>
             </div>
+        </div>
+        <div class="lg:col-span-3 flex justify-end space-x-3">
+          <UButton
+            v-if="isReviewable"
+            color="primary"
+            size="md"
+            class="rounded-sm"
+            @click="submitReview"
+          >
+            Submit
+          </UButton>
         </div>
       </div>
     </div>

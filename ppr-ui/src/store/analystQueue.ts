@@ -1,6 +1,12 @@
-import type { DateRangeFilterIF, QueueDetailIF, QueueSummaryIF } from "@/composables/analystQueue/interfaces"
-import { queueTableColumns } from "@/composables/analystQueue/resources"
+import type { 
+  DateRangeFilterIF,
+  QueueDetailIF,
+  QueueSummaryIF,
+  QueueReviewUpdatePayloadIF
+} from "@/composables/analystQueue/interfaces"
+import { queueTableColumns, ReviewStatusTypes } from "@/composables"
 import { getReviews } from "@/utils/mhr-api-helper"
+import { computed, ref, watch } from 'vue'
 
 
 export const useAnalystQueueStore = defineStore('mhr/queue', () => {
@@ -12,6 +18,17 @@ export const useAnalystQueueStore = defineStore('mhr/queue', () => {
   // Review
   const queueTransfer = ref<QueueDetailIF>(null)
   const reviewId = ref<string>(null)
+  
+  // Review Decision State
+  const reviewDecision = ref<QueueReviewUpdatePayloadIF>({})
+  
+  // Error state for validation messages
+  const validationErrors = ref({
+    declineReasonType: '',
+    general: ''
+  })
+  
+  const isValidate = ref(false)
 
  const getQueueTabledata = async () => {
   isQueueTableDataLoading.value = true
@@ -77,6 +94,11 @@ const showClearFilterButton = computed(() => {
   })
 })
 
+const isReviewable = computed(() => {
+  return [ReviewStatusTypes.NEW, ReviewStatusTypes.IN_REVIEW].includes(queueTransfer.value?.status)
+})
+
+
 const assignees = computed(() => {
   const uniqueAssignees = new Set()
 
@@ -101,6 +123,36 @@ const assignees = computed(() => {
   })
  }
 
+  // Real-time validation function
+  const validateReviewDecision = () => {
+    // Clear previous errors
+    validationErrors.value.declineReasonType = ''
+    validationErrors.value.general = ''
+    
+    // Check if no decision is made
+    if (!reviewDecision.value.statusType) {
+      validationErrors.value.general = 'Please select a decision (Approve or Decline)'
+      return false
+    }
+
+    if (reviewDecision.value.statusType === ReviewStatusTypes.APPROVED) {
+      return true
+    }
+    
+    // If declined, must have a reason
+    if (reviewDecision.value.statusType === ReviewStatusTypes.DECLINED) {
+      if (reviewDecision.value.declinedReasonType) {
+        return true
+      } else {
+        validationErrors.value.declineReasonType = 'Please select a reason for declining'
+        return true
+      }
+    }
+    
+    return false
+  }
+
+
  return {
     assignees,
     queueTableData,
@@ -108,9 +160,14 @@ const assignees = computed(() => {
     filteredQueueReviews,
     columnFilters,
     showClearFilterButton,
+    isReviewable,
     queueTransfer,
     reviewId,
+    reviewDecision,
+    validationErrors,
+    isValidate,
     getQueueTabledata,
-    toggleColumnsVisibility
+    toggleColumnsVisibility,
+    validateReviewDecision
   }
 })
