@@ -15,7 +15,7 @@ LABEL org.label-schema.vcs-ref=${VCS_REF} \
 LABEL maintainer="thorwolpert"
 LABEL vendor="BCROS"
 
-ARG APP_ENV \
+ARG APP_ENV="production" \
   # Needed for fixing permissions of files created by Docker:
   UID=1000 \
   GID=1000
@@ -74,9 +74,7 @@ RUN --mount=type=cache,target="$POETRY_CACHE_DIR" \
   && poetry version \
   # Install deps:
   && poetry run pip install -U pip \
-  && poetry install \
-    $(if [ -z ${APP_ENV+x} ] | [ "$APP_ENV" = 'production' ]; then echo '--only main'; fi) \
-    --no-interaction --no-ansi
+  && poetry install --only main --no-interaction --no-ansi
 
 USER web
 
