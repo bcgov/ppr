@@ -183,6 +183,7 @@ class Config:  # pylint: disable=too-few-public-methods
 
     NOTIFY_MAN_REG_CONFIG = os.getenv("NOTIFY_MAN_REG_CONFIG")
     NOTIFY_LOCATION_CONFIG = os.getenv("NOTIFY_LOCATION_CONFIG")
+    NOTIFY_REVIEW_CONFIG = os.getenv("NOTIFY_REVIEW_CONFIG", "")
 
     DEPLOYMENT_ENV = os.getenv("DEPLOYMENT_ENV", "development")
     if not GOOGLE_DEFAULT_SA and DEPLOYMENT_ENV in ("unitTesting", "testing"):

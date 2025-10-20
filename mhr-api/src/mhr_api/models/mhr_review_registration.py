@@ -17,6 +17,7 @@ import copy
 from sqlalchemy.dialects.postgresql import ENUM as PG_ENUM
 from sqlalchemy.sql import text
 
+import mhr_api.models.registration_utils as reg_utils
 from mhr_api.exceptions import DatabaseException
 from mhr_api.models import utils as model_utils
 from mhr_api.models.mhr_registration import REG_TO_DOC_TYPE
@@ -242,6 +243,7 @@ class MhrReviewRegistration(db.Model):
         if json_data.get("documentId"):
             review_reg.document_id = json_data.get("documentId")
         review_reg.document_type = REG_TO_DOC_TYPE[review_reg.registration_type]
+        json_data["documentDescription"] = reg_utils.get_document_description(review_reg.document_type)
         if json_data.get("paymentPending"):
             review_reg.status_type = MhrReviewStatusTypes.PAY_PENDING
         else:

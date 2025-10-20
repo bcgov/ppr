@@ -26,6 +26,7 @@ from mhr_api.reports import get_callback_pdf
 from mhr_api.resources import registration_utils as reg_utils
 from mhr_api.resources import utils as resource_utils
 from mhr_api.services.document_storage.storage_service import DocumentTypes, GoogleStorageService
+from mhr_api.services.notify import Notify
 from mhr_api.services.utils.exceptions import ReportDataException, ReportException, StorageException
 from mhr_api.utils.logging import logger
 
@@ -117,6 +118,15 @@ def registration_callback_error(code: str, registration_id: int, status_code, me
     return resource_utils.error_response(status_code, error)
 
 
+def send_review_notification(reg_data: dict, verification_url: str):
+    """Staff review approved registration: send notification to the submitting party email address."""
+    try:
+        notify: Notify = Notify(**{"review": True})
+        notify.send_review_approved(reg_data, verification_url)
+    except Exception as err:  # noqa: B902; wrapping exception
+        logger.warning(f"Email notification for reviewId={reg_data.get("reviewId")} failed: {err}")
+
+
 def get_registration_callback_report(
     registration: MhrRegistration, report_info: MhrRegistrationReport  # pylint: disable=too-many-return-statements
 ):
@@ -151,14 +161,19 @@ def get_registration_callback_report(
             )
         doc_name = model_utils.get_doc_storage_name(registration)
         logger.info(f"Saving registration report output to doc storage: name={doc_name}.")
-        response = GoogleStorageService.save_document(doc_name, raw_data, DocumentTypes.REGISTRATION)
-        logger.info(f"Updating report tracking doc_storage_url to {doc_name}, doc storage response {response}.")
+        if report_info.report_data.get("reviewId"):
+            response = GoogleStorageService.save_document_link(doc_name, raw_data, DocumentTypes.REGISTRATION, 7)
+        else:
+            response = GoogleStorageService.save_document(doc_name, raw_data, DocumentTypes.REGISTRATION)
+            logger.info(f"Updating report tracking doc_storage_url to {doc_name}, doc storage response {response}.")
         report_info.doc_storage_url = doc_name
         report_info.save()
         # Track success event.
         EventTracking.create(
             registration_id, EventTracking.EventTrackingTypes.MHR_REGISTRATION_REPORT, int(HTTPStatus.OK)
         )
+        if report_info.report_data.get("reviewId"):
+            send_review_notification(report_info.report_data, response)
         return {}, HTTPStatus.OK
     except ReportException as report_err:
         return registration_callback_error(
