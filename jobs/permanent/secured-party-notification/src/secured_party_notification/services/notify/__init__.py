@@ -30,7 +30,7 @@ STATUS_ERROR_BODY = "Job failed with error {err_msg}."
 
 
 class Notify:
-    """Notify calls the GCNotify service."""
+    """Notify calls the GCNotify service to email the status of the job run."""
 
     def __init__(self, config: Config):
         """Create the notify service."""
@@ -46,7 +46,9 @@ class Notify:
             batch_job_id=status_data.get("batch_job_id"),
             total_count=status_data.get("total_count"),
             missing_count=status_data.get("missing_count"),
-            batch_file_name=status_data.get("batch_file_name"),
+            batch_file_name=status_data.get("delivery_zip_file_name"),
+            zip_file_count=status_data.get("zip_file_count"),
+            zip_file_error_count=status_data.get("zip_file_error_count"),
             csv_file_url=status_data.get("csv_file_url"),
         )
         body = body.replace("$", "\n")

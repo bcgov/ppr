@@ -13,23 +13,28 @@
 # limitations under the License.
 """This module executes all the job steps."""
 import copy
+import io
 import json
 import sys
+import zipfile
 from contextlib import suppress
 from datetime import datetime as _datetime
-from datetime import timezone
 
 import psycopg2
+import pytz
 
 from secured_party_notification.config import Config
 from secured_party_notification.services.document_storage.storage_service import GoogleStorageService
 from secured_party_notification.services.notify import Notify
-from secured_party_notification.services.report.report import Report
 from secured_party_notification.utils.logging import logger
 
 CONTENT_TYPE_CSV = "text/csv"
+CONTENT_TYPE_TEXT = "text/plain"
+CONTENT_TYPE_ZIP = "application/zip"
 CONTENT_TYPE_PDF = "application/pdf"
 BATCH_FILE_DOC_NAME = "batch-notifications-{batch_job_id}.pdf"
+DELIVERY_COUNT_FILE_NAME = "PPRVER.{curr_date}.txt"
+DELIVERY_ZIP_FILE_NAME = "PPRVER.{curr_date}.zip"
 CSV_FILE_DOC_NAME = "batch-notifications-status-{batch_job_id}.csv"
 CSV_HEADER = "reg_number,base_reg_number,reg_type,registration_id,party_id,storage_path,status\n"
 CSV_LINE = '"{reg_num}","{base_reg_num}","{reg_type}",{reg_id},{party_id},"{storage_path}",{status}\n'
@@ -75,15 +80,35 @@ UPDATE mail_reports
 
 def get_batch_doc_storage_name(batch_job_id: str):
     """Get a batch file document storage name in the format YYYY/MM/DD/batch-notifications-{batch_job_id}.pdf."""
-    name = _datetime.now(timezone.utc).isoformat()[:10]
+    name = _datetime.now(pytz.utc).isoformat()[:10]
     name = name.replace("-", "/") + "/" + BATCH_FILE_DOC_NAME.format(batch_job_id=batch_job_id)
     return name
 
 
 def get_csv_doc_storage_name(batch_job_id: str):
     """Get a csv file document storage name in the format YYYY/MM/DD/batch-notifications-status-{batch_job_id}.csv."""
-    name = _datetime.now(timezone.utc).isoformat()[:10]
+    name = _datetime.now(pytz.utc).isoformat()[:10]
     name = name.replace("-", "/") + "/" + CSV_FILE_DOC_NAME.format(batch_job_id=batch_job_id)
+    return name
+
+
+def get_delivery_zip_name():
+    """Get a document delivery zip file name in the format PPRVER.YYYYMMDD.zip."""
+    now_ts = _datetime.now(pytz.utc)
+    now_local = now_ts.astimezone(pytz.timezone("Canada/Pacific"))
+    local_date: str = now_local.isoformat()[:10].replace("-", "")
+    storage_date = now_ts.isoformat()[:10].replace("-", "/")
+    name = storage_date + "/" + DELIVERY_ZIP_FILE_NAME.format(curr_date=local_date)
+    return name
+
+
+def get_delivery_count_name():
+    """Get a document delivery document count file name in the format PPRVER.YYYYMMDD.txt."""
+    now_ts = _datetime.now(pytz.utc)
+    now_local = now_ts.astimezone(pytz.timezone("Canada/Pacific"))
+    local_date: str = now_local.isoformat()[:10].replace("-", "")
+    storage_date = now_ts.isoformat()[:10].replace("-", "/")
+    name = storage_date + "/" + DELIVERY_COUNT_FILE_NAME.format(curr_date=local_date)
     return name
 
 
@@ -108,6 +133,8 @@ def run_summary_query(
         else:
             status_data["csv_file_name"] = get_csv_doc_storage_name(status_data["batch_job_id"])
             status_data["batch_file_name"] = get_batch_doc_storage_name(status_data["batch_job_id"])
+            status_data["delivery_count_file_name"] = get_delivery_count_name()
+            status_data["delivery_zip_file_name"] = get_delivery_zip_name()
         logger.info(f"Status query results: {str(status_data)}")
     except (psycopg2.Error, Exception) as err:
         error_message = f"Error attempting to run summary query: {err}"
@@ -170,8 +197,92 @@ def get_mail_report_data(db_cursor: psycopg2.extensions.cursor, config: Config):
     return db_cursor.fetchall()
 
 
-def job(config: Config):  # pylint: disable=too-many-locals,too-many-statements
-    """Execute the job."""
+def add_pdf_to_zip(zip_data, pdf_data, filename: str):
+    """
+    Append pdf file data with the filename to the document delivery ZIP file.
+
+    Args:
+        zip_data: ZipFile to append the file data to.
+        pdf_data: The pdf report data in bytes to add to the zip file.
+        filename: The pdf report filename in the document delivery format.
+
+    Returns:
+        Updated zipfile
+    """
+
+
+def batch_reports(status_data: dict, rows) -> dict:
+    """
+    Build the document delivery ZIP file from individual reports in document storage.
+    Save the zip file to doc storage along with the count file.
+    Capture the status of the individual reports as a csv row. Save the csv file to doc storage
+    and make available to the notfication service as a download link in status_data as csv_file_url.
+
+    Args:
+        status_data: Dictionary to store job status information.
+        rows: Database query rows - record set from the mail_reports tables.
+
+    Returns:
+        Updated status_data with zip file counts zip_file_count and zip_file_error_count
+    """
+    count: int = 0
+    zip_error_count: int = 0  # Report data exists in doc storage but error adding to zip file.
+    csv_data = []
+    report_data = None
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_data:
+        for row in rows:
+            try:
+                report_id = int(row[7])
+                if row[5]:
+                    storage_name = str(row[5])
+                    report_data = GoogleStorageService.get_document(storage_name)
+                    zip_data.writestr(storage_name[11:], report_data)
+                    csv_data.append(get_csv_data(row, 201))
+                    count += 1
+                else:
+                    logger.warning(f"No mail report found for id={report_id}, status={int(row[6])}")
+                    csv_data.append(get_csv_data(row, None))
+            except Exception as report_err:
+                logger.error(f"Notification report failed for mail_reports id={report_id}: {report_err}")
+                zip_error_count += 1
+                csv_data.append(get_csv_data(row, 500))
+    if count > 0:
+        GoogleStorageService.save_document(
+            status_data.get("delivery_zip_file_name"), zip_buffer.getvalue(), CONTENT_TYPE_ZIP
+        )
+    GoogleStorageService.save_document(
+        status_data.get("delivery_count_file_name"), str(count) + "\n", CONTENT_TYPE_TEXT
+    )
+    status_data = generate_csv_file(csv_data, status_data)
+    status_data["zip_file_count"] = count
+    status_data["zip_file_error_count"] = zip_error_count
+    logger.info(f"batch_reports completed zip file count={count} error count={zip_error_count}.")
+    return status_data
+
+
+def job(config: Config):
+    """
+    Execute the job:
+        Run a query to get the document storage paths for the secured party notification reports
+        (already generated) to include in the job.
+        Track summary status in the status_data dictionary.
+        Track individual report status in the csv data.
+        Build a zip file of reports with the BCMail+ naming convention.
+        Save the zip file to doc storage along with the count file.
+        Save the csv file to doc storage, make available to staff on request or as an email recipient.
+        Send a job status email with the csv file as a link.
+
+    TO DO:
+        Use a GCP ephemeral disk to build the zip file.
+        Use existing document delivery job tracking framework. Replace or in addition to status_data.
+        Conditionally add BCMail+ delivery via SFTP only if sftp env vars exist (PROD only).
+
+    Args:
+        config: Job configuration containing environment variables.
+
+    Returns:
+    """
     notify_client = Notify(config)
     db_conn: psycopg2.extensions.connection
     db_cursor: psycopg2.extensions.cursor
@@ -179,42 +290,14 @@ def job(config: Config):  # pylint: disable=too-many-locals,too-many-statements
         logger.info("Getting database connection and cursor.")
         db_conn = psycopg2.connect(dsn=config.APP_DATABASE_URI)
         db_cursor = db_conn.cursor()
-        csv_data = []
-        report_data = None
         status_data = run_summary_query(db_conn, db_cursor, config)
         if status_data.get("total_count") < 1:  # Non-PROD
             logger.info(f"No notifications within the last {config.JOB_INTERVAL_HOURS} hours.")
             notify_client.send_status(status_data)
             return
         rows = get_mail_report_data(db_cursor, config)
-        merge_reports = []  # Merge in batches of 10. Could make configurable. Or remove batch file if not needed.
-        merge_counter: int = 0
-        for row in rows:
-            try:
-                report_id = int(row[7])
-                if row[5]:
-                    merge_reports.append(GoogleStorageService.get_document(str(row[5])))
-                    csv_data.append(get_csv_data(row, 201))
-                    merge_counter += 1
-                else:
-                    logger.warning(f"No mail report found for id={report_id}, status={int(row[6])}")
-                    csv_data.append(get_csv_data(row, None))
-                if merge_counter == 10:
-                    report_data, status = Report.batch_merge(merge_reports)
-                    logger.info(f"Batch report merge 10 status={status}")
-                    merge_reports = [report_data]
-                    merge_counter = 0
-            except Exception as report_err:
-                logger.error(f"Notification report failed for mail_reports id={report_id}: {report_err}")
-                csv_data.append(get_csv_data(row, 500))
-        if merge_counter > 0:  # Check for final batch report merge.
-            report_data, status = Report.batch_merge(merge_reports)
-            logger.info(f"Batch report final merge {merge_counter} status={status}")
+        status_data = batch_reports(status_data, rows)
         set_job_id(db_conn, db_cursor, config, status_data.get("batch_job_id"))
-        if report_data:
-            GoogleStorageService.save_document(status_data.get("batch_file_name"), report_data, CONTENT_TYPE_PDF)
-            logger.info("Batch file saved to document storage.")
-        status_data = generate_csv_file(csv_data, status_data)
         logger.info("Run completed: sending email.")
         notify_client.send_status(status_data)
         job_message: str = f"Run successful: status info {json.dumps(status_data)}."
