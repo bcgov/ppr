@@ -10,7 +10,8 @@ export const useConnectFeeStore = defineStore('connect/fee', () => {
     showProcessingFees: false,
     showGst: false,
     showPst: false,
-    showServiceFees: false
+    showServiceFees: false,
+    showCertifiedSearchFees: false,
   })
 
   const fees = ref<ConnectFees>({})
@@ -23,6 +24,7 @@ export const useConnectFeeStore = defineStore('connect/fee', () => {
     priorityFees: 0,
     processingFees: 0,
     serviceFees: 0,
+    certifiedFees: 0,
     tax: {
       gst: 0,
       pst: 0
@@ -34,7 +36,6 @@ export const useConnectFeeStore = defineStore('connect/fee', () => {
     let total = 0
     for (const key of Object.keys(fees.value)) {
       if (fees.value[key]?.waived) {
-        // if waived then total value for is 0
         continue
       }
       const quantity = fees.value[key]?.quantity ?? 1
@@ -43,6 +44,8 @@ export const useConnectFeeStore = defineStore('connect/fee', () => {
       } else if (fees.value[key][feeValue]) {
         if (feeValue === 'total') {
           total += (fees.value[key].filingFees * quantity)
+        } else if (feeValue === 'priorityFees' || feeValue === 'certifiedFees') {
+          total += fees.value[key][feeValue]
         } else {
           total += fees.value[key][feeValue] * quantity
         }
@@ -68,8 +71,10 @@ export const useConnectFeeStore = defineStore('connect/fee', () => {
   const totalServiceFees = computed(() => getMaxFromFees('serviceFees'))
   const totalGst = computed(() => getTotalFromFees('gst', true))
   const totalPst = computed(() => getTotalFromFees('pst', true))
+  const totalCertifiedFees = computed(() => getTotalFromFees('certifiedFees', true))
   const total = computed(() => getTotalFromFees('total') +
-    totalPriorityFees.value + totalServiceFees.value + totalGst.value + totalPst.value + totalProcessingFees.value
+    totalPriorityFees.value + totalServiceFees.value + totalGst.value + totalPst.value + totalProcessingFees.value +
+    totalCertifiedFees.value
   )
 
   /**

@@ -367,7 +367,7 @@ export default defineComponent({
         case StaffPaymentOptions.NONE: // should never happen
           break
       }
-
+      console.log(staffPaymentData)
       setStaffPayment(staffPaymentData)
     }
 
@@ -394,7 +394,7 @@ export default defineComponent({
 
     onMounted(() => {
       // Set Fees
-      feeOptions.value.showServiceFees = true
+      feeOptions.value.showServiceFees = !isRoleStaff.value
       setRegistrationFees(localState.feeType)
       setFeeQuantity(localState.feeType, localState.feeQuantity)
     })
