@@ -367,7 +367,7 @@ export default defineComponent({
         case StaffPaymentOptions.NONE: // should never happen
           break
       }
-      console.log(staffPaymentData)
+
       setStaffPayment(staffPaymentData)
     }
 
