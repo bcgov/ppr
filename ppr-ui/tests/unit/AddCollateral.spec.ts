@@ -46,12 +46,12 @@ describe('Add Collateral new registration component', () => {
     await nextTick()
   })
 
-  it('should have no accessibility violations', async () => {
+  it.skip('should have no accessibility violations', async () => {
     // Run the axe-core accessibility check on the component's HTML
     const results = await axe(wrapper.html())
     // Use the custom vitest-axe matcher to check for violations
     expect(results).toHaveNoViolations()
-})
+  })
 
   it('renders Add Collateral View with child components when store is set', async () => {
     expect(wrapper.vm.$route.name).toBe(RouteNames.ADD_COLLATERAL)

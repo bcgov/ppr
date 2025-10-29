@@ -175,7 +175,7 @@ const props = withDefaults(defineProps<{
 
 </script>
 <style lang="scss" scoped>
-@import '@/assets/styles/theme';
+@use '@/assets/styles/theme' as *;
 .v-row {
   min-height: 65px;
   border-top: 1px solid $gray3;

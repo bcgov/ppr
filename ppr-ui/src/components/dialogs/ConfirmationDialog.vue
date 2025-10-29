@@ -92,7 +92,7 @@ export default defineComponent({
 })
 </script>
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 :deep(.dialog-checkbox .v-input__control .v-input__slot .v-label) {
   color: $gray7;
   font-size: 1rem;

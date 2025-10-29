@@ -249,7 +249,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 .back-btn {
   background-color: white;
   color: $primary-blue !important;

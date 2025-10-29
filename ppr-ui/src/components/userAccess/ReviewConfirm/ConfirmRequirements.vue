@@ -61,7 +61,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 .confirmation-checkbox {
   background-color: $gray1;
   padding: .75rem 1rem;

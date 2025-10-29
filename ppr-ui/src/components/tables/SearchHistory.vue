@@ -810,7 +810,7 @@ export default defineComponent({
 </template>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 .table-header:first-child {
   padding-left: 24px!important;
 }

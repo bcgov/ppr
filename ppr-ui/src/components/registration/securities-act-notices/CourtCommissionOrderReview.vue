@@ -120,7 +120,7 @@ const courtCommissionNumberLabel = computed(() => props.order?.courtOrder ? 'Cou
 
 </script>
 <style lang="scss" scoped>
-@import '@/assets/styles/theme';
+@use '@/assets/styles/theme' as *;
 h4 {
   white-space: nowrap;
 }

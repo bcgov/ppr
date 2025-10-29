@@ -70,5 +70,5 @@ export default defineComponent({
 })
 </script>
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 </style>

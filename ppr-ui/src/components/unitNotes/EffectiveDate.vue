@@ -201,7 +201,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 
 .v-radio {
   padding-bottom: 0.5rem;

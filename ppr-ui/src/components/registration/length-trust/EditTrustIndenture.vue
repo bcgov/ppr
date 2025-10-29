@@ -114,5 +114,5 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 /* Need scoped for date picker v-deep style overrides to work */
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 </style>

@@ -1,6 +1,5 @@
 import type { Moment } from 'moment';
 import moment from 'moment'
-import 'moment-timezone'
 import type { CalendarDate } from '@internationalized/date'
 import { today } from '@internationalized/date'
 
@@ -308,9 +307,9 @@ export function convertToISO8601LastMinute(dateStr: string): string {
  *  - 'd' stands for days (e.g., 'd-7' means 7 days ago)
  *  - 'm' stands for months (e.g., 'm-3' means 3 months ago)
  *  - 'y' stands for years (e.g., 'y-1' means 1 year ago)
- * 
+ *
  * @param {string} input - A string representing the time offset. It follows the pattern 'd-N', 'm-N', or 'y-N'
- * 
+ *
  * @returns {CalendarDate} - The calculated date based on the current date minus the provided time offset.
  */
 export function calculatePreviousDate(input: string): CalendarDate {

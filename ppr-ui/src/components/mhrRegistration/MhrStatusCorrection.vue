@@ -127,7 +127,7 @@ watch(() => mhrStatus, async (status: MhApiStatusTypes) => {
 
 </script>
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 .v-icon {
   margin-top: -2px;
 }

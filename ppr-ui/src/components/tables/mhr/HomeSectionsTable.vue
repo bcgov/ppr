@@ -269,7 +269,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 th {
   font-size: 0.875rem !important;
   color: $gray9 !important;

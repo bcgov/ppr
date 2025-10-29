@@ -692,7 +692,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme';
+@use '@/assets/styles/theme' as *;
 .msg-hide-icon {
   min-height: 0!important;
   height: 0!important;

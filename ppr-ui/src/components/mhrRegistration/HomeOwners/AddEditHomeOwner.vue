@@ -862,7 +862,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 :deep(.theme--light.v-icon.mdi-close) {
   color: $primary-blue !important;
 }

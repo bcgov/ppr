@@ -169,7 +169,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 .hide-show-owners {
   color: $primary-blue !important;
   &:hover {

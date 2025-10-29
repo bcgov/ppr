@@ -418,7 +418,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme';
+@use '@/assets/styles/theme' as *;
 
 #mhr-staff-payment-section {
   :deep(.theme--light.v-text-field.v-input--is-disabled .v-input__slot::before) {

@@ -1,4 +1,5 @@
-@import 'theme.scss';
+@use 'theme.scss' as *;
+
 .app-body {
   flex: 1 1 auto;
   position: relative;

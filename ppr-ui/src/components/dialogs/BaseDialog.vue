@@ -165,7 +165,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 .close-btn, .close-btn:hover, .close-btn::before {
   background-color: transparent;
   height: 24px;

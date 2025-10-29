@@ -148,7 +148,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 .division-span {
   height: 40px;
   border-right: 1px solid black;

@@ -1,21 +1,53 @@
-import { defineVitestConfig } from '@nuxt/test-utils/config'
+import { defineConfig } from 'vitest/config'
+import vue from '@vitejs/plugin-vue'
+import path from 'path'
 
-export default defineVitestConfig({
+export default defineConfig({
+  plugins: [vue()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+      '#app': path.resolve(__dirname, 'node_modules/nuxt/dist/app')
+    }
+  },
   test: {
     dir: 'tests',
-    server: {
-      deps: {
-        inline: ['vuetify', 'vue-pdf-embed']
-      }
-    },
+    environment: 'happy-dom',
     globals: true,
     testTimeout: 100000,
-    setupFiles: '../tests/setup.ts',
+    setupFiles: 'tests/setup.ts',
     silent: true,
-    onConsoleLog (log) {
-      if (log.includes('warn')) return false // Filter out Vue warnings while preserving errors and logs.
+    onConsoleLog(log) {
+      if (log.includes('warn')) return false
     },
-    environment: 'nuxt',
+    server: {
+      deps: {
+        inline: [
+          '@internationalized/date',
+          'launchdarkly-js-client-sdk',
+          '@sbc/services',
+          '@sentry/browser',
+          'country-list',
+          'provinces',
+          'vue',
+          '@vue/test-utils',
+          '@vue/devtools-api',
+          '@vue/runtime-dom',
+          '@vue/runtime-core',
+          '@vue/reactivity',
+          '@vue/shared',
+          '@vue/server-renderer',
+          'vuetify',
+          'vue-pdf-embed'
+        ]
+      },
+    },
+    transformMode: {
+      web: [/.[jt]sx?/],
+    },
+    resolve: {
+      moduleDirectories: ['node_modules']
+    },
     environmentOptions: {
       nuxt: {
         overrides: {
@@ -67,6 +99,5 @@ export default defineVitestConfig({
           },
         }
       }
-    }
   }
 })

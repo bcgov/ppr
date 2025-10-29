@@ -227,7 +227,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 :deep(.v-text-field > .v-input__control > .v-input__slot) {
   background-color: $gray1;
 }

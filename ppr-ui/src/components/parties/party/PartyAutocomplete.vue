@@ -193,7 +193,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 .auto-complete-item:hover {
   cursor: pointer;
   color: $primary-blue !important;

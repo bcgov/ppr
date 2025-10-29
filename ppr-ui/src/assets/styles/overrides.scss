@@ -1,5 +1,5 @@
 // Vuetify Overrides
-@import 'theme.scss';
+@use 'theme.scss' as *;
 // Central Loading Wrapper
 .overlay-container {
   .v-overlay__content {

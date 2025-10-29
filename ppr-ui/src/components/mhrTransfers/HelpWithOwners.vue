@@ -85,7 +85,7 @@ import ErrorContact from '@/components/common/ErrorContact.vue'
 
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 
 h4 {
   font-size: 16px;
