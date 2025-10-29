@@ -40,7 +40,7 @@
         {{ item.activeCount > 1 ? `${item.serialNumber} (${item.activeCount})` : `${item.serialNumber}` }}
       </td>
       <td
-        v-else-if="header.value === 'edit'" 
+        v-else-if="header.value === 'edit'"
         class="lien-col">
         <v-tooltip
           location="top"
@@ -69,12 +69,12 @@
       </td>
     </template>
   </template>
-  
+
   <script lang="ts">
   import { defineComponent, reactive, toRefs } from 'vue'
 
   import type { BaseHeaderIF, ManufacturedHomeSearchResultIF } from '@/interfaces'
-  
+
   export default defineComponent({
     name: 'SearchedResultsMhrTableRow',
     props: {
@@ -142,7 +142,7 @@
     const setIncludeLienInfo = (item: ManufacturedHomeSearchResultIF) => {
       emit('setIncludeLienInfo', item)
     }
-  
+
       return {
         getOwnerName,
         getOwnerStatus,
@@ -154,9 +154,9 @@
     }
   })
   </script>
-  
+
   <style lang="scss" scoped>
-  @import '@/assets/styles/theme.scss';
+  @use '@/assets/styles/theme.scss' as *;
   .selected-row {
     td {
       background: $blueSelected;
@@ -166,4 +166,3 @@
     min-width: 12rem;
   }
   </style>
-  

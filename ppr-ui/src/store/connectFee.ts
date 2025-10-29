@@ -1,4 +1,5 @@
-import { ConnectPaymentMethod } from '~/enums/connect-payment-method'
+import { defineStore } from 'pinia'
+import { ConnectPaymentMethod } from '@/enums/connect-payment-method'
 
 export const useConnectFeeStore = defineStore('connect/fee', () => {
   const { $payApi } = useNuxtApp()

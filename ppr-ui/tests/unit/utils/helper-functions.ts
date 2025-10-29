@@ -1,5 +1,9 @@
 import type { VueWrapper } from '@vue/test-utils';
 import { mount } from '@vue/test-utils'
+import { createPinia } from 'pinia'
+import { createVuetify } from 'vuetify'
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
 import { MhApiStatusTypes, MhrSubTypes, ProductCode, RouteNames } from '@/enums'
 import type { RouterMock } from 'vue-router-mock';
 import { createRouterMock, injectRouterMock } from 'vue-router-mock'
@@ -42,6 +46,9 @@ import {
   UserAccess,
   YourHome
 } from '@/pages'
+
+const vuetify = createVuetify({ components, directives })
+
 
 const store = useStore()
 
@@ -385,7 +392,7 @@ export async function createComponent (
 
   return mount(shimComponent, {
     global: {
-      plugins: [mockRouter]
+      plugins: [mockRouter, createPinia(), vuetify]
     }
   }).getComponent(component)
 }

@@ -92,7 +92,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import type { ContentIF, FormIF, UpdatedBadgeIF } from '@/interfaces'
 import { UpdatedBadge } from '@/components/common'
 
