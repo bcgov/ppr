@@ -11,6 +11,7 @@ export default {
       futureEffectiveFees: 'Future Effective Fees',
       serviceFees: 'Service Fee',
       processingFees: 'Staff Processing Fee',
+      certifiedSearch: 'Certified Search',
       itemLabels: {
         PLACEHOLDER: '-',
         TEST: 'This is test entry',

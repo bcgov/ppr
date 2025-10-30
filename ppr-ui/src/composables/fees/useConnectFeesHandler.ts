@@ -2,17 +2,14 @@ import type { FeeSummaryTypes } from '@/composables/fees/enums'
 import { storeToRefs } from 'pinia'
 import { useConnectFeeStore } from '@/store/connectFee'
 import { RegistrationFees } from '@/resources/feeSchedule'
-import { APIRegistrationTypes, UIRegistrationTypes } from '@/enums'
-
 
 export const useConnectFeesHandler = () => {
   const {
     fees,
-    feeOptions,
-    userSelectedPaymentMethod
+    feeOptions
   } = storeToRefs(useConnectFeeStore())
   const { setFees } = useConnectFeeStore()
-  const { isRoleStaff, getStaffPayment } = storeToRefs(useStore())
+  const { isSearchCertified, isRoleStaff, getStaffPayment,  } = storeToRefs(useStore())
 
   /** Set the registration fees */
   const setRegistrationFees = (registrationFeeType: FeeSummaryTypes): void => {
@@ -35,7 +32,8 @@ export const useConnectFeesHandler = () => {
         [registrationFeeType]: {
           ...RegistrationFees[registrationFeeType],
           quantity: quantity,
-          total: RegistrationFees[registrationFeeType].filingFees * quantity
+          waived: fees.value[registrationFeeType]?.waived,
+          total: RegistrationFees[registrationFeeType].filingFees * quantity,
         }
       })
     })
@@ -43,13 +41,15 @@ export const useConnectFeesHandler = () => {
 
   /** Waive the fees (no fee) */
   const waiveFees = (registrationFeeType: FeeSummaryTypes, isNoFee: boolean): void => {
-    setFees({
-      [registrationFeeType]: {
-        ...fees.value[registrationFeeType],
-        filingFees: isNoFee ? 0 : RegistrationFees[registrationFeeType].filingFees,
+    const updatedFees = { ...fees.value }
+    Object.keys(updatedFees).forEach(key => {
+      updatedFees[key] = {
+        ...updatedFees[key],
+        filingFees: isNoFee ? 0 : RegistrationFees[key]?.filingFees ?? updatedFees[key].filingFees,
         waived: isNoFee
       }
     })
+    setFees(updatedFees)
   }
 
   /** Set the quantity of the specified fee type */
@@ -59,8 +59,11 @@ export const useConnectFeesHandler = () => {
       [registrationFeeType]: {
         ...RegistrationFees[registrationFeeType],
         quantity: quantity,
+        waived: fees.value[registrationFeeType]?.waived,
         total: RegistrationFees[registrationFeeType]?.filingFees * quantity +
-          RegistrationFees[registrationFeeType]?.serviceFees
+          RegistrationFees[registrationFeeType]?.serviceFees,
+        priorityFees: fees.value[registrationFeeType]?.priorityFees ?? 0,
+        certifiedFees: fees.value[registrationFeeType]?.certifiedFees ?? 0
       }
     })
   }
@@ -68,16 +71,34 @@ export const useConnectFeesHandler = () => {
   /** Set the priority fee (ie $100) */
   const setPriority = async (registrationFeeType: FeeSummaryTypes, isPriority: boolean): Promise<void> => {
     setFees({
-      [registrationFeeType]: {
-        ...RegistrationFees[registrationFeeType],
-        priorityFees: isPriority ? 100 : 0
-      }
+      ...fees.value,
+      ...(registrationFeeType && {
+        [registrationFeeType]: {
+          ...fees.value[registrationFeeType],
+          priorityFees: isPriority ? 100 : 0
+        }
+      })
+    })
+  }
+
+  /** Set the certified fees */
+  const setCertifiedSearchFee = (registrationFeeType: FeeSummaryTypes, isCertified): void => {
+    setFees({
+      ...fees.value,
+      ...(registrationFeeType && {
+        [registrationFeeType]: {
+          ...fees.value[registrationFeeType],
+          certifiedFees: isCertified ? 25 : 0
+        }
+      })
     })
   }
 
   watch(() => getStaffPayment.value?.option, async (option: number) => {
     if (isRoleStaff.value) {
-      await waiveFees(Object.keys(fees.value)[0] as FeeSummaryTypes, option === 0)
+      for (const key of Object.keys(fees.value)) {
+        await waiveFees(key as FeeSummaryTypes, option === 0)
+      }
     }
   })
 
@@ -85,6 +106,13 @@ export const useConnectFeesHandler = () => {
     if (isRoleStaff.value) {
       feeOptions.value.showPriorityFees = isPriority
       await setPriority(Object.keys(fees.value)[0] as FeeSummaryTypes, isPriority)
+    }
+  })
+
+  watch(() => isSearchCertified.value, async (isCertified: boolean) => {
+    if (isRoleStaff.value) {
+      feeOptions.value.showCertifiedSearchFees = isCertified
+      await setCertifiedSearchFee(Object.keys(fees.value)[0] as FeeSummaryTypes, isCertified)
     }
   })
 

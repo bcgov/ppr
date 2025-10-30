@@ -182,6 +182,12 @@ const getFeeItemLabelTooltip = (typeCode: string) => {
             :fee="totalGst"
             :show-fee-value="isPlaceholderActive"
           />
+          <ConnectFeeExtraFee
+            v-if="feeOptions.showCertifiedSearchFees"
+            :description="$t('ConnectFeeWidget.feeSummary.certifiedSearch')"
+            :fee="25.00"
+            :show-fee-value="true"
+          />
         </div>
 
         <div class="flex flex-row items-end justify-between border-y border-gray-300 py-3 px-4">
