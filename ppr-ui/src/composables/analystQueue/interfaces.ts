@@ -1,5 +1,5 @@
 import type { OwnerIF, DocumentSummaryList, SubmittingPartyIF } from "@/interfaces"
-import type { ReviewRegTypes, ReviewStatusTypes } from "@/composables/analystQueue/enums"
+import type { ReviewRegTypes, ReviewStatusTypes, ReviewDecisionTypes } from "@/composables/analystQueue/enums"
 
 export interface QueueSummaryIF {
     reviewId: string
@@ -72,6 +72,11 @@ export interface QueueDetailIF {
 }
 
 export interface QueueReviewUpdatePayloadIF {
+    staffNote?: string
+    clientNote?: string
+    changeNote?: string
     statusType?: ReviewStatusTypes
+    declinedReasonType?: ReviewDecisionTypes
+    username?: string
     assigneeName?: string
 }
