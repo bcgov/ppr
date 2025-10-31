@@ -515,7 +515,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
                             )
                             .all()
                         )
-                        logger.error(f"DB find_by_document_id getting changes for MHR# {mhr_num}")
+                        logger.debug(f"DB find_by_document_id getting changes for MHR# {mhr_num}")
             except Exception as db_exception:  # noqa: B902; return nicer error
                 logger.error("DB find_by_document_id exception: " + str(db_exception))
                 raise DatabaseException(db_exception) from db_exception

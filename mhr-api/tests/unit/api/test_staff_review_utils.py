@@ -134,6 +134,7 @@ def test_change_registration(session, pay_ref, account_id, username, usergroup, 
     assert reg_json.get("usergroup") == usergroup
     assert reg_json.get("registrationType") == reg_type
     assert reg_json.get("mhrNumber") == mhr_num
+    assert reg_json.get("documentDescription")
     test_reg: MhrRegistration = MhrRegistration.find_by_mhr_number(mhr_num, account_id)
     assert test_reg.status_type == MhrRegistrationStatusTypes.DRAFT.value
     review_regs = MhrReviewRegistration.find_by_mhr_number(mhr_num)

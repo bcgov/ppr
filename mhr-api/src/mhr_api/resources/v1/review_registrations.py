@@ -31,6 +31,7 @@ from mhr_api.resources import utils as resource_utils
 from mhr_api.resources.v1.transfers import set_owner_edit
 from mhr_api.services.authz import authorized, is_staff
 from mhr_api.services.doc_service import doc_id_lookup_staff
+from mhr_api.services.notify import Notify
 from mhr_api.services.payment.exceptions import SBCPaymentException
 from mhr_api.services.payment.payment import Payment
 from mhr_api.utils.auth import jwt
@@ -158,7 +159,7 @@ def approve_registration(review_id: int, review_reg: MhrReviewRegistration):
     current_owners = reg_utils.get_active_owners(current_reg)
     update_registration_status(review_reg, current_reg)
     new_reg: MhrRegistration = staff_review_utils.create_change_registration(draft, current_reg, review_reg)
-    queue_transfer_report(draft, current_reg, new_reg, current_owners)
+    queue_transfer_report(review_id, draft, current_reg, new_reg, current_owners)
     update_draft(draft)
 
 
@@ -179,6 +180,14 @@ def decline_registration(review_id: int, review_reg: MhrReviewRegistration, requ
         request_json["payRefund"] = f"Pay API refund failed: {err.status_code}: {err.message}"
         logger.info(f" Refund for invoice {review_reg.pay_invoice_id} failed: {err.status_code}: {err.message}")
     update_draft(draft)
+    try:
+        reason: str = request_json.get("declinedReasonType")
+        if request_json.get("staffNote"):
+            reason += ": " + request_json.get("staffNote")
+        notify: Notify = Notify(**{"review": True})
+        notify.send_review_declined(review_reg.registration_data, reason)
+    except Exception as err:  # noqa: B902; wrapping exception
+        logger.warning(f"Email notification for reviewId={review_id} failed: {err}")
 
 
 def update_registration_status(review_reg: MhrReviewRegistration, base_reg: MhrRegistration):
@@ -216,10 +225,13 @@ def update_draft(draft: MhrDraft):
     logger.info(f"Draft {draft.id} updated for MHR {draft.mhr_number} reg type {draft.registration_type}")
 
 
-def queue_transfer_report(draft: MhrDraft, current_reg: MhrRegistration, new_reg: MhrRegistration, current_owners):
+def queue_transfer_report(
+    review_id: int, draft: MhrDraft, current_reg: MhrRegistration, new_reg: MhrRegistration, current_owners
+):  # pylint: disable=too-many-locals
     """Set up the registration verification report generation."""
     new_reg.change_registrations = current_reg.change_registrations
     response_json = new_reg.json
+    response_json["reviewId"] = review_id
     current_reg.current_view = True
     current_json = current_reg.new_registration_json
     current_json["ownerGroups"] = current_owners
