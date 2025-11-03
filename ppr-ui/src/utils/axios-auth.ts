@@ -20,4 +20,4 @@ axios.interceptors.response.use(
   }
 )
 
-export { axios }
+export { axios as axiosAuth }

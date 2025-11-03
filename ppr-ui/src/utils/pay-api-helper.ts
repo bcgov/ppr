@@ -4,7 +4,7 @@ import { StatusCodes } from 'http-status-codes'
 import type { FeeCodes } from '@/composables/fees/enums'
 import { ErrorCategories } from '@/enums'
 import type { GetFeesI } from '@/interfaces'
-import { axios } from '@/utils/axios-pay'
+import { axiosPay } from '@/utils/axios-pay'
 
 /**
  * Retrieves fee information for a specific fee code from the Payment API.
@@ -14,7 +14,7 @@ import { axios } from '@/utils/axios-pay'
 export async function getFees (feeCode: FeeCodes): Promise<GetFeesI> {
   const url = sessionStorage.getItem('PAY_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
-  return axios.get(`fees/PPR/${feeCode}`, config)
+  return axiosPay.get(`fees/PPR/${feeCode}`, config)
     .then(
       response => {
         const data = response?.data
@@ -53,7 +53,7 @@ export async function getFees (feeCode: FeeCodes): Promise<GetFeesI> {
 export async function getPaymentInformation (accountId: string): Promise<any> {
   const url = sessionStorage.getItem('PAY_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
-  return axios.get(`accounts/${accountId}`, config)
+  return axiosPay.get(`accounts/${accountId}`, config)
     .then(
       response => {
         const data = response?.data

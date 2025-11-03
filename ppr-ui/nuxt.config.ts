@@ -12,43 +12,9 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-03-07',
   devtools: { enabled: true },
 
-  components: [
-    '~/components',
-    '~/components/collateral',
-    '~/components/collateral/generalCollateral',
-    '~/components/collateral/vehicle',
-    '~/components/common',
-    '~/components/dashboard',
-    '~/components/dialogs',
-    '~/components/dialogs/common',
-    '~/components/exemptions',
-    '~/components/mhrHistory',
-    '~/components/mhrRegistration',
-    '~/components/mhrRegistration/HomeLocation',
-    '~/components/mhrRegistration/HomeOwners',
-    '~/components/mhrRegistration/ReviewConfirm',
-    '~/components/mhrRegistration/YourHome',
-    '~/components/mhrTransfers',
-    '~/components/mhrTransportPermits',
-    '~/components/mhrTransportPermits/ConfirmCompletionContent',
-    '~/components/mhrTransportPermits/HelpContent',
-    '~/components/parties',
-    '~/components/parties/debtor',
-    '~/components/parties/party',
-    '~/components/parties/summaries',
-    '~/components/registration',
-    '~/components/registration/length-trust',
-    '~/components/registration/securities-act-notices',
-    '~/components/registration/repairers-lien-messaging',
-    '~/components/search',
-    '~/components/tables',
-    '~/components/tables/common',
-    '~/components/tables/mhr',
-    '~/components/tables/ppr',
-    '~/components/tombstones',
-    '~/components/unitNotes',
-    '~/components/userAccess'
-  ],
+  components: {
+    dirs: [{ path: '~/components', extensions: ['vue'], pathPrefix: false }]
+  },
 
   extends: [
     '@sbc-connect/nuxt-core-layer-beta',
@@ -108,6 +74,9 @@ export default defineNuxtConfig({
       { name: 'English', code: 'en-CA', iso: 'en-CA', dir: 'ltr', file: 'en-CA.ts' },
       { name: 'Français', code: 'fr-CA', iso: 'fr-CA', dir: 'ltr', file: 'fr-CA.ts' }
     ],
+    bundle: {
+      optimizeTranslationDirective: false
+    },
     strategy: 'prefix',
     lazy: true,
     // Make this point to your actual locales folder; with srcDir set, prefer 'src/locales'

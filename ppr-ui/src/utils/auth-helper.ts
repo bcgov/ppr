@@ -1,5 +1,5 @@
 // Libraries
-import { axios } from '@/utils/axios-auth'
+import { axiosAuth } from '@/utils/axios-auth'
 import { StatusCodes } from 'http-status-codes'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 // Interfaces, Enums
@@ -88,7 +88,7 @@ export async function getAccountInfoFromAuth (currentUser: UserInfoIF = null): P
 
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
 
-  const accountInfo = await axios
+  const accountInfo = await axiosAuth
     .get(`orgs/${accountId}`, config)
     .then(response => {
       const data = response?.data
@@ -118,7 +118,7 @@ export async function getAccountInfoFromAuth (currentUser: UserInfoIF = null): P
       phoneExtension: currentUser.contacts[0].phoneExtension
     }
   } else {
-    accountAdminInfo = await axios
+    accountAdminInfo = await axiosAuth
       .get(`orgs/${accountId}/members?membershipTypeCode=ADMIN&status=ACTIVE`, config)
       .then(response => {
         const data = response?.data
@@ -156,7 +156,7 @@ export async function getRegisteringPartyFromAuth (): Promise<PartyIF> {
   const accountId = accountInfo.id
 
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
-  return axios.get(`orgs/${accountId}`, config)
+  return axiosAuth.get(`orgs/${accountId}`, config)
     .then(
       response => {
         const data = response?.data
@@ -199,7 +199,7 @@ export async function getSbcFromAuth (): Promise<boolean> {
   const accountId = accountInfo.id
 
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
-  return axios.get(`orgs/${accountId}`, config)
+  return axiosAuth.get(`orgs/${accountId}`, config)
     .then(
       response => {
         const data = response?.data
@@ -227,7 +227,7 @@ export async function getAccountMembers (): Promise<any> {
   const accountId = accountInfo?.id
 
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
-  return axios.get(`orgs/${accountId}/members?active`, config)
+  return axiosAuth.get(`orgs/${accountId}/members?active`, config)
     .then(
       response => {
         const data = response?.data
@@ -253,7 +253,7 @@ export async function fetchAccountProducts (accountId: number): Promise<Array<Us
     headers: { Accept: 'application/json' }
   }
 
-  return axios.get(`orgs/${accountId}/products`, config)
+  return axiosAuth.get(`orgs/${accountId}/products`, config)
     .then(response => {
       const data = response?.data as Array<UserProductSubscriptionIF>
       if (!data) {
@@ -290,7 +290,7 @@ export async function requestProductAccess (productCode: ProductCode): Promise<a
     }]
   }
 
-  return axios.post(`orgs/${accountId}/products`, payload, config)
+  return axiosAuth.post(`orgs/${accountId}/products`, payload, config)
     .then(response => {
       const data: UserProductSubscriptionIF[] = response?.data as Array<UserProductSubscriptionIF>
       if (!data) {
@@ -333,7 +333,7 @@ export async function updateProductAccess (productCode: ProductCode): Promise<an
     }]
   }
 
-  return axios.patch(`orgs/${accountId}/products`, payload, config)
+  return axiosAuth.patch(`orgs/${accountId}/products`, payload, config)
     .then(response => {
       const data: UserProductSubscriptionIF[] = response?.data as Array<UserProductSubscriptionIF>
       if (!data) {
@@ -357,7 +357,7 @@ export async function getProductSubscription (
   const accountId = accountInfo.id
 
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
-  return axios.get(`accounts/${accountId}/products/${productCode}/authorizations`, config)
+  return axiosAuth.get(`accounts/${accountId}/products/${productCode}/authorizations`, config)
     .then(
       response => {
         const data = response?.data as { membership: AccountProductMemberships, roles: Array<AccountProductRoles> }

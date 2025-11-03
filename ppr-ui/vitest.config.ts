@@ -10,6 +10,13 @@ export default defineConfig({
       '#app': path.resolve(__dirname, 'node_modules/nuxt/dist/app')
     }
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: 'modern-compiler', // or 'modern'
+      },
+    },
+  },
   test: {
     dir: 'tests',
     environment: 'happy-dom',
@@ -99,5 +106,6 @@ export default defineConfig({
           },
         }
       }
+    }
   }
 })
