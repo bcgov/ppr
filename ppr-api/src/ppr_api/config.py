@@ -180,7 +180,7 @@ class Config:  # pylint: disable=too-few-public-methods
     GCP_PS_VERIFICATION_REPORT_TOPIC = os.getenv("GCP_PS_VERIFICATION_REPORT_TOPIC", "ppr-mail-report")
     GCP_PS_REGISTRATION_REPORT_TOPIC = os.getenv("GCP_PS_REGISTRATION_REPORT_TOPIC", "ppr-registration-report")
 
-    GATEWAY_URL = os.getenv("GATEWAY_URL", "https://bcregistry-dev.apigee.net")
+    GATEWAY_URL = os.getenv("GATEWAY_URL", "https://test.api.connect.gov.bc.ca")
     SUBSCRIPTION_API_KEY = os.getenv("SUBSCRIPTION_API_KEY")
     # Host name/IP of mail out service for file transfer: only in TEST and PROD.
     SURFACE_MAIL_HOST = os.getenv("SURFACE_MAIL_HOST", "")

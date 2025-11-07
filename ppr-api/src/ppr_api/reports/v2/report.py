@@ -326,7 +326,6 @@ class Report:  # pylint: disable=too-few-public-methods
             "logoGrey",
             "macros",
             "registrarSignature",
-            "registrarSignatureSO",
             "registration/securedParties",
             "registration/courtOrderInformation",
             "registration/debtors",

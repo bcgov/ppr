@@ -148,7 +148,7 @@ def test_mail_report_json(session):
         registration_id=2000,
         party_id=3000,
         report_data=json.dumps(TEST_REPORT_DATA),
-        doc_storage_url='http%3A%2F%2Fmocktarget.apigee.net',
+        doc_storage_url='/2025/10/25/test-report.pdf',
         status=200,
         batch_job_id=1234
     )
