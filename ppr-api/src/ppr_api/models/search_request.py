@@ -380,9 +380,9 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a search history summary list of searches executed by an account."""
         history_list = []
         query: str = search_utils.build_search_history_query(params)
-        logger.info(query)
+        logger.debug(query)
         query_params = search_utils.build_account_query_params(params)
-        logger.info(query_params)
+        logger.debug(query_params)
         rows = None
         from_ui: bool = params.from_ui is not None and params.from_ui
         count = SearchRequest.get_account_history_count(params.account_id)

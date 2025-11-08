@@ -102,7 +102,7 @@ def test_registration_report_json(session):
         registration_id=2000,
         report_data= json.dumps(TEST_REPORT_DATA),
         report_type=ReportTypes.MHR_REGISTRATION,
-        doc_storage_url='http%3A%2F%2Fmocktarget.apigee.net'
+        doc_storage_url='/2025/10/25/test-report.pdf'
     )
     report_json = {
         'id': report.id,
