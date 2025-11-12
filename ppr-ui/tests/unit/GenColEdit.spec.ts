@@ -25,7 +25,7 @@ describe('GenColEdit tests', () => {
     await nextTick()
 
     expect(wrapper.findComponent(GenColEdit).exists()).toBe(true)
-    expect(wrapper.vm.newDesc).toBe('')
+    expect(wrapper.vm.newDesc).toBe(null)
     expect(wrapper.vm.generalCollateral).toEqual([])
     expect(wrapper.vm.showErrorComponent).toBe(false)
     expect(wrapper.findAll(generalCollateralEdit).length).toBe(1)

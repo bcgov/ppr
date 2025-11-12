@@ -12,6 +12,7 @@ import { RegistrationTypes } from '@/resources'
 import { nextTick } from 'vue'
 import { expect, it, test } from 'vitest'
 import { axe } from 'vitest-axe'
+import { createPinia } from 'pinia'
 
 const store = useStore()
 
@@ -27,7 +28,13 @@ describe('Redirects when Add Collateral is not ready', () => {
     await store.setRegistrationType(null)
     await store.setRegistrationFlowType(null)
 
-    wrapper = await createComponent(AddCollateral, { appReady: true }, RouteNames.ADD_COLLATERAL)
+    wrapper = await createComponent(
+      AddCollateral,
+      { appReady: true },
+      RouteNames.ADD_COLLATERAL,
+      {},
+      [createPinia()]
+      )
   })
 
   it('redirects to dashboard when store is not set', async () => {
@@ -42,7 +49,13 @@ describe('Add Collateral new registration component', () => {
     await store.setRegistrationType(mockedSelectSecurityAgreement())
     await store.setRegistrationFlowType(RegistrationFlowType.NEW)
 
-    wrapper = await createComponent(AddCollateral, { appReady: true }, RouteNames.ADD_COLLATERAL)
+    wrapper = await createComponent(
+      AddCollateral,
+      { appReady: true },
+      RouteNames.ADD_COLLATERAL,
+      null,
+      [createPinia()]
+    )
     await nextTick()
   })
 

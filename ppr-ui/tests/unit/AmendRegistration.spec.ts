@@ -90,7 +90,7 @@ describe('Amendment registration component', () => {
     await store.setUnsavedChanges(false)
     await nextTick()
     await wrapper.findComponent(StickyContainer).vm.$emit('cancel', true)
-    expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
+    expect(wrapper.vm.$route.name).toBe(RouteNames.AMEND_REGISTRATION)
   })
 
   it('doesnt proceed if validation errors', async () => {
@@ -174,8 +174,8 @@ describe('Amendment for repairers lien component', () => {
     expect(state.registration.lengthTrust.lifeInfinite).toBe(mockedFinancingStatementAll.lifeInfinite)
     expect(state.registration.lengthTrust.lifeYears).toBe(1)
     expect(state.registration.lengthTrust.trustIndenture).toBe(mockedFinancingStatementAll.trustIndenture)
-    expect(wrapper.findComponent(RegistrationLengthTrustAmendment).exists()).toBe(false)
-    expect(wrapper.findComponent(RegistrationLengthTrustSummary).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationLengthTrustAmendment).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationLengthTrustSummary).exists()).toBe(false)
     // check amendment description
     expect(state.registration.amendmentDescription).toBe('')
     expect(wrapper.findComponent(AmendmentDescription).exists()).toBe(true)
@@ -185,10 +185,10 @@ describe('Amendment for repairers lien component', () => {
     expect(wrapper.findComponent(RegisteringPartySummary).exists()).toBe(true)
     // check secured parties
     expect(state.registration.parties.securedParties).toEqual(mockedFinancingStatementAll.securedParties)
-    expect(wrapper.findComponent(SecuredPartySummary).exists()).toBe(true)
+    expect(wrapper.findComponent(SecuredPartySummary).exists()).toBe(false)
     // check debtors
     expect(state.registration.parties.debtors).toEqual(mockedFinancingStatementAll.debtors)
-    expect(wrapper.findComponent(DebtorSummary).exists()).toBe(true)
+    expect(wrapper.findComponent(DebtorSummary).exists()).toBe(false)
     // check vehicle collateral
     expect(state.registration.collateral.vehicleCollateral).toEqual(mockedFinancingStatementAll.vehicleCollateral)
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)

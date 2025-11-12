@@ -6,7 +6,7 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import { MhApiStatusTypes, MhrSubTypes, ProductCode, RouteNames } from '@/enums'
 import type { RouterMock } from 'vue-router-mock';
-import { createRouterMock, injectRouterMock } from 'vue-router-mock'
+import { createRouterMock } from 'vue-router-mock'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import {
   mockMhrTransferCurrentHomeOwner,
@@ -60,7 +60,8 @@ export async function createComponent (
   component: any,
   props: Record<string, any> = {},
   initialRoute: RouteNames | null = null,
-  query: Record<string, any> = {}
+  query: Record<string, any> = {},
+  optionalPlugins: Array<any> = []
 ): Promise<any> {
   // Set up mock router
   const mockRouter: RouterMock = createRouterMock({
@@ -371,7 +372,6 @@ export async function createComponent (
       query
     }
   })
-  injectRouterMock(mockRouter)
 
   // Set up mock authentication
   setupMockUser()
@@ -392,7 +392,7 @@ export async function createComponent (
 
   return mount(shimComponent, {
     global: {
-      plugins: [mockRouter, createPinia(), vuetify]
+      plugins: [mockRouter, ...optionalPlugins, vuetify]
     }
   }).getComponent(component)
 }

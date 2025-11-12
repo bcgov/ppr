@@ -1,11 +1,9 @@
 import { nextTick } from 'vue'
 import { beforeEach } from 'vitest'
 import { createComponent, getLastEvent, getTestId } from './utils'
-import { ProductCode } from '@/enums'
 import { Attention, FormField } from '@/components/common'
 import { useStore } from '@/store/store'
 import { attentionConfig, attentionConfigManufacturer } from '@/resources'
-import { mockedManufacturerAuthRoles } from './test-data'
 
 const store = useStore()
 
@@ -53,9 +51,7 @@ describe('Attention', () => {
   })
 
   it('has the right configurations for manufacturer', async () => {
-    await store.setAuthRoles(mockedManufacturerAuthRoles)
-    await store.setUserProductSubscriptionsCodes([ProductCode.MHR, ProductCode.MANUFACTURER])
-    const wrapper = await createComponent(Attention, attentionProps)
+    const wrapper = await createComponent(Attention, { ...attentionProps, configOverride: attentionConfigManufacturer })
 
     const description = wrapper.find(getTestId(`${sectionId}-description`))
     const title = wrapper.find(getTestId(`${sectionId}-title`))

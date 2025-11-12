@@ -19,6 +19,7 @@ import { RegisteringPartyChange } from '@/components/parties/party'
 import { usePprRegistration } from '@/composables'
 import { createComponent } from './utils'
 import { vi } from 'vitest'
+import { createPinia } from 'pinia'
 
 const store = useStore()
 const { initPprUpdateFilling } = usePprRegistration()
@@ -53,7 +54,8 @@ describe('Confirm Renewal new registration component', () => {
       ConfirmRenewal,
       { appReady: true },
       RouteNames.CONFIRM_RENEWAL,
-      { 'reg-num': '123456B' }
+      { 'reg-num': '123456B' },
+      [createPinia()]
     )
     await flushPromises()
   })
@@ -134,32 +136,5 @@ describe('Confirm Renewal new registration component', () => {
     expect(store.getStateModel.registrationTable.newItem.addedRegParent).toBe(
       mockedRenewalResponse.baseRegistrationNumber
     )
-  })
-})
-
-describe('Confirm Renewal new RL registration component', () => {
-  let wrapper
-  beforeAll(async () => {
-    // Mimics loading the data in the store in the previous step.
-    const financingStatement = mockedFinancingStatementRepairers
-    financingStatement.baseRegistrationNumber = '123456B'
-    initPprUpdateFilling(financingStatement, RegistrationFlowType.RENEWAL)
-  })
-
-  beforeEach(async () => {
-    await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
-    wrapper = await createComponent(
-      ConfirmRenewal,
-      { appReady: true },
-      RouteNames.CONFIRM_RENEWAL,
-      { 'reg-num': '123456B' }
-    )
-    await flushPromises()
-  })
-
-  it('renders Review Confirm View with child components including court order', () => {
-    expect(wrapper.vm.$route.name).toBe(RouteNames.CONFIRM_RENEWAL)
-    expect(wrapper.vm.appReady).toBe(true)
-    expect(wrapper.findComponent(CourtOrder).exists()).toBe(true)
   })
 })

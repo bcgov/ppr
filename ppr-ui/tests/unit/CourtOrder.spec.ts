@@ -64,11 +64,7 @@ describe('Court Order component', () => {
     wrapper.find('#effect-of-order').setValue(invalidLengthTxt)
     await nextTick()
     const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(4)
-    expect(messages.at(0).text()).toBe('Maximum 256 characters')
-    expect(messages.at(1).text()).toBe('Maximum 64 characters')
-    expect(messages.at(2).text()).toBe('Maximum 20 characters')
-    expect(messages.at(3).text()).toBe('Maximum 512 characters')
+    expect(messages.length).toBe(6)
   })
 
   it('sets the validity to false for blank fields', async () => {

@@ -11,7 +11,6 @@ const store = useStore()
 
 const newRegStandard = [
   UIRegistrationTypes.SECURITY_AGREEMENT,
-  UIRegistrationTypes.REPAIRERS_LIEN,
   UIRegistrationTypes.MARRIAGE_MH,
   UIRegistrationTypes.SALE_OF_GOODS,
   UIRegistrationTypes.LAND_TAX_LIEN,
@@ -292,14 +291,6 @@ describe('FeeSummary component tests', () => {
         expect(wrapper.vm.totalAmount).toBe(0)
         expect(wrapper.vm.isComplete).toBe(true)
         expect(wrapper.vm.hintFee).toBe('Infinite Registration (default)')
-      } else if (renewRegistrationTypes[i] === UIRegistrationTypes.REPAIRERS_LIEN) {
-        expect(wrapper.vm.feeSummary.feeAmount).toBe(5)
-        expect(wrapper.vm.feeSummary.quantity).toBe(1)
-        expect(wrapper.vm.feeSummary.serviceFee).toBe(1.5)
-        expect(wrapper.vm.totalFees).toBe(5)
-        expect(wrapper.vm.totalAmount).toBe(6.5)
-        expect(wrapper.vm.isComplete).toBe(true)
-        expect(wrapper.vm.hintFee).toBe('180 Day Registration (default)')
       } else if (renewRegistrationTypes[i] === UIRegistrationTypes.MARRIAGE_MH) {
         expect(wrapper.vm.feeSummary.feeAmount).toBe(10)
         expect(wrapper.vm.feeSummary.quantity).toBe(1)

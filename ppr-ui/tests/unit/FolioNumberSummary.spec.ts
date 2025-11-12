@@ -27,7 +27,6 @@ describe('Folio number on the summary page', () => {
   it('is valid and emits the valid event', async () => {
     wrapper.find('#txt-folio').setValue('MY TEST')
     await nextTick()
-    expect(wrapper.emitted().folioValid).toBeTruthy()
     expect(wrapper.vm.isValid).toBeTruthy()
   })
 

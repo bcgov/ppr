@@ -102,24 +102,26 @@ export default defineNuxtConfig({
   },
 
   vite: {
-    resolve: {
-      dedupe: ['vue']
+
+    css: {
+      preprocessorOptions: {
+        // for <style lang="scss">
+        scss: {
+          api: 'modern-compiler' // or 'modern'
+        },
+        // if you also use <style lang="sass">
+        sass: {
+          api: 'modern-compiler'
+        }
+      }
     },
+
     plugins: [
       vuetify({ styles: { configFile: '/assets/styles/vuetify-variables.scss' } })
     ],
-    server: {
-      watch: {
-        usePolling: true
-      }
-    },
+
     logLevel: 'silent',
-    optimizeDeps: {
-      // Prevent esbuild from scanning/prebundling Nuxt, which imports #build/*
-      exclude: ['nuxt'],
-      noDiscovery: true,
-      include: ['vuelidate', 'lodash', 'keycloak-js']
-    },
+
     vue: {
       template: {
         transformAssetUrls

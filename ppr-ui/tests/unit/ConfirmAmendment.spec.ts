@@ -9,6 +9,7 @@ import {
   mockedGeneralCollateral1,
   mockedPartyCodeSearchResults
 } from './test-data'
+import { createPinia } from 'pinia'
 
 import { ConfirmAmendment } from '@/pages'
 import { CertifyInformation, FolioNumberSummary, StickyContainer } from '@/components/common'
@@ -88,7 +89,8 @@ describe('Confirm Amendment registration component', () => {
       ConfirmAmendment,
       { appReady: true },
       RouteNames.CONFIRM_AMENDMENT,
-      { 'reg-num': '123456B' }
+      { 'reg-num': '123456B' },
+      [createPinia()]
     )
     await flushPromises()
   })
@@ -186,7 +188,8 @@ describe('Confirm Amendment registration save registration', () => {
       ConfirmAmendment,
       { appReady: true },
       RouteNames.CONFIRM_AMENDMENT,
-      { 'reg-num': '123456B' }
+      { 'reg-num': '123456B' },
+      [createPinia()]
     )
     await flushPromises()
   })
@@ -256,7 +259,8 @@ describe('Confirm Amendment for staff', () => {
       ConfirmAmendment,
       { appReady: true },
       RouteNames.CONFIRM_AMENDMENT,
-      { 'reg-num': '123456B' }
+      { 'reg-num': '123456B' },
+      [createPinia()]
     )
     await flushPromises()
   })
