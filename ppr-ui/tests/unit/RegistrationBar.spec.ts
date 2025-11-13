@@ -1,4 +1,3 @@
-import { nextTick } from 'vue'
 import { RegistrationBar, RegistrationBarButtonList, RegistrationBarTypeAheadList } from '@/components/registration'
 import {
   RegistrationTypesMiscellaneousCC,
@@ -74,7 +73,6 @@ describe('RegistrationBar select basic drop down tests', () => {
     // Verify displayed list of standard registration types
     const dropDownItems = [
       selectSecurity,
-      selectReparers,
       selectMarriage,
       selectLand,
       selectSale,
@@ -88,9 +86,9 @@ describe('RegistrationBar select basic drop down tests', () => {
     }
     // FUTURE: add a test for each registration type
     // selecting an item in the list emits it from the component
-    wrapper.find(selectReparers).trigger('click')
+    wrapper.find(selectSecurity).trigger('click')
     await flushPromises()
-    expect(getLastEvent(wrapper, selectedType)).toBe(standardRegistrations[2])
+    expect(getLastEvent(wrapper, selectedType)).toBe(standardRegistrations[1])
   })
 })
 

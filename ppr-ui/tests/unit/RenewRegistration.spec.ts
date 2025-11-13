@@ -16,13 +16,16 @@ import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { createComponent } from './utils'
 import { useStore } from '@/store/store'
 import { vi } from 'vitest'
-
-const store = useStore()
+import { createPinia, setActivePinia } from 'pinia'
 
 describe('Renew registration component', () => {
-  let wrapper: any
+  let wrapper, pinia, store
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     vi.mock('@/utils/ppr-api-helper', () => ({
       getFinancingStatement: vi.fn(() =>
         Promise.resolve({ ...mockedFinancingStatementAll })),
@@ -32,7 +35,8 @@ describe('Renew registration component', () => {
       RenewRegistration,
       { appReady: true },
       RouteNames.RENEW_REGISTRATION,
-      { 'reg-num': '123456B' }
+      { 'reg-num': '123456B' },
+      [pinia]
     )
     await flushPromises()
   })

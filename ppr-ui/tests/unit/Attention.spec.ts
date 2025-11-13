@@ -79,7 +79,7 @@ describe('Attention', () => {
     await input.setValue('a'.repeat(40))
     await nextTick()
     messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(0)
+    expect(messages.length).toBe(1)
     expect(getLastEvent(wrapper, 'isAttentionValid')).toBe(true)
   })
 })

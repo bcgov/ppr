@@ -20,6 +20,7 @@ import { useNewMhrRegistration } from '@/composables/mhrRegistration'
 import { defaultFlagSet } from '@/utils'
 import { expect, it } from 'vitest'
 import { axe } from 'vitest-axe'
+import { dataTestId } from './plugins'
 
 const store = useStore()
 
@@ -177,9 +178,9 @@ describe('Home Owners', () => {
     expect(addOwnerSection.exists()).toBeTruthy()
 
     // make updates to the owner
-    await addOwnerSection.findInputByTestId('first-name').setValue('Jean-Claude')
-    await addOwnerSection.findInputByTestId('middle-name').setValue('Van')
-    await addOwnerSection.findInputByTestId('last-name').setValue('Damme')
+    await dataTestId(addOwnerSection).findInputByTestId('first-name').setValue('Jean-Claude')
+    await dataTestId(addOwnerSection).findInputByTestId('middle-name').setValue('Van')
+    await dataTestId(addOwnerSection).findInputByTestId('last-name').setValue('Damme')
 
     expect(store.getMhrRegistrationHomeOwnerGroups[0].owners.length).toBe(2)
     await clickDoneAddOwner()
@@ -735,9 +736,9 @@ describe('HomeOwner Corrections', () => {
     expect(addOwnerSection.exists()).toBeTruthy()
 
     // make updates to the owner
-    await addOwnerSection.findInputByTestId('first-name').setValue('Jean-Claude')
-    await addOwnerSection.findInputByTestId('middle-name').setValue('Van')
-    await addOwnerSection.findInputByTestId('last-name').setValue('Damme')
+    await dataTestId(addOwnerSection).findInputByTestId('first-name').setValue('Jean-Claude')
+    await dataTestId(addOwnerSection).findInputByTestId('middle-name').setValue('Van')
+    await dataTestId(addOwnerSection).findInputByTestId('last-name').setValue('Damme')
 
     expect(store.getMhrRegistrationHomeOwnerGroups[0].owners.length).toBe(2)
     await clickDoneAddOwner()

@@ -46,7 +46,7 @@ import {
 import { DeathCertificate, SupportingDocuments } from '@/components/mhrTransfers'
 import { transferSupportingDocuments, transfersErrors, MixedRolesErrors } from '@/resources'
 import { useHomeOwners, useNewMhrRegistration } from '@/composables'
-import flushPromises from 'flush-promises'
+import { dataTestId } from './plugins'
 
 const store = useStore()
 
@@ -836,7 +836,7 @@ describe('Home Owners', () => {
     expect(supportingDocuments.text()).toContain(transferSupportingDocuments[TRANSFER_TYPE].optionTwo.text)
 
     const radioButtonGrantOfProbate = <HTMLInputElement>(
-      supportingDocuments.findInputByTestId('supporting-doc-option-one').element
+      dataTestId(supportingDocuments).findInputByTestId('supporting-doc-option-one').element
     )
     // check that Grant of Probate radio button option is selected by default
     expect(radioButtonGrantOfProbate.checked).toBe(true)
@@ -1046,7 +1046,7 @@ describe('Home Owners', () => {
     expect(supportingDocuments.text()).not.toContain(transferSupportingDocuments[TRANSFER_TYPE].optionOne.note)
 
     // click on Grant of Probate with Will radio button in SupportingDocuments component
-    supportingDocuments.findInputByTestId('supporting-doc-option-one').setValue(true)
+    dataTestId(supportingDocuments).findInputByTestId('supporting-doc-option-one').setValue(true)
     await nextTick()
 
     expect(supportingDocuments.text()).toContain(transferSupportingDocuments[TRANSFER_TYPE].optionOne.note)

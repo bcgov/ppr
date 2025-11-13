@@ -24,15 +24,20 @@ import { RouteNames, UnitNoteDocTypes } from '@/enums'
 import { mockedAddress } from './test-data'
 import { TransportPermitDetails } from '@/components/mhrTransportPermits'
 import PartySelectMethod from '@/components/parties/PartySelectMethod.vue'
+import { createPinia, setActivePinia } from 'pinia'
 
 const store = useStore()
 
 describe('ExemptionReview', () => {
-  let wrapper
+  let wrapper, store, pinia
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
+    setupMockStaffUser(store)
     wrapper = await createComponent(ExemptionReview, { showErrors: false }, RouteNames.EXEMPTION_REVIEW)
-    setupMockStaffUser()
     await nextTick()
   })
 
@@ -53,7 +58,7 @@ describe('ExemptionReview', () => {
   })
 
   it('renders the AccountInfo for Qualified Supplier', async () => {
-    setupMockLawyerOrNotary()
+    setupMockLawyerOrNotary(store)
     await nextTick()
 
     expect(wrapper.findComponent(AccountInfo).exists()).toBe(true)
@@ -69,7 +74,7 @@ describe('ExemptionReview', () => {
   })
 
   it('renders the FolioOrReferenceNumber for Qualified Supplier', async () => {
-    setupMockLawyerOrNotary()
+    setupMockLawyerOrNotary(store)
     await nextTick()
 
     expect(wrapper.findComponent(FolioOrReferenceNumber).exists()).toBe(true)
@@ -92,10 +97,10 @@ describe('ExemptionReview', () => {
   })
 
   it('renders the Exemption Review with active Transport Permit', async () => {
-    setupMockStaffUser()
+    setupMockStaffUser(store)
 
     // setup active Transport Permit and Non-Res Exemption
-    setupActiveTransportPermit()
+    setupActiveTransportPermit(store)
     store.setMhrLocation({ key: 'address', value: mockedAddress })
     store.setMhrExemptionNote({ key: 'documentType', value: UnitNoteDocTypes.NON_RESIDENTIAL_EXEMPTION })
     await nextTick()

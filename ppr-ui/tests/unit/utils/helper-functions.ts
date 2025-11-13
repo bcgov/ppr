@@ -444,15 +444,15 @@ export function setupMockUser (): void {
  *
  * @returns void
  */
-export function setupMockStaffUser (): void {
+export function setupMockStaffUser (piniaStore): void {
   setupMockUser()
-  store.setAuthRoles(['staff', 'ppr_staff'])
+  piniaStore.setAuthRoles(['staff', 'ppr_staff'])
 }
 
-export function setupMockLawyerOrNotary (): void {
+export function setupMockLawyerOrNotary (piniaStore): void {
   setupMockUser()
-  store.setAuthRoles([])
-  store.setUserProductSubscriptionsCodes([ProductCode.LAWYERS_NOTARIES])
+  piniaStore.setAuthRoles([])
+  piniaStore.setUserProductSubscriptionsCodes([ProductCode.LAWYERS_NOTARIES])
 }
 
 /**
@@ -462,9 +462,9 @@ export function setupMockLawyerOrNotary (): void {
  * @function setupActiveTransportPermit
  * @returns {Promise<void>}
  */
-export async function setupActiveTransportPermit (): Promise<void> {
+export async function setupActiveTransportPermit (piniaStore): Promise<void> {
   // parse permit data
-  store.setMhrInformation({
+  piniaStore.setMhrInformation({
     permitDateTime: '2024-02-05T08:40:53-08:00',
     permitExpiryDateTime: '2024-03-06T09:00:00-07:53',
     permitRegistrationNumber: '00502383',
@@ -472,11 +472,11 @@ export async function setupActiveTransportPermit (): Promise<void> {
     permitStatus: MhApiStatusTypes.ACTIVE,
   })
 
-  await store.setMhrTransportPermit({ key: 'landStatusConfirmation', value: true })
-  await store.setMhrTransportPermit({ key: 'newLocation', value: mockTransportPermitNewLocation })
-  await store.setMhrTransportPermit({ key: 'ownLand', value: true })
-  await store.setMhrTransportPermitPreviousLocation(mockTransportPermitPreviousLocation)
-  await store.setTransportPermitChangeAllowed(true)
+  await piniaStore.setMhrTransportPermit({ key: 'landStatusConfirmation', value: true })
+  await piniaStore.setMhrTransportPermit({ key: 'newLocation', value: mockTransportPermitNewLocation })
+  await piniaStore.setMhrTransportPermit({ key: 'ownLand', value: true })
+  await piniaStore.setMhrTransportPermitPreviousLocation(mockTransportPermitPreviousLocation)
+  await piniaStore.setTransportPermitChangeAllowed(true)
 }
 
 /**
@@ -503,10 +503,10 @@ export function addIDsForOwners (ownersGroups): Array<any> {
  *
  * @returns {Promise<void>} A promise that resolves when the setup is complete.
  */
-export async function setupCurrentHomeOwners (): Promise<void> {
-  await store.setMhrTransferCurrentHomeOwnerGroups([mockMhrTransferCurrentHomeOwner])
+export async function setupCurrentHomeOwners (piniaStore): Promise<void> {
+  await piniaStore.setMhrTransferCurrentHomeOwnerGroups([mockMhrTransferCurrentHomeOwner])
   const homeOwnerWithIdsArray = addIDsForOwners([mockMhrTransferCurrentHomeOwner])
-  await store.setMhrTransferHomeOwnerGroups(homeOwnerWithIdsArray)
+  await piniaStore.setMhrTransferHomeOwnerGroups(homeOwnerWithIdsArray)
 }
 
 /**
@@ -519,7 +519,7 @@ export async function setupCurrentHomeOwners (): Promise<void> {
  *
  * @returns {Promise<void>} A promise that resolves when the setup is complete.
  */
-export async function setupCurrentMultipleHomeOwnersGroups (): Promise<void> {
+export async function setupCurrentMultipleHomeOwnersGroups (piniaStore): Promise<void> {
   // setup two groups so they can be shown in the table
   const currentHomeOwnersGroups = [
     mockMhrTransferCurrentHomeOwner,
@@ -529,9 +529,9 @@ export async function setupCurrentMultipleHomeOwnersGroups (): Promise<void> {
     }
   ]
 
-  await store.setMhrTransferCurrentHomeOwnerGroups(currentHomeOwnersGroups)
+  await piniaStore.setMhrTransferCurrentHomeOwnerGroups(currentHomeOwnersGroups)
   const homeOwnerWithIdsArray = addIDsForOwners(currentHomeOwnersGroups)
-  await store.setMhrTransferHomeOwnerGroups(homeOwnerWithIdsArray)
+  await piniaStore.setMhrTransferHomeOwnerGroups(homeOwnerWithIdsArray)
 }
 
 /**

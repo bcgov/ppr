@@ -22,6 +22,7 @@ import Collateral from '@/components/collateral/Collateral.vue'
 import { StickyContainer } from '@/components/common'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import flushPromises from 'flush-promises'
+import { createPinia, setActivePinia } from 'pinia'
 
 const store = useStore()
 
@@ -35,15 +36,20 @@ vi.mock('@/utils/registration-helper', () => ({
 }))
 
 describe('Amendment registration component', () => {
-  let wrapper: any
+  let wrapper, store, pinia
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
     wrapper = await createComponent(
       AmendRegistration,
       { appReady: true },
       RouteNames.AMEND_REGISTRATION,
-      { 'reg-num': '123456B' }
+      { 'reg-num': '123456B' },
+      [pinia]
     )
     await flushPromises()
   })
@@ -90,7 +96,7 @@ describe('Amendment registration component', () => {
     await store.setUnsavedChanges(false)
     await nextTick()
     await wrapper.findComponent(StickyContainer).vm.$emit('cancel', true)
-    expect(wrapper.vm.$route.name).toBe(RouteNames.AMEND_REGISTRATION)
+    expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
 
   it('doesnt proceed if validation errors', async () => {
@@ -149,14 +155,19 @@ describe('Amendment registration component', () => {
 })
 
 describe('Amendment for repairers lien component', () => {
-  let wrapper
+  let wrapper, store, pinia
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     wrapper = await createComponent(
       AmendRegistration,
       { appReady: true },
       RouteNames.AMEND_REGISTRATION,
-      { 'reg-num': '123456B' }
+      { 'reg-num': '123456B' },
+      [pinia]
     )
     await flushPromises()
   })

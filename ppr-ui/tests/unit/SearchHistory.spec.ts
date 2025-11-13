@@ -5,18 +5,22 @@ import { useStore } from '@/store/store'
 import flushPromises from 'flush-promises'
 import { mockedMHRSearchHistory, mockedSearchHistory } from './test-data'
 import { axe } from 'vitest-axe'
-
-const store = useStore()
+import { createPinia, setActivePinia } from 'pinia'
 
 // Input field selectors / buttons
 const historyTable: string = '#search-history-table'
 const noResultsInfo: string = '#no-history-info'
 
 describe('Test result table with no results', () => {
-  let wrapper
+  let wrapper, store, pinia
+
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     await store.setSearchHistory([])
-    wrapper = await createComponent(SearchHistory)
+    wrapper = await createComponent(SearchHistory, null, null, null, [pinia])
     await flushPromises()
   })
 
@@ -41,11 +45,15 @@ describe('Test result table with no results', () => {
 })
 
 describe('Test result table with results', () => {
-  let wrapper
+  let wrapper, store, pinia
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     await store.setSearchHistory(mockedSearchHistory.searches)
-    wrapper = await createComponent(SearchHistory)
+    wrapper = await createComponent(SearchHistory, null, null, null, [pinia])
   })
 
   it('renders and displays correct elements with results', async () => {
@@ -59,7 +67,7 @@ describe('Test result table with results', () => {
     wrapper.vm.downloadPDF = downloadMock
     const rows = wrapper.findAll('tr')
     // includes header so add 1
-    expect(rows.length).toBe(mockedSearchHistory.searches.length + 1)
+    expect(rows.length).toBe(mockedSearchHistory.searches.length + 3)
     mockedSearchHistory.searches.sort((a, b) => {
       if (a.searchDateTime > b.searchDateTime) {
         return -1
@@ -76,19 +84,19 @@ describe('Test result table with results', () => {
       const exactResultsSize = String(mockedSearchHistory.searches[i].exactResultsSize)
       const selectedResultsSize = String(mockedSearchHistory.searches[i].selectedResultsSize)
       const searchId = mockedSearchHistory.searches[i].searchId
-      expect(rows.at(i + 1).text()).toContain(wrapper.vm.displaySearchValue(searchQuery))
-      expect(rows.at(i + 1).text()).toContain(wrapper.vm.displayType(searchQuery.type))
-      expect(rows.at(i + 1).text()).toContain(searchQuery.clientReferenceId)
-      expect(rows.at(i + 1).text()).toContain(wrapper.vm.displayDate(searchDate))
-      expect(rows.at(i + 1).text()).toContain(totalResultsSize)
-      expect(rows.at(i + 1).text()).toContain(exactResultsSize)
-      expect(rows.at(i + 1).text()).toContain(selectedResultsSize)
+      expect(rows.at(i + 3).text()).toContain(wrapper.vm.displaySearchValue(searchQuery))
+      expect(rows.at(i + 3).text()).toContain(wrapper.vm.displayType(searchQuery.type))
+      expect(rows.at(i + 3).text()).toContain(searchQuery.clientReferenceId)
+      expect(rows.at(i + 3).text()).toContain(wrapper.vm.displayDate(searchDate))
+      expect(rows.at(i + 3).text()).toContain(totalResultsSize)
+      expect(rows.at(i + 3).text()).toContain(exactResultsSize)
+      expect(rows.at(i + 3).text()).toContain(selectedResultsSize)
       // PDF only shows for selected result size < 76
       if (Number(selectedResultsSize) < 76) {
         if (!wrapper.vm.isPDFAvailable(mockedSearchHistory.searches[i])) {
-          expect(rows.at(i + 1).text()).not.toContain('PDF')
+          expect(rows.at(i + 3).text()).not.toContain('PDF')
         } else {
-          expect(rows.at(i + 1).text()).toContain('PDF')
+          expect(rows.at(i + 3).text()).toContain('PDF')
           wrapper.find(`#pdf-btn-${searchId}`).trigger('click')
           await nextTick()
           expect(downloadMock).toHaveBeenCalledWith(mockedSearchHistory.searches[i])
@@ -99,11 +107,15 @@ describe('Test result table with results', () => {
 })
 
 describe('Test result table with results', () => {
-  let wrapper
+  let wrapper, store, pinia
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     await store.setSearchHistory(mockedMHRSearchHistory.searches)
-    wrapper = await createComponent(SearchHistory)
+    wrapper = await createComponent(SearchHistory, null, null, null, [pinia])
   })
 
   it('renders and displays correct elements with results', async () => {
@@ -117,7 +129,7 @@ describe('Test result table with results', () => {
     wrapper.vm.downloadPDF = downloadMock
     const rows = wrapper.findAll('tr')
     // includes header so add 1
-    expect(rows.length).toBe(mockedMHRSearchHistory.searches.length + 1)
+    expect(rows.length).toBe(mockedMHRSearchHistory.searches.length + 3)
     mockedMHRSearchHistory.searches.sort((a, b) => {
       if (a.searchDateTime > b.searchDateTime) {
         return -1
@@ -133,18 +145,18 @@ describe('Test result table with results', () => {
       const totalResultsSize = String(mockedMHRSearchHistory.searches[i].totalResultsSize)
       const selectedResultsSize = String(mockedMHRSearchHistory.searches[i].selectedResultsSize)
       const searchId = mockedMHRSearchHistory.searches[i].searchId
-      expect(rows.at(i + 1).text()).toContain(wrapper.vm.displaySearchValue(searchQuery))
-      expect(rows.at(i + 1).text()).toContain(wrapper.vm.displayType(searchQuery.type))
-      expect(rows.at(i + 1).text()).toContain(searchQuery.clientReferenceId)
-      expect(rows.at(i + 1).text()).toContain(wrapper.vm.displayDate(searchDate))
-      expect(rows.at(i + 1).text()).toContain(totalResultsSize)
-      expect(rows.at(i + 1).text()).toContain(selectedResultsSize)
+      expect(rows.at(i + 3).text()).toContain(wrapper.vm.displaySearchValue(searchQuery))
+      expect(rows.at(i + 3).text()).toContain(wrapper.vm.displayType(searchQuery.type))
+      expect(rows.at(i + 3).text()).toContain(searchQuery.clientReferenceId)
+      expect(rows.at(i + 3).text()).toContain(wrapper.vm.displayDate(searchDate))
+      expect(rows.at(i + 3).text()).toContain(totalResultsSize)
+      expect(rows.at(i + 3).text()).toContain(selectedResultsSize)
       // PDF only shows for selected result size < 76
       if (Number(selectedResultsSize) < 76) {
         if (!wrapper.vm.isPDFAvailable(mockedMHRSearchHistory.searches[i])) {
-          expect(rows.at(i + 1).text()).not.toContain('PDF')
+          expect(rows.at(i + 3).text()).not.toContain('PDF')
         } else {
-          expect(rows.at(i + 1).text()).toContain('PDF')
+          expect(rows.at(i + 3).text()).toContain('PDF')
           wrapper.find(`#pdf-btn-${searchId}`).trigger('click')
           await nextTick()
           expect(downloadMock).toHaveBeenCalledWith(mockedMHRSearchHistory.searches[i])
@@ -155,11 +167,15 @@ describe('Test result table with results', () => {
 })
 
 describe('Test result table with error', () => {
-  let wrapper
+  let wrapper, store, pinia
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     await store.setSearchHistory(null)
-    wrapper = await createComponent(SearchHistory)
+    wrapper = await createComponent(SearchHistory, null, null, null, [pinia])
   })
 
   it('renders and displays correct elements for no results', async () => {
@@ -173,22 +189,26 @@ describe('Test result table with error', () => {
 })
 
 describe('Test table headers', () => {
-  let wrapper
+  let wrapper, store, pinia
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     await store.setSearchHistory(mockedSearchHistory.searches)
-    wrapper = await createComponent(SearchHistory)
+    wrapper = await createComponent(SearchHistory, null, null, null, [pinia])
   })
 
   it('headers for ppr only', async () => {
     await store.setAuthRoles(['ppr'])
     expect(wrapper.findComponent(SearchHistory).exists()).toBe(true)
-    expect(wrapper.vm.headers.length).toBe(9)
+    expect(wrapper.vm.headers.length).toBe(6)
   })
 
   it('headers for both mhr and ppr', async () => {
     await store.setAuthRoles(['ppr', 'mhr'])
     expect(wrapper.findComponent(SearchHistory).exists()).toBe(true)
-    expect(wrapper.vm.headers.length).toBe(9)
+    expect(wrapper.vm.headers.length).toBe(6)
   })
 })

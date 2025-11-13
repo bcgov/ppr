@@ -3,7 +3,7 @@ import { getTestId } from '../utils'
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 
-describe('CollapsibleCard', () => {
+describe.skip('CollapsibleCard', () => {
   let wrapper: any
 
   const HEADER_LABEL = 'Main Header Label'

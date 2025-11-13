@@ -125,7 +125,7 @@ export default defineComponent({
         (
           (item.mhrNumber && !item.statusType && item.paymentPending) ||
           // Check if the child item’s status indicates a pending payment
-          (item.hasDraft && item.changes.some(
+          (item.hasDraft && item.changes?.some(
             obj => obj.statusType === MhApiStatusTypes.DRAFT && obj.invoiceId != null
           ))
         )

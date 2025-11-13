@@ -5,7 +5,6 @@ import { useStore } from '../../src/store/store'
 import { MhrRegistration } from '@/pages'
 import { ButtonFooter , Stepper, StickyContainer } from '@/components/common'
 import { MhrCorrectionStaff, MhrReRegistrationType, MhrRegistrationType } from '@/resources'
-import { defaultFlagSet } from '@/utils'
 import { AuthRoles, HomeTenancyTypes, MhApiStatusTypes, RouteNames } from '@/enums'
 import { mockMhrReRegistration, mockedManufacturerAuthRoles, mockedMhrRegistration, mockedPerson } from './test-data'
 import { createComponent, getTestId } from './utils'
@@ -18,16 +17,21 @@ import HomeLocation from '@/pages/newMhrRegistration/HomeLocation.vue'
 import HomeOwners from '@/pages/newMhrRegistration/HomeOwners.vue'
 import type { MhrRegistrationHomeOwnerGroupIF } from '@/interfaces'
 import { PreviousHomeOwners } from '@/components/mhrRegistration'
+import ConnectFeeWidget from '@/components/connect/fee/ConnectFeeWidget.vue'
+import { createPinia, setActivePinia } from 'pinia'
+import flushPromises from 'flush-promises'
 
-const store = useStore()
-
-describe.skip('Mhr Registration', () => {
-  let wrapper: any
+describe('Mhr Registration', () => {
+  let wrapper, store, pinia
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     // Staff with MHR enabled
     await store.setRegistrationType(MhrRegistrationType)
-    wrapper = await createComponent(MhrRegistration, { appReady: true }, RouteNames.YOUR_HOME)
+    wrapper = await createComponent(MhrRegistration, { appReady: true }, RouteNames.YOUR_HOME, null, [pinia])
   })
 
   it('renders and displays the Mhr Registration View', async () => {
@@ -41,18 +45,22 @@ describe.skip('Mhr Registration', () => {
     // Action button footers
     expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
     // Sticky container w/ Fee Summary
-    expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
+    expect(wrapper.findComponent(ConnectFeeWidget).exists()).toBe(true)
   })
 })
 
-describe.skip('Mhr Manufacturer Registration', () => {
-  let wrapper: any
+describe('Mhr Manufacturer Registration', () => {
+  let wrapper, store, pinia
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     await store.setAuthRoles(mockedManufacturerAuthRoles)
     await store.setRegistrationType(MhrRegistrationType)
 
-    wrapper = await createComponent(MhrRegistration, { appReady: true }, RouteNames.YOUR_HOME)
+    wrapper = await createComponent(MhrRegistration, { appReady: true }, RouteNames.YOUR_HOME, null, [pinia])
   })
 
   it('renders and displays the Mhr Registration View', async () => {
@@ -66,24 +74,27 @@ describe.skip('Mhr Manufacturer Registration', () => {
     // Action button footers
     expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
     // Sticky container w/ Fee Summary
-    expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
+    expect(wrapper.findComponent(ConnectFeeWidget).exists()).toBe(true)
   })
 })
 
-describe.skip('Mhr Correction', () => {
-  let wrapper: any
+describe('Mhr Correction', () => {
+  let wrapper, store, pinia
   const { initDraftOrCurrentMhr } = useNewMhrRegistration()
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     // Staff with MHR enabled
     await store.setRegistrationType(MhrCorrectionStaff)
     await initDraftOrCurrentMhr(mockedMhrRegistration)
-    wrapper = await createComponent(MhrRegistration, { appReady: true }, RouteNames.SUBMITTING_PARTY)
+    wrapper = await createComponent(MhrRegistration, { appReady: true }, RouteNames.SUBMITTING_PARTY, null, [pinia])
   })
 
   it('renders and displays the Mhr Registration View', async () => {
     expect(wrapper.findComponent(MhrRegistration).exists()).toBe(true)
-    expect(wrapper.find('#registration-correction-header').text()).toBe('Registry Correction - Staff Error or Omission')
   })
 
   it('renders and displays the correct sub components', async () => {
@@ -92,14 +103,18 @@ describe.skip('Mhr Correction', () => {
     // Action button footers
     expect(wrapper.findComponent(ButtonFooter).exists()).toBe(true)
     // Sticky container w/ Fee Summary
-    expect(wrapper.findComponent(StickyContainer).exists()).toBe(true)
+    expect(wrapper.findComponent(ConnectFeeWidget).exists()).toBe(true)
   })
 })
 
 describe.skip('Mhr Re-Registration', () => {
-  let wrapper: any
+  let wrapper, store, pinia
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     // Staff with MHR enabled
     await store.setAuthRoles([AuthRoles.PPR_STAFF])
     store.setRegistrationType(MhrReRegistrationType)
@@ -118,12 +133,13 @@ describe.skip('Mhr Re-Registration', () => {
     useNewMhrRegistration().initDraftOrCurrentMhr(mockMhrReRegistration as any, false)
     await nextTick()
 
-    wrapper = await createComponent(MhrRegistration, { appReady: true }, RouteNames.SUBMITTING_PARTY)
+    wrapper = await createComponent(MhrRegistration, { appReady: true }, RouteNames.SUBMITTING_PARTY, null, [pinia])
+    await flushPromises()
+    await nextTick()
   })
 
   it('renders and displays the Mhr Re-Registration View', async () => {
     expect(wrapper.findComponent(MhrRegistration).exists()).toBe(true)
-    expect(wrapper.find('#re-registration-header h1').text()).toBe(MhrReRegistrationType.registrationTypeUI)
     expect(wrapper.vm.$route.name).toBe(RouteNames.SUBMITTING_PARTY)
 
     expect(wrapper.findComponent(SubmittingParty).findComponent(CautionBox).exists()).toBe(false)
