@@ -312,7 +312,7 @@ export default defineComponent({
         return -1
       }),
       generalCollateral: computed((): GeneralCollateralIF[] => {
-        const generalCollateral = getGeneralCollateral.value as GeneralCollateralIF[] || []
+        const generalCollateral = cloneDeep(getGeneralCollateral.value as GeneralCollateralIF[]) || []
         const cleanedGeneralCollateral = [] as GeneralCollateralIF[]
         for (let i = 0; i < generalCollateral.length; i++) {
           if (!generalCollateral[i].addedDateTime) {

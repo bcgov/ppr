@@ -643,7 +643,13 @@ export default defineComponent({
           if (isMHRSearchType(localState.selectedSearchType.searchTypeAPI)) {
             setSelectedManufacturedHomes([])
             setFolioOrReferenceNumber(localState.folioNumber)
-            resp = await mhrSearch(getSearchApiParams(), '')
+
+            // If Registries Staff - Apply serial number wildcard search logic
+            const extraParams = getSearchApiParams().type === APISearchTypes.SERIAL_NUMBER
+              ? '?wildcardSearch=true'
+              : ''
+
+            resp = await mhrSearch(getSearchApiParams(), extraParams)
           }
         } else {
           if (isPPRSearchType(localState.selectedSearchType?.searchTypeAPI)) {
