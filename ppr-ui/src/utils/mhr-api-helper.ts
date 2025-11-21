@@ -28,7 +28,7 @@ import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
 import { addTimestampToDate } from '@/utils'
 import { trim } from 'lodash'
 import type { AxiosError } from 'axios'
-import type { 
+import type {
   QueueDetailIF,
   QueueSummaryIF,
   QueueReviewUpdatePayloadIF
