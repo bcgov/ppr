@@ -35,6 +35,7 @@ jobs:
       target: ${{ inputs.target }}
       app_name: "assets-ui"
       working_directory: "./ppr-ui"
+      node_version: "22"
     secrets:
       WORKLOAD_IDENTIFY_POOLS_PROVIDER: ${{ secrets.WORKLOAD_IDENTIFY_POOLS_PROVIDER }}
       GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }}
