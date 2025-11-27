@@ -27,7 +27,7 @@ describe('Certify Information on the confirmation page', () => {
     expect(wrapper.find('#checkbox-certified').exists()).toBe(true)
   })
 
-  it.only('renders the certify information valid data from the store', async () => {
+  it('renders the certify information valid data from the store', async () => {
     const certifyInfo: CertifyIF = wrapper.vm.certifyInformation
     expect(certifyInfo.legalName).toEqual(mockedAmendmentCertified.legalName)
     expect(certifyInfo.certified).toBeTruthy()
