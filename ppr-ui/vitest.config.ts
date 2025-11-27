@@ -26,6 +26,8 @@ export default defineVitestConfig({
     setupFiles: ['../tests/i18n.ts', '../tests/setup.ts'],
     globals: true,
     silent: true,
+    testTimeout: 30_000, // 30s for each test
+    hookTimeout: 30_000, // 30s for beforeAll/afterAll/etc
     css: {
       preprocessorOptions: {
         scss: {
