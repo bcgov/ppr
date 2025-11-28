@@ -17,11 +17,12 @@ import { useStore } from '@/store/store'
 import { cloneDeep } from 'lodash'
 import { HomeLocation, MhrRegistration, MhrReviewConfirm, YourHome } from '@/pages'
 import { mockComponent } from '@nuxt/test-utils/runtime'
+import { createPinia, setActivePinia } from 'pinia'
 
 const store = useStore()
 
 describe('Mhr Public Amendments', async () => {
-  let wrapper
+  let wrapper, pinia, store
 
   // navigate to a step of the Mhr Amendments flow
   const goToStep = async (stepNum: number) => {
@@ -30,6 +31,9 @@ describe('Mhr Public Amendments', async () => {
   }
   beforeEach(async () => {
     mockComponent('NuxtPage', { setup(props) { } })
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
 
     await store.setAuthRoles([AuthRoles.PPR_STAFF])
     await store.setRegistrationType(MhrPublicAmendment)
@@ -41,7 +45,9 @@ describe('Mhr Public Amendments', async () => {
     wrapper = await createComponent(
       MhrRegistration,
       { appReady: true },
-      RouteNames.SUBMITTING_PARTY
+      RouteNames.SUBMITTING_PARTY,
+      null,
+      [pinia]
     )
     wrapper.vm.dataLoaded = true
     await nextTick()

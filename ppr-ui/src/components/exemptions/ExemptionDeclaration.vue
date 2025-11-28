@@ -211,7 +211,7 @@ watch(() => props.validate, (val: boolean) => {
 })
 </script>
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 :deep(.v-selection-control--error:not(.v-selection-control--disabled) .v-selection-control__input>.v-icon) {
   color: $gray7;
 }

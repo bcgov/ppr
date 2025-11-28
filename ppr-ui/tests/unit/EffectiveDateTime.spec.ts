@@ -3,7 +3,7 @@ import { createComponent, getTestId } from './utils'
 import { EffectiveDate } from '@/components/unitNotes'
 import { useStore } from '@/store/store'
 import { InputFieldDatePicker } from '@/components/common'
-
+import { dataTestId } from './plugins/data-test-id'
 const store = useStore()
 
 const props = {
@@ -30,10 +30,10 @@ describe('EffectiveDate', () => {
     expect(EffectiveDateTimeComponent.find(getTestId('date-summary-label')).exists()).toBeFalsy()
 
     const immediateDate = <HTMLInputElement>(
-      EffectiveDateTimeComponent.findInputByTestId('immediate-date-radio')).element
+      dataTestId(EffectiveDateTimeComponent).findInputByTestId('immediate-date-radio')).element
 
     const pastDate = <HTMLInputElement>(
-      EffectiveDateTimeComponent.findInputByTestId('past-date-radio')).element
+      dataTestId(EffectiveDateTimeComponent).findInputByTestId('past-date-radio')).element
 
     expect(immediateDate.checked).toBeTruthy()
     expect(pastDate.checked).toBeFalsy()
@@ -44,7 +44,7 @@ describe('EffectiveDate', () => {
 
     expect(wrapper.vm.effectiveDate).toBe('')
 
-    EffectiveDateTimeComponent.findInputByTestId('past-date-radio').setValue(true)
+    dataTestId(EffectiveDateTimeComponent).findInputByTestId('past-date-radio').setValue(true)
     EffectiveDateTimeComponent.findComponent(InputFieldDatePicker).vm.$emit('emitDate', '2023-07-01')
     expect(wrapper.vm.selectedPastDate).toBeTruthy()
 

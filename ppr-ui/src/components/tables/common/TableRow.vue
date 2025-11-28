@@ -125,7 +125,7 @@ export default defineComponent({
         (
           (item.mhrNumber && !item.statusType && item.paymentPending) ||
           // Check if the child item’s status indicates a pending payment
-          (item.hasDraft && item.changes.some(
+          (item.hasDraft && item.changes?.some(
             obj => obj.statusType === MhApiStatusTypes.DRAFT && obj.invoiceId != null
           ))
         )
@@ -1501,7 +1501,7 @@ export default defineComponent({
 </template>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 .registration-row {
   // $blueSelected 0.5 opacity colour at full opacity (needed for .actions-cell overlay)
   background-color: #f2f6fb;

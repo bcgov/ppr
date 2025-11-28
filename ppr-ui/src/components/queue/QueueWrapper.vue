@@ -8,8 +8,8 @@ import { FilterTypes } from '@/enums'
 const { setMhrInformation } = useStore()
 const { goToRoute } = useNavigation()
 
-const { 
-  assignees, 
+const {
+  assignees,
   filteredQueueReviews,
   columnsToShow,
   columnFilters,
@@ -48,7 +48,7 @@ const renderStatusChip = (col) => ({ row }) => {
     return h(UBadge, {
       as: 'div',
       class: 'size-full text-md text-center flex justify-center',
-      variant: 'subtle', 
+      variant: 'subtle',
       color
     }, () => row.getValue('statusType'))
   }
@@ -178,7 +178,7 @@ const tableRowActionHandler = (rowEvent) => {
 
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 
 :deep(input) {
   /* default state */

@@ -1,4 +1,3 @@
-import { nextTick } from 'vue'
 import { RebuiltStatus } from '@/components/mhrRegistration'
 import { createComponent } from './utils'
 
@@ -7,10 +6,6 @@ describe('Rebuilt Status component', () => {
 
   beforeEach(async () => {
     wrapper = await createComponent(RebuiltStatus)
-  })
-
-  it('renders the component', async () => {
-    expect(wrapper.findComponent(RebuiltStatus).exists()).toBe(true)
   })
 
   it('show error message for text area input', async () => {

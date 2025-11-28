@@ -1,7 +1,6 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+// TypeScript
 import { defineNuxtConfig } from 'nuxt/config'
 import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
-
 import fs from 'fs'
 import path from 'path'
 
@@ -12,61 +11,27 @@ const appVersion = JSON.parse(packageJson).version
 export default defineNuxtConfig({
   compatibilityDate: '2025-03-07',
   devtools: { enabled: true },
-  // Auto-import components from the components directory
-  // Expanded paths to reduce component renames where implemented ie <CollateralGeneralCollateral />
-  components: [
-    '~/components',
-    '~/components/collateral',
-    '~/components/collateral/generalCollateral',
-    '~/components/collateral/vehicle',
-    '~/components/common',
-    '~/components/dashboard',
-    '~/components/dialogs',
-    '~/components/dialogs/common',
-    '~/components/exemptions',
-    '~/components/mhrHistory',
-    '~/components/mhrRegistration',
-    '~/components/mhrRegistration/HomeLocation',
-    '~/components/mhrRegistration/HomeOwners',
-    '~/components/mhrRegistration/ReviewConfirm',
-    '~/components/mhrRegistration/YourHome',
-    '~/components/mhrTransfers',
-    '~/components/mhrTransportPermits',
-    '~/components/mhrTransportPermits/ConfirmCompletionContent',
-    '~/components/mhrTransportPermits/HelpContent',
-    '~/components/parties',
-    '~/components/parties/debtor',
-    '~/components/parties/party',
-    '~/components/parties/summaries',
-    '~/components/registration',
-    '~/components/registration/length-trust',
-    '~/components/registration/securities-act-notices',
-    '~/components/registration/repairers-lien-messaging',
-    '~/components/search',
-    '~/components/tables',
-    '~/components/tables/common',
-    '~/components/tables/mhr',
-    '~/components/tables/ppr',
-    '~/components/tombstones',
-    '~/components/unitNotes',
-    '~/components/userAccess'
-  ],
+
+  components: {
+    dirs: [{ path: '~/components', extensions: ['vue'], pathPrefix: false }]
+  },
+
   extends: [
-    '@sbc-connect/nuxt-core-layer-beta', 'documents-common-base-layer',
+    '@sbc-connect/nuxt-core-layer-beta',
+    'documents-common-base-layer'
   ],
+
   imports: {
     dirs: ['store', 'composables', 'enums', 'interfaces', 'utils']
   },
+
   app: {
     buildAssetsDir: '/src/',
     head: {
       title: 'Assets UI',
       htmlAttrs: { dir: 'ltr' },
       link: [
-        {
-          rel: 'icon',
-          type: 'image/png',
-          href: './src/assets/favicon.png' },
+        { rel: 'icon', type: 'image/png', href: './src/assets/favicon.png' },
         {
           rel: 'stylesheet',
           type: 'text/css',
@@ -75,101 +40,95 @@ export default defineNuxtConfig({
       ],
       script: [
         {
-          src: `https://ws1.postescanada-canadapost.ca/js/addresscomplete-2.30.js?key=tr28-mh11-ud79-br91&app=
-          14466&culture=en`,
+          src: 'https://ws1.postescanada-canadapost.ca/js/addresscomplete-2.30.js?key=tr28-mh11-ud79-br91&app=14466&culture=en',
           type: 'text/javascript'
         }
       ]
     }
   },
+
   build: {
-    transpile: ['vuetify'],
+    transpile: ['vuetify']
   },
+
   srcDir: 'src/',
+
   alias: {
     '@': path.resolve(__dirname, './src'),
     '@sbc': path.resolve(__dirname, './node_modules/sbc-common-components/src')
   },
-  ssr: false,
+
   modules: [
     '@nuxt/eslint',
     '@pinia/nuxt',
     'nuxt-lodash',
     '@nuxt/test-utils/module',
-    '@nuxt/ui',
-    (_options, nuxt) => {
-      nuxt.hooks.hook('vite:extendConfig', (config) => {
-        config.plugins.push(vuetify({ autoImport: true }))
-      })
-    }
+    ['@nuxt/ui', { icons: ['mdi'] }],
+    '@nuxtjs/i18n'
   ],
-  css: [
-    '~/assets/css/tw.css'
-  ],
-  ui: {
-    icons: ['mdi']
-  },
+
+  css: ['~/assets/css/tw.css'],
+
   i18n: {
     locales: [
-      {
-        name: 'English',
-        code: 'en-CA',
-        iso: 'en-CA',
-        dir: 'ltr',
-        file: 'en-CA.ts'
-      },
-      {
-        name: 'Français',
-        code: 'fr-CA',
-        iso: 'fr-CA',
-        dir: 'ltr',
-        file: 'fr-CA.ts'
-      }
+      { name: 'English', code: 'en-CA', iso: 'en-CA', dir: 'ltr', file: 'en-CA.ts' },
+      { name: 'Français', code: 'fr-CA', iso: 'fr-CA', dir: 'ltr', file: 'fr-CA.ts' }
     ],
-      strategy: 'prefix',
-      lazy: true,
-      langDir: 'locales',
-      defaultLocale: 'en-CA',
-      detectBrowserLanguage: false,
-      vueI18n: './i18n.config.ts'
+    bundle: {
+      optimizeTranslationDirective: false
+    },
+    strategy: 'prefix',
+    lazy: true,
+    // Make this point to your actual locales folder; with srcDir set, prefer 'src/locales'
+    langDir: 'locales',
+    defaultLocale: 'en-CA',
+    detectBrowserLanguage: false,
+    // If your config file is under src/, use 'src/i18n.config.ts'
+    vueI18n: './i18n.config.ts'
   },
+
   typescript: {
     tsConfig: {
       compilerOptions: {
-        module: "esnext",
-        dynamicImport: true,
+        module: 'esnext',
+        // dynamicImport is not a TS compiler option; safe to remove if present elsewhere
+        // dynamicImport: true,
         noImplicitAny: false,
         strictNullChecks: false,
         strict: true
       }
     },
-    // NOTE: https://github.com/vuejs/language-tools/issues/3969
     typeCheck: false
   },
+
   vite: {
+
+    css: {
+      preprocessorOptions: {
+        // for <style lang="scss">
+        scss: {
+          api: 'modern-compiler' // or 'modern'
+        },
+        // if you also use <style lang="sass">
+        sass: {
+          api: 'modern-compiler'
+        }
+      }
+    },
+
     plugins: [
       vuetify({ styles: { configFile: '/assets/styles/vuetify-variables.scss' } })
     ],
-    server: {
-      watch: {
-        usePolling: true
-      }
-    },
-    // Configure Vite's logging level
-    logLevel: 'silent', // Options: 'info', 'warn', 'error', 'silent'
-    optimizeDeps: {
-      include: [
-        'vuelidate',
-        'lodash',
-        'keycloak-js',
-      ]
-    },
+
+    logLevel: 'silent',
+
     vue: {
       template: {
-        transformAssetUrls,
-      },
+        transformAssetUrls
+      }
     }
   },
+
   runtimeConfig: {
     public: {
       version: (appName && appVersion) ? `${appName} v${appVersion}` : '',

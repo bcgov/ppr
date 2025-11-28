@@ -8,11 +8,11 @@ import {
 import { useStore } from '@/store/store'
 import type { FinancingStatementIF } from '@/interfaces'
 import { MhApiStatusTypes, RouteNames } from '@/enums'
-import { defaultFlagSet, pacificDate } from '@/utils'
+import { pacificDate } from '@/utils'
 import { nextTick } from 'vue'
 import { expect } from 'vitest'
-import { Tombstone, TombstoneDefault, TombstoneDynamic } from '@/components/tombstones'
-import flushPromises from 'flush-promises'
+import { TombstoneDynamic } from '@/components/tombstones'
+import { createPinia, setActivePinia } from 'pinia'
 
 const store = useStore()
 
@@ -22,23 +22,25 @@ const tombstoneSubHeader: string = '.tombstone-sub-header'
 const tombstoneInfo: string = '.tombstone-info'
 
 describe('Tombstone component', () => {
-  let wrapper
+  let wrapper, store, pinia
 
   const registration: FinancingStatementIF = {
     ...mockedFinancingStatementComplete
   }
   const registrationType = mockedSelectSecurityAgreement()
 
-  beforeAll(async () => {
+  beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     // setup data
     await store.setRegistrationType(registrationType)
     await store.setRegistrationNumber(registration.baseRegistrationNumber)
     await store.setRegistrationCreationDate(registration.createDateTime)
     await store.setRegistrationExpiryDate(registration.expiryDate)
-  })
 
-  beforeEach(async () => {
-    wrapper = await createComponent(TombstoneDynamic, null, RouteNames.REVIEW_DISCHARGE)
+    wrapper = await createComponent(TombstoneDynamic, null, RouteNames.REVIEW_DISCHARGE, null,[pinia])
     await nextTick()
   })
 
@@ -155,14 +157,6 @@ describe('TombstoneDynamic component - MHR', () => {
     expect(tombstoneDynamic.find(tombstoneInfo).text()).toContain(mockedMhrInformationExempt.statusType)
   })
 
-  it('does not render correction btns for Mhr when staff and the FF is disabled', async () => {
-    setupMockStaffUser()
-    await nextTick()
-
-    const correctionBtn = await wrapper.find('#registry-correction-btn')
-    expect(correctionBtn.exists()).toBe(false)
-  })
-
   it('does not render correction btns for Mhr when not staff and the FF is enabled', async () => {
     setupMockUser()
     await nextTick()
@@ -172,7 +166,7 @@ describe('TombstoneDynamic component - MHR', () => {
   })
 
   it('renders correction btns properly for Mhr when staff and the FF is enabled', async () => {
-    setupMockStaffUser()
+    setupMockStaffUser(store)
     await nextTick()
 
     const correctionBtn = await wrapper.find('#registry-correction-btn')

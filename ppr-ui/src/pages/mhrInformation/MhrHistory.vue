@@ -315,7 +315,7 @@ function mapOwnersApiToUi(owners: Array<any>): Array<any> {
 
 </script>
 <style lang="scss" scoped>
-@import '@/assets/styles/theme';
+@use '@/assets/styles/theme' as *;
 .person-executor-icon {
   margin-top: -3px !important;
   height: 22px !important;

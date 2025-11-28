@@ -58,7 +58,7 @@ const emits = defineEmits<{
 }>()
 
 /** Props **/
- 
+
 const props = withDefaults(defineProps<{
   isAddingNotice?: boolean,
   isSummary?: boolean,
@@ -114,7 +114,7 @@ const scrollToActivePanel = (activeIndex: number) => {
 
 </script>
 <style lang="scss" scoped>
-@import '@/assets/styles/theme';
+@use '@/assets/styles/theme' as *;
 .securities-act-notices-panel-row {
   background: $gray1;
   overflow-y: auto;

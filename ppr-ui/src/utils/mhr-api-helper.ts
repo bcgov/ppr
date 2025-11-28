@@ -1,5 +1,5 @@
 // Libraries
-import { axios } from '@/utils/axios-ppr'
+import { axiosAssets } from '@/utils/axios-ppr'
 import { StatusCodes } from 'http-status-codes'
 import type {
   ErrorDetailIF,
@@ -48,7 +48,7 @@ export async function mhrSearch (
   searchCriteria: MhrSearchCriteriaIF,
   extraParams: string
 ): Promise<any> {
-  return axios
+  return axiosAssets
     .post<SearchResponseIF>(`searches${extraParams}`, searchCriteria, getDefaultConfig())
     .then(response => {
       const data = response?.data
@@ -131,7 +131,7 @@ export async function getMHRegistrationSummary (
   registrationNum: string,
   refreshing: boolean
 ): Promise<MhRegistrationSummaryIF|any> {
-  return axios
+  return axiosAssets
     .get(`other-registrations/${registrationNum}`, getDefaultConfig())
     .then(response => {
       const data = response?.data as MhRegistrationSummaryIF
@@ -191,7 +191,7 @@ export async function addMHRegistrationSummary (registrationNum: string): Promis
 
   const config = { baseURL: url, headers: { Accept: 'application/json', 'Account-Id': currentAccountId } }
 
-  return axios
+  return axiosAssets
     .post(`other-registrations/${registrationNum}`, {}, config)
     .then(response => {
       const data = response?.data as MhRegistrationSummaryIF
@@ -281,7 +281,7 @@ export async function submitSelectedMhr (
     extraParams += 'ccPayment=true'
   }
 
-  return axios
+  return axiosAssets
     .post(`search-results/${searchId}${extraParams}`, selected, getDefaultConfig())
     .then(response => {
       return response
@@ -299,7 +299,7 @@ export async function searchMhrPDF (searchId: string): Promise<any> {
     headers: { Accept: 'application/pdf' },
     responseType: 'blob' as 'json'
   }
-  return axios
+  return axiosAssets
     .get(`search-results/${searchId}`, config)
     .then(response => {
       const data = response?.data
@@ -328,7 +328,7 @@ export async function submitMhrRegistration (
     let paymentParams = mhrStaffPaymentParameters(staffPayment)
     if (isCcOverride) paymentParams += 'ccPayment=true'
 
-    const result = await axios.post(`registrations?${paymentParams}`, payloadData, getDefaultConfig())
+    const result = await axiosAssets.post(`registrations?${paymentParams}`, payloadData, getDefaultConfig())
     if (!result?.data) {
       throw new Error('Invalid API response')
     }
@@ -368,7 +368,7 @@ export async function mhrRegistrationHistory(
       path = addSortParams(path, sortOptions)
     }
 
-    const result = await axios.get(path, {
+    const result = await axiosAssets.get(path, {
       ...getDefaultConfig(),
       signal: mhrRegistrationController.signal, // attach abort signal
     })
@@ -392,7 +392,7 @@ export async function mhRegistrationPDF (pdfPath: string): Promise<any> {
     headers: { Accept: 'application/pdf' },
     responseType: 'blob' as 'json'
   }
-  return axios
+  return axiosAssets
     .get(pdfPath, config)
     .then(response => {
       const data = response?.data
@@ -431,7 +431,7 @@ export async function mhRegistrationPDF (pdfPath: string): Promise<any> {
 // Request to validate Document exists and is unique
 export async function validateDocumentID (documentId: string) {
   try {
-    const result = await axios.get(`documents/verify/${documentId}`, getDefaultConfig())
+    const result = await axiosAssets.get(`documents/verify/${documentId}`, getDefaultConfig())
     if (!result?.data) {
       throw new Error('Invalid API response')
     }
@@ -459,7 +459,7 @@ export async function submitMhrTransfer (
   const url = `transfers/${mhrNumber}?${paymentParams}`
 
   try {
-    const result = await axios.post(url, payloadData, getDefaultConfig())
+    const result = await axiosAssets.post(url, payloadData, getDefaultConfig())
     if (!result?.data) {
       throw new Error('Invalid API response')
     }
@@ -489,7 +489,7 @@ export async function submitAdminRegistration (
     let paymentParams = mhrStaffPaymentParameters(staffPayment)
     if (isCcOverride) paymentParams += 'ccPayment=true'
 
-    const result = await axios.post(
+    const result = await axiosAssets.post(
       `admin-registrations/${mhrNumber}?${paymentParams}`,
       payloadData,
       getDefaultConfig()
@@ -519,7 +519,7 @@ export async function submitMhrUnitNote (mhrNumber, payloadData, isAdminRegistra
     const paymentParams = mhrStaffPaymentParameters(staffPayment)
     // different Unit Notes are submitted to different endpoints
     const endpoint = isAdminRegistration ? `admin-registrations/${mhrNumber}` : `notes/${mhrNumber}`
-    const result = await axios.post(`${endpoint}?${paymentParams}`, payloadData, getDefaultConfig())
+    const result = await axiosAssets.post(`${endpoint}?${paymentParams}`, payloadData, getDefaultConfig())
     if (!result?.data) {
       throw new Error('Invalid API response')
     }
@@ -549,7 +549,7 @@ export async function submitMhrTransportPermit (
     if (isCcOverride) paymentParams += 'ccPayment=true'
     const url = `permits/${mhrNumber}?${paymentParams}`
 
-    const result = await axios.post(url, payloadData, getDefaultConfig())
+    const result = await axiosAssets.post(url, payloadData, getDefaultConfig())
     if (!result?.data) {
       throw new Error('Invalid API response')
     }
@@ -571,7 +571,7 @@ export async function submitMhrTransportPermit (
 export async function fetchMhRegistration (
   mhRegistrationNum: string
 ): Promise<any> {
-  return axios
+  return axiosAssets
     .get(`registrations/${mhRegistrationNum}?current=true`, getDefaultConfig())
     .then(response => {
       return response
@@ -604,7 +604,7 @@ export async function fetchMhRegistration (
 export async function deleteMhRegistrationSummary (
   mhRegistrationNum: string
 ): Promise<ErrorIF> {
-  return axios
+  return axiosAssets
     .delete(`other-registrations/${mhRegistrationNum}`, getDefaultConfig())
     .then(response => {
       return { statusCode: response?.status as StatusCodes }
@@ -643,7 +643,7 @@ export async function createMhrDraft (type: APIMhrTypes|ApiTransferTypes, draft:
     registration: draft
   }
 
-  return axios
+  return axiosAssets
     .post<MhrDraftIF>('drafts', payload, getDefaultConfig())
     .then(response => {
       const data: MhrDraftIF = response?.data
@@ -700,7 +700,7 @@ export async function updateMhrDraft (
     registration: draft
   }
 
-  return axios
+  return axiosAssets
     .put<MhrDraftIF>('drafts/' + draftId, payload, getDefaultConfig())
     .then(response => {
       const data: MhrDraftIF = response?.data
@@ -753,7 +753,7 @@ export async function getMhrDrafts(sortOptions?): Promise<Array<MhrDraftIF> | an
       path = addSortParams(path + '?', sortOptions)
     }
 
-    const response = await axios.get<Array<MhrDraftIF>>(path, {
+    const response = await axiosAssets.get<Array<MhrDraftIF>>(path, {
       ...getDefaultConfig(),
       signal: draftsAbortController.signal
     })
@@ -779,7 +779,7 @@ export async function getMhrDraft (draftId: string): Promise<MhrDraftApiIF|any> 
     }
     return draft
   }
-  return axios
+  return axiosAssets
     .get<MhrDraftApiIF>('drafts/' + draftId, getDefaultConfig())
     .then(response => {
       const data: MhrDraftApiIF = response?.data
@@ -797,7 +797,7 @@ export async function getMhrDraft (draftId: string): Promise<MhrDraftApiIF|any> 
 export async function cancelMhrDraft (draftID: string): Promise<ErrorIF> {
   if (!draftID) return { statusCode: StatusCodes.BAD_REQUEST, message: 'No draft ID given.' }
 
-  return axios
+  return axiosAssets
     .patch<void>(`drafts/cancel/${draftID}`, getDefaultConfig())
     .then(response => {
       return { statusCode: response?.status as StatusCodes }
@@ -808,7 +808,7 @@ export async function cancelMhrDraft (draftID: string): Promise<ErrorIF> {
 export async function deleteMhrDraft (draftID: string): Promise<ErrorIF> {
   if (!draftID) return { statusCode: StatusCodes.BAD_REQUEST, message: 'No draft ID given.' }
 
-  return axios
+  return axiosAssets
     .delete<void>(`drafts/${draftID}`, getDefaultConfig())
     .then(response => {
       return { statusCode: response?.status as StatusCodes }
@@ -874,13 +874,13 @@ function addSortParams (url: string, sortOptions: RegistrationSortIF): string {
 // Get the manufacturer information for a manufacturer MHR
 export async function getMhrManufacturerInfo (): Promise<MhrManufacturerInfoIF> {
   try {
-    const response = await axios.get<MhrManufacturerInfoIF>('manufacturers', getDefaultConfig())
+    const response = await axiosAssets.get<MhrManufacturerInfoIF>('manufacturers', getDefaultConfig())
     const data: MhrManufacturerInfoIF = response?.data
     if (!data) {
       throw new Error('Invalid API response')
     }
     return data
-  } catch (error: AxiosError | any) {
+  } catch (error: axiosAssetsError | any) {
     if (error.response && error.response.status === 404) {
       console.error('Resource not found:', error.message)
       // Handle 404 gracefully, returning null
@@ -899,7 +899,7 @@ export async function getMhrManufacturerInfo (): Promise<MhrManufacturerInfoIF> 
  * @throws {Error} - If an invalid API response is received.
  */
 export async function createManufacturer (payload: MhrManufacturerInfoIF): Promise<MhrManufacturerInfoIF> {
-  return axios
+  return axiosAssets
     .post<MhrManufacturerInfoIF>('manufacturers', payload, getDefaultConfig())
     .then(response => {
       const data: MhrManufacturerInfoIF = response?.data
@@ -916,7 +916,7 @@ export async function createManufacturer (payload: MhrManufacturerInfoIF): Promi
  * @throws {Error} - If an invalid API response is received.
  */
 export async function updateManufacturer (payload: MhrManufacturerInfoIF): Promise<MhrManufacturerInfoIF> {
-  return axios
+  return axiosAssets
     .put<MhrManufacturerInfoIF>('manufacturers', payload, getDefaultConfig())
     .then(response => {
       const data: MhrManufacturerInfoIF = response?.data
@@ -930,13 +930,13 @@ export async function updateManufacturer (payload: MhrManufacturerInfoIF): Promi
 /** Request Qualified Supplier record in MHR */
 export async function getQualifiedSupplier (): Promise<MhrQsPayloadIF> {
   try {
-    const response = await axios.get<MhrQsPayloadIF>('qualified-suppliers', getDefaultConfig())
+    const response = await axiosAssets.get<MhrQsPayloadIF>('qualified-suppliers', getDefaultConfig())
     const data: MhrQsPayloadIF = response?.data
     if (!data) {
       throw new Error('Invalid API response')
     }
     return data
-  } catch (error: AxiosError | any) {
+  } catch (error: axiosAssetsError | any) {
     if (error.response && error.response.status === 404) {
       console.error('Resource not found:', error.message)
       // Handle 404 gracefully, returning null
@@ -954,7 +954,7 @@ export async function getQualifiedSupplier (): Promise<MhrQsPayloadIF> {
  * @param payload The request payload containing the qualified supplier application information
  */
 export async function createQualifiedSupplier (payload: MhrQsPayloadIF): Promise<MhrQsPayloadIF> {
-  return axios
+  return axiosAssets
     .post<MhrQsPayloadIF>('qualified-suppliers', payload, getDefaultConfig())
     .then(response => {
       const data: MhrQsPayloadIF = response?.data
@@ -970,7 +970,7 @@ export async function createQualifiedSupplier (payload: MhrQsPayloadIF): Promise
  * @param payload The request payload containing the qualified supplier application information
  */
 export async function updateQualifiedSupplier (payload: MhrQsPayloadIF): Promise<MhrQsPayloadIF> {
-  return axios
+  return axiosAssets
     .put<MhrQsPayloadIF>('qualified-suppliers', payload, getDefaultConfig())
     .then(response => {
       const data: MhrQsPayloadIF = response?.data
@@ -989,7 +989,7 @@ export async function getQsServiceAgreements (): Promise<any> {
     headers: { Accept: 'application/pdf' },
     responseType: 'blob' as 'json'
   }
-  return axios
+  return axiosAssets
     .get('service-agreements/latest', config)
     .then(response => {
       const data = response?.data
@@ -1027,7 +1027,7 @@ export async function createExemption (
     if (isCcOverride) paymentParams += 'ccPayment=true'
     const url = `exemptions/${mhrNumber}?${paymentParams}`
 
-    const response = await axios.post<ExemptionIF>(
+    const response = await axiosAssets.post<ExemptionIF>(
       url,
       payload,
       getDefaultConfig()
@@ -1062,7 +1062,7 @@ export async function createExemption (
  */
 export async function getMhrHistory (mhrNumber: string): Promise<MhrHistoryRoIF> {
   try {
-    const response = await axios.get<MhrHistoryRoIF>(`registrations/history/${mhrNumber}`, getDefaultConfig())
+    const response = await axiosAssets.get<MhrHistoryRoIF>(`registrations/history/${mhrNumber}`, getDefaultConfig())
     const data: MhrHistoryRoIF = response?.data
     if (!data) {
       throw new Error('Invalid API response')
@@ -1083,7 +1083,7 @@ export async function getMhrHistory (mhrNumber: string): Promise<MhrHistoryRoIF>
 
 export async function getReviews (): Promise<Array<QueueSummaryIF> | any> {
   try {
-    const response = await axios.get<Array<MhrHistoryRoIF>>(`reviews`, getDefaultConfig())
+    const response = await axiosAssets.get<Array<MhrHistoryRoIF>>(`reviews`, getDefaultConfig())
     const data: Array<MhrHistoryRoIF> = response?.data
     if (!data) {
       throw new Error('Invalid API response')
@@ -1104,7 +1104,7 @@ export async function getReviews (): Promise<Array<QueueSummaryIF> | any> {
 
 export async function getQueuedTransfer (reviewId: string): Promise<QueueDetailIF | any> {
   try {
-    const response = await axios.get<QueueDetailIF>(
+    const response = await axiosAssets.get<QueueDetailIF>(
       `reviews/${reviewId}?includeDocuments=true`,
       getDefaultConfig()
     )
@@ -1130,7 +1130,7 @@ export async function updateQueuedTransfer (
   reviewId: string, payload: QueueReviewUpdatePayloadIF
 ): Promise<QueueDetailIF | any> {
   try {
-    const response = await axios.patch<QueueDetailIF>(
+    const response = await axiosAssets.patch<QueueDetailIF>(
       `reviews/${reviewId}`,
       payload,
       getDefaultConfig()

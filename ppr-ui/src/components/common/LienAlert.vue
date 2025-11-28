@@ -55,7 +55,7 @@ import {
   defineComponent,
   reactive,
   toRefs
-} from 'vue-demi'
+} from 'vue'
 
 export default defineComponent({
   name: 'LienAlert',
@@ -122,7 +122,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 
 #important-message {
 

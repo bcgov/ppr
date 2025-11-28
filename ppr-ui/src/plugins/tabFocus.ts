@@ -1,4 +1,5 @@
 // assets-ui/src/plugins/tabFocus.ts
+import { defineNuxtPlugin } from '#app'
 
 export const tabFocus = {
   install(app) {
@@ -64,3 +65,7 @@ export const tabFocus = {
     addTabFocusToComponent(VTextarea)
   }
 }
+
+export default defineNuxtPlugin(nuxtApp => {
+  nuxtApp.vueApp.use(tabFocus)
+})

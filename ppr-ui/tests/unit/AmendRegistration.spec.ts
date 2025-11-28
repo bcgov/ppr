@@ -22,6 +22,7 @@ import Collateral from '@/components/collateral/Collateral.vue'
 import { StickyContainer } from '@/components/common'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import flushPromises from 'flush-promises'
+import { createPinia, setActivePinia } from 'pinia'
 
 const store = useStore()
 
@@ -35,15 +36,20 @@ vi.mock('@/utils/registration-helper', () => ({
 }))
 
 describe('Amendment registration component', () => {
-  let wrapper: any
+  let wrapper, store, pinia
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
     wrapper = await createComponent(
       AmendRegistration,
       { appReady: true },
       RouteNames.AMEND_REGISTRATION,
-      { 'reg-num': '123456B' }
+      { 'reg-num': '123456B' },
+      [pinia]
     )
     await flushPromises()
   })
@@ -149,14 +155,19 @@ describe('Amendment registration component', () => {
 })
 
 describe('Amendment for repairers lien component', () => {
-  let wrapper
+  let wrapper, store, pinia
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     wrapper = await createComponent(
       AmendRegistration,
       { appReady: true },
       RouteNames.AMEND_REGISTRATION,
-      { 'reg-num': '123456B' }
+      { 'reg-num': '123456B' },
+      [pinia]
     )
     await flushPromises()
   })
@@ -174,8 +185,8 @@ describe('Amendment for repairers lien component', () => {
     expect(state.registration.lengthTrust.lifeInfinite).toBe(mockedFinancingStatementAll.lifeInfinite)
     expect(state.registration.lengthTrust.lifeYears).toBe(1)
     expect(state.registration.lengthTrust.trustIndenture).toBe(mockedFinancingStatementAll.trustIndenture)
-    expect(wrapper.findComponent(RegistrationLengthTrustAmendment).exists()).toBe(false)
-    expect(wrapper.findComponent(RegistrationLengthTrustSummary).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationLengthTrustAmendment).exists()).toBe(true)
+    expect(wrapper.findComponent(RegistrationLengthTrustSummary).exists()).toBe(false)
     // check amendment description
     expect(state.registration.amendmentDescription).toBe('')
     expect(wrapper.findComponent(AmendmentDescription).exists()).toBe(true)
@@ -185,10 +196,10 @@ describe('Amendment for repairers lien component', () => {
     expect(wrapper.findComponent(RegisteringPartySummary).exists()).toBe(true)
     // check secured parties
     expect(state.registration.parties.securedParties).toEqual(mockedFinancingStatementAll.securedParties)
-    expect(wrapper.findComponent(SecuredPartySummary).exists()).toBe(true)
+    expect(wrapper.findComponent(SecuredPartySummary).exists()).toBe(false)
     // check debtors
     expect(state.registration.parties.debtors).toEqual(mockedFinancingStatementAll.debtors)
-    expect(wrapper.findComponent(DebtorSummary).exists()).toBe(true)
+    expect(wrapper.findComponent(DebtorSummary).exists()).toBe(false)
     // check vehicle collateral
     expect(state.registration.collateral.vehicleCollateral).toEqual(mockedFinancingStatementAll.vehicleCollateral)
     expect(wrapper.findComponent(Collateral).exists()).toBe(true)

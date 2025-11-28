@@ -226,7 +226,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 .err-msg {
   color: $error;
   font-size: 0.75rem;

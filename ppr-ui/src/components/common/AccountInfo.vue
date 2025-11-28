@@ -146,7 +146,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 th:first-child, td:first-child {
   min-width: 13.125rem;
 }

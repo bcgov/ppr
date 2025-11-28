@@ -7,14 +7,17 @@ import { defaultFlagSet } from '@/utils'
 import { useStore } from '@/store/store'
 import { createComponent } from './utils'
 import { nextTick } from 'vue'
-
-const store = useStore()
+import { createPinia, setActivePinia } from 'pinia'
 
 describe('UserAccess', () => {
-  let wrapper
+  let wrapper, store, pinia
 
   beforeEach(async () => {
-    wrapper = await createComponent(UserAccess, { appReady: true }, RouteNames.QS_ACCESS_TYPE)
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
+    wrapper = await createComponent(UserAccess, { appReady: true }, RouteNames.QS_ACCESS_TYPE, null, [pinia])
   })
 
   afterEach(() => {

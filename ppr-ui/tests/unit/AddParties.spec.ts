@@ -8,6 +8,7 @@ import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { Parties } from '@/components/parties'
 import type { LengthTrustIF } from '@/interfaces'
 import { RegistrationTypes } from '@/resources'
+import { createPinia, setActivePinia } from 'pinia'
 
 const store = useStore()
 
@@ -32,12 +33,22 @@ describe('Redirects when Add Parties is not ready', () => {
 })
 
 describe('Add Parties new registration component', () => {
-  let wrapper: any
+  let wrapper, store, pinia
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     await store.setRegistrationType(mockedSelectSecurityAgreement())
     await store.setRegistrationFlowType(RegistrationFlowType.NEW)
-    wrapper = await createComponent(AddSecuredPartiesAndDebtors, { appReady: true }, RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS)
+    wrapper = await createComponent(
+      AddSecuredPartiesAndDebtors,
+      { appReady: true },
+      RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS,
+      null,
+      [pinia]
+    )
   })
 
   it('renders Add Parties View with child components when store is set', async () => {

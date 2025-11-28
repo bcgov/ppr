@@ -1,15 +1,19 @@
 import { createComponent, getTestId } from './utils'
 import { OtherInformation } from '@/components/mhrRegistration'
+import { createPinia, setActivePinia } from 'pinia'
+import flushPromises from 'flush-promises'
+import { useStore } from '@/store/store'
 
 describe('Other Information component', () => {
-  let wrapper
+  let wrapper, store, pinia
 
   beforeEach(async () => {
-    wrapper = await createComponent(OtherInformation)
-  })
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
 
-  it('renders the component', async () => {
-    expect(wrapper.findComponent(OtherInformation).exists()).toBe(true)
+    wrapper = await createComponent(OtherInformation, null, null, null, [pinia])
+    await flushPromises()
   })
 
   it('show error message for Other Information input', async () => {

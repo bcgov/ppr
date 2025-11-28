@@ -1,5 +1,5 @@
-@import 'theme.scss';
-@import 'accessibility.scss';
+@use 'theme.scss' as *;
+@use 'accessibility.scss' as *;
 
 @font-face {
   font-family: 'BCSans';

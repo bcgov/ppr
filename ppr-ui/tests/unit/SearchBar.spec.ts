@@ -14,6 +14,7 @@ import { MHRSearchTypes, SearchTypes } from '@/resources'
 import { ConfirmationDialog } from '@/components/dialogs'
 import flushPromises from 'flush-promises'
 import { delayActions } from '@/utils/mhr-api-helper'
+import { createPinia, setActivePinia } from 'pinia'
 
 const store = useStore()
 
@@ -106,17 +107,21 @@ describe('Payment confirmation popup', () => {
 })
 
 describe('Serial number search', () => {
-  let wrapper
+  let wrapper, store, pinia
   const select: SearchTypeIF = SearchTypes[1]
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     await store.setUserInfo({
       firstname: 'test',
       lastname: 'tester',
       username: 'user',
       settings: mockedDisableAllUserSettingsResponse
     })
-    wrapper = await createComponent(SearchBar)
+    wrapper = await createComponent(SearchBar, null, null, null, [pinia])
   })
 
   it('searches when fields are filled', async () => {
@@ -152,7 +157,7 @@ describe('Serial number search', () => {
   })
 
   it('hides and shows things for staff', async () => {
-    setupMockStaffUser()
+    setupMockStaffUser(store)
     await store.setUserProductSubscriptionsCodes([''])
     wrapper = await createComponent(SearchBar)
 

@@ -16,8 +16,8 @@ import { mockedDebtorNames, mockedFinancingStatementAll } from './test-data'
 import { useStore } from '@/store/store'
 import { createComponent } from './utils'
 import { vi } from 'vitest'
+import { createPinia, setActivePinia } from 'pinia'
 
-const store = useStore()
 
 vi.mock('@/utils/ppr-api-helper', () => ({
   getFinancingStatement: vi.fn(() =>
@@ -25,16 +25,27 @@ vi.mock('@/utils/ppr-api-helper', () => ({
 }))
 
 describe('ReviewConfirm new registration component', () => {
-  let wrapper
+  let wrapper, pinia, store
 
   beforeEach(async () => {
+    // 1) Fresh pinia for each test
+    pinia = createPinia()
+    setActivePinia(pinia)
+
+    // 2) Now get the store from this active pinia
+    store = useStore()
+
+    // 3) Mutate the SAME store that the component will see
     await store.setRegistrationConfirmDebtorName(mockedDebtorNames[0])
+
     wrapper = await createComponent(
       DischargeRegistration,
       { appReady: true },
       RouteNames.REVIEW_DISCHARGE, {
         'reg-num': '123456B'
-      })
+      },
+      [pinia]
+    )
     await flushPromises()
   })
 

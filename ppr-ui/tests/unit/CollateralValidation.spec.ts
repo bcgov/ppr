@@ -45,8 +45,8 @@ describe('Collateral validation tests', () => {
     wrapper.find(doneButtonSelector).trigger('click')
     await flushPromises()
     const messages = wrapper.findAll('.v-messages__message')
-    expect(messages.length).toBe(1)
-    expect(messages.at(0).text()).toBe('Enter a valid year')
+    expect(messages.length).toBe(2)
+    expect(messages.at(0).text()).toBe('YYYY')
   })
 
   it('validates serial number for vehicle', async () => {

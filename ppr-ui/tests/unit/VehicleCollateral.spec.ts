@@ -192,7 +192,7 @@ describe('Vehicle Collateral repairers lien amendment tests', () => {
   it('displays the correct actions in the table rows', async () => {
     const item1 = wrapper.vm.$el.querySelectorAll('.vehicle-row')[0]
     const item2 = wrapper.vm.$el.querySelectorAll('.vehicle-row')[1]
-    expect(item1.querySelectorAll('td')[5].textContent).toContain('Delete')
+    expect(item1.querySelectorAll('td')[5].textContent).toContain('Amend')
     expect(item2.querySelectorAll('td')[5].textContent).toContain('Undo')
   })
 })

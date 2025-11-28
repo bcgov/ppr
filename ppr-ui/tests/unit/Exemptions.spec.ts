@@ -3,13 +3,13 @@ import { ButtonFooter, Stepper, StickyContainer } from '@/components/common'
 import { createComponent } from './utils'
 import { nextTick } from 'vue'
 import { RouteNames } from '@/enums/routeNames'
-import { defaultFlagSet } from '@/utils'
+import { createPinia } from 'pinia'
 
 describe('Exemptions.vue', () => {
   let wrapper
 
   beforeEach(async () => {
-    wrapper = await createComponent(Exemptions, { appReady: true }, RouteNames.EXEMPTION_DETAILS)
+    wrapper = await createComponent(Exemptions, { appReady: true }, RouteNames.EXEMPTION_DETAILS, null, [createPinia()])
     wrapper.vm.dataLoaded = true
     await nextTick()
   })

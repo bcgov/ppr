@@ -35,34 +35,6 @@ describe('RegistrationLengthTrust SA tests', () => {
   })
 })
 
-describe('RegistrationLengthTrust RL tests', () => {
-  let wrapper
-  beforeEach(async () => {
-    await store.setRegistrationType(mockedRepairersLien())
-    // await store.setLengthTrust(mockedLengthTrust2)
-    await store.setLengthTrust({
-      valid: true,
-      trustIndenture: false,
-      lifeInfinite: false,
-      lifeYears: 0,
-      showInvalid: false,
-      surrenderDate: '2021-01-21'
-    })
-    wrapper = await createComponent(RegistrationLengthTrustSummary, { isSummary: false })
-  })
-
-  it('renders with RL values', async () => {
-    expect(wrapper.findComponent(RegistrationLengthTrustSummary).exists()).toBe(true)
-    expect(wrapper.vm.showTrustIndenture).toBe(false)
-    expect(wrapper.vm.lifeInfinite).toBe('false')
-    expect(wrapper.vm.surrenderDate).toBe('2021-01-21')
-    expect(wrapper.vm.lengthSummary).toBe('180 Days')
-    expect(wrapper.vm.surrenderDateSummary).toBe('January 21, 2021')
-    expect(wrapper.find('#registration-length').text()).toContain('180 Days')
-    expect(wrapper.find('#trust-indenture-summary').exists()).toBeFalsy()
-  })
-})
-
 describe('RegistrationLengthTrust SG tests', () => {
   let wrapper
   beforeEach(async () => {

@@ -1,5 +1,5 @@
 // Libraries
-import { axios } from '@/utils/axios-base'
+import { axiosBase } from '@/utils/axios-base'
 import { StatusCodes } from 'http-status-codes'
 import { ErrorCategories } from '@/enums'
 import type { LtsaDetailsIF, TitleSummariesIF } from '@/interfaces/ltsa-api-interfaces'
@@ -12,7 +12,7 @@ export async function ltsaSummary (
   const url = sessionStorage.getItem('LTSA_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
 
-  return axios
+  return axiosBase
     .get<TitleSummariesIF>(`titledirect/search/api/titleSummaries?filter=parcelIdentifier:${pidNumber}`, config)
     .then(response => {
       const data = response?.data
@@ -46,7 +46,7 @@ export async function ltsaDetails (
     }
   }
 
-  return axios
+  return axiosBase
     .post<LtsaDetailsIF>('titledirect/search/api/orders', orderPayload, config)
     .then(response => {
       const data = response?.data

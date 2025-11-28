@@ -120,8 +120,8 @@ describe('TombstoneDefault component tests', () => {
 
     /* eslint-disable max-len */
     await assertHeaderForRole(wrapper, CLIENT_PPR, 'My Personal Property Registry', [ProductCode.PPR])
-    await assertHeaderForRole(wrapper, CLIENT_PPR_MHR, 'My Personal Property Registry', [ProductCode.PPR, ProductCode.MHR])
-    await assertHeaderForRole(wrapper, STAFF_PPR, 'Staff Personal Property Registry')
+    await assertHeaderForRole(wrapper, CLIENT_PPR_MHR, 'My Asset Registries', [ProductCode.PPR, ProductCode.MHR])
+    await assertHeaderForRole(wrapper, STAFF_PPR, 'Staff Asset Registries')
 
     await assertHeaderForRole(wrapper, STAFF_MHR, 'Staff Asset Registries')
     await assertHeaderForRole(wrapper, CLIENT_MHR, 'My Manufactured Home Registry', [ProductCode.MHR])

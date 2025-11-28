@@ -18,6 +18,7 @@ import { useStore } from '@/store/store'
 import { afterEach, beforeEach, beforeAll } from 'vitest'
 import { useUserAccess } from '@/composables'
 import flushPromises from 'flush-promises'
+import { createPinia, setActivePinia } from 'pinia'
 
 const store = useStore()
 
@@ -25,10 +26,14 @@ const store = useStore()
 const subProducts: MhrSubTypes[] = [MhrSubTypes.DEALERS, MhrSubTypes.LAWYERS_NOTARIES, MhrSubTypes.MANUFACTURER]
 for (const subProduct of subProducts) {
   describe(`MhrInformation: ${subProduct}`, () => {
-    let wrapper
+    let wrapper, store, pinia
     const { setQsInformationModel } = useUserAccess()
 
-    beforeAll(async () => {
+    beforeEach(async () => {
+      pinia = createPinia()
+      setActivePinia(pinia)
+      store = useStore()
+
       // Setup User
       await setupMockUser()
 
@@ -39,16 +44,16 @@ for (const subProduct of subProducts) {
 
       await flushPromises()
       await nextTick()
-    })
 
-    beforeEach(async () => {
       wrapper = await createComponent(
         MhrInformation,
         { appReady: true, isMhrTransfer: true },
-        RouteNames.MHR_INFORMATION
+        RouteNames.MHR_INFORMATION,
+        null,
+        [pinia]
       )
 
-      await setupCurrentHomeOwners()
+      await setupCurrentHomeOwners(store)
       wrapper.vm.dataLoaded = true
       await nextTick()
     })

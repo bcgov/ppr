@@ -107,7 +107,7 @@ const submitDateRange = (): void => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 .date-selection {
   border-radius: 5px;
   z-index: 1001;

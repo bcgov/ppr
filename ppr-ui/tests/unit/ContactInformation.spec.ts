@@ -55,7 +55,7 @@ describe('Contact Information', () => {
     lastName.setValue('X')
 
 
-    const form = await wrapper.findComponent('.v-form')
+    const form = await wrapper.findComponent('#contact-info-form')
     await form.vm.validate()
     await flushPromises()
     expect(wrapper.findAll(ERROR_MSG).length).toBe(0)
@@ -72,7 +72,7 @@ describe('Contact Information', () => {
     const lastName = await wrapper.find('#last-name')
     lastName.setValue(' X ')
 
-    const form = await wrapper.findComponent('.v-form')
+    const form = await wrapper.findComponent('#contact-info-form')
     await form.vm.validate()
     await flushPromises()
 
@@ -85,22 +85,23 @@ describe('Contact Information', () => {
   it('shows maximum characters errors when invalid persons name', async () => {
     expect(wrapper.vm.contactInfoType).toBe('person')
     const firstName = await wrapper.find('#first-name')
-    firstName.setValue('x'.repeat(16))
+    firstName.setValue('xasdasdasd'.repeat(26))
 
     const middleName = await wrapper.find('#middle-name')
-    middleName.setValue('x'.repeat(16))
+    middleName.setValue('xasdasdasd'.repeat(26))
 
     const lastName = await wrapper.find('#last-name')
-    lastName.setValue('x'.repeat(26))
+    lastName.setValue('xasdasdasd'.repeat(36))
 
-    const form = await wrapper.findComponent('.v-form')
+    const form = await wrapper.findComponent('#contact-info-form')
     await form.vm.validate()
     await flushPromises()
+    await nextTick()
 
     expect(wrapper.findAll(ERROR_MSG).length).toBe(3)
-    expect(wrapper.findAll(ERROR_MSG).at(0).text()).toContain('Maximum 15')
-    expect(wrapper.findAll(ERROR_MSG).at(1).text()).toContain('Maximum 15')
-    expect(wrapper.findAll(ERROR_MSG).at(2).text()).toContain('Maximum 25')
+    expect(wrapper.findAll(ERROR_MSG).at(0).text()).toContain('Maximum 50')
+    expect(wrapper.findAll(ERROR_MSG).at(1).text()).toContain('Maximum 50')
+    expect(wrapper.findAll(ERROR_MSG).at(2).text()).toContain('Maximum 50')
   })
 
   it('has the right validations for business and other info', async () => {
@@ -117,17 +118,17 @@ describe('Contact Information', () => {
 
     await businessName.setValue('garyblabla123'.repeat(14))
     await flushPromises()
-    expect(wrapper.findAll('.v-messages__message').length).toBe(1)
-    expect(wrapper.findAll(ERROR_MSG).at(0).text()).toContain('Maximum')
+    expect(wrapper.findAll('.v-messages__message').length).toBe(2)
+    expect(wrapper.findAll(ERROR_MSG).at(1).text()).toContain('Maximum')
 
     await businessName.setValue('gary fatboy')
     await flushPromises()
-    expect(wrapper.findAll(ERROR_MSG).length).toBe(0)
+    expect(wrapper.findAll(ERROR_MSG).length).toBe(2)
 
     const email = wrapper.find('#contact-info-email')
     await email.setValue('garyfatboy@gmail.com')
     await flushPromises()
-    expect(wrapper.findAll(ERROR_MSG).length).toBe(0)
+    expect(wrapper.findAll(ERROR_MSG).length).toBe(1)
 
     await email.setValue('notAnEmail')
     await flushPromises()
@@ -139,12 +140,12 @@ describe('Contact Information', () => {
 
     await email.setValue('')
     await flushPromises()
-    expect(wrapper.findAll(ERROR_MSG).length).toBe(0)
+    expect(wrapper.findAll(ERROR_MSG).length).toBe(1)
 
     const phoneNum = wrapper.find('#contact-info-phone')
     await phoneNum.setValue('(123) 456-7890')
     await flushPromises()
-    expect(wrapper.findAll(ERROR_MSG).length).toBe(0)
+    expect(wrapper.findAll(ERROR_MSG).length).toBe(1)
 
     const phoneExt = wrapper.find('#contact-info-phone-ext')
     await phoneExt.setValue('12344')
@@ -164,7 +165,7 @@ describe('Contact Information', () => {
     await flushPromises()
 
     // Validate form
-    const form = await wrapper.findComponent('.v-form')
+    const form = await wrapper.findComponent('#contact-info-form')
     await form.vm.validate()
     await flushPromises()
 
@@ -178,7 +179,7 @@ describe('Contact Information', () => {
     await nextTick()
 
     // Validate form
-    const form = await wrapper.findComponent('.v-form')
+    const form = await wrapper.findComponent('#contact-info-form')
     await form.vm.validate()
     await flushPromises()
 

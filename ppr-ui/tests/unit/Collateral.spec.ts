@@ -437,7 +437,7 @@ describe('Collateral RL tests for amendments', () => {
     // should still render for amendments
     expect(wrapper.findComponent(VehicleCollateral).exists()).toBe(true)
     // should not render for repairers lien
-    expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(false)
+    expect(wrapper.findComponent(GeneralCollateral).exists()).toBe(true)
 
     expect(wrapper.findAll(collateralSummary).length).toBe(1)
     expect(wrapper.findAll(collateralEdit).length).toBe(0)

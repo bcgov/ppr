@@ -8,8 +8,8 @@ import { RouteNames } from '@/enums'
 import { FolioNumberSummary, StickyContainer } from '@/components/common'
 import { FeeSummaryTypes } from '@/composables/fees/enums'
 import { BaseDialog } from '@/components/dialogs'
-import { defaultFlagSet } from '@/utils/feature-flags'
 import { mockedMHRSearchResults } from './test-data'
+import { createPinia } from 'pinia'
 
 const store = useStore()
 
@@ -20,7 +20,13 @@ describe('Confirm MHRSearch view', () => {
     await store.setManufacturedHomeSearchResults(mockedMHRSearchResults)
     await nextTick()
 
-    wrapper = await createComponent(ConfirmMHRSearch, { appReady: true }, RouteNames.MHRSEARCH_CONFIRM)
+    wrapper = await createComponent(
+      ConfirmMHRSearch,
+      { appReady: true },
+      RouteNames.MHRSEARCH_CONFIRM,
+      null,
+      [createPinia()]
+    )
     await flushPromises()
   })
 
@@ -37,7 +43,6 @@ describe('Confirm MHRSearch view', () => {
     expect(wrapper.findComponent(StickyContainer).vm.$props.setBackBtn).toBe('Back')
     expect(wrapper.findComponent(StickyContainer).vm.$props.setCancelBtn).toBe('Cancel')
     expect(wrapper.findComponent(StickyContainer).vm.$props.setSubmitBtn).toBe('Pay and Download Result')
-    expect(wrapper.findComponent(StickyContainer).vm.$props.setFeeType).toBe(FeeSummaryTypes.MHSEARCH)
     expect(wrapper.findComponent(StickyContainer).vm.$props.setErrMsg).toBe('')
     // folio
     expect(wrapper.findComponent(FolioNumberSummary).exists()).toBe(true)

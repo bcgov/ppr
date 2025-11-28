@@ -18,7 +18,7 @@ import {
   getKeycloakRoles,
   getSbcFromAuth,
   updateLdUser,
-  axios,
+  axiosAuth,
   parsePayDetail
 } from '@/utils'
 import { getPPRUserSettings  } from '@/utils/ppr-api-helper'
@@ -351,7 +351,7 @@ export default defineComponent({
     const fetchCurrentUser = (): Promise<any> => {
       const authUrl = sessionStorage.getItem('AUTH_API_URL')
       const config = { baseURL: authUrl }
-      return axios.get('users/@me', config)
+      return axiosAuth.get('users/@me', config)
     }
 
     /** Gets user products and sets browser title accordingly. */
@@ -689,6 +689,6 @@ export default defineComponent({
 </template>
 
 <style lang="scss">
-@import '@/assets/styles/theme';
-@import '@/assets/styles/overrides';
+@use '@/assets/styles/theme' as *;
+@use '@/assets/styles/overrides' as *;
 </style>

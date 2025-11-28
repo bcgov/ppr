@@ -973,7 +973,7 @@ export default defineComponent({
 </template>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 .registration-table {
   max-height: 700px;
   min-height: 250px;

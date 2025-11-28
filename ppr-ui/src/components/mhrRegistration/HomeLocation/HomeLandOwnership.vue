@@ -92,7 +92,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue-demi'
+import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import type { ContentIF, FormIF, UpdatedBadgeIF } from '@/interfaces'
 import { UpdatedBadge } from '@/components/common'
 
@@ -157,7 +157,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 .divider-mt {
   margin-top: 14px;
 }

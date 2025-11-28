@@ -103,5 +103,5 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme';
+@use '@/assets/styles/theme' as *;
 </style>

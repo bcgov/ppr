@@ -56,11 +56,11 @@ describe('Attention', () => {
     expect(messages.length).toBe(0)
     expect(getLastEvent(wrapper, 'isFolioOrRefNumValid')).toBe(true)
 
-    await input.setValue('a'.repeat(31))
+    await input.setValue('a'.repeat(55))
     await nextTick()
     messages = wrapper.findAll('.v-input--error .v-messages__message')
     expect(messages.length).toBe(1)
-    expect(messages.at(0).text()).toBe('Maximum 30 characters')
+    expect(messages.at(0).text()).toBe('Maximum 50 characters')
     expect(getLastEvent(wrapper, 'isFolioOrRefNumValid')).toBe(false)
   })
 })

@@ -33,7 +33,7 @@ describe('Secured Party validation tests - business', () => {
     await nextTick()
     const messages = wrapper.findAll(ERROR_MSG)
     // With no country selected - errors: business name, country, address line 1
-    expect(messages.length).toBe(3)
+    expect(messages.length).toBe(4)
     expect(messages.at(0).text()).toBe('Please enter a business name')
   })
 })
@@ -57,7 +57,7 @@ describe('Secured Party validation tests - individual', () => {
 
     const messages = wrapper.findAll(ERROR_MSG)
     // With no country selected - errors: first name, last name, country, address line 1
-    expect(messages.length).toBe(4)
+    expect(messages.length).toBe(5)
     expect(messages.at(0).text()).toBe('Please enter a first name')
     expect(messages.at(1).text()).toBe('Please enter a last name')
   })

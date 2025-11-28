@@ -5,14 +5,18 @@ import {
 import { RegistrationRepairersLien } from '@/components/registration'
 import { useStore } from '@/store/store'
 import { createComponent } from './utils'
-
-const store = useStore()
+import { createPinia, setActivePinia } from 'pinia'
 
 describe('RegistrationLengthTrust RL tests', () => {
-  let wrapper
+  let wrapper, pinia, store
+
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     await store.setRegistrationType(mockedRepairersLien())
-    wrapper = await createComponent(RegistrationRepairersLien, { isRenewal: false })
+    wrapper = await createComponent(RegistrationRepairersLien, { isRenewal: false }, null, null, [pinia])
   })
 
   it('renders with RL values', async () => {
@@ -26,6 +30,7 @@ describe('RegistrationLengthTrust RL tests', () => {
     expect(wrapper.vm.lienAmountSummary).toBe('Not entered')
     expect(wrapper.vm.surrenderDateSummary).toBe('Not entered')
   })
+
   it('renders lienAmount', async () => {
     wrapper.vm.lienAmount = '$1,000,000'
     await nextTick()
@@ -47,8 +52,13 @@ describe('RegistrationLengthTrust RL tests', () => {
 })
 
 describe('RegistrationLengthTrust RL renewal test', () => {
-  let wrapper
+  let wrapper, pinia, store
+
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     await store.setRegistrationType(mockedRepairersLien())
     await store.setRegistrationExpiryDate('2021-07-28T07:59:59+00:00')
     await store.setLengthTrust({
@@ -61,7 +71,7 @@ describe('RegistrationLengthTrust RL renewal test', () => {
       lienAmount: ''
     })
 
-    wrapper = await createComponent(RegistrationRepairersLien, { isRenewal: true })
+    wrapper = await createComponent(RegistrationRepairersLien, { isRenewal: true }, null, null, [pinia])
   })
 
   it('renders with default values', async () => {

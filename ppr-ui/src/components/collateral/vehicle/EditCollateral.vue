@@ -356,7 +356,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';d
+@use '@/assets/styles/theme.scss' as *;d
 
 .container .v-card > .border-error-left {
   border-top-left-radius: unset;

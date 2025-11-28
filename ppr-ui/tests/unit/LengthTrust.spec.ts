@@ -9,8 +9,7 @@ import { mockedSelectSecurityAgreement } from './test-data'
 import { useStore } from '@/store/store'
 import { createComponent } from './utils'
 import flushPromises from 'flush-promises'
-
-const store = useStore()
+import { createPinia, setActivePinia } from 'pinia'
 
 // Input field selectors / buttons
 const header = '#registration-header'
@@ -18,12 +17,18 @@ const title = '.sub-header'
 const titleInfo = '.sub-header-info'
 
 describe('Length and Trust Indenture new registration component', () => {
-  let wrapper
+  let wrapper, pinia, store
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
+    // 3) Mutate the store as needed
     await store.setRegistrationType(null)
     await store.setRegistrationFlowType(null)
-    wrapper = await createComponent(LengthTrust, { appReady: true })
+
+    wrapper = await createComponent(LengthTrust, { appReady: true }, null, null, [pinia])
   })
 
   it('redirects to dashboard when store is not set', () => {

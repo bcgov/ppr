@@ -1,5 +1,5 @@
 // Libraries
-import { axios } from '@/utils/axios-ppr'
+import { axiosAssets } from '@/utils/axios-ppr'
 import { StatusCodes } from 'http-status-codes'
 import type { ErrorCodes, SettingOptions } from '@/enums';
 import { StaffPaymentOptions , ErrorCategories } from '@/enums'
@@ -171,7 +171,7 @@ export async function search (
 ): Promise<SearchResponseIF> {
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
-  return axios
+  return axiosAssets
     .post<SearchResponseIF>(`searches${extraParams}`, searchCriteria, config)
     .then(response => {
       const data = response?.data
@@ -302,7 +302,7 @@ export async function updateSelected (
 ): Promise<number> {
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
-  return axios
+  return axiosAssets
     .put(`searches/${searchId}`, selected, config)
     .then(response => {
       return response.status
@@ -326,7 +326,7 @@ export async function submitSelected (
   if (shouldCallback) {
     callback = '&callbackURL=PPR_UI'
   }
-  return axios
+  return axiosAssets
     .post(`search-results/${searchId}?useCurrent=${useCurrentSelect}${callback}`, selected, config)
     .then(response => {
       return response.status
@@ -344,7 +344,7 @@ export async function searchPDF (searchId: string): Promise<any> {
     headers: { Accept: 'application/pdf' },
     responseType: 'blob' as 'json'
   }
-  return axios
+  return axiosAssets
     .get(`search-results/${searchId}`, config)
     .then(response => {
       const data = response?.data
@@ -371,7 +371,7 @@ export async function searchHistory (filters: SearchHistoryFilterIF): Promise<Se
   }
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
-  return axios
+  return axiosAssets
     .get<Array<SearchResponseIF>>(`search-history?from_ui=true${queryString}`, config)
     .then(response => {
       const data = response?.data
@@ -411,7 +411,7 @@ export async function searchHistory (filters: SearchHistoryFilterIF): Promise<Se
 export async function getPprSearchHistoryById (searchId: string): Promise<SearchHistoryResponseIF> {
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
-  return axios
+  return axiosAssets
     .get<Array<SearchResponseIF>>(`searches/${searchId}`, config)
     .then(response => {
       const data = response?.data
@@ -452,7 +452,7 @@ export async function getPprSearchHistoryById (searchId: string): Promise<Search
 export async function getPPRUserSettings (): Promise<UserSettingsIF> {
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
-  return axios
+  return axiosAssets
     .get('user-profile', config)
     .then(response => {
       const data: UserSettingsIF = response?.data
@@ -500,7 +500,7 @@ export async function updateUserSettings (
 ): Promise<UserSettingsIF> {
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
-  return axios
+  return axiosAssets
     .patch('user-profile', { [`${setting}`]: settingValue }, config)
     .then(response => {
       const data: UserSettingsIF = response?.data
@@ -542,7 +542,7 @@ export async function updateUserSettings (
 
 // Save a new draft.
 export async function createDraft (draft: DraftIF): Promise<DraftIF> {
-  return axios
+  return axiosAssets
     .post<DraftIF>('drafts', draft, getDefaultConfig())
     .then(response => {
       const data: DraftIF = response?.data
@@ -594,7 +594,7 @@ export async function updateDraft (draft: DraftIF): Promise<DraftIF> {
     }
     return draft
   }
-  return axios
+  return axiosAssets
     .put<DraftIF>('drafts/' + documentId, draft, getDefaultConfig())
     .then(response => {
       const data: DraftIF = response?.data
@@ -640,7 +640,7 @@ export async function getDraft (documentId: string): Promise<DraftIF> {
     }
     return draft
   }
-  return axios
+  return axiosAssets
     .get<DraftIF>('drafts/' + documentId, getDefaultConfig())
     .then(response => {
       const data: DraftIF = response?.data
@@ -679,7 +679,7 @@ export async function getDraft (documentId: string): Promise<DraftIF> {
 export async function cancelPprDraft (draftID: string): Promise<ErrorIF> {
   if (!draftID) return { statusCode: StatusCodes.BAD_REQUEST, message: 'No draft ID given.' }
 
-  return axios
+  return axiosAssets
     .patch<void>(`drafts/cancel/${draftID}`, getDefaultConfig())
     .then(response => {
       return { statusCode: response?.status as StatusCodes }
@@ -689,7 +689,7 @@ export async function cancelPprDraft (draftID: string): Promise<ErrorIF> {
 // Delete an existing draft (any type) by documentId.
 export async function deleteDraft (documentId: string): Promise<ErrorIF> {
   if (!documentId) return { statusCode: StatusCodes.BAD_REQUEST, message: 'No document ID given.' }
-  return axios
+  return axiosAssets
     .delete<void>(`drafts/${documentId}`, getDefaultConfig())
     .then(response => {
       return { statusCode: response?.status as StatusCodes }
@@ -729,7 +729,7 @@ export async function partyCodeSearch (
   if (!/^\d+$/.test(nameOrCode) && !exactSearch) {
     fuzzyName = '?fuzzyNameSearch=true'
   }
-  return axios
+  return axiosAssets
     .get(`party-codes/head-offices/${nameOrCode}${fuzzyName}`, config)
     .then(response => {
       const data = response?.data
@@ -772,7 +772,7 @@ export async function partyCodeAccount (isSecurityActCodeLookup: boolean = false
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
   const securitiesActParam = isSecurityActCodeLookup ? '?securitiesActCodes=true' : ''
-  return axios
+  return axiosAssets
     .get(`party-codes/accounts${securitiesActParam}`, config)
     .then(response => {
       const data = response?.data
@@ -818,7 +818,7 @@ export async function registrationHistory (sortOptions: RegistrationSortIF = nul
     ? addSortParams( `financing-statements/registrations?collapse=true&pageNumber=${page}&fromUI=true`, sortOptions)
     : `financing-statements/registrations?collapse=true&pageNumber=${page}&fromUI=true`
 
-  return axios
+  return axiosAssets
     .get(url, config)
     .then(response => {
       const data = response?.data as RegistrationSummaryIF[]
@@ -879,7 +879,7 @@ export async function draftHistory (sortOptions: RegistrationSortIF): Promise<{
   const baseURL = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL, headers: { Accept: 'application/json' } }
   const url = addSortParams('drafts?fromUI=true', sortOptions)
-  return axios
+  return axiosAssets
     .get(url, config)
     .then(response => {
       const data = response?.data as DraftResultIF[]
@@ -921,7 +921,7 @@ export async function createFinancingStatement (
   statement: FinancingStatementIF,
   extraParams: string
 ): Promise<FinancingStatementIF> {
-  return axios
+  return axiosAssets
     .post<FinancingStatementIF>(
       `financing-statements${extraParams}`,
       statement,
@@ -965,7 +965,7 @@ export async function createAmendmentStatement (
   statement: AmendmentStatementIF,
   extraParams: string
 ): Promise<AmendmentStatementIF> {
-  return axios
+  return axiosAssets
     .post<AmendmentStatementIF>(
       `financing-statements/${statement.baseRegistrationNumber}/amendments${extraParams}`,
       statement,
@@ -995,7 +995,7 @@ export async function createDischarge (
   discharge: DischargeRegistrationIF,
   extraParams: string
 ): Promise<DischargeRegistrationIF> {
-  return axios
+  return axiosAssets
     .post<DischargeRegistrationIF>(
       `financing-statements/${discharge.baseRegistrationNumber}/discharges${extraParams}`,
       discharge,
@@ -1038,7 +1038,7 @@ export async function createRenewal (
   renewal: RenewRegistrationIF,
   extraParams: string
 ): Promise<RenewRegistrationIF> {
-  return axios
+  return axiosAssets
     .post<RenewRegistrationIF>(
       `financing-statements/${renewal.baseRegistrationNumber}/renewals${extraParams}`,
       renewal,
@@ -1081,7 +1081,7 @@ export async function getFinancingStatement (
   current: boolean,
   registrationNum: string
 ): Promise<FinancingStatementIF> {
-  return axios
+  return axiosAssets
     .get<FinancingStatementIF>(
       `financing-statements/${registrationNum}?current=${current}`,
       getDefaultConfig()
@@ -1129,7 +1129,7 @@ export async function addRegistrationSummary (
   registrationNum: string
 ): Promise<RegistrationSummaryIF> {
   registrationNum = registrationNum?.toUpperCase()
-  return axios
+  return axiosAssets
     .post(`financing-statements/registrations/${registrationNum}`, {}, getDefaultConfig())
     .then(response => {
       const data = response?.data as RegistrationSummaryIF
@@ -1179,7 +1179,7 @@ export async function getRegistrationSummary (
   refreshing: boolean
 ): Promise<(RegistrationSummaryIF)> {
   registrationNum = registrationNum?.toUpperCase()
-  return axios
+  return axiosAssets
     .get(`financing-statements/registrations/${registrationNum}`, getDefaultConfig())
     .then(response => {
       const data = response?.data as RegistrationSummaryIF
@@ -1232,7 +1232,7 @@ export async function getRegistrationSummary (
 export async function deleteRegistrationSummary (
   registrationNum: string
 ): Promise<ErrorIF> {
-  return axios
+  return axiosAssets
     .delete(`financing-statements/registrations/${registrationNum}`, getDefaultConfig())
     .then(response => {
       return { statusCode: response?.status as StatusCodes }
@@ -1272,7 +1272,7 @@ export async function registrationPDF (pdfPath: string): Promise<any> {
     headers: { Accept: 'application/pdf' },
     responseType: 'blob' as 'json'
   }
-  return axios
+  return axiosAssets
     .get(pdfPath, config)
     .then(response => {
       const data = response?.data
@@ -1312,7 +1312,7 @@ export async function registrationPDF (pdfPath: string): Promise<any> {
 export async function debtorNames (registrationNum: string): Promise<[DebtorNameIF]> {
   const url = sessionStorage.getItem('PPR_API_URL')
   const config = { baseURL: url, headers: { Accept: 'application/json' } }
-  return axios
+  return axiosAssets
     .get(`financing-statements/${registrationNum}/debtorNames`, config)
     .then(response => {
       const data = response?.data

@@ -22,17 +22,20 @@ import { RegistrationTypes } from '@/resources'
 import { useStore } from '@/store/store'
 import { nextTick } from 'vue'
 import { vi } from 'vitest'
-
-const store = useStore()
+import { createPinia, setActivePinia } from 'pinia'
 
 const header = '#registration-header'
 const title: string = '.generic-label'
 const titleInfo: string = '.sub-header-info'
 
 describe('Review Confirm new registration component', () => {
-  let wrapper
+  let wrapper, store, pinia
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     await store.setRegistrationType(null)
     await store.setRegistrationFlowType(null)
     vi.mock('@/utils/auth-helper', () => ({
@@ -44,7 +47,7 @@ describe('Review Confirm new registration component', () => {
   })
 
   it('redirects to dashboard when store is not set', async () => {
-    wrapper = await createComponent(ReviewConfirm, { appReady: true }, RouteNames.REVIEW_CONFIRM)
+    wrapper = await createComponent(ReviewConfirm, { appReady: true }, RouteNames.REVIEW_CONFIRM, null, [pinia])
     expect(wrapper.vm.$route.name).toBe(RouteNames.DASHBOARD)
   })
 

@@ -6,7 +6,7 @@ import { addDaysToDate, pacificDate, shortPacificDate } from '@/utils/date-helpe
 import { useTransportPermits } from '@/composables'
 const { getMhrInformation } = storeToRefs(useStore())
 
- 
+
 const props = withDefaults(defineProps<{
   isCancelledLocation?: boolean,
   isVoidPermit?: boolean,
@@ -81,7 +81,7 @@ const { isExtendChangeLocationActive } = useTransportPermits()
 </template>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 h3 {
   line-height: unset;
 }

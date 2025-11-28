@@ -1,6 +1,7 @@
 import { useRoute, useRouter } from 'vue-router'
 import { RouteNames } from '@/enums'
 import { scrollToTop } from '@/utils'
+import { useRuntimeConfig } from '#app'
 
 export const useNavigation = () => {
   const route = useRoute()

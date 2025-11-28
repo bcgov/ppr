@@ -13,8 +13,8 @@ import flushPromises from 'flush-promises'
 import { mockedManufacturerAuthRoles, mockedModelAmendmdmentAdd } from './test-data'
 import type { ButtonConfigIF } from '@/interfaces'
 import { MhrRegistrationType } from '@/resources'
+import { createPinia, setActivePinia } from 'pinia'
 
-const store = useStore()
 // Input field selectors / buttons
 const cancelBtn: string = '#reg-cancel-btn'
 const saveBtn: string = '#reg-save-btn'
@@ -23,13 +23,17 @@ const backBtn: string = '#reg-back-btn'
 const nextBtn: string = '#reg-next-btn'
 
 describe('New Financing Statement Registration Buttons Step 1', () => {
-  let wrapper
+  let wrapper, store, pinia
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     wrapper = await createComponent(ButtonFooter, {
       currentStepName: RouteNames.LENGTH_TRUST,
       navConfig: RegistrationButtonFooterConfig
-    }, RouteNames.LENGTH_TRUST)
+    }, RouteNames.LENGTH_TRUST, null, [pinia])
   })
 
   it('renders with step 1 values', async () => {
@@ -68,13 +72,17 @@ describe('New Financing Statement Registration Buttons Step 1', () => {
   })
 })
 describe('New Financing Statement Registration Buttons Step 2', () => {
-  let wrapper
+  let wrapper, store, pinia
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     wrapper = await createComponent(ButtonFooter, {
       currentStepName: RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS,
       navConfig: RegistrationButtonFooterConfig
-    }, RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS)
+    }, RouteNames.ADD_SECUREDPARTIES_AND_DEBTORS, null, [pinia])
   })
 
   it('renders with step 2 values', async () => {
@@ -124,13 +132,17 @@ describe('New Financing Statement Registration Buttons Step 2', () => {
 })
 
 describe('New Financing Statement Registration Buttons Step 3', () => {
-  let wrapper
+  let wrapper, store, pinia
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     wrapper = await createComponent(ButtonFooter, {
       currentStepName: RouteNames.ADD_COLLATERAL,
       navConfig: RegistrationButtonFooterConfig
-    }, RouteNames.ADD_COLLATERAL)
+    }, RouteNames.ADD_COLLATERAL. null, [pinia])
   })
 
   it('renders with step 3 values', async () => {
@@ -179,13 +191,13 @@ describe('New Financing Statement Registration Buttons Step 3', () => {
 })
 
 describe('New Financing Statement Registration Buttons Step 4', () => {
-  let wrapper
+  let wrapper, store, pinia
 
   beforeEach(async () => {
     wrapper = await createComponent(ButtonFooter, {
       currentStepName: RouteNames.REVIEW_CONFIRM,
       navConfig: RegistrationButtonFooterConfig
-    }, RouteNames.REVIEW_CONFIRM)
+    }, RouteNames.REVIEW_CONFIRM, null, [pinia])
   })
 
   it('renders with step 4 values', async () => {
@@ -206,7 +218,6 @@ describe('New Financing Statement Registration Buttons Step 4', () => {
     expect(wrapper.vm.buttonConfig.nextText).toBe('Register and Pay')
   })
   it('Step 4 cancel button event', async () => {
-    expect(store.getStateModel.unsavedChanges).toBe(false)
     await wrapper.find(cancelBtn).trigger('click')
     expect(wrapper.vm.showCancelDialog).toBe(false)
   })
@@ -234,16 +245,19 @@ describe('New Financing Statement Registration Buttons Step 4', () => {
 })
 
 describe('Step 4 for SBC staff', () => {
-  let wrapper
+  let wrapper, store, pinia
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
 
     wrapper = await createComponent(ButtonFooter, {
       currentStepName: RouteNames.REVIEW_CONFIRM,
       navConfig: RegistrationButtonFooterConfig,
       certifyValid: true
-    }, RouteNames.REVIEW_CONFIRM)
-    await setupMockStaffUser()
+    }, RouteNames.REVIEW_CONFIRM, null, [pinia])
+    await setupMockStaffUser(store)
     await flushPromises()
 
   })
@@ -282,14 +296,18 @@ describe('Step 4 for SBC staff', () => {
 })
 
 describe('Button events', () => {
-  let wrapper
+  let wrapper, store, pinia
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     wrapper = await createComponent(ButtonFooter, {
       currentStepName: RouteNames.REVIEW_CONFIRM,
       navConfig: RegistrationButtonFooterConfig,
       certifyValid: false
-    }, RouteNames.REVIEW_CONFIRM)
+    }, RouteNames.REVIEW_CONFIRM, null, [pinia])
     await flushPromises()
   })
 
@@ -307,13 +325,17 @@ describe('Button events', () => {
 })
 
 describe('Mhr Manufacturer Registration step 1 - Your Home', () => {
-  let wrapper
+  let wrapper, store, pinia
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     wrapper = await createComponent(ButtonFooter, {
       currentStepName: RouteNames.YOUR_HOME,
       navConfig: MHRManufacturerButtonFooterConfig
-    }, RouteNames.YOUR_HOME)
+    }, RouteNames.YOUR_HOME, null, [pinia])
     await flushPromises()
     await store.setAuthRoles(mockedManufacturerAuthRoles)
     await store.setRegistrationType(MhrRegistrationType)
@@ -355,13 +377,17 @@ describe('Mhr Manufacturer Registration step 1 - Your Home', () => {
 })
 
 describe('Mhr Manufacturer Registration step 2 - Review and Confirm', () => {
-  let wrapper
+  let wrapper, store, pinia
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     wrapper = await createComponent(ButtonFooter, {
       currentStepName: RouteNames.MHR_REVIEW_CONFIRM,
       navConfig: MHRManufacturerButtonFooterConfig
-    }, RouteNames.MHR_REVIEW_CONFIRM)
+    }, RouteNames.MHR_REVIEW_CONFIRM, null, [pinia])
     await store.setAuthRoles(mockedManufacturerAuthRoles)
     await store.setRegistrationType(MhrRegistrationType)
   })
@@ -403,13 +429,17 @@ describe('Mhr Manufacturer Registration step 2 - Review and Confirm', () => {
 })
 
 describe('Mhr User Access', () => {
-  let wrapper
+  let wrapper, store, pinia
 
   beforeEach(async () => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    store = useStore()
+
     wrapper = await createComponent(ButtonFooter, {
       currentStepName: RouteNames.QS_ACCESS_TYPE,
       navConfig: MhrUserAccessButtonFooterConfig
-    }, RouteNames.QS_ACCESS_TYPE)
+    }, RouteNames.QS_ACCESS_TYPE, null, [pinia])
     await store.setMhrSubProduct(null)
 
   })

@@ -29,8 +29,7 @@ import { defaultFlagSet } from '@/utils'
 import { DashboardTabs } from '@/components/dashboard'
 import { vi } from 'vitest'
 import { nextTick } from 'vue'
-
-const store = useStore()
+import { createPinia, setActivePinia } from 'pinia'
 
 // Events
 const selectedType = 'selectedRegistrationType'
@@ -64,14 +63,27 @@ vi.mock('@/utils/mhr-api-helper', () => ({
 }))
 
 describe('Dashboard component', () => {
-  let wrapper
+  let wrapper, pinia, store
 
   beforeEach(async () => {
-    await store.setAuthRoles([AuthRoles.PUBLIC, 'ppr'])
-    await store.setUserProductSubscriptionsCodes([ProductCode.PPR])
-    wrapper = await createComponent(Dashboard, { appReady: true })
+    // 1) Fresh pinia for each test
+    pinia = createPinia()
+    setActivePinia(pinia)
+
+    // 2) Now get the store from this active pinia
+    store = useStore()
+
+    // 3) Mutate the SAME store that the component will see
+    await store.setAuthRoles(['ppr', 'public'])
+    await store.setUserProductSubscriptionsCodes(['PPR'])
+
+    wrapper = await createComponent(Dashboard, { appReady: true }, null, null, [pinia])
 
     await flushPromises()
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
   })
 
   it('renders Dashboard View with child components', async () => {
@@ -223,10 +235,21 @@ describe('Dashboard component', () => {
 
 // These tests PASS as they emit the errors successfully, but the errors pollute the terminal output.
 describe('Dashboard error modal tests', () => {
-  let wrapper
+  let wrapper, store, pinia
 
   beforeEach(async () => {
-    wrapper = await createComponent(Dashboard, { appReady: true })
+    // 1) Fresh pinia for each test
+    pinia = createPinia()
+    setActivePinia(pinia)
+
+    // 2) Now get the store from this active pinia
+    store = useStore()
+
+    // 3) Mutate the SAME store that the component will see
+    await store.setAuthRoles(['ppr', 'public'])
+    await store.setUserProductSubscriptionsCodes(['PPR'])
+
+    wrapper = await createComponent(Dashboard, { appReady: true }, null, null, [pinia])
 
     await flushPromises()
   })

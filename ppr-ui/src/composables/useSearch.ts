@@ -1,6 +1,6 @@
 import { MHRSearchTypes, SearchTypes } from '@/resources'
 import { APIMHRSearchTypes, APIMHRMapSearchTypes, ErrorCategories } from '@/enums'
-import { axios } from '@/utils'
+import { axiosAuth } from '@/utils'
 import type { SearchResponseI } from '@/interfaces'
 import { StatusCodes } from 'http-status-codes'
 
@@ -53,7 +53,7 @@ export const useSearch = () => {
 
     // add search-api config stuff
     const config = getSearchConfig(params)
-    return axios
+    return axiosAuth
       .get<SearchResponseI>('businesses/search/facets', config)
       .then(response => {
         const data: SearchResponseI = response?.data

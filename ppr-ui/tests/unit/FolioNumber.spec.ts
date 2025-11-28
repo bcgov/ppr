@@ -30,10 +30,11 @@ describe('Folio number tests', () => {
   })
 
   it('validates the folio number', async () => {
-    wrapper.find(folioEditTxt).setValue('Test File Number that is too long')
+    wrapper.find(folioEditTxt).setValue('Test File Number that is too long asdasd asdasd asdasd asdasda asdasd asdasd asdada asd asd asdasd')
     await nextTick()
+
     const messages = wrapper.findAll('.v-messages__message')
     expect(messages.length).toBe(1)
-    expect(messages.at(0).text()).toBe('Maximum 15 characters reached')
+    expect(messages.at(0).text()).toBe('Maximum 50 characters reached')
   })
 })

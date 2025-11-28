@@ -1,112 +1,63 @@
-// // setup.ts
-import { afterEach, beforeAll, expect, vi } from 'vitest'
+// Setup file for Vitest tests
+import { vi } from 'vitest'
 import { config } from '@vue/test-utils'
-import { dataTestId } from './unit/plugins'
 import { createPinia, setActivePinia } from 'pinia'
-import * as matchers from 'vitest-axe/matchers'
-import 'vitest-axe/extend-expect'
 
-import 'vuetify/styles'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
-import { createVuetify } from 'vuetify'
-
-// Create Vuetify instance
-const vuetify = createVuetify({
-  components,
-  directives,
-})
-
-// Extend vitest with axe matchers
-expect.extend(matchers)
-
-// Define Pinia/Vuetify/router globally
-const pinia = createPinia()
+// Setup Pinia
 setActivePinia(createPinia())
 
-// Add properties to the wrapper
-config.global.plugins.push([vuetify, pinia, dataTestId])
+// FeeWidget, no-props stub
+config.global.stubs = {
+  // Works for locally-registered or auto-imported components
+  ConnectFeeWidget: {
+    template: '<div data-testid="fee-widget-stub"></div>',
+  },
 
-// Suppress Vue warnings
-config.global.config.warnHandler = () => null
-global.css = { supports: () => false }
+  // If your project uses kebab-case in templates (Nuxt auto-imports)
+  'ConnectFeeWidget': {
+    template: '<div data-testid="fee-widget-stub"></div>',
+  },
+}
 
-beforeAll(() => {
+// Mock useI18n globally
+vi.stubGlobal('useI18n', () => ({
+  t: (k: string) => k,      // echo key
+  locale: { value: 'en' }   // minimal shape if you read locale
+}))
 
-  vi.mock('@/plugins/keycloak', () => ({
-    default: vi.fn()
-  }))
+// keycloak-js: return a no-op client that always "initializes"
+vi.mock('keycloak-js', () => ({
+  default: vi.fn(() => ({
+    init: vi.fn().mockResolvedValue(true),
+    login: vi.fn(),
+    logout: vi.fn(),
+    updateToken: vi.fn().mockResolvedValue(true),
+    token: 'test-token',
+    authenticated: true,
+  })),
+}))
 
-  // Mock the entire vue-pdf-embed module
-  vi.mock('vue-pdf-embed', () => {
-    // Replace the component with a dummy component or return an empty object
-    return {
-      default: {
-        render () {
-          return null
-        }
-      }
-    }
-  })
+vi.mock('launchdarkly-js-client-sdk', () => ({
+  initialize: vi.fn(() => ({
+    on: vi.fn(),
+    off: vi.fn(),
+    variation: vi.fn().mockReturnValue(false),
+    identify: vi.fn(),
+    close: vi.fn(),
+  })),
+}))
 
-  // Mock the WysiwygEditor component
-  vi.mock('@/components/common/WysiwygEditor.vue', () => {
-    // Replace the component with a dummy component or return an empty object
-    return {
-      default: {
-        render () {
-          return null
-        }
-      }
-    }
-  })
+// stub an EventTarget (VisualViewport extends EventTarget)
+const vv = new EventTarget() as EventTarget & {
+  width?: number; height?: number; scale?: number;
+  offsetLeft?: number; offsetTop?: number; pageLeft?: number; pageTop?: number;
+}
+vv.width = 1024
+vv.height = 768
+vv.scale = 1
 
-  // Stub the SbcHeader component
-  vi.mock('../node_modules/sbc-common-components/src/components/SbcHeader.vue', () => {
-    // Replace the component with a dummy component or return an empty object
-    return {
-      default: {
-        render () {
-          return null
-        }
-      }
-    }
-  })
+vi.stubGlobal('visualViewport', vv)
 
-  // Mock lodash library and override the 'debounce' method to immediately invoke the provided function without delays
-  vi.mock('lodash', async () => {
-    const actualLodash: any = await vi.importActual('lodash')
-    return {
-      ...actualLodash.default,
-      throttle: vi.fn((fn) => fn)
-    }
-  })
 
-  // Mock the WysiwygEditors (imported editor portion) component functions
-  global.ClipboardEvent = class ClipboardEvent {
-    constructor(type, eventInitDict) {
-      // Implement the constructor as needed
-    }
-  }
-  global.DragEvent = class ClipboardEvent {
-    constructor() {}
-  }
-
-  // Mock Sentry
-  vi.mock('@sentry/browser', () => ({
-    captureException: vi.fn()
-  }))
-
-  // Extend JSDOM with canvas to facilitate AA testing
-  Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
-    value: vi.fn(),
-    writable: true
-  })
-})
-
-afterEach(() => {
-  // Restore the mocked functions
-  vi.restoreAllMocks()
-})
 
 

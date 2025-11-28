@@ -22,8 +22,8 @@ describe('GenColAmend tests', () => {
 
   it('renders default', async () => {
     expect(wrapper.findComponent(GenColAmend).exists()).toBe(true)
-    expect(wrapper.vm.addDesc).toBe('')
-    expect(wrapper.vm.delDesc).toBe('')
+    expect(wrapper.vm.addDesc).toBe(null)
+    expect(wrapper.vm.delDesc).toBe(null)
     expect(wrapper.vm.generalCollateral).toEqual([])
   })
 
@@ -40,8 +40,8 @@ describe('GenColAmend tests', () => {
       [{ descriptionAdd: 'addexample', descriptionDelete: 'othertest', addedDateTime: '2021-10-13' }])
     await nextTick()
 
-    expect(wrapper.vm.addDesc).toBe('')
-    expect(wrapper.vm.delDesc).toBe('')
+    expect(wrapper.vm.addDesc).toBe(null)
+    expect(wrapper.vm.delDesc).toBe(null)
   })
 
   it('updates general collateral', async () => {

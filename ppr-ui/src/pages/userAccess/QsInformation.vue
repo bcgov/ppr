@@ -171,7 +171,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme';
+@use '@/assets/styles/theme' as *;
 :deep(.v-input--hide-details > .v-input__control > .v-input__slot) {
   display: flex;
   align-items: flex-start;

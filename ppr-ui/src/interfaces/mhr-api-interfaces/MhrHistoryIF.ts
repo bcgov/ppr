@@ -54,12 +54,6 @@ export interface LocationIF extends MhrLocationInfoIF{
   isOwnLand?: string
 }
 
-export interface IndividualNameIF {
-  first?: string
-  last?: string
-  middle?: string
-}
-
 export interface OwnerIF {
   address?: AddressIF
   createDateTime?: string

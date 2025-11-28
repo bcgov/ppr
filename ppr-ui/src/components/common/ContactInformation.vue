@@ -404,7 +404,7 @@ watch(() => props.isHidden, async (isHidden: boolean) => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/styles/theme.scss';
+@use '@/assets/styles/theme.scss' as *;
 p {
   color: $gray7
 }
