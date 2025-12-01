@@ -1,0 +1,204 @@
+{
+  "mhrNumber": "099001",
+  "createDateTime": "2023-12-04T18:46:19+00:00",
+  "registrationType": "REG_STAFF_ADMIN",
+  "status": "FROZEN",
+  "documentDescription": "REGISTRAR'S CORRECTION",
+  "documentId": "80888301",
+  "documentRegistrationNumber": "00507062",
+  "clientReferenceId": "UT-REGC-003",
+  "attentionReference": "CHRISTINE SINCLAIR",
+  "submittingParty": {
+    "businessName": "ABC SEARCHING COMPANY",
+    "address": {
+      "street": "222 SUMMER STREET",
+      "city": "VICTORIA",
+      "region": "BC",
+      "country": "CA",
+      "postalCode": "V8W 2V8"
+    },
+    "emailAddress": "bsmith@abc-search.com"
+  },
+  "documentType": "REGC",
+  "note": {
+    "documentId": "80888301",
+    "documentType": "REGC",
+    "status": "ACTIVE",
+    "remarks": "UT REGC NOTE STATUS CHECk",
+    "createDateTime": "2023-12-04T18:46:19+00:00",
+    "documentDescription": "REGISTRAR'S CORRECTION",
+    "documentRegistrationNumber": "00507062",
+    "effectiveDateTime": "2023-12-04T18:46:19+00:00"
+  },
+  "location": {
+    "locationId": 737,
+    "status": "ACTIVE",
+    "locationType": "MH_PARK",
+    "address": {
+      "street": "8300 GALLAGHER LK FRONTAGE RD",
+      "city": "PRINCE RUPERT",
+      "region": "BC",
+      "country": "CA"
+    },
+    "parkName": "THETIS LAKE PARK",
+    "pad": "12",
+    "leaveProvince": false,
+    "taxCertificate": true,
+    "taxExpiryDate": "2024-01-15T08:01:00+00:00"
+  },
+  "hasCaution": false,
+  "payment": {
+    "invoiceId": "32511",
+    "receipt": "/api/v1/payment-requests/32511/receipts"
+  },
+  "usergroup": "ppr_staff",
+  "username": "Business Registry Test 1",
+  "ownerGroups": [
+    {
+      "groupId": 7,
+      "type": "SOLE",
+      "status": "ACTIVE",
+      "interest": "",
+      "interestNumerator": 0,
+      "interestDenominator": 0,
+      "tenancySpecified": true,
+      "owners": [
+        {
+          "type": "SOLE",
+          "individualName": {
+            "first": "JUNE",
+            "last": "LOUIE"
+          },
+          "phoneNumber": "2506419307",
+          "address": {
+            "city": "TERRACE",
+            "street": "102-3614 KALUM STREET",
+            "region": "BC",
+            "country": "CA",
+            "postalCode": "V8G 4E2"
+          },
+          "partyType": "OWNER_IND",
+          "ownerId": 1
+        },
+        {
+          "type": "SOLE",
+          "individualName": {
+            "first": "JANE",
+            "last": "LOUIE"
+          },
+          "phoneNumber": "2506419307",
+          "address": {
+            "city": "TERRACE",
+            "street": "102-3614 KALUM STREET",
+            "region": "BC",
+            "country": "CA",
+            "postalCode": "V8G 4E2"
+          },
+          "partyType": "OWNER_IND",
+          "ownerId": 1
+        }
+      ]
+    },
+    {
+      "groupId": 7,
+      "type": "SOLE",
+      "status": "ACTIVE",
+      "interest": "",
+      "interestNumerator": 0,
+      "interestDenominator": 0,
+      "tenancySpecified": true,
+      "owners": [
+        {
+          "type": "SOLE",
+          "individualName": {
+            "first": "JOHN",
+            "middle": "JOYCE",
+            "last": "LOUIE"
+          },
+          "phoneNumber": "2506419307",
+          "address": {
+            "city": "TERRACE",
+            "street": "102-3614 KALUM STREET",
+            "region": "BC",
+            "country": "CA",
+            "postalCode": "V8G 4E2"
+          },
+          "partyType": "OWNER_IND",
+          "ownerId": 1
+        },
+        {
+          "type": "SOLE",
+          "individualName": {
+            "first": "JAMES",
+            "last": "LOUIE"
+          },
+          "phoneNumber": "2506419307",
+          "address": {
+            "city": "TERRACE",
+            "street": "102-3614 KALUM STREET",
+            "region": "BC",
+            "country": "CA",
+            "postalCode": "V8G 4E2"
+          },
+          "partyType": "OWNER_IND",
+          "ownerId": 1
+        }
+      ]
+    }
+  ],
+  "nocLocation": true,
+  "ppr": {
+    "baseRegistrationNumber": "100752P",
+    "registrationDescription": "PPSA SECURITY AGREEMENT",
+    "securedParty": {
+        "partyId": 11871,
+        "businessName": "BANK OF BRITISH COLUMBIA LTD.",
+        "address": {
+          "street": "3721 BEACON AVENUE",
+          "city": "SIDNEY",
+          "region": "BC",
+          "country": "CA",
+          "postalCode": "V7R 1R7"
+        }
+      },
+    "securedParties": [
+      {
+        "partyId": 11871,
+        "businessName": "BANK OF BRITISH COLUMBIA LTD.",
+        "address": {
+          "street": "3721 BEACON AVENUE",
+          "city": "SIDNEY",
+          "region": "BC",
+          "country": "CA",
+          "postalCode": "V7R 1R7"
+        }
+      },
+      {
+        "partyId": 12576,
+        "businessName": "NEW TEST SECURED PARTY 3 LTD.",
+        "address": {
+          "street": "3721 BEACON AVENUE",
+          "city": "SIDNEY",
+          "region": "BC",
+          "country": "CA",
+          "postalCode": "V7R 1R7"
+        },
+        "added": true
+      }
+    ],
+    "debtors": [
+      {
+        "partyId": 12577,
+        "businessName": "NEW TEST DEBTOR 3 LTD.",
+        "address": {
+          "street": "721 DEBTOR AVE",
+          "city": "VICTORIA",
+          "region": "BC",
+          "country": "CA",
+          "postalCode": "A1A 1A1"
+        },
+        "added": true
+      }
+    ]
+  }
+}

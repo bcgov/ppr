@@ -1,0 +1,2763 @@
+openapi: 3.0.0
+info:
+  title: Manufactured Home Registry API
+  version: 1.0.0
+  description: '<p>The Manufactured Home Registry (MHR) is a centralised, electronic register where details of manufactured homes can be registered and searched. The MHR API provides a real-time, secure, direct link between your business systems and the MHR. With this API you can submit the following transactions:<ul><li>Search for Manufactured Home information</li></ul></p><p>All requests must include a BC Registries issued API key.</p><p>All requests must include an Account ID.</p><p>Fee Information<br>Refer to the BC Registries Payment API to look up an MHR service fee by fee code.</p><p>Payment Information<br>When submitting a request for which there is a fee, the payment invoice ID and a reference to the payment receipt are returned in the response.</p><p>Searches<br>Executing a search is a two step process:<ol><li>Submit search query criteria which on success returns a set of results as summary information.</li><li>Submit selected summary results from the first step to obtain details on one or more Registrations.</li></ol>A fee is charged for the completion of a new search request - the second step.<ul><li>A charge is applied for each manufactured home selected.</li><li>An additional charge is applied for each search selection that includes a PPR lien search.</li></ul></p>'
+  contact:
+    name: BC Registries
+servers:
+  - url: 'https://sandbox.api.connect.gov.bc.ca'
+    description: Sandbox
+  - url: 'https://api.connect.gov.bc.ca'
+    description: Production
+paths:
+  /mhr/api/v1/searches:
+    post:
+      tags:
+        - Search
+      summary: Submit a new search request
+      description: '<p>Executes a new search query as the first of two steps in the search process. The results are a summary list of one or more matches that after review can be filtered as the second step in the search process. The second step returns MH Registration details. If the search has no matches, the HTTP response code is 201, there are no match results in the response, and totalResultsSize is 0. A service fee is charged for each new search query selection (step 2). The four types of searches are:<ul><li>MHR_NUMBER - Search by MANUFACTURED HOME REGISTRATION Number (exact match)</li><li>OWNER_NAME - Search by owner name</li><li>ORGANIZATION_NAME - Search by organization/business name</li><li>SERIAL_NUMBER - Search by serial number</li></ul></p><p>Results are sorted in acending order chronologically by registration createDateTime.</p><p>Note<br>BC Registries may impose an upper limit on the total number of results returned (TBD). The response includes <ul><li>returnedResultsSize - the number of results returned.</li><li>totalResultsSize - the number of matches found in the Registry.</li><li>maxResultsSize - the Registry upper limit on number of results returned.</li></ul><br>If totalResultsSize is greater than returnedResultsSize then you need to refine your search criteria such as with start and end timestamps to include the omitted matches.</p>'
+      operationId: post-search
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/searchQuery'
+            examples:
+              search-by-mhr-number:
+                summary: Search by MHR Number request.
+                value:
+                  type: MHR_NUMBER
+                  criteria:
+                    value: '001234'
+                  clientReferenceId: EX-00000402
+              search-by-serial-number:
+                summary: Search by Serial Number request.
+                value:
+                  type: SERIAL_NUMBER
+                  criteria:
+                    value: XVF003456
+                  clientReferenceId: EX-00000403
+              search-by-owner-name:
+                summary: Search by Owner Name request.
+                value:
+                  type: OWNER_NAME
+                  criteria:
+                    ownerName:
+                      first: James
+                      last: Smith
+                  clientReferenceId: EX-00000404
+              search-by-organization-name:
+                summary: Search by Organization Name request.
+                value:
+                  type: ORGANIZATION_NAME
+                  criteria:
+                    value: RANCOURT HOLDINGS LTD.
+                  clientReferenceId: EX-00000405
+              search-no-results:
+                summary: Example of search criteria that will return no results.
+                value:
+                  type: MHR_NUMBER
+                  criteria:
+                    value: XXXXXX
+      responses:
+        '201':
+          description: Created
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/AccessControlAllowOrigin'
+            Access-Control-Allow-Methods:
+              $ref: '#/components/headers/AccessControlAllowMethods'
+            Access-Control-Allow-Headers:
+              $ref: '#/components/headers/AccessControlAllowHeaders'
+            Access-Control-Max-Age:
+              $ref: '#/components/headers/AccessControlMaxAge'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/searchQueryResults'
+              examples:
+                /api/v1/searches/post/001234:
+                  summary: Search by MHR Number response.
+                  value:
+                    searchId: '1294371'
+                    searchDateTime: '2020-05-14T21:08:32+00:00'
+                    returnedResultsSize: 1
+                    totalResultsSize: 1
+                    maxResultsSize: 1000
+                    searchQuery:
+                      type: MHR_NUMBER
+                      criteria:
+                        value: '001234'
+                      clientReferenceId: EX-00000402
+                    results:
+                      - mhrNumber: '001234'
+                        createDateTime: '2020-02-21T18:56:20+00:00'
+                        status: ACTIVE
+                        includeLienInfo: false
+                        activeCount: 1
+                        exemptCount: 0
+                        historicalCount: 0
+                        homeLocation: PENTICTON
+                        ownerName:
+                          first: James
+                          last: Smith
+                        ownerStatus: ACTIVE
+                        serialNumber: 52D70556
+                        baseInformation:
+                          year: 2018
+                          make: WATSON IND. (ALTA)
+                          model: DUCHESS
+                /api/v1/searches/post/ORGANIZATION_NAME:
+                  summary: Search by Owner Name response.
+                  value:
+                    maxResultsSize: 5000
+                    results:
+                      - activeCount: 1
+                        baseInformation:
+                          make: 2006 LANDMARK 28824
+                          model: ''
+                          year: 2006
+                        createDateTime: '2006-02-06T19:52:41-08:00'
+                        exemptCount: 0
+                        historicalCount: 2
+                        homeLocation: LANGLEY
+                        mhId: 264346
+                        mhrNumber: '091688'
+                        organizationName: RANCOURT HOLDINGS LTD.
+                        ownerStatus: ACTIVE
+                        serialNumber: 0322292A
+                        status: ACTIVE
+                    returnedResultsSize: 1
+                    searchDateTime: '2023-10-30T22:11:06+00:00'
+                    searchId: '1294376'
+                    searchQuery:
+                      clientReferenceId: EX-00000405
+                      criteria:
+                        value: RANCOURT HOLDINGS LTD.
+                      type: ORGANIZATION_NAME
+                    totalResultsSize: 1
+                /api/v1/searches/post/OWNER_NAME:
+                  summary: Search by Owner Name response.
+                  value:
+                    searchId: '1294372'
+                    searchDateTime: '2020-05-15T21:08:32Z'
+                    returnedResultsSize: 1
+                    totalResultsSize: 1
+                    maxResultsSize: 1000
+                    searchQuery:
+                      type: OWNER_NAME
+                      criteria:
+                        ownerName:
+                          first: James
+                          last: Smith
+                      clientReferenceId: EX-00000404
+                    results:
+                      - activeCount: 1
+                        baseInformation:
+                          make: SAFEWAY 2-S
+                          model: ''
+                          year: 1969
+                        createDateTime: '1995-11-14T08:00:01-08:00'
+                        exemptCount: 0
+                        historicalCount: 0
+                        homeLocation: VERNON
+                        mhrNumber: '001234'
+                        ownerName:
+                          first: JAMES
+                          last: SMITH
+                          middle: DAVID
+                        ownerStatus: ACTIVE
+                        serialNumber: '56605'
+                        status: ACTIVE
+                /api/v1/searches/post/SERIAL_NUMBER:
+                  summary: Search by Serial Number response.
+                  value:
+                    searchId: '1294373'
+                    searchDateTime: '2020-05-16T21:17:32+00:00'
+                    returnedResultsSize: 2
+                    totalResultsSize: 2
+                    maxResultsSize: 1000
+                    searchQuery:
+                      type: SERIAL_NUMBER
+                      criteria:
+                        value: XVF003456
+                      clientReferenceId: EX-00000403
+                    results:
+                      - activeCount: 1
+                        baseInformation:
+                          make: 2020 CORNERSTONE DW 27CO5604
+                          model: ''
+                          year: 2020
+                        createDateTime: '2020-08-31T19:42:12-07:00'
+                        exemptCount: 0
+                        historicalCount: 0
+                        homeLocation: PENTICTON
+                        mhId: 445254
+                        mhrNumber: '104907'
+                        ownerName:
+                          first: TERRI
+                          last: ROBERTSON
+                          middle: ANN
+                        ownerStatus: ACTIVE
+                        serialNumber: 003000AA003456A
+                        status: ACTIVE
+                      - activeCount: 1
+                        baseInformation:
+                          make: 2020 CORNERSTONE DW 27CO5604
+                          model: ''
+                          year: 2020
+                        createDateTime: '2020-08-31T19:42:12-07:00'
+                        exemptCount: 0
+                        historicalCount: 0
+                        homeLocation: PENTICTON
+                        mhId: 445254
+                        mhrNumber: '104907'
+                        ownerName:
+                          first: TERRI
+                          last: ROBERTSON
+                          middle: ANN
+                        ownerStatus: ACTIVE
+                        serialNumber: 003000AA003456B
+                        status: ACTIVE
+                /api/v1/searches/post/MHR_NUMBER/XXXXXX:
+                  summary: Search no results response.
+                  value:
+                    searchId: '1294378'
+                    searchDateTime: '2020-05-14T21:16:32+00:00'
+                    returnedResultsSize: 0
+                    totalResultsSize: 0
+                    maxResultsSize: 1000
+                    searchQuery:
+                      type: MHR_NUMBER
+                      criteria:
+                        value: XXXXXX
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    parameters: []
+  '/mhr/api/v1/searches/{searchId}':
+    parameters:
+      - $ref: '#/components/parameters/searchId'
+    put:
+      tags:
+        - Search
+      summary: Select Search Registrations
+      description: This operation is intended for BCRS application internal use only. It supports application search step 1 autosave of the search selection prior to the execution of search step 2. The added searchSummaryInformation "selected" property indicates if a query result is to be included in the search step 2 details. Note that this operation is a complete replacement of the search step 1 results. The response echoes back the request body.
+      operationId: put-update-search-select
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/searchSummaryInformation'
+            examples:
+              update-selection-example:
+                summary: Update the search selection Business Debtor similar match request.
+                value:
+                  - createDateTime: '2020-08-10T18:56:20+00:00'
+                    mhrNumber: '001234'
+                    status: ACTIVE
+                    includeLienInfo: false
+                    homeLocation: PENTICTON
+                    organizationName: SAGE HILL INC.
+                    ownerName:
+                      first: James
+                      last: Smith
+                    ownerStatus: ACTIVE
+                    serialNumber: 52D70556
+                    baseInformation:
+                      year: 2018
+                      make: WATSON IND. (ALTA)
+                      model: DUCHESS
+      responses:
+        '202':
+          description: Update accepted
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/AccessControlAllowOrigin'
+            Access-Control-Allow-Methods:
+              $ref: '#/components/headers/AccessControlAllowMethods'
+            Access-Control-Allow-Headers:
+              $ref: '#/components/headers/AccessControlAllowHeaders'
+            Access-Control-Max-Age:
+              $ref: '#/components/headers/AccessControlMaxAge'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/searchSummaryInformation'
+              examples:
+                /api/v1/searches/1294376/put:
+                  summary: Search select Business Debtor response.
+                  value:
+                    - createDateTime: '2020-08-10T18:56:20+00:00'
+                      mhrNumber: '001234'
+                      status: ACTIVE
+                      includeLienInfo: false
+                      homeLocation: PENTICTON
+                      organizationName: SAGE HILL INC.
+                      ownerName:
+                        first: James
+                        last: Smith
+                      ownerStatus: ACTIVE
+                      serialNumber: 52D70556
+                      baseInformation:
+                        year: 2018
+                        make: WATSON IND. (ALTA)
+                        model: DUCHESS
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  '/mhr/api/v1/search-results/{searchId}':
+    parameters:
+      - $ref: '#/components/parameters/searchId'
+      - $ref: '#/components/parameters/accountId'
+      - schema:
+          type: string
+          example: application/pdf
+        in: header
+        name: Accept
+        description: The optional requested MIME type format of the response. Either application/json (the default) or application/pdf are allowed.
+    get:
+      tags:
+        - Search
+      summary: Fetch Previous Search of MANUFACTURED HOME REGISTRATIONs.
+      description: 'After a search has completed, this operation may be used to retrieve the search detail information identified by the searchId path parameter. This operation is permitted for up to seven days after the initial search.'
+      operationId: get-searches-select-results
+      responses:
+        '200':
+          description: Search detail results either as JSON or PDF.
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/AccessControlAllowOrigin'
+            Access-Control-Allow-Methods:
+              $ref: '#/components/headers/AccessControlAllowMethods'
+            Access-Control-Allow-Headers:
+              $ref: '#/components/headers/AccessControlAllowHeaders'
+            Access-Control-Max-Age:
+              $ref: '#/components/headers/AccessControlMaxAge'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/searchDetailResults'
+              examples:
+                /api/v1/search-results/1294371/get:
+                  summary: Search select results MHR Number response.
+                  value:
+                    searchDateTime: '2020-05-14T21:08:32+00:00'
+                    totalResultsSize: 1
+                    certified: false
+                    searchQuery:
+                      type: MHR_NUMBER
+                      criteria:
+                        value: '001234'
+                    selected:
+                      - createDateTime: '2020-02-21T18:56:20+00:00'
+                        mhrNumber: '001234'
+                        status: ACTIVE
+                        includeLienInfo: false
+                        homeLocation: PENTICTON
+                        ownerName:
+                          first: JAMES
+                          last: SMITH
+                        ownerStatus: ACTIVE
+                        serialNumber: 52D70556
+                        baseInformation:
+                          year: 2018
+                          make: WATSON IND. (ALTA)
+                          model: DUCHESS
+                    payment:
+                      receipt: /pay/api/v1/payment-requests/2198743/receipts
+                      invoiceId: '2198743'
+                    details:
+                      - mhrNumber: '001234'
+                        documentId: '42800656'
+                        status: ACTIVE
+                        createDateTime: '2022-06-01T17:00:00+00:00'
+                        clientReferenceId: EX-MH001234
+                        declaredValue: 120000
+                        ownerGroups:
+                          - groupId: 1
+                            owners:
+                              - individualName:
+                                  first: JAMES
+                                  last: SMITH
+                                address:
+                                  street: 6665 238TH STREET
+                                  city: LANGLEY
+                                  region: BC
+                                  country: CA
+                                  postalCode: V3A 6H4
+                                phoneNumber: '6044620279'
+                            type: COMMON
+                            interest: UNDIVIDED 4/5
+                            interestNumerator: 4
+                            status: ACTIVE
+                            tenancySpecified: true
+                          - groupId: 2
+                            owners:
+                              - individualName:
+                                  first: JOHN
+                                  middle: STEVEN
+                                  last: CONNOLLY
+                                address:
+                                  street: 6665 238TH STREET
+                                  city: LANGLEY
+                                  region: BC
+                                  country: CA
+                                  postalCode: V3A 6H4
+                                phoneNumber: '6044620279'
+                            type: COMMON
+                            interest: UNDIVIDED 1/5
+                            interestNumerator: 1
+                            status: ACTIVE
+                            tenancySpecified: true
+                        location:
+                          parkName: HIDDEN VALLEY TRAILER COURT
+                          pad: '20'
+                          address:
+                            street: 940 BLANSHARD STREET
+                            city: VICTORIA
+                            region: BC
+                            country: CA
+                            postalCode: A1A 1A1
+                          leaveProvince: false
+                          pidNumber: '011625490'
+                          taxCertificate: false
+                          dealerName: NOR-TEC DESIGN GROUP LTD.
+                        description:
+                          manufacturer: STARLINE
+                          baseInformation:
+                            year: 2018
+                            make: WATSON IND. (ALTA)
+                            model: DUCHESS
+                          sectionCount: 1
+                          sections:
+                            - serialNumber: 52D70556
+                              lengthFeet: 52
+                              lengthInches: 0
+                              widthFeet: 12
+                              widthInches: 0
+                          csaNumber: '786356'
+                          csaStandard: Z240
+                        notes:
+                          - documentType: EXRS
+                            documentId: REG01234
+                            createDateTime: '1995-02-21T18:56:00+00:00'
+                            remarks: ''
+                            contactName: JOHNNY NUCLEO
+                            contactAddress:
+                              street: 940 BLANSHARD STREET
+                              city: VICTORIA
+                              region: BC
+                              postalCode: V8W 3E6
+                              country: CA
+                        payment:
+                          receipt: /pay/api/v1/payment-requests/2198744/receipts
+                          invoiceId: '2198744'
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Search
+      summary: Select Search Registrations
+      description: '<p>As the second step in the search two-step process, choose from the summary information returned in the first step which manufactured home registrations to retrieve detailed information about. Only an mhrNumber needs to be provided to select a manufactured home registration.</p><p>If the request is accepted a report is queued for generation as a final step. There may be delay before the report is available with a subsequent GET request.</p><p>If requesting a PDF and the number of registrations is greater than 75, the request must include a callbackURL parameter, otherwise a 400 status is returned. If the request is accepted in this scenario the response will return a getReportURL value. When the report is available a notification will be sent to the callbackURL. The body of the notification is a single JSON property getReportURL with the same value as the original response. The caller can then use the GET /mhr/api/v1/search-results/{searchId} endpoint to fetch the PDF.</p>'
+      operationId: post-searches-select-results
+      parameters:
+        - name: callbackURL
+          in: query
+          required: false
+          description: 'If the response format is PDF and the number of registrations is above the threshold, include an encoded URL to receive a notfication that the PDF is available.'
+          schema:
+            type: string
+        - name: clientReferenceId
+          in: query
+          required: false
+          description: Optionally provide a client transaction/reference identifier for the request. If present it will overwrite the value submitted in the first search step.
+          schema:
+            type: string
+        - name: certified
+          in: query
+          required: false
+          description: BC Registries staff only option to request a certified copy of the search report with an additional fee.
+          schema:
+            type: boolean
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/searchSummaryInformation'
+            examples:
+              mhr-number-match-1294371:
+                summary: Search select MHR Number request.
+                value:
+                  - createDateTime: '2020-08-10T18:56:20+00:00'
+                    mhrNumber: '001234'
+                    status: ACTIVE
+                    includeLienInfo: false
+                    homeLocation: PENTICTON
+                    ownerName:
+                      first: James
+                      last: Smith
+                    ownerStatus: ACTIVE
+                    serialNumber: 52D70556
+                    baseInformation:
+                      year: 2018
+                      make: WATSON IND. (ALTA)
+                      model: DUCHESS
+              mhr-serial-number-1294373:
+                summary: Search select Serial Number request.
+                value:
+                  - activeCount: 1
+                    baseInformation:
+                      make: 2020 CORNERSTONE DW 27CO5604
+                      model: ''
+                      year: 2020
+                    createDateTime: '2020-08-31T19:42:12-07:00'
+                    exemptCount: 0
+                    historicalCount: 0
+                    homeLocation: PENTICTON
+                    mhId: 445254
+                    mhrNumber: '104907'
+                    ownerName:
+                      first: TERRI
+                      last: ROBERTSON
+                      middle: ANN
+                    ownerStatus: ACTIVE
+                    serialNumber: 003000AA003456B
+                    status: ACTIVE
+              mhr-owner-name-1294372:
+                summary: Search select individual owner name request.
+                value:
+                  - baseInformation:
+                      make: 3 BEDROOM
+                      model: ''
+                      year: 1973
+                    createDateTime: '1995-11-14T00:00:01+00:00'
+                    homeLocation: INVERMERE
+                    mhrNumber: '024289'
+                    ownerName:
+                      first: DAVID
+                      last: HAMM
+                      middle: WAYNE
+                    serialNumber: 68MA0970
+                    status: ACTIVE
+              mhr-organization-name-1294376:
+                summary: Search select owner business/organization name request.
+                value:
+                  - activeCount: 1
+                    baseInformation:
+                      make: 2006 LANDMARK 28824
+                      model: ''
+                      year: 2006
+                    createDateTime: '2006-02-06T19:52:41-08:00'
+                    exemptCount: 0
+                    historicalCount: 2
+                    homeLocation: LANGLEY
+                    mhId: 264346
+                    mhrNumber: '091688'
+                    organizationName: RANCOURT HOLDINGS LTD.
+                    ownerStatus: ACTIVE
+                    serialNumber: 0322292A
+                    status: ACTIVE
+      responses:
+        '200':
+          description: Search detail results either as JSON or PDF.
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/AccessControlAllowOrigin'
+            Access-Control-Allow-Methods:
+              $ref: '#/components/headers/AccessControlAllowMethods'
+            Access-Control-Allow-Headers:
+              $ref: '#/components/headers/AccessControlAllowHeaders'
+            Access-Control-Max-Age:
+              $ref: '#/components/headers/AccessControlMaxAge'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/searchDetailResults'
+              examples:
+                /api/v1/search-results/1294371/post:
+                  summary: Search select Registration Number response.
+                  value:
+                    searchDateTime: '2020-05-14T21:08:32+00:00'
+                    totalResultsSize: 1
+                    certified: false
+                    searchQuery:
+                      type: MHR_NUMBER
+                      criteria:
+                        value: '001234'
+                    selected:
+                      - createDateTime: '2020-02-21T18:56:20Z'
+                        mhrNumber: '001234'
+                        status: ACTIVE
+                        includeLienInfo: false
+                        homeLocation: PENTICTON
+                        ownerName:
+                          first: JAMES
+                          last: SMITH
+                        ownerStatus: ACTIVE
+                        serialNumber: 52D70556
+                        baseInformation:
+                          year: 2018
+                          make: WATSON IND. (ALTA)
+                          model: DUCHESS
+                    payment:
+                      receipt: /pay/api/v1/payment-requests/2198743/receipts
+                      invoiceId: '2198743'
+                    details:
+                      - mhrNumber: '001234'
+                        documentId: '42800656'
+                        status: ACTIVE
+                        clientReferenceId: EX-MH001234
+                        createDateTime: '2022-06-01T17:00:00+00:00'
+                        declaredValue: 120000
+                        ownerGroups:
+                          - groupId: 1
+                            owners:
+                              - individualName:
+                                  first: JAMES
+                                  last: SMITH
+                                address:
+                                  street: 6665 238TH STREET
+                                  city: LANGLEY
+                                  region: BC
+                                  country: CA
+                                  postalCode: V3A 6H4
+                                phoneNumber: '6044620279'
+                            type: COMMON
+                            interest: UNDIVIDED 4/5
+                            interestNumerator: 4
+                            status: ACTIVE
+                            tenancySpecified: true
+                          - groupId: 2
+                            owners:
+                              - individualName:
+                                  first: JOHN
+                                  middle: STEVEN
+                                  last: CONNOLLY
+                                address:
+                                  street: 6665 238TH STREET
+                                  city: LANGLEY
+                                  region: BC
+                                  country: CA
+                                  postalCode: V3A 6H4
+                                phoneNumber: '6044620279'
+                            type: COMMON
+                            interest: UNDIVIDED 1/5
+                            interestNumerator: 1
+                            status: ACTIVE
+                            tenancySpecified: true
+                        location:
+                          parkName: HIDDEN VALLEY TRAILER COURT
+                          pad: '20'
+                          address:
+                            street: 940 BLANSHARD STREET
+                            city: VICTORIA
+                            region: BC
+                            country: CA
+                            postalCode: A1A 1A1
+                          leaveProvince: false
+                          pidNumber: '011625490'
+                          taxCertificate: false
+                          dealerName: NOR-TEC DESIGN GROUP LTD.
+                        description:
+                          manufacturer: STARLINE
+                          baseInformation:
+                            year: 2018
+                            make: WATSON IND. (ALTA)
+                            model: DUCHESS
+                          sectionCount: 1
+                          sections:
+                            - serialNumber: 52D70556
+                              lengthFeet: 52
+                              lengthInches: 0
+                              widthFeet: 12
+                              widthInches: 0
+                          csaNumber: '786356'
+                          csaStandard: Z240
+                        notes:
+                          - documentType: EXRS
+                            documentId: REG01234
+                            createDateTime: '1995-02-21T18:56:00+00:00'
+                            remarks: ''
+                            contactName: JOHNNY NUCLEO
+                            contactAddress:
+                              street: 940 BLANSHARD STREET
+                              city: VICTORIA
+                              region: BC
+                              postalCode: V8W 3E6
+                              country: CA
+                        payment:
+                          receipt: /pay/api/v1/payment-requests/2198744/receipts
+                          invoiceId: '2198744'
+                /api/v1/search-results/1294372/post:
+                  summary: Search select Individual Owner Name response.
+                  value:
+                    certified: false
+                    details:
+                      - createDateTime: '1995-11-14T08:00:01+00:00'
+                        declaredValue: 0
+                        description:
+                          baseInformation:
+                            circa: false
+                            make: SAFEWAY 2-S
+                            model: ''
+                            year: 1969
+                          manufacturer: SAFEWAY
+                          sectionCount: 1
+                          sections:
+                            - lengthFeet: 56
+                              lengthInches: 0
+                              serialNumber: '56605'
+                              widthFeet: 12
+                              widthInches: 0
+                          status: ACTIVE
+                        documentDescription: RECORD CONVERSION
+                        documentId: REG31577
+                        documentRegistrationNumber: '00031577'
+                        location:
+                          address:
+                            city: VERNON
+                            country: CA
+                            region: BC
+                            street: BUCHANAN ROAD
+                          landDistrict: ODYD
+                          leaveProvince: false
+                          locationId: 25891
+                          locationType: OTHER
+                          lot: '238'
+                          plan: '1216'
+                          range: ' '
+                          section: '20'
+                          status: ACTIVE
+                          taxCertificate: false
+                          township: '6'
+                        mhrNumber: '001234'
+                        notes: []
+                        ownLand: false
+                        ownerGroups:
+                          - groupId: 1
+                            owners:
+                              - address:
+                                  city: VERNON
+                                  country: CA
+                                  region: BC
+                                  street: 'RR 4, TRONSON ROAD'
+                                individualName:
+                                  first: JAMES
+                                  last: SMITH
+                                  middle: DAVID
+                                ownerId: 31376
+                                partyType: OWNER_IND
+                                phoneNumber: '604'
+                                status: ACTIVE
+                                type: JOINT
+                              - address:
+                                  city: VERNON
+                                  country: CA
+                                  region: BC
+                                  street: 'RR 4, TRONSON ROAD'
+                                individualName:
+                                  first: DONNA
+                                  last: SMITH
+                                  middle: LYNN
+                                ownerId: 31377
+                                partyType: OWNER_IND
+                                phoneNumber: '604'
+                                status: ACTIVE
+                                type: JOINT
+                            status: ACTIVE
+                            tenancySpecified: false
+                            type: JOINT
+                          - groupId: 1
+                            owners:
+                              - address:
+                                  city: VERNON
+                                  country: CA
+                                  region: BC
+                                  street: 'RR 4, TRONSON ROAD'
+                                individualName:
+                                  first: JAMES
+                                  last: SMITH
+                                  middle: DAVID
+                                ownerId: 31376
+                                partyType: OWNER_IND
+                                phoneNumber: '604'
+                                status: ACTIVE
+                                type: JOINT
+                              - address:
+                                  city: VERNON
+                                  country: CA
+                                  region: BC
+                                  street: 'RR 4, TRONSON ROAD'
+                                individualName:
+                                  first: DONNA
+                                  last: SMITH
+                                  middle: LYNN
+                                ownerId: 31377
+                                partyType: OWNER_IND
+                                phoneNumber: '604'
+                                status: ACTIVE
+                                type: JOINT
+                            status: ACTIVE
+                            tenancySpecified: false
+                            type: JOINT
+                        registrationType: MHREG_CONVERSION
+                        status: ACTIVE
+                    getReportURL: /ppr/api/v1/search-results/16940
+                    payment:
+                      invoiceId: '32264'
+                      receipt: /api/v1/payment-requests/32264/receipts
+                    searchDateTime: '2023-10-30T21:36:45+00:00'
+                    searchQuery:
+                      clientReferenceId: MI-UT-0002
+                      criteria:
+                        ownerName:
+                          first: James
+                          last: Smith
+                      type: OWNER_NAME
+                    selected:
+                      - activeCount: 1
+                        baseInformation:
+                          make: SAFEWAY 2-S
+                          model: ''
+                          year: 1969
+                        createDateTime: '1995-11-14T08:00:01-08:00'
+                        exemptCount: 0
+                        historicalCount: 0
+                        homeLocation: VERNON
+                        mhId: 28245
+                        mhrNumber: '031577'
+                        ownerName:
+                          first: JAMES
+                          last: SMITH
+                          middle: DAVID
+                        ownerStatus: ACTIVE
+                        serialNumber: '56605'
+                        status: ACTIVE
+                    totalResultsSize: 1
+                /api/v1/search-results/1294373/post:
+                  summary: Search select Serial Number response.
+                  value:
+                    certified: false
+                    details:
+                      - clientReferenceId: 003000AA003456AB
+                        createDateTime: '2020-08-31T19:42:12+00:00'
+                        declaredDateTime: '2021-02-08T22:53:23+00:00'
+                        declaredValue: 243929
+                        description:
+                          baseInformation:
+                            circa: false
+                            make: 2020 CORNERSTONE DW 27CO5604
+                            model: ''
+                            year: 2020
+                          csaNumber: MD-17153
+                          csaStandard: A277
+                          manufacturer: MODULINE INDUSTRIES - PENTICTON
+                          sectionCount: 2
+                          sections:
+                            - lengthFeet: 56
+                              lengthInches: 0
+                              serialNumber: 003000AA003456A
+                              widthFeet: 13
+                              widthInches: 6
+                            - lengthFeet: 52
+                              lengthInches: 0
+                              serialNumber: 003000AA003456B
+                              widthFeet: 13
+                              widthInches: 6
+                          status: ACTIVE
+                        documentDescription: MANUFACTURED HOME REGISTRATION
+                        documentId: '80044773'
+                        documentRegistrationNumber: '00447287'
+                        location:
+                          address:
+                            city: PENTICTON
+                            country: CA
+                            region: BC
+                            street: 490 ALEXANDER AVENUE
+                          leaveProvince: false
+                          legalDescription: LOT 2 DISTRICT LOT 4 GROUP 7 SIMILKAMEEN DIVISION YALE (FORMERLY YALE-LYTTON) DISTRICT PLAN 5384
+                          locationId: 189839
+                          locationType: OTHER
+                          pidNumber: '003275892'
+                          plan: ' '
+                          range: ' '
+                          status: ACTIVE
+                          taxCertificate: false
+                        mhrNumber: '104907'
+                        notes: []
+                        ownLand: false
+                        ownerGroups:
+                          - groupId: 3
+                            owners:
+                              - address:
+                                  city: PENTICTON
+                                  country: CA
+                                  postalCode: V2A 1K5
+                                  region: BC
+                                  street: 102-496 WESTMINSTER AVNEUE W
+                                individualName:
+                                  first: CHARLES
+                                  last: ROBERTSON
+                                  middle: MALCOM
+                                ownerId: 929847
+                                partyType: OWNER_IND
+                                phoneNumber: '6048036334'
+                                status: ACTIVE
+                                type: JOINT
+                              - address:
+                                  city: PENTICTON
+                                  country: CA
+                                  postalCode: V2A 1K5
+                                  region: BC
+                                  street: 102-496 WESTMINSTER AVNEUE W
+                                individualName:
+                                  first: TERRI
+                                  last: ROBERTSON
+                                  middle: ANN
+                                ownerId: 930168
+                                partyType: OWNER_IND
+                                phoneNumber: '6048036334'
+                                status: ACTIVE
+                                type: JOINT
+                            status: ACTIVE
+                            tenancySpecified: true
+                            type: JOINT
+                        registrationType: MHREG
+                        status: ACTIVE
+                        submittingParty:
+                          address:
+                            city: 'PENTICTON '
+                            country: CA
+                            postalCode: V2A 5X5
+                            region: BC
+                            street: 1175 RAILWAY STREET
+                          businessName: CHAMPION CANADA INTERNATIONAL ULC
+                          phoneNumber: '2504930122'
+                    getReportURL: /ppr/api/v1/search-results/16942
+                    payment:
+                      invoiceId: '32265'
+                      receipt: /api/v1/payment-requests/32265/receipts
+                    searchDateTime: '2023-10-30T21:56:13+00:00'
+                    searchQuery:
+                      clientReferenceId: MS-UT-0002
+                      criteria:
+                        value: XVF003456
+                      type: SERIAL_NUMBER
+                    selected:
+                      - activeCount: 1
+                        baseInformation:
+                          make: 2020 CORNERSTONE DW 27CO5604
+                          model: ''
+                          year: 2020
+                        createDateTime: '2020-08-31T19:42:12-07:00'
+                        exemptCount: 0
+                        extraMatches:
+                          - activeCount: 1
+                            baseInformation:
+                              make: 2020 CORNERSTONE DW 27CO5604
+                              model: ''
+                              year: 2020
+                            createDateTime: '2020-08-31T19:42:12-07:00'
+                            exemptCount: 0
+                            historicalCount: 0
+                            homeLocation: PENTICTON
+                            mhId: 445254
+                            mhrNumber: '104907'
+                            ownerName:
+                              first: TERRI
+                              last: ROBERTSON
+                              middle: ANN
+                            ownerStatus: ACTIVE
+                            serialNumber: 003000AA003456B
+                            status: ACTIVE
+                        historicalCount: 0
+                        homeLocation: PENTICTON
+                        mhId: 445254
+                        mhrNumber: '104907'
+                        ownerName:
+                          first: TERRI
+                          last: ROBERTSON
+                          middle: ANN
+                        ownerStatus: ACTIVE
+                        serialNumber: 003000AA003456A
+                        status: ACTIVE
+                    totalResultsSize: 1
+                /api/v1/search-results/1294376/post:
+                  summary: Search select Organization/Business Name response.
+                  value:
+                    certified: false
+                    details:
+                      - clientReferenceId: '0322292'
+                        createDateTime: '2006-02-06T19:52:41+00:00'
+                        declaredDateTime: '2021-09-17T16:50:40+00:00'
+                        declaredValue: 100000
+                        description:
+                          baseInformation:
+                            circa: false
+                            make: 2006 LANDMARK 28824
+                            model: ''
+                            year: 2006
+                          csaNumber: '30028'
+                          csaStandard: Z240
+                          manufacturer: MODULINE INDUSTRIES (CANADA) LTD.
+                          sectionCount: 2
+                          sections:
+                            - lengthFeet: 50
+                              lengthInches: 0
+                              serialNumber: 0322292A
+                              widthFeet: 14
+                              widthInches: 0
+                            - lengthFeet: 52
+                              lengthInches: 0
+                              serialNumber: 0322292B
+                              widthFeet: 14
+                              widthInches: 0
+                          status: ACTIVE
+                        documentDescription: MANUFACTURED HOME REGISTRATION
+                        documentId: '80012013'
+                        documentRegistrationNumber: '00266089'
+                        location:
+                          address:
+                            city: LANGLEY
+                            country: CA
+                            region: BC
+                            street: 21729 56TH AVENUE
+                          leaveProvince: false
+                          legalDescription: LOT 8 SECTION 7 TOWNSHIP 11 NEW WESTMINSTER DISTRICT PLAN 42988
+                          locationId: 138190
+                          locationType: OTHER
+                          pidNumber: '006578772'
+                          plan: ' '
+                          range: ' '
+                          status: ACTIVE
+                          taxCertificate: false
+                        mhrNumber: '091688'
+                        notes: []
+                        ownLand: false
+                        ownerGroups:
+                          - groupId: 8
+                            owners:
+                              - address:
+                                  city: LANGLEY
+                                  country: CA
+                                  postalCode: V2Y 2M9
+                                  region: BC
+                                  street: 21801 - 56 AVENUE
+                                organizationName: RANCOURT HOLDINGS LTD.
+                                ownerId: 929127
+                                partyType: OWNER_BUS
+                                phoneNumber: '604'
+                                status: ACTIVE
+                                type: SOLE
+                            status: ACTIVE
+                            tenancySpecified: true
+                            type: SOLE
+                        registrationType: MHREG
+                        status: ACTIVE
+                        submittingParty:
+                          address:
+                            city: 'PENTICTON '
+                            country: CA
+                            postalCode: V2A 6K3
+                            region: BC
+                            street: 1175 RAILWAY STREET
+                          businessName: MODULINE INDUSTRIES (CANADA) LTD.
+                          phoneNumber: '2504930122'
+                    getReportURL: /ppr/api/v1/search-results/16947
+                    payment:
+                      invoiceId: '32266'
+                      receipt: /api/v1/payment-requests/32266/receipts
+                    searchDateTime: '2023-10-30T22:11:06+00:00'
+                    searchQuery:
+                      clientReferenceId: EX-00000405
+                      criteria:
+                        value: RANCOURT HOLDINGS LTD.
+                      type: ORGANIZATION_NAME
+                    selected:
+                      - activeCount: 1
+                        baseInformation:
+                          make: 2006 LANDMARK 28824
+                          model: ''
+                          year: 2006
+                        createDateTime: '2006-02-06T19:52:41-08:00'
+                        exemptCount: 0
+                        historicalCount: 2
+                        homeLocation: LANGLEY
+                        mhId: 264346
+                        mhrNumber: '091688'
+                        organizationName: RANCOURT HOLDINGS LTD.
+                        ownerStatus: ACTIVE
+                        serialNumber: 0322292A
+                        status: ACTIVE
+                    totalResultsSize: 1
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /mhr/api/v1/search-history:
+    parameters:
+      - $ref: '#/components/parameters/accountId'
+    get:
+      tags:
+        - Search
+      summary: List account search history
+      description: '<p>Retrieve a list of previous searches performed by the account ID submitting the request. The list items include the search criteria and summary results (search step 1 responses). The default sort order is by search timestamp starting with the most recent. The results size may be limited by number of items or by most recent number of days.</p><p>If no previous search history exists for the account, an empty array is returned.</p>'
+      operationId: list-search-history
+      responses:
+        '200':
+          description: OK
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/AccessControlAllowOrigin'
+            Access-Control-Allow-Methods:
+              $ref: '#/components/headers/AccessControlAllowMethods'
+            Access-Control-Allow-Headers:
+              $ref: '#/components/headers/AccessControlAllowHeaders'
+            Access-Control-Max-Age:
+              $ref: '#/components/headers/AccessControlMaxAge'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/searchQueryResults'
+              examples:
+                /api/v1/search-history/get:
+                  value:
+                    - searchId: '1294371'
+                      searchDateTime: '2020-05-14T21:16:32+00:00'
+                      returnedResultsSize: 1
+                      totalResultsSize: 1
+                      maxResultsSize: 1000
+                      searchQuery:
+                        type: MHR_NUMBER
+                        criteria:
+                          value: '001234'
+                        clientReferenceId: EX-00000402
+                      username: John Smith
+                      payment:
+                        receipt: /pay/api/v1/payment-requests/2198743/receipts
+                        invoiceId: '2198743'
+                    - searchId: '1294372'
+                      searchDateTime: '2020-05-15T21:16:32+00:00'
+                      returnedResultsSize: 1
+                      totalResultsSize: 1
+                      maxResultsSize: 1000
+                      searchQuery:
+                        type: OWNER_NAME
+                        criteria:
+                          ownerName:
+                            first: James
+                            last: Smith
+                        clientReferenceId: EX-00000403
+                      username: Jane Smith
+                      payment:
+                        receipt: /pay/api/v1/payment-requests/2198744/receipts
+                        invoiceId: '2198744'
+                    - searchId: '1294373'
+                      searchDateTime: '2020-05-16T21:08:32+00:00'
+                      returnedResultsSize: 1
+                      totalResultsSize: 1
+                      maxResultsSize: 1000
+                      searchQuery:
+                        type: SERIAL_NUMBER
+                        criteria:
+                          value: 52D70556
+                        clientReferenceId: A-00000402
+                      username: ''
+                      payment:
+                        receipt: /pay/api/v1/payment-requests/2198745/receipts
+                        invoiceId: '2198745'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  schemas:
+    address:
+      title: address
+      description: 'Capture address information for an entity. If the country code is Canada or the US, region and postal code are required.'
+      type: object
+      properties:
+        street:
+          type: string
+          description: 'Street address and name. '
+        city:
+          type: string
+          description: 'City, Town, or Village.'
+        region:
+          type: string
+          description: 'For Canada or USA, 2 character region code matching the country code.'
+          minLength: 2
+          maxLength: 2
+        country:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: 2 Character ISO 3166-1 Alpha-2 Country Code.
+        postalCode:
+          type: string
+          description: 'Postal Code in A1A 1A1 format for Canada, or zip code for US addresses.'
+        streetAdditional:
+          type: string
+          description: Additional address field.
+      required:
+        - street
+        - city
+      x-examples:
+        address-example-1:
+          street: 721 Fort St.
+          city: Victoria
+          region: BC
+          country: CA
+          postalCode: A1A 1A1
+    baseInformation:
+      type: object
+      title: baseInformation
+      description: <p>Base information about a MANUFACTURED HOME REGISTRATION.</p>
+      properties:
+        year:
+          type: integer
+          minimum: 1900
+          maximum: 2100
+          description: Year of manufacture of the home.
+        make:
+          type: string
+          description: Make of home (or manufacturer's name).
+        model:
+          type: string
+          description: Model name.
+        circa:
+          type: boolean
+          description: True if the year value is uncertain.
+          default: false
+      required:
+        - year
+      x-examples:
+        mhr-new-request:
+          year: 2018
+          make: WATSON IND. (ALTA)
+          model: DUCHESS
+          circa: false
+    clientReferenceId:
+      type: string
+      description: An optional client reference identifier associated with a change. Provided to facilitate client tracking of MHR activity. Identical in use to a Folio Tag.
+      example: A-00004241
+    createDateTime:
+      type: string
+      format: date-time
+      description: 'Generated by the MHR system and included in a response, the date and time a record is created in the system.'
+      example: '2020-02-21T18:56:00+00:00'
+    description:
+      title: description
+      type: object
+      description: This object holds a description of a manufacture home. Provide either a certification CSA number or an engineer date and name.
+      properties:
+        manufacturer:
+          type: string
+          description: The manufacturer of the home.
+        baseInformation:
+          $ref: '#/components/schemas/baseInformation'
+        sectionCount:
+          type: integer
+          minimum: 1
+          maximum: 4
+          description: The number of sections in the manufactured home.
+        sections:
+          type: array
+          description: 'Contains information about the manufactured home sections. At least one item is required, maximum four.'
+          items:
+            $ref: '#/components/schemas/sectionInformation'
+        csaNumber:
+          type: string
+          description: The assigned certification CSA number.
+        csaStandard:
+          type: string
+          description: The CSA standard code.
+        engineerDate:
+          type: string
+          format: date-time
+          description: 'The date of the engineering inspection in the ISO 8601 format YYYY-MM-DDThh:mm:ssTZD.'
+        engineerName:
+          type: string
+          description: The name of the engineer who performed the inspection.
+        rebuiltRemarks:
+          type: string
+          description: Comments on the rebuilt status of the home.
+        otherRemarks:
+          type: string
+          description: Other comments on the home.
+      required:
+        - manufacturer
+        - baseInformation
+        - sections
+        - sectionCount
+      x-examples:
+        description-example:
+          manufacturer: STARLINE
+          baseInformation:
+            year: 2018
+            make: WATSON IND. (ALTA)
+            model: DUCHESS
+          sectionCount: 1
+          sections:
+            - serialNumber: 52D70556
+              lengthFeet: 52
+              lengthInches: 0
+              widthFeet: 12
+              widthInches: 0
+          csaNumber: '786356'
+          csaStandard: 'Z240,'
+          rebuiltRemarks: 'REBUILT AS A DOUBLE WIDE, MAKE/MODEL CUSTOM, YEAR 1995'
+          otherRemarks: 'BC SAFETY AUTHORITY #339556, PERMIT# EL-721296-2018'
+    documentType:
+      type: string
+      enum:
+        - REG_102
+        - REG_103
+        - REG_103E
+        - AFFE
+        - CAU
+        - CAUC
+        - CAUE
+        - COUR
+        - DEAT
+        - EXNR
+        - EXRE
+        - EXRS
+        - FZE
+        - LETA
+        - NCON
+        - NCAN
+        - NPUB
+        - NRED
+        - REGC
+        - REST
+        - TAXN
+        - THAW
+        - TRAN
+        - WILL
+      description: <p>The set of request document types supported by this API when creating and cancelling notes. Some document types are for registrations that can only be submitted by Registries staff.<ul><li>REG_102 - DECAL REPLACEMENT</li><li>REG_103 - TRANSPORT PERMIT</li><li>REG_103E - EXTEND TRANSPORT PERMIT</li><li>CAU - CAUTION</li><li>CAUC - CONTINUE CAUTION</li><li>CAUE - EXTEND CAUTION</li><li>COUR - COURT RESCIND ORDER</li><li>EXNR - NON-RESIDENTIAL EXEMPTION</li><li>EXRE - RESCIND EXEMPTION</li><li>EXRS - RESIDENTIAL EXEMPTION</li><li>FZE - REGISTRARS FREEZE</li><li>NCAN - CANCEL NOTE</li><li>NCON - CONFIDENTIAL NOTE</li><li>NPUB - PUBLIC NOTE</li><li>NRED - NOTICE OF REDEMPTION</li><li>REGC - REG. CORRECTION</li><li>REST - RESTRAINING ORDER</li><li>TAXN - TAX SALE NOTICE</li><li>THAW - REMOVE FREEZE</li></ul></p>
+      example: EXRS
+    errorResponse:
+      type: object
+      properties:
+        errorMessage:
+          type: string
+          description: Gateway message identifying the source of the error.
+        rootCause:
+          type: string
+          description: Details of the error condition from the component generating the error.
+      description: Object to hold an MHR request error.
+      required:
+        - errorMessage
+      x-examples:
+        error-example-1:
+          errorMessage: 'API security error: API key check failed.'
+          rootCause: 'InvalidApiKey: Invalid ApiKey'
+    individualName:
+      title: individualName
+      type: object
+      description: An individual full name for a manufactured home owner that is a person.
+      properties:
+        first:
+          type: string
+          description: First name.
+        last:
+          type: string
+          description: Last Name.
+        middle:
+          type: string
+          description: Middle or Second Name.
+      required:
+        - first
+        - last
+      x-examples:
+        individual-name-example-1:
+          first: Robert
+          last: Smith
+          middle: James
+    location:
+      title: location
+      type: object
+      description: This object represents a manufacture home location. TaxExpiryDate should only be included if a tax certificate exists and a valid date has been provided.
+      properties:
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - DRAFT
+            - HISTORICAL
+          description: The status of the locaton. Assigned by the MHR application and included in a response.
+        locationType:
+          type: string
+          enum:
+            - MANUFACTURER
+            - MH_PARK
+            - RESERVE
+            - STRATA
+            - OTHER
+          description: The locaton type. Use OTHER if the type is not known. MANUFACTURER - dealer's or manufacturer's lot. MH_PARK - Manufacturer home park (other than a strata park). RESERVE - Indian Reserve.
+        parkName:
+          type: string
+          description: The name of the location park.
+        pad:
+          type: string
+          description: The location pad.
+        address:
+          $ref: '#/components/schemas/address'
+        leaveProvince:
+          type: boolean
+          description: Flag indicating the location of the manufactured home is no longer in the province.
+          default: false
+        pidNumber:
+          type: string
+          description: Parcel identifier number without dashes.
+          default: ''
+          example: '011625490'
+        taxCertificate:
+          type: boolean
+          description: Flag indicating a tax cerfificate has been provided.
+          default: false
+        taxExpiryDate:
+          type: string
+          format: date-time
+          description: The tax certificate expiry date as date-time. Omit if no value provided.
+        exceptionPlan:
+          type: string
+          description: Exception plan number or description.
+          example: EXCEPT PART INCLUDED IN PLAN 7152
+          default: ''
+        dealerName:
+          type: string
+          description: The name of the manufacured home dealer.
+          default: ''
+        additionalDescription:
+          type: string
+          description: Additional location information.
+          example: SPALLUMCHEEN INDIAN RESERVE NO. 2
+          default: ''
+        legalDescription:
+          type: string
+          description: LTSA parcel identifier legal description. May be submitted with new registrations requests. In the future it may be included in search results.
+          example: PARCEL C (O3806) OF LOT 10 DISTRICT LOT 9778 CARIBOO DISTRICT PLAN 2289
+          default: ''
+        lot:
+          type: string
+          description: LTSA lot number.
+          example: '3'
+          default: ''
+        parcel:
+          type: string
+          description: LTSA parcel description.
+          example: A (69860M)
+          default: ''
+        block:
+          type: string
+          description: LTSA block number.
+          example: '14'
+          default: ''
+        districtLot:
+          type: string
+          description: LTSA district lot number.
+          example: '4913'
+          default: ''
+        partOf:
+          type: string
+          description: Part of abbreviated description derived from the LTSA legal description.
+          example: NE 1/4
+          default: ''
+        section:
+          type: string
+          description: LTSA section number.
+          example: '34'
+          default: ''
+        township:
+          type: string
+          description: LTSA township number.
+          example: '84'
+          default: ''
+        range:
+          type: string
+          description: LTSA range number.
+          example: '25'
+          default: ''
+        meridian:
+          type: string
+          description: Abbreviated meridian description derived from the LTSA legal description of the meridian.
+          example: W6M
+          default: ''
+        landDisrtict:
+          type: string
+          description: LTSA district description.
+          example: CARIBOU
+          default: ''
+        plan:
+          type: string
+          description: LTSA plan number.
+          example: '71177'
+          default: ''
+        bandName:
+          type: string
+          description: 'Required if the location type is RESERVE, otherwise not used. Represents the name of the band.'
+          example: Ts'kw'aylaxw First Nation
+          default: ''
+        reserveNumber:
+          type: string
+          description: 'Required if the location type is RESERVE, otherwise not used. Represents the band reserve number.'
+          example: '514'
+          default: ''
+      required:
+        - address
+      x-examples:
+        location-example:
+          status: ACTIVE
+          locationType: MH_PARK
+          parkName: HIDDEN VALLEY TRAILER COURT
+          pad: '20'
+          address:
+            street: 940 BLANSHARD STREET
+            city: VICTORIA
+            region: BC
+            country: CA
+            postalCode: ' '
+          leaveProvince: false
+          pidNumber: '011625490'
+          taxCertificate: false
+          dealerName: NOR-TEC DESIGN GROUP LTD.
+          additionalDescription: ''
+          lot: '3'
+          parcel: A (69860M)
+          block: ''
+          districtLot: ''
+          partOf: ''
+          section: '34'
+          township: '78'
+          range: '16'
+          meridian: ''
+          landDistrict: PEACE RIVER
+          plan: ''
+        location-reserve-example:
+          status: ACTIVE
+          locationType: RESERVE
+          address:
+            street: 940 BLANSHARD STREET
+            city: VICTORIA
+            region: BC
+            country: CA
+            postalCode: ' '
+          leaveProvince: false
+          additionalDescription: Additional description of Indian Reserve here.
+          bandName: SPALLUMCHEEN
+          reserveNumber: '2'
+    note:
+      title: unit note
+      type: object
+      description: '<p>This object represents a manufacture home registration note (unit note) as well as the registration of a unit note for a subset of document types. If the document type is NCAN, cancelledDocumentType, cancelledDocumentDescription, and cancelledDocumentRegistrationNumber are conditionally included as the values for the unit note that has been cancelled.</p><p>For the exemption EXRS and EXNR document types, expiryDateTime represents the destroyed date if provided. If a destroyed date is submitted the destroyed flag is set to true.</p>'
+      properties:
+        documentType:
+          $ref: '#/components/schemas/documentType'
+        documentId:
+          type: string
+          description: The unique document ID for the registration associated with the note.
+        documentRegistrationNumber:
+          type: string
+          description: The unique document registration number for the registration associated with the note.
+        documentDescription:
+          type: string
+          description: A description of the document type.
+          example: RESIDENTIAL EXEMPTION
+        createDateTime:
+          $ref: '#/components/schemas/createDateTime'
+        effectiveDateTime:
+          type: string
+          format: date-time
+          description: 'The date and time the unit note is effective. If not included in the request it will set to the registration timestamp. For some document types it may be in the past. It is in the ISO 8601 format YYYY-MM-DDThh:mm:ssTZD.'
+          example: '2023-05-30T20:12:32+00:00'
+        expiryDateTime:
+          type: string
+          format: date-time
+          description: The date and time of the unit note expiry.
+          example: '2023-09-01T06:59:59+00:00'
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - CANCELLED
+            - EXPIRED
+          description: 'The status of the note, set by the system and included in API responses.'
+        remarks:
+          type: string
+          description: Additional information about the registration.
+        givingNoticeParty:
+          $ref: '#/components/schemas/party'
+        destroyed:
+          type: boolean
+          description: True if the unit note is for an EXRS or EXNR document type and destroyed/expiry date exists. Set by the system and included in API responses.
+          default: false
+        cancelledDocumentType:
+          $ref: '#/components/schemas/documentType'
+        cancelledDocumentDescription:
+          type: string
+          description: Conditionally included with the NCAN document type as the document type description for the unit note registration that has been cancelled.
+          example: NOTICE OF CAUTION
+        cancelledDocumentRegistrationNumber:
+          type: string
+          description: Conditionally included with the NCAN document type as the unique document registration number for the unit note registration that has been cancelled.
+      required:
+        - documentType
+      x-examples:
+        exrs-example:
+          documentType: EXRS
+          documentId: '10104509'
+          documentRegistrationNumber: '00500243'
+          documentDescription: RESIDENTIAL EXEMPTION
+          createDateTime: '2023-06-21T18:56:00+00:00'
+          effectiveDateTime: '2023-06-21T18:56:00+00:00'
+          remarks: HOME IS TO BE USED AS A STORAGE SHED
+          givingNoticeParty:
+            businessName: 'ALEX MARR, BARRISTER & SOLICITOR'
+            address:
+              street: 172 BATTLE STREET
+              city: KAMLOOPS
+              region: BC
+              country: CA
+              postalCode: V2C 2L2
+            phoneNumber: '2508289998'
+          status: ACTIVE
+          destroyed: false
+        ncan-example:
+          cancelledDocumentDescription: NOTICE OF CAUTION
+          cancelledDocumentRegistrationNumber: 503921
+          cancelledDocumentType: CAU
+          documentType: NCAN
+          documentId: '10104509'
+          documentRegistrationNumber: '00500243'
+          documentDescription: CANCEL NOTE
+          createDateTime: '2023-07-04T18:56:00+00:00'
+          effectiveDateTime: '2023-07-04T18:56:00+00:00'
+          remarks: CONTINUED UNTIL FURTHER ORDER OF THE COURT
+          givingNoticeParty:
+            businessName: 'ALEX MARR, BARRISTER & SOLICITOR'
+            address:
+              street: 172 BATTLE STREET
+              city: KAMLOOPS
+              region: BC
+              country: CA
+              postalCode: V2C 2L2
+            phoneNumber: '2508289998'
+          status: ACTIVE
+          destroyed: false
+    owner:
+      title: owner
+      type: object
+      description: This object represents a manufacture home owner.
+      properties:
+        ownerId:
+          type: integer
+          description: 'Assigned by the application and returned in responses, ownerId is a unique identifier of the owner.'
+        individualName:
+          $ref: '#/components/schemas/individualName'
+        organizationName:
+          type: string
+          description: The organization/business name of the owner.
+        phoneNumber:
+          type: string
+          description: 'The owner phone number formatted as only digits: no spaces, periods, or dashes.'
+          default: ''
+          example: '6044620279'
+        address:
+          $ref: '#/components/schemas/address'
+        type:
+          type: string
+          enum:
+            - JOINT
+            - SOLE
+            - COMMON
+            - JT
+            - SO
+            - TC
+          description: The type of owner group. JOINT - joint tenancy; SOLE - sole ownership; COMMON - tenants in common; JT - joint tenancy (deprecated); SO - sole ownership (deprecated); TC - tenants in common (deprecated).
+        partyType:
+          type: string
+          enum:
+            - OWNER_IND
+            - OWNER_BUS
+            - EXECUTOR
+            - TRUSTEE
+            - TRUST
+            - ADMINISTRATOR
+          description: 'The type of owner. Always included in responses. Only required in requests when specifying an executor, trustee, trust, or administrator. OWNER_IND - individual owner; OWNER_BUS - organization or business owner; EXECUTOR - executor of an estate; TRUSTEE - trustee executor of an estate; TRUST - beneficiary company; ADMINISTRATOR - administrator of an estate.'
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - EXEMPT
+            - PREVIOUS
+          description: The status of the owner.
+        suffix:
+          type: string
+          description: The business/organization or individual name suffix.
+        description:
+          type: string
+          description: 'Required and only used when the partyType value is EXECUTOR, TRUSTEE, TRUST, or ADMINISTRATOR. Describes the party.'
+          example: 'EXECUTOR OF THE ESTATE OF LOIS MAE STEWART, DECEASED'
+        deathCertificateNumber:
+          type: string
+          description: 'Include only for transfer due to death registration types when the owner is in the deleteOwnerGroups, is an individual, and is deceased.'
+          example: 234232432-2
+        deathDateTime:
+          type: string
+          format: date-time
+          example: '2021-02-21T18:56:00+00:00'
+          description: Include only for transfer due to death registration types when the owner in the deleteOwnerGroups is deceased. Must be in the past when the registration is submitted.
+        corpNumber:
+          type: string
+          description: Optional business company number. Include in a request if available and the added owner is a business/organziation.
+          example: '0850942'
+        deathCorpNumber:
+          type: string
+          description: 'Include only for transfer due to death registration types when the owner is in the deleteOwnerGroups, not added, and is a business/organization.'
+          example: '0721064'
+      x-examples:
+        business-example:
+          ownerId: 1
+          organizationName: SAGE HILL INC.
+          address:
+            street: 3122B LYNNLARK PLACE
+            city: VICTORIA
+            region: BC
+            country: CA
+            postalCode: A1A 1A1
+          type: SO
+          status: EXEMPT
+          corpNumber: '0624812'
+        individual-example:
+          ownerId: 2
+          individualName:
+            first: James
+            last: Smith
+          address:
+            street: 3122B LYNNLARK PLACE
+            city: VICTORIA
+            region: BC
+            country: CA
+            postalCode: A1A 1A1
+          type: SO
+          phoneNumber: '6044620279'
+          status: ACTIVE
+        trustee-example:
+          ownerId: 1
+          individualName:
+            first: CHRISTOPHER
+            last: SMART
+          address:
+            street: 3122B LYNNLARK PLACE
+            city: VICTORIA
+            region: BC
+            country: CA
+            postalCode: A1A 1A1
+          type: JOINT
+          partyType: EXECUTOR
+          description: 'EXECUTOR OF THE ESTATE OF LOIS MAE STEWART, DECEASED'
+          status: ACTIVE
+        trand-deceased-example:
+          ownerId: 2
+          individualName:
+            first: JANET
+            last: SMITH
+          address:
+            street: 3122B LYNNLARK PLACE
+            city: VICTORIA
+            region: BC
+            country: CA
+            postalCode: A1A 1A1
+          type: JOINT
+          partyType: OWNER_IND
+          deathCertificateNumber: 23423423442-2
+          deathDateTime: '2021-02-21T18:56:00+00:00'
+    ownerGroup:
+      title: ownerGroup
+      type: object
+      description: '<p>This object represents a manufactured home owner group. Owner sequence is implied by the position in the array. The JT, SO, and TC types are deprecated and will be removed in the future. Interest, interestNumerator, and interestDenominator are only included when there are multiple owner groups. A JOINT group type must have at least 2 owners. If a JOINT group type has an owner partyType value of EXECUTER, TRUSTEE, or ADMINISTRATOR, all owners within the group must have the identical partyType value. A tenancy type of NA (Not Applicable) applies to a multiple active owner group scenario where a group owner is a TRUSTEE, EXECUTOR, or ADMINISTRATOR.</p><p>Mulitple Owner Group Rules:<ul><li>The COMMON type can only be submitted when there is more than 1 group.</li><li>InterestNumerator and interestDenominator are required.</li><li>If interest is provided the value should be UNDIVIDED.</li><li>The sum of the interestNumerator values across all groups must equal the interestDenominator (when adjusted to use a common denominator).</li></ul></p><p>Valid owner group scenarios:<ul><li>A single owner group with 1 owner and a type value of SOLE.</li><li>A single owner group with 2 or more owners and a type value of JOINT.</li><li>Multiple owner groups each of which has 1 owner and a type value of COMMON.</li><li>Multiple owner groups each of which has 2 or more owners and a type value of JOINT.</li><li>Multiple owner groups which contain a combination of COMMON and JOINT types. Each group with a COMMON type contains 1 owner. Each group with a JOINT type contains 2 or more owners.</li></ul></p>'
+      properties:
+        groupId:
+          type: integer
+          description: Assigned by the system if not provided. Starts with 1 and increments for each group associated with a home.
+          example: 1
+        owners:
+          type: array
+          description: Contains information about the manufactured home owners. At least one owner is required. If the type is Sole Ownership (SOLE) only 1 owner is allowed.
+          items:
+            $ref: '#/components/schemas/owner'
+        interest:
+          type: string
+          description: Describes the group ownership portion as a fraction. Does not apply and may be omitted for the Sole Ownership (SOLE) type.
+          example: UNDIVIDED 1/2
+        interestNumerator:
+          type: integer
+          description: Represents the group ownership portion as the numerator of a fraction. Does not apply and may be omitted for the Sole Ownership (SOLE) type.
+          example: 1
+        interestDenominator:
+          type: integer
+          description: Represents the group ownership portion as the denominator of a fraction.  Does not apply and may be omitted for the Sole Ownership (SOLE) type.
+          example: 2
+        type:
+          type: string
+          enum:
+            - COMMON
+            - JOINT
+            - NA
+            - SOLE
+            - JT
+            - SO
+            - TC
+          description: 'The type of owner group (tenancy type). Not Applicable (NA) applies to a multiple active owner group scenario where a group owner is a TRUSTEE, EXECUTOR, or ADMINISTRATOR. COMMON - tenants in common; JOINT - joint tenancy; NA - Not Applicable; SOLE - sole ownership; JT - joint tenancy (deprecated); SO - sole ownership (deprecated); TC - tenants in common (deprecated).'
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - EXEMPT
+            - PREVIOUS
+          description: The status of the owner group.
+        tenancySpecified:
+          type: boolean
+          description: 'Flag indicating details on the JT or TC types are included. If false, no interest or interest numerator is provided.'
+          default: false
+      required:
+        - owners
+        - type
+      x-examples:
+        group-sole-example:
+          groupId: 1
+          owners:
+            - individualName:
+                first: James
+                last: Smith
+              address:
+                street: 3122B LYNNLARK PLACE
+                city: VICTORIA
+                region: BC
+                country: CA
+                postalCode: A1A 1A1
+              phoneNumber: '6044620279'
+          type: SOLE
+        group-common-example:
+          groupId: 1
+          owners:
+            - individualName:
+                first: MARY-ANNE
+                last: BICKNELL
+              address:
+                street: 6665 238TH STREET
+                city: LANGLEY
+                region: BC
+                country: CA
+                postalCode: V3A 6H4
+          type: COMMON
+          interest: UNDIVIDED
+          interestNumerator: 3
+          interestDenominator: 5
+        group-joint-example:
+          groupId: 2
+          owners:
+            - individualName:
+                first: MARY-ANNE
+                last: BICKNELL
+              address:
+                street: 6665 238TH STREET
+                city: LANGLEY
+                region: BC
+                country: CA
+                postalCode: V3A 6H4
+            - individualName:
+                first: JAMES
+                last: JOHNSON
+              address:
+                street: 6665 238TH STREET
+                city: LANGLEY
+                region: BC
+                country: CA
+                postalCode: V3A 6H4
+          type: JOINT
+          interest: UNDIVIDED
+          interestNumerator: 2
+          interestDenominator: 5
+    party:
+      title: party
+      type: object
+      description: 'This object holds information about a submitting party for a new registration. If using a client code in a request do not include the name, address, or email address. If not using a client code, include either an individual name or a business name, but not both. In the future the emailAddress property may become mandatory.'
+      x-examples:
+        business-new-request:
+          businessName: ABC SEARCHING COMPANY
+          address:
+            street: 222 SUMMER STREET
+            city: VICTORIA
+            region: BC
+            country: CA
+            postalCode: V8W 2V8
+          emailAddress: bsmith@abc-search.com
+        individual-response:
+          personName:
+            first: Michael
+            last: Smith
+          address:
+            street: 520 Johnson St
+            city: Victoria
+            region: BC
+            country: CA
+            postalCode: V8S 2V4
+          emailAddress: msmith@gmail.com
+          phoneNumber: '2504930122'
+          phoneExtension: ''
+          partyId: 1321064
+        code-example:
+          code: '5000009'
+      properties:
+        code:
+          type: string
+          description: 'Submitting Party''s Client Code.  If supplied, name (person or business), address, and email address do not need to be supplied.'
+        personName:
+          $ref: '#/components/schemas/individualName'
+        businessName:
+          type: string
+          description: Legal business name.
+        address:
+          $ref: '#/components/schemas/address'
+        phoneNumber:
+          type: string
+          description: The contact phone number of the individual or business without an extension value.
+          example: '2504930122'
+        phoneExtension:
+          type: string
+          description: The contact phone number extension value.
+          example: '546'
+        emailAddress:
+          type: string
+          description: The email address of the individual or business.
+          format: email
+          example: bsmith@abc-search.com
+    payment:
+      title: payment
+      type: object
+      description: Payment invoice identifier and reference to the payment receipt returned in a response.
+      properties:
+        invoiceId:
+          type: string
+          description: Unique identifier of the payment transaction.
+        receipt:
+          type: string
+          description: Payment API URI to obtain the payment receipt.
+      x-examples:
+        payment-example-1:
+          invoiceId: '2198743'
+          receipt: /pay/api/v1/payment-requests/2198743/receipts
+    registration:
+      title: New Manufactured Home Registration
+      type: object
+      description: <p>This object holds information for a manufacture home registration. A Submitting Party is required when submitting new registrations. For Registries staff new MH registrations a documentID is required.</p>
+      properties:
+        mhrNumber:
+          type: string
+          description: Unique MANUFACTURED HOME REGISTRATION number assigned by the Manufactured Home Registry.
+        documentId:
+          type: string
+          description: Unique registration document ID/number required for new registrations as a reference to the decal; assigned by the Manufactured Home Registry staff.
+          example: '80043823'
+        documentRegistrationNumber:
+          type: string
+          description: The document registration number that uniquely identifies a registration. Assigned by the application and returned in a response.
+          example: '00442217'
+        draftNumber:
+          type: string
+          description: The identifier of the draft document if the registration is created from a draft. Include to mark the draft as used so it will be excluded from the account list.
+          example: '00000190'
+        documentDescription:
+          type: string
+          description: A description of the registration report document.
+          example: MANUFACTURED HOME REGISTRATION
+        registrationType:
+          $ref: '#/components/schemas/registrationType'
+        createDateTime:
+          $ref: '#/components/schemas/createDateTime'
+        status:
+          $ref: '#/components/schemas/status'
+        clientReferenceId:
+          $ref: '#/components/schemas/clientReferenceId'
+        submittingParty:
+          $ref: '#/components/schemas/party'
+        declaredValue:
+          type: integer
+          description: The declared value of the manufactured home as a number in Canadian dollars.
+        attentionReference:
+          type: string
+          description: The registration document attention or reference information.
+          example: GWB14768.100
+        ownerGroups:
+          type: array
+          description: Contains information about the manufactured home owners. At least one owner group is required when submitting a new registration request.
+          items:
+            $ref: '#/components/schemas/ownerGroup'
+        location:
+          $ref: '#/components/schemas/location'
+        description:
+          $ref: '#/components/schemas/description'
+        ownLand:
+          type: boolean
+          description: True if the manufactured home is located on land that the owners own or have a registered lease of not less than 3 years.
+          example: false
+        notes:
+          type: array
+          description: Notes about the MANUFACTURED HOME REGISTRATION documents.
+          items:
+            $ref: '#/components/schemas/note'
+        hasCaution:
+          type: boolean
+          description: 'Included in the response, true if a caution on the manufacuted home exists that has not expired and has not been cancelled. Allows for cautions that have been continued or extended.'
+          example: false
+          default: false
+        frozenDocumentType:
+          type: string
+          description: 'If the status is FROZEN and the request is for the current view of a home, frozenDocumentType is conditionally included in the response as the document type of the registration that put the home in a frozen or locked state. The set of document types includes AFFE, TAXN, REST, NCON, REG_103 (expired). AFFE blocks registration for all users; the remaining document types block registrations for non-staff users. One of the defined document types.'
+          example: AFFE
+        payment:
+          $ref: '#/components/schemas/payment'
+        pprRegistrations:
+          type: array
+          description: Contains any JSON representing a PPR financing statement with registration history.
+          items:
+            type: object
+      required:
+        - ownerGroups
+        - location
+        - description
+      x-examples:
+        new-registration-example:
+          mhrNumber: '001234'
+          documentId: '42800656'
+          documentDescription: MANUFACTURED HOME REGISTRATION
+          documentRegistrationNumber: '00442217'
+          registrationType: MHREG
+          status: ACTIVE
+          clientReferenceId: EX-MH001234
+          declaredValue: 120000
+          attentionReference: GWB14768.100
+          submittingParty:
+            businessName: ABC SEARCHING COMPANY
+            address:
+              street: 222 SUMMER STREET
+              city: VICTORIA
+              region: BC
+              country: CA
+              postalCode: V8W 2V8
+            emailAddress: bsmith@abc-search.com
+          ownerGroups:
+            - groupId: 1
+              owners:
+                - individualName:
+                    first: MARY-ANNE
+                    last: BICKNELL
+                  address:
+                    street: 6665 238TH STREET
+                    city: LANGLEY
+                    region: BC
+                    country: CA
+                    postalCode: V3A 6H4
+                  phoneNumber: '6044620279'
+              type: COMMON
+              interest: UNDIVIDED 4/5
+              interestNumerator: 4
+              status: ACTIVE
+              tenancySpecified: true
+            - groupId: 2
+              owners:
+                - individualName:
+                    first: JOHN
+                    middle: STEVEN
+                    last: CONNOLLY
+                  address:
+                    street: 6665 238TH STREET
+                    city: LANGLEY
+                    region: BC
+                    country: CA
+                    postalCode: V3A 6H4
+                  phoneNumber: '6044620279'
+              type: COMMON
+              interest: UNDIVIDED 1/5
+              interestNumerator: 1
+              status: ACTIVE
+              tenancySpecified: true
+          location:
+            parkName: HIDDEN VALLEY TRAILER COURT
+            pad: '20'
+            address:
+              street: 940 BLANSHARD STREET
+              city: VICTORIA
+              region: BC
+              country: CA
+              postalCode: A1A 1A1
+            leaveProvince: false
+            pidNumber: '011625490'
+            taxCertificate: false
+            dealerName: NOR-TEC DESIGN GROUP LTD.
+            lot: '3'
+            parcel: A (69860M)
+            block: ''
+            districtLot: ''
+            partOf: ''
+            section: '34'
+            township: '78'
+            range: '16'
+            meridian: ''
+            landDistrict: PEACE RIVER
+            plan: ''
+          description:
+            manufacturer: STARLINE
+            baseInformation:
+              year: 2018
+              make: WATSON IND. (ALTA)
+              model: DUCHESS
+            sectionCount: 1
+            sections:
+              - serialNumber: 52D70556
+                lengthFeet: 52
+                lengthInches: 0
+                widthFeet: 12
+                widthInches: 0
+            csaNumber: '786356'
+            csaStandard: Z240
+            rebuiltRemarks: 'REBUILT AS A DOUBLE WIDE, MAKE/MODEL CUSTOM, YEAR 1995'
+            otherRemarks: 'BC SAFETY AUTHORITY #339556, PERMIT# EL-721296-2018'
+          ownLand: false
+          payment:
+            receipt: /pay/api/v1/payment-requests/2198744/receipts
+            invoiceId: '2198744'
+        search-registration-example:
+          mhrNumber: '001234'
+          status: ACTIVE
+          clientReferenceId: EX-MH001234
+          declaredValue: '120000.00'
+          ownerGroups:
+            - groupId: 1
+              owners:
+                - individualName:
+                    first: MARY-ANNE
+                    last: BICKNELL
+                  address:
+                    street: 6665 238TH STREET
+                    city: LANGLEY
+                    region: BC
+                    country: CA
+                    postalCode: V3A 6H4
+                  phoneNumber: '6044620279'
+              type: COMMON
+              interest: UNDIVIDED 4/5
+              interestNumerator: 4
+              status: ACTIVE
+              tenancySpecified: true
+            - groupId: 2
+              owners:
+                - individualName:
+                    first: JOHN
+                    middle: STEVEN
+                    last: CONNOLLY
+                  address:
+                    street: 6665 238TH STREET
+                    city: LANGLEY
+                    region: BC
+                    country: CA
+                    postalCode: V3A 6H4
+                  phoneNumber: '6044620279'
+              type: COMMON
+              interest: UNDIVIDED 1/5
+              interestNumerator: 1
+              status: ACTIVE
+              tenancySpecified: true
+          location:
+            parkName: HIDDEN VALLEY TRAILER COURT
+            pad: '20'
+            address:
+              street: 940 BLANSHARD STREET
+              city: VICTORIA
+              region: BC
+              country: CA
+              postalCode: A1A 1A1
+            leaveProvince: false
+            pidNumber: '011625490'
+            taxCertificate: false
+            dealerName: NOR-TEC DESIGN GROUP LTD.
+          description:
+            manufacturer: STARLINE
+            baseInformation:
+              year: 2018
+              make: WATSON IND. (ALTA)
+              model: DUCHESS
+            sectionCount: 1
+            sections:
+              - serialNumber: 52D70556
+                lengthFeet: 52
+                lengthInches: 0
+                widthFeet: 12
+                widthInches: 0
+            csaNumber: '786356'
+            csaStandard: Z240
+            rebuiltRemarks: 'REBUILT AS A DOUBLE WIDE, MAKE/MODEL CUSTOM, YEAR 1995'
+            otherRemarks: 'BC SAFETY AUTHORITY #339556, PERMIT# EL-721296-2018'
+          notes:
+            - documentType: EXRS
+              documentId: '10104509'
+              documentRegistrationNumber: '00500243'
+              documentDescription: RESIDENTIAL EXEMPTION
+              createDateTime: '1995-02-21T18:56:00+00:00'
+              remarks: HOME IS TO BE USED AS A STORAGE SHED
+              givingNoticeParty:
+                businessName: 'ALEX MARR, BARRISTER & SOLICITOR'
+                address:
+                  street: 172 BATTLE STREET
+                  city: KAMLOOPS
+                  region: BC
+                  country: CA
+                  postalCode: V2C 2L2
+                phoneNumber: '2508289998'
+              status: ACTIVE
+          payment:
+            receipt: /pay/api/v1/payment-requests/2198744/receipts
+            invoiceId: '2198744'
+    registrationType:
+      type: string
+      enum:
+        - DECAL_REPLACE
+        - EXEMPTION_NON_RES
+        - EXEMPTION_RES
+        - MHREG
+        - MHREG_CONVERSION
+        - PERMIT
+        - PERMIT_EXTENSION
+        - REG_STAFF_ADMIN
+        - TRAND
+        - TRANS
+        - TRANS_AFFIDAVIT
+        - TRANS_ADMIN
+        - TRANS_WILL
+      description: <p>The set of registration types supported by this API.<ol><li>DECAL_REPLACE - replace an MH registration decal</li><li>EXEMPTION_NON_RES - non-residential exemption</li><li>EXEMPTION_RES - residential exemption</li><li>MHREG - manufactured home registration</li><li>MHREG_CONVERSION - manufactured home original paper form registration converted to an electronic version</li><li>PERMIT - transport permit</li><li>PERMIT_EXTENSION - extend a transport permit</li><li>REG_STAFF_ADMIN</li>registries staff administration registration<li>TRAND - TRANSFER DUE TO SURVIVING JOINT TENANT(S)</li><li>TRANS - TRANSFER DUE TO SALE OR GIFT</li><li>TRANS_AFFIDAVIT - TRANSFER TO EXECUTOR – ESTATE UNDER $25000 WITH WILL</li><li>TRANS_ADMIN - TRANSFER TO ADMINISTRATOR – GRANT OF ADMINISTRATION</li><li>TRANS_WILL - TRANSFER TO EXECUTOR – GRANT OF PROBATE WITH WILL.</li></ol></p>
+      example: TRANS
+    searchDetailResults:
+      title: searchDetailResults
+      type: object
+      description: Object to hold search Registration details from the second step in the search process.
+      properties:
+        searchDateTime:
+          type: string
+          format: date-time
+          description: The UTC date and time the system executed the search query (search step one).
+        totalResultsSize:
+          type: integer
+          minimum: 1
+          description: The total number of Registrations included in the response.
+        searchQuery:
+          $ref: '#/components/schemas/searchQuery'
+        selected:
+          type: array
+          description: The selection of search criteria matches included in the results.
+          items:
+            $ref: '#/components/schemas/searchSummaryInformation'
+        searchingParty:
+          type: string
+          description: A description of the party who performed the searching.
+        payment:
+          $ref: '#/components/schemas/payment'
+        details:
+          type: array
+          description: This array holds detail information on one or more registrations.
+          items:
+            $ref: '#/components/schemas/registration'
+        callbackURL:
+          type: string
+          description: 'If the response format is PDF and the request has more than the threshold number of Registrations, echo back the callbackURL request parameter value. Otherwise the parameter is ignored (if the response is not a PDF or the number of Registrations is below the threshold).'
+        getReportURL:
+          type: string
+          description: 'If the response format is PDF and the request has more than the threshold number of Registrations, return the full path to GET the PDF once the notification is sent to the callbackURL that the report is available. If present the response details property is an empty array.'
+        certified:
+          type: boolean
+          default: false
+          description: 'False by default and used by report generation, indicates the search results are a certified copy. Only BC Registries staff can create certified copy reports.'
+      required:
+        - searchDateTime
+        - totalResultsSize
+        - searchQuery
+        - payment
+      x-examples: null
+    searchQuery:
+      title: search
+      type: object
+      description: Object to hold search request criteria in the search first step (when executing a new search).
+      x-examples:
+        search-mhr-number-example:
+          type: MHR_NUMBER
+          criteria:
+            value: '003456'
+          clientReferenceId: EX-00000402
+        search-owner-name-example:
+          type: OWNER_NAME
+          criteria:
+            ownerName:
+              first: James
+              last: Smith
+          clientReferenceId: EX-00000403
+        search-organization-name-example:
+          type: ORGANIZATION_NAME
+          criteria:
+            value: SAGE HILL INC.
+          clientReferenceId: EX-00000404
+        search-serial-number-example:
+          type: SERIAL_NUMBER
+          criteria:
+            value: XVF003456
+          clientReferenceId: EX-00000405
+      properties:
+        type:
+          type: string
+          enum:
+            - OWNER_NAME
+            - ORGANIZATION_NAME
+            - MHR_NUMBER
+            - SERIAL_NUMBER
+          description: The type of search to execute. One of <ul><li>OWNER_NAME</li><li>ORGANIZATION_NAME</li><li>SERIAL_NUMBER</li><li>MHR_NUMBER</li></ul>
+        criteria:
+          type: object
+          description: 'The criteria of the search - the value to search on. Provide either value or debtorName. The criteria must match the type. For example, if searching by INDIVIDUAL_DEBTOR or BUSINESS_DEBTOR the debtorName must be provided and the value must be null or absent.'
+          properties:
+            value:
+              type: string
+              description: 'The search string.  Can be the serial number, MHR number, or organization name. Required if type is not OWNER_NAME.'
+            ownerName:
+              $ref: '#/components/schemas/individualName'
+        clientReferenceId:
+          $ref: '#/components/schemas/clientReferenceId'
+      required:
+        - type
+        - criteria
+    searchQueryResults:
+      title: searchQueryResults
+      type: object
+      description: Object to hold search query results from the first step in the search process.
+      properties:
+        searchId:
+          type: string
+          description: Unique MHR identifier of the search generated by the MHR system.
+        searchDateTime:
+          type: string
+          format: date-time
+          description: The date-time the system successfully completed the search.
+        maxResultsSize:
+          type: integer
+          minimum: 1
+          description: 'Set by the Registry, the maximum number of Registrations returned in a search result. Included to indicate if the search exceeds the maximum allowed number of results.'
+        totalResultsSize:
+          type: integer
+          minimum: 0
+          description: 'The total number or Registration matches found in the Registry. If the value is greater than maxResultsSize or greater than returnedResultsSize, then not all Registration matches are included in the result set.'
+        returnedResultsSize:
+          type: integer
+          minimum: 0
+          description: The number of Registrations returned in the result set. The upper limit is set by maxResultsSize. If the value is less than totalResultsSize then not all Registration matches are included in the result set.
+        searchQuery:
+          $ref: '#/components/schemas/searchQuery'
+        results:
+          type: array
+          description: This object holds summary information on one or more Registrations that match the search criteria.
+          items:
+            $ref: '#/components/schemas/searchSummaryInformation'
+        selectedResultsSize:
+          type: integer
+          minimum: 0
+          description: The total number of matching registrations included in the detail response. Set when fetching account search history.
+        username:
+          type: string
+          default: ''
+          example: Mark Smith
+          description: 'Only set when fetching account search history, if available the first and last name of the user who submitted the search request.'
+      required:
+        - searchId
+        - searchDateTime
+        - maxResultsSize
+        - totalResultsSize
+        - returnedResultsSize
+        - searchQuery
+      x-examples:
+        search-results-mhr-num-example:
+          searchId: '1294371'
+          searchDateTime: '2020-05-14T21:16:32+00:00'
+          returnedResultsSize: 1
+          totalResultsSize: 1
+          maxResultsSize: 1000
+          searchQuery:
+            type: MHR_NUMBER
+            criteria:
+              value: '001234'
+            clientReferenceId: EX-00000402
+          results:
+            - createDateTime: '2020-02-21T18:56:20Z'
+              mhrNumber: '001234'
+              status: ACTIVE
+              includeLienInfo: false
+              homeLocation: PENTICTON
+              organizationName: SAGE HILL INC.
+              ownerName:
+                first: James
+                last: Smith
+              serialNumber: 52D70556
+              baseInformation:
+                year: 2018
+                make: WATSON IND. (ALTA)
+                model: DUCHESS
+        search-results-owner-example:
+          searchId: '1294372'
+          searchDateTime: '2020-05-15T21:16:32+00:00'
+          returnedResultsSize: 1
+          totalResultsSize: 1
+          maxResultsSize: 1000
+          searchQuery:
+            type: OWNER_NAME
+            criteria:
+              ownerName:
+                first: James
+                last: Smith
+            clientReferenceId: EX-00000403
+          results:
+            - createDateTime: '2020-02-21T18:56:20Z'
+              mhrNumber: '001234'
+              status: ACTIVE
+              includeLienInfo: false
+              homeLocation: PENTICTON
+              organizationName: SAGE HILL INC.
+              ownerName:
+                first: James
+                last: Smith
+              serialNumber: 52D70556
+              baseInformation:
+                year: 2018
+                make: WATSON IND. (ALTA)
+                model: DUCHESS
+        search-results-serial-example:
+          searchId: '1294373'
+          searchDateTime: '2020-05-16T21:08:32+00:00'
+          returnedResultsSize: 1
+          totalResultsSize: 1
+          searchQuery:
+            type: SERIAL_NUMBER
+            criteria:
+              value: 52D70556
+            clientReferenceId: A-00000402
+          results:
+            - createDateTime: '2020-02-21T18:56:20Z'
+              mhrNumber: '001234'
+              status: ACTIVE
+              includeLienInfo: false
+              homeLocation: PENTICTON
+              organizationName: SAGE HILL INC.
+              ownerName:
+                first: James
+                last: Smith
+              serialNumber: 52D70556
+              baseInformation:
+                year: 2018
+                make: WATSON IND. (ALTA)
+                model: DUCHESS
+    searchSummaryInformation:
+      title: searchSummaryInformation
+      type: object
+      description: <p>Object to hold the search summary information for a single search match. Search query results may return an array of searchSummaryInformation objects.</p>
+      x-examples:
+        summary-result-owner-example:
+          mhrNumber: '001234'
+          createDateTime: '2020-02-21T18:56:20Z'
+          status: ACTIVE
+          includeLienInfo: false
+          homeLocation: PENTICTON
+          ownerName:
+            first: James
+            last: Smith
+          ownerStatus: ACTIVE
+          serialNumber: 52D70556
+          baseInformation:
+            year: 2018
+            make: WATSON IND. (ALTA)
+            model: DUCHESS
+          activeCount: 1
+          exemptCount: 0
+          historicalCount: 0
+        summary-result-org-example:
+          mhrNumber: '066212'
+          createDateTime: '1995-11-14T08:00:00+00:00'
+          status: ACTIVE
+          includeLienInfo: false
+          homeLocation: NANAIMO
+          organizationName: TOWER HOMES (1988) LTD.
+          ownerStatus: ACTIVE
+          serialNumber: IJ1732AB
+          baseInformation:
+            year: 1990
+            make: VILLA/DA-600
+            model: null
+          activeCount: 0
+          exemptCount: 0
+          historicalCount: 1
+      properties:
+        mhrNumber:
+          type: string
+          description: Unique MANUFACTURED HOME REGISTRATION number assigned by the Manufactured Home Registry.
+        status:
+          $ref: '#/components/schemas/status'
+        organizationName:
+          type: string
+          description: The name of the organzation associated with the manufactured home.
+        homeLocation:
+          type: string
+          description: The physical location of the manufactured home.
+        ownerName:
+          $ref: '#/components/schemas/individualName'
+        ownerStatus:
+          type: string
+          enum:
+            - ACTIVE
+            - EXEMPT
+            - PREVIOUS
+          description: The status of the owner.
+        serialNumber:
+          type: string
+          description: Serial number of the first manufactured home section.
+        baseInformation:
+          $ref: '#/components/schemas/baseInformation'
+        selected:
+          type: boolean
+          description: Set to true to specify the match is to be included in the search detail results (search step 2).
+          default: true
+        includeLienInfo:
+          type: boolean
+          description: Set to true to specify PPR information associated with the MHR number is to be included in the search detail results (search step 2). The default is false.
+          default: false
+        activeCount:
+          type: integer
+          description: The number of exact matches within the same MH registration that are active.
+        exemptCount:
+          type: integer
+          description: The number of exact matches within the same MH registration that are in an exempt state.
+        historicalCount:
+          type: integer
+          description: The number of exact matches within the same MH registration that are historical.
+      required:
+        - mhrNumber
+        - status
+        - baseInformation
+    sectionInformation:
+      type: object
+      title: sectionInformation
+      description: <p>Section information for a MANUFACTURED HOME REGISTRATION. A manufactured home must have at least 1 section.</p>
+      properties:
+        serialNumber:
+          type: string
+          description: Serial number of the manufactured home section.
+        lengthFeet:
+          type: integer
+          minimum: 1
+          maximum: 100
+          description: Length feet measurement for the section.
+        lengthInches:
+          type: integer
+          minimum: 0
+          maximum: 11
+          description: Length inches measurement for the section.
+        widthFeet:
+          type: integer
+          minimum: 1
+          maximum: 100
+          description: Width feet measurement for the section.
+        widthInches:
+          type: integer
+          minimum: 0
+          maximum: 11
+          description: Width inches measurement for the section.
+      required:
+        - serialNumber
+        - lengthFeet
+        - widthFeet
+      x-examples:
+        mhr-section-1:
+          serialNumber: 52D70556
+          lengthFeet: 52
+          lengthInches: 0
+          widthFeet: 12
+          widthInches: 0
+    status:
+      type: string
+      enum:
+        - ACTIVE
+        - CANCELLED
+        - DRAFT
+        - EXEMPT
+        - FROZEN
+      description: '<p>The status of a manufactured home: one of ACTIVE (registered), CANCELLED, DRAFT, EXEMPT, or FROZEN. FROZEN is a temporary state where only BC Registries staff can make a change to the manufactured home.</p>'
+      example: ACTIVE
+  securitySchemes:
+    api_key:
+      type: apiKey
+      description: API Gateway issued API key for a consumer with the MHR product assigned to their BC Registries account. Required for all requests.
+      name: x-apikey
+      in: header
+  responses:
+    BadRequest:
+      description: 'The server cannot or will not process the request due to an apparent client error (e.g., malformed request syntax, size too large, invalid request message framing, or deceptive request routing).'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          examples:
+            example-1:
+              value:
+                errorMessage: API invalid JSON payload or required field missing.
+                rootCause: '{"fault":{"faultstring":"Failed to execute the ExtractVariables: EV-request-create","detail":{"errorcode":"steps.extractvariables.ExecutionFailed"}}}'
+    Unauthorized:
+      description: 'Similar to 403 Forbidden, but specifically for use when authentication is required and has failed or has not yet been provided. The user does not have valid authentication credentials for the target resource.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          examples:
+            example-1:
+              value:
+                errorMessage: 'API security error: API key check failed.'
+                rootCause: 'InvalidApiKey: Invalid ApiKey'
+    NotFound:
+      description: The requested resource could not be found but may be available in the future. Subsequent requests by the client are permissible.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          examples:
+            example-1:
+              value:
+                errorMessage: API backend third party service error.
+                rootCause: '{"message": "User joe-smith does not exist."}'
+    PaymentRequired:
+      description: This 402 code is used by the API for all failed payment requests. The rootCause holds whatever message is returned by the payment system.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          examples:
+            example-1:
+              value:
+                errorMessage: API backend third party service error.
+                rootCause: '{"message": "SBCPaymentException(SBC Pay API exception. API request failed)"}'
+    InternalServerError:
+      description: 'A generic error message, given when an unexpected condition was encountered and no more specific message is suitable.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          examples:
+            example-1:
+              value:
+                errorMessage: 'API unexpected error. If error persists, contact API support.'
+                rootCause: '{"fault":{"faultstring":"Execution of ServiceCallout SC-Request-JWT failed. Reason: ResponseCode 400 is treated as error","detail":{"errorcode":"steps.servicecallout.ExecutionFailed"}}}'
+  parameters:
+    accountId:
+      name: Account-Id
+      in: header
+      description: The account that the user is operating on behalf of.
+      required: true
+      schema:
+        type: string
+      example: PS91871
+    searchId:
+      name: searchId
+      in: path
+      description: 'The value of the search response id value.  If an invalid searchId is submitted then the response is a [404] status code.'
+      required: true
+      schema:
+        type: string
+      example: '12345671'
+  headers:
+    AccessControlAllowOrigin:
+      schema:
+        type: string
+        description: Access-Control-Allow-Origin
+        x-examples:
+          notify_1:
+            value: ''
+    AccessControlAllowMethods:
+      schema:
+        type: string
+        description: Access-Control-Allow-Methods
+        x-examples:
+          notify_1:
+            value: 'GET, PUT, POST, PATCH'
+    AccessControlAllowHeaders:
+      schema:
+        type: string
+        description: Access-Control-Allow-Headers
+        x-examples:
+          notify_1:
+            value: 'content-type, accept, x-apikey, authorization'
+    AccessControlMaxAge:
+      schema:
+        type: integer
+        description: Access-Control-Max-Age
+        x-examples:
+          notify_1:
+            value: 3628800
+tags:
+  - name: Draft
+  - name: Exemption
+  - name: Manufacturer
+  - name: Permit
+  - name: Registration
+  - name: Search
+  - name: Transfer
+security:
+  - api_key: []
