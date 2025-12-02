@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ppr-api"
-version = "1.3.13"
+version = "1.3.3"
 description = ""
 authors = ["dlovett <doug@daxiom.com>"]
 license = "BSD 3"
@@ -29,21 +29,21 @@ structured-logging = { git = "https://github.com/bcgov/sbc-connect-common.git", 
 oauthlib = "^3.2.2"
 Jinja2 = "^3.1.2"
 google-api-core = "^2.11.0"
-google-auth-oauthlib = "^1.0.0"
-google-auth = "^2.16.2"
-google-cloud-core = "^2.3.2"
+google-auth-oauthlib = "^1.2.3"
+google-auth = "2.41.1"
+google-cloud-core = "^2.5.0"
 google-cloud-pubsub = "^2.15.0"
-google-cloud-storage = "^2.7.0"
-googleapis-common-protos = "^1.58.0"
-grpc-google-iam-v1 = "^0.12.6"
-grpcio-status = "^1.51.3"
+google-cloud-storage = "^3.6.0"
+googleapis-common-protos = "^1.72.0"
+grpc-google-iam-v1 = "^0.14.3"
+grpcio-status = "^1.76.0"
 PyPDF2 = "^3.0.1"
 pytz = "^2022.7.1"
 alembic-utils = "^0.8.3"
 datedelta = "^1.4"
 flask-jwt-oidc = "^0.7.0"
-registry-schemas =  { git = "https://github.com/bcgov/registry-schemas.git", tag = "1.8.14" }
 flask-babel = "^4.0.0"
+registry-schemas = {git = "https://github.com/bcgov/registry-schemas.git", rev = "1.8.14"}
 
 
 [tool.poetry.group.test.dependencies]

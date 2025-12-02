@@ -1,0 +1,137 @@
+{
+  "searchDateTime": "2023-07-11T15:04:23+00:00",
+  "searchQuery": {
+    "type": "MHR_NUMBER",
+    "criteria": {"value": "106567"},
+    "clientReferenceId": "S23PV-093 ACMC"
+  },
+  "certified": false,
+  "payment": {
+    "invoiceId": "3268376",
+    "receipt": "/api/v1/payment-requests/3268376/receipts"
+  },
+  "details": [
+    {
+      "mhrNumber": "106567",
+      "status": "ACTIVE",
+      "documentId": "80048292",
+      "createDateTime": "2022-02-03T13:31:05-07:53",
+      "clientReferenceId": "",
+      "attentionReference": "",
+      "ownLand": false,
+      "declaredValue": 309000,
+      "declaredDateTime": "2023-02-27T09:20:34-07:53",
+      "ownerGroups": [
+        {
+          "groupId": 4,
+          "type": "SOLE",
+          "status": "ACTIVE",
+          "interest": "",
+          "interestNumerator": 0,
+          "interestDenominator": 0,
+          "tenancySpecified": true,
+          "owners": [
+            {
+              "type": "SOLE",
+              "organizationName": "PRICE MASONRY LTD.",
+              "phoneNumber": "2502487595",
+              "address": {
+                "city": "COOMBS",
+                "street": "PO BOX 731",
+                "region": "BC",
+                "country": "CA",
+                "postalCode": "V0R 1M0",
+                "streetAdditional": "2196 HALONA WAY"
+              },
+              "partyType": "OWNER_BUS",
+              "ownerId": 1
+            }
+          ]
+        }
+      ],
+      "location": {
+        "parkName": "",
+        "pad": "",
+        "status": "ACTIVE",
+        "address": {
+          "street": "653 YAMBURY ROAD",
+          "city": "QUALICUM BEACH",
+          "region": "BC",
+          "country": "CA",
+          "postalCode": ""
+        },
+        "pidNumber": "031825648",
+        "lot": "",
+        "parcel": "",
+        "block": "",
+        "districtLot": "",
+        "partOf": "",
+        "section": "",
+        "township": "",
+        "range": "",
+        "meridian": "",
+        "landDistrict": "",
+        "plan": "",
+        "taxCertificate": false,
+        "leaveProvince": false,
+        "exceptionPlan": "",
+        "dealerName": "",
+        "additionalDescription": "",
+        "legalDescription": "STRATA LOT A  DISTRICT LOT 49  NANOOSE DISTRICT  STRATA PLAN EPS8095   TOGETHER WITH AN INTEREST IN THE COMMON PROPERTY IN PROPORTION TO THE UNIT   ENTITLEMENT OF THE STRATA LOT AS SHOWN ON FORM V  "
+      },
+      "description": {
+        "manufacturer": "TRIPLE M HOUSING LTD",
+        "baseInformation": {
+          "year": "2022",
+          "make": "BCOST2857-11110-CDK3",
+          "model": ""
+        },
+        "sectionCount": 2,
+        "sections": [
+          {
+            "serialNumber": "S60011110",
+            "lengthFeet": 60,
+            "lengthInches": 0,
+            "widthFeet": 14,
+            "widthInches": 0
+          },
+          {
+            "serialNumber": "S60011110",
+            "lengthFeet": 42,
+            "lengthInches": 0,
+            "widthFeet": 14,
+            "widthInches": 0
+          }
+        ],
+        "csaNumber": "010421",
+        "csaStandard": "A277",
+        "engineerName": "",
+        "rebuiltRemarks": "",
+        "otherRemarks": ""
+      },
+      "notes": [],
+      "hasCaution": false
+    }
+  ],
+  "totalResultsSize": 1,
+  "selected": [
+    {
+      "mhrNumber": "106567",
+      "status": "ACTIVE",
+      "createDateTime": "2022-02-03T13:31:05-07:53",
+      "homeLocation": "QUALICUM BEACH",
+      "serialNumber": "S60011110",
+      "baseInformation": {
+        "year": 2022,
+        "make": "BCOST2857-11110-CDK3",
+        "model": ""
+      },
+      "activeCount": 1,
+      "exemptCount": 0,
+      "historicalCount": 0,
+      "mhId": 108122,
+      "organizationName": "PRICE MASONRY LTD.",
+      "ownerStatus": "ACTIVE"
+    }
+  ]
+}

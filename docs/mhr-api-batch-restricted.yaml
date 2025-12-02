@@ -1,0 +1,2329 @@
+openapi: 3.0.0
+info:
+  title: Manufactured Home Registry Batch Registrations API
+  version: 1.0.0
+  description: '<p>The Manufactured Home Registry (MHR) is a centralised, electronic register where details of manufactured homes can be registered and searched. The MHR API provides a real-time, secure, direct link between your business systems and the MHR. With this Batch Registrations API you can retrieve MHR registrations within a timestamp (date and time) range.</p><p>All requests must include a BC Registries issued API key.</p><p>All requests must include an Account ID. Access is restricted by Account ID.</p>'
+  contact:
+    name: BC Registries
+servers:
+  - url: 'https://sandbox.api.connect.gov.bc.ca'
+    description: Sandbox
+  - url: 'https://api.connect.gov.bc.ca'
+    description: Production
+paths:
+  /mhr/api/v1/registrations/batch:
+    get:
+      tags:
+        - Registration
+      summary: Retrieve recent MHR registrations
+      description: '<p>Retrieve an array of recent manufactured home registry registrations. By default, registrations created within the previous 7 days at the time of the request are included in the response.</p><p>Optional startDateTime and endDateTime query parameters may specify the registrations to include in the response. Both must be submitted otherwise they are ignored.</p><p>All registrations include the status, location, description and owner groups that are current at the date and time of the registration.</p><p>The results are sorted chronologically by registration timestamp.</p><p>Registrations with the following document types which change a home location include the previous location:<ul><li>REG_103</li><li>AMEND_PERMIT</li><li>CANCEL_PERMIT</li><li>PUBA (with location change)</li><li>REGC_STAFF (with location change)</li><li>REGC_CLIENT (with location change)</li><li>CONF</li><li>STAT</li></ul></p><p>Registrations with the following document types which change owners include the previous owner groups:<ul><li>PUBA (if ownership changes)</li><li>REGC_CLIENT (if ownership changes)</li><li>REGC_STAFF (if ownership changes)</li><li>AFFE</li><li>TRAN</li><li>DEAT</li><li>LETA</li><li>WILL</li><li>TRANS_FAMILY_ACT</li><li>TRANS_INFORMAL_SALE</li><li>TRANS_LAND_TITLE</li><li>TRANS_QUIT_CLAIM</li><li>TRANS_RECEIVERSHIP</li><li>TRANS_SEVER_GRANT</li><li>TRANS_WRIT_SEIZURE</li><li>ABAN</li><li>BANK</li><li>COMP</li><li>COU</li><li>FORE</li><li>GENT</li><li>REIV</li><li>REPV</li><li>SZL</li><li>TAXS</li><li>VEST</li><li>MAID</li><li>MAIL</li><li>MARR</li><li>MEAM</li><li>NAMV</li></ul></p><p>Registrations with the following document types may include a note:<ul><li>EXRS</li><li>EXNR</li><li>PUBA</li><li>REGC_CLIENT</li><li>REGC_STAFF</li><li>REG_103</li><li>STAT</li><li>AMEND_PERMIT</li><li>CANCEL_PERMIT</li></ul></p>'
+      operationId: get-registration
+      parameters:
+        - $ref: '#/components/parameters/accountId'
+        - name: startDateTime
+          in: query
+          required: false
+          description: Optionally limit the results date and time range by specifying a start date and time. This timestamp must be in the past and earlier than endDateTime.
+          schema:
+            type: string
+            format: date-time
+            example: '2023-12-27T08:01:00+00:00'
+        - name: endDateTime
+          in: query
+          required: false
+          description: Optionally limit the results date and time range by specifying an end date and time. This timestamp must be in the past and later than startDateTime.
+          schema:
+            type: string
+            format: date-time
+            example: '2023-12-29T08:01:00+00:00'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/AccessControlAllowOrigin'
+            Access-Control-Allow-Methods:
+              $ref: '#/components/headers/AccessControlAllowMethods'
+            Access-Control-Allow-Headers:
+              $ref: '#/components/headers/AccessControlAllowHeaders'
+            Access-Control-Max-Age:
+              $ref: '#/components/headers/AccessControlMaxAge'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/batchRegistration'
+              examples:
+                /api/v1/registrations/batch/get:
+                  summary: Batch registrations response.
+                  value:
+                    - mhrNumber: '108092'
+                      createDateTime: '2023-12-29T22:09:02+00:00'
+                      registrationType: MHREG
+                      status: ACTIVE
+                      declaredValue: 0
+                      documentDescription: MANUFACTURED HOME REGISTRATION
+                      documentId: '80888004'
+                      documentRegistrationNumber: '00550150'
+                      ownLand: true
+                      attentionReference: NEIL GAIMAN
+                      clientReferenceId: UT-MHREG-SOLE
+                      submittingParty:
+                        businessName: ABC TEST COMPANY
+                        address:
+                          street: 222 SUMMER STREET
+                          city: VICTORIA
+                          region: BC
+                          country: CA
+                          postalCode: V8W 2V8
+                        emailAddress: bsmith@abc-search.com
+                      location:
+                        locationId: 200168
+                        status: ACTIVE
+                        locationType: OTHER
+                        address:
+                          street: 71-8676 BLANSHARD STREET
+                          streetAdditional: SECOND FLOOR
+                          city: VICTORIA
+                          region: BC
+                          country: CA
+                          postalCode: A1A 1A1
+                        lot: '24'
+                        landDistrict: CARIBOU
+                        plan: '16'
+                        leaveProvince: false
+                        taxCertificate: false
+                      description:
+                        status: ACTIVE
+                        sectionCount: 1
+                        csaNumber: '3847656'
+                        csaStandard: ''
+                        engineerName: GREAT ENGINEERING INC.
+                        baseInformation:
+                          make: MODULINE
+                          model: ADVENTURE X-5000
+                          circa: false
+                          year: 2011
+                        rebuiltRemarks: ''
+                        otherRemarks: ''
+                        manufacturer: Test MH
+                        engineerDate: '2023-08-24T07:00:01+00:00'
+                        sections:
+                          - serialNumber: 022000A011739
+                            lengthFeet: 60
+                            lengthInches: 0
+                            widthFeet: 12
+                            widthInches: 0
+                      ownerGroups:
+                        - groupId: 1
+                          type: SOLE
+                          status: ACTIVE
+                          tenancySpecified: true
+                          owners:
+                            - ownerId: 988774
+                              status: ACTIVE
+                              partyType: OWNER_IND
+                              individualName:
+                                first: MARY-ANNE
+                                last: BICKNELL
+                              address:
+                                street: 6665 238TH STREET
+                                city: LANGLEY
+                                region: BC
+                                country: CA
+                                postalCode: V3A 6H4
+                              phoneNumber: '6044620279'
+                              type: SOLE
+                      hasCaution: false
+                      documentType: REG_101
+                    - mhrNumber: '108092'
+                      createDateTime: '2023-12-29T22:11:01+00:00'
+                      registrationType: PERMIT
+                      status: ACTIVE
+                      declaredValue: 0
+                      documentDescription: TRANSPORT PERMIT
+                      documentId: '80888005'
+                      documentRegistrationNumber: '00550151'
+                      clientReferenceId: UT-PERMIT
+                      attentionReference: Anne Patchett
+                      submittingParty:
+                        businessName: ABC UNIT TEST COMPANY
+                        address:
+                          street: 222 SUMMER STREET
+                          city: VICTORIA
+                          region: BC
+                          country: CA
+                          postalCode: V8W 2V8
+                        emailAddress: bsmith@abc-search.com
+                      note:
+                        documentId: '80888005'
+                        documentType: REG_103
+                        status: ACTIVE
+                        remarks: ''
+                        createDateTime: '2023-12-29T22:11:01+00:00'
+                        documentDescription: TRANSPORT PERMIT
+                        documentRegistrationNumber: '00550151'
+                        expiryDateTime: '2024-01-28T00:00:00+00:00'
+                      hasCaution: false
+                      description:
+                        sectionCount: 1
+                        csaNumber: '3847656'
+                        csaStandard: ''
+                        engineerName: GREAT ENGINEERING INC.
+                        baseInformation:
+                          make: MODULINE
+                          model: ADVENTURE X-5000
+                          circa: false
+                          year: 2011
+                        rebuiltRemarks: ''
+                        otherRemarks: ''
+                        manufacturer: Test MH
+                        engineerDate: '2023-08-24T07:00:01+00:00'
+                        sections:
+                          - serialNumber: 022000A011739
+                            lengthFeet: 60
+                            lengthInches: 0
+                            widthFeet: 12
+                            widthInches: 0
+                      ownerGroups:
+                        - groupId: 1
+                          type: SOLE
+                          status: ACTIVE
+                          tenancySpecified: true
+                          owners:
+                            - ownerId: 988774
+                              status: ACTIVE
+                              partyType: OWNER_IND
+                              individualName:
+                                first: MARY-ANNE
+                                last: BICKNELL
+                              address:
+                                street: 6665 238TH STREET
+                                city: LANGLEY
+                                region: BC
+                                country: CA
+                                postalCode: V3A 6H4
+                              phoneNumber: '6044620279'
+                              type: SOLE
+                      documentType: REG_103
+                      previousLocation:
+                        locationId: 200168
+                        status: ACTIVE
+                        locationType: OTHER
+                        address:
+                          street: 71-8676 BLANSHARD STREET
+                          streetAdditional: SECOND FLOOR
+                          city: VICTORIA
+                          region: BC
+                          country: CA
+                          postalCode: A1A 1A1
+                        lot: '24'
+                        landDistrict: CARIBOU
+                        plan: '16'
+                        leaveProvince: false
+                        taxCertificate: false
+                      location:
+                        locationId: 200169
+                        status: ACTIVE
+                        locationType: OTHER
+                        address:
+                          street: 8300 GALLAGHER LK FRONTAGE RD
+                          city: NELSON
+                          region: BC
+                          country: CA
+                          postalCode: ''
+                        lot: '24'
+                        landDistrict: CARIBOU
+                        plan: '16'
+                        leaveProvince: false
+                        taxCertificate: true
+                        taxExpiryDate: '2024-02-28T08:01:00+00:00'
+                    - mhrNumber: '108092'
+                      createDateTime: '2023-12-29T22:27:24+00:00'
+                      registrationType: TRANS
+                      status: ACTIVE
+                      declaredValue: 200634
+                      documentDescription: TRANSFER DUE TO SALE OR GIFT
+                      documentId: '80888006'
+                      documentRegistrationNumber: '00550152'
+                      clientReferenceId: UT-TEST-TRANS
+                      attentionReference: UT-TESTING
+                      submittingParty:
+                        businessName: ABC UNIT TEST LTD.
+                        address:
+                          street: 303 - 895 FORT STREET
+                          city: VICTORIA
+                          region: BC
+                          country: CA
+                          postalCode: V8W 1H5
+                      transferDate: '2023-12-23T08:00:00+00:00'
+                      consideration: '$200,634.00'
+                      ownLand: true
+                      hasCaution: false
+                      documentType: TRAN
+                      description:
+                        sectionCount: 1
+                        csaNumber: '3847656'
+                        csaStandard: ''
+                        engineerName: GREAT ENGINEERING INC.
+                        baseInformation:
+                          make: MODULINE
+                          model: ADVENTURE X-5000
+                          circa: false
+                          year: 2011
+                        rebuiltRemarks: ''
+                        otherRemarks: ''
+                        manufacturer: Test MH
+                        engineerDate: '2023-08-24T07:00:01+00:00'
+                        sections:
+                          - serialNumber: 022000A011739
+                            lengthFeet: 60
+                            lengthInches: 0
+                            widthFeet: 12
+                            widthInches: 0
+                      location:
+                        locationId: 200169
+                        status: ACTIVE
+                        locationType: OTHER
+                        address:
+                          street: 8300 GALLAGHER LK FRONTAGE RD
+                          city: NELSON
+                          region: BC
+                          country: CA
+                          postalCode: ''
+                        lot: '24'
+                        landDistrict: CARIBOU
+                        plan: '16'
+                        leaveProvince: false
+                        taxCertificate: true
+                        taxExpiryDate: '2024-02-28T08:01:00+00:00'
+                      previousOwnerGroups:
+                        - groupId: 1
+                          type: SOLE
+                          status: ACTIVE
+                          tenancySpecified: true
+                          owners:
+                            - ownerId: 988774
+                              status: ACTIVE
+                              partyType: OWNER_IND
+                              individualName:
+                                first: MARY-ANNE
+                                last: BICKNELL
+                              address:
+                                street: 6665 238TH STREET
+                                city: LANGLEY
+                                region: BC
+                                country: CA
+                                postalCode: V3A 6H4
+                              phoneNumber: '6044620279'
+                              type: SOLE
+                      ownerGroups:
+                        - groupId: 2
+                          type: JOINT
+                          status: ACTIVE
+                          tenancySpecified: true
+                          owners:
+                            - ownerId: 988777
+                              status: ACTIVE
+                              partyType: OWNER_IND
+                              individualName:
+                                first: SHERLOCK
+                                last: HOLMES
+                              address:
+                                street: 6665 238TH STREET
+                                city: LANGLEY
+                                region: BC
+                                country: CA
+                                postalCode: V3A 6H4
+                              phoneNumber: '6044620279'
+                              type: JOINT
+                            - ownerId: 988778
+                              status: ACTIVE
+                              partyType: OWNER_IND
+                              individualName:
+                                first: JOHN
+                                last: WATSON
+                              address:
+                                street: 6665 238TH STREET
+                                city: LANGLEY
+                                region: BC
+                                country: CA
+                                postalCode: V3A 6H4
+                              phoneNumber: '6044620279'
+                              type: JOINT
+                    - mhrNumber: '108092'
+                      createDateTime: '2023-12-29T22:34:43+00:00'
+                      registrationType: EXEMPTION_RES
+                      status: EXEMPT
+                      declaredValue: 0
+                      documentDescription: RESIDENTIAL EXEMPTION
+                      documentId: '80888007'
+                      documentRegistrationNumber: '00550153'
+                      clientReferenceId: UT-EXEMPTION
+                      attentionReference: JACKSON POLLOCK
+                      submittingParty:
+                        personName:
+                          first: JOHN
+                          last: SMITH
+                          middle: B
+                        address:
+                          street: 222 SUMMER STREET
+                          city: VICTORIA
+                          region: BC
+                          country: CA
+                          postalCode: V8W 2V8
+                        emailAddress: jbsmith@gmail.com
+                        phoneNumber: '2504930122'
+                      note:
+                        documentId: '80888007'
+                        documentType: EXRS
+                        status: ACTIVE
+                        remarks: RESIDENTIAL EXEMPTION test
+                        createDateTime: '2023-12-29T22:34:43+00:00'
+                        documentDescription: RESIDENTIAL EXEMPTION
+                        documentRegistrationNumber: '00550153'
+                        effectiveDateTime: '2023-12-29T22:34:43+00:00'
+                        givingNoticeParty:
+                          personName:
+                            first: PABLO
+                            last: PICASSO
+                          address:
+                            street: 1222 SUMMER STREET
+                            city: VICTORIA
+                            region: BC
+                            country: CA
+                            postalCode: V8W 2V8
+                          phoneNumber: '2508289999'
+                        destroyed: false
+                      hasCaution: false
+                      location:
+                        locationId: 200169
+                        status: ACTIVE
+                        locationType: OTHER
+                        address:
+                          street: 8300 GALLAGHER LK FRONTAGE RD
+                          city: NELSON
+                          region: BC
+                          country: CA
+                          postalCode: ''
+                        lot: '24'
+                        landDistrict: CARIBOU
+                        plan: '16'
+                        leaveProvince: false
+                        taxCertificate: true
+                        taxExpiryDate: '2024-02-28T08:01:00+00:00'
+                      ownerGroups:
+                        - groupId: 2
+                          type: JOINT
+                          status: ACTIVE
+                          tenancySpecified: true
+                          owners:
+                            - ownerId: 988777
+                              status: ACTIVE
+                              partyType: OWNER_IND
+                              individualName:
+                                first: SHERLOCK
+                                last: HOLMES
+                              address:
+                                street: 6665 238TH STREET
+                                city: LANGLEY
+                                region: BC
+                                country: CA
+                                postalCode: V3A 6H4
+                              phoneNumber: '6044620279'
+                              type: JOINT
+                            - ownerId: 988778
+                              status: ACTIVE
+                              partyType: OWNER_IND
+                              individualName:
+                                first: JOHN
+                                last: WATSON
+                              address:
+                                street: 6665 238TH STREET
+                                city: LANGLEY
+                                region: BC
+                                country: CA
+                                postalCode: V3A 6H4
+                              phoneNumber: '6044620279'
+                              type: JOINT
+                      documentType: EXRS
+                      description:
+                        sectionCount: 1
+                        csaNumber: '3847656'
+                        csaStandard: ''
+                        engineerName: GREAT ENGINEERING INC.
+                        baseInformation:
+                          make: MODULINE
+                          model: ADVENTURE X-5000
+                          circa: false
+                          year: 2011
+                        rebuiltRemarks: ''
+                        otherRemarks: ''
+                        manufacturer: Test MH
+                        engineerDate: '2023-08-24T07:00:01+00:00'
+                        sections:
+                          - serialNumber: 022000A011739
+                            lengthFeet: 60
+                            lengthInches: 0
+                            widthFeet: 12
+                            widthInches: 0
+                    - mhrNumber: '108092'
+                      createDateTime: '2023-12-29T22:46:23+00:00'
+                      registrationType: EXEMPTION_NON_RES
+                      status: EXEMPT
+                      declaredValue: 0
+                      documentDescription: NON-RESIDENTIAL EXEMPTION
+                      documentId: '80888008'
+                      documentRegistrationNumber: '00550154'
+                      clientReferenceId: UT-EXEMPTION-EXNR
+                      attentionReference: JAMES HILTON
+                      submittingParty:
+                        personName:
+                          first: JOHN
+                          last: SMITH
+                          middle: B
+                        address:
+                          street: 222 SUMMER STREET
+                          city: VICTORIA
+                          region: BC
+                          country: CA
+                          postalCode: V8W 2V8
+                        emailAddress: jbsmith@gmail.com
+                        phoneNumber: '2504930122'
+                      note:
+                        documentId: '80888008'
+                        documentType: EXNR
+                        status: ACTIVE
+                        remarks: EXNR test.
+                        createDateTime: '2023-12-29T22:46:23+00:00'
+                        documentDescription: NON-RESIDENTIAL EXEMPTION
+                        documentRegistrationNumber: '00550154'
+                        effectiveDateTime: '2023-12-29T22:46:23+00:00'
+                        givingNoticeParty:
+                          personName:
+                            first: CAMERON
+                            last: ANDERSON
+                            middle: WALLACE
+                          address:
+                            street: 1222 SUMMER STREET
+                            city: VICTORIA
+                            region: BC
+                            country: CA
+                            postalCode: V8W 2V8
+                          phoneNumber: '2508289999'
+                        destroyed: true
+                        expiryDateTime: '2023-08-22T06:59:59+00:00'
+                      nonResidential: true
+                      hasCaution: false
+                      location:
+                        locationId: 200169
+                        status: ACTIVE
+                        locationType: OTHER
+                        address:
+                          street: 8300 GALLAGHER LK FRONTAGE RD
+                          city: NELSON
+                          region: BC
+                          country: CA
+                          postalCode: ''
+                        lot: '24'
+                        landDistrict: CARIBOU
+                        plan: '16'
+                        leaveProvince: false
+                        taxCertificate: true
+                        taxExpiryDate: '2024-02-28T08:01:00+00:00'
+                      ownerGroups:
+                        - groupId: 2
+                          type: JOINT
+                          status: ACTIVE
+                          tenancySpecified: true
+                          owners:
+                            - ownerId: 988777
+                              status: ACTIVE
+                              partyType: OWNER_IND
+                              individualName:
+                                first: SHERLOCK
+                                last: HOLMES
+                              address:
+                                street: 6665 238TH STREET
+                                city: LANGLEY
+                                region: BC
+                                country: CA
+                                postalCode: V3A 6H4
+                              phoneNumber: '6044620279'
+                              type: JOINT
+                            - ownerId: 988778
+                              status: ACTIVE
+                              partyType: OWNER_IND
+                              individualName:
+                                first: JOHN
+                                last: WATSON
+                              address:
+                                street: 6665 238TH STREET
+                                city: LANGLEY
+                                region: BC
+                                country: CA
+                                postalCode: V3A 6H4
+                              phoneNumber: '6044620279'
+                              type: JOINT
+                      documentType: EXNR
+                      description:
+                        sectionCount: 1
+                        csaNumber: '3847656'
+                        csaStandard: ''
+                        engineerName: GREAT ENGINEERING INC.
+                        baseInformation:
+                          make: MODULINE
+                          model: ADVENTURE X-5000
+                          circa: false
+                          year: 2011
+                        rebuiltRemarks: ''
+                        otherRemarks: ''
+                        manufacturer: Test MH
+                        engineerDate: '2023-08-24T07:00:01+00:00'
+                        sections:
+                          - serialNumber: 022000A011739
+                            lengthFeet: 60
+                            lengthInches: 0
+                            widthFeet: 12
+                            widthInches: 0
+                    - mhrNumber: '108092'
+                      createDateTime: '2023-12-29T22:54:28+00:00'
+                      registrationType: REG_STAFF_ADMIN
+                      status: ACTIVE
+                      documentDescription: RESCIND EXEMPTION
+                      documentId: '80888009'
+                      documentRegistrationNumber: '00550155'
+                      clientReferenceId: UT-ADMIN-EXRE
+                      attentionReference: JANE GIBSON
+                      submittingParty:
+                        businessName: ABC UNIT TEST COMPANY
+                        address:
+                          street: 222 SUMMER STREET
+                          city: VICTORIA
+                          region: BC
+                          country: CA
+                          postalCode: V8W 2V8
+                        emailAddress: bsmith@abc-search.com
+                      documentType: EXRE
+                      hasCaution: false
+                      description:
+                        sectionCount: 1
+                        csaNumber: '3847656'
+                        csaStandard: ''
+                        engineerName: GREAT ENGINEERING INC.
+                        baseInformation:
+                          make: MODULINE
+                          model: ADVENTURE X-5000
+                          circa: false
+                          year: 2011
+                        rebuiltRemarks: ''
+                        otherRemarks: ''
+                        manufacturer: Test MH
+                        engineerDate: '2023-08-24T07:00:01+00:00'
+                        sections:
+                          - serialNumber: 022000A011739
+                            lengthFeet: 60
+                            lengthInches: 0
+                            widthFeet: 12
+                            widthInches: 0
+                      location:
+                        locationId: 200169
+                        status: ACTIVE
+                        locationType: OTHER
+                        address:
+                          street: 8300 GALLAGHER LK FRONTAGE RD
+                          city: NELSON
+                          region: BC
+                          country: CA
+                          postalCode: ''
+                        lot: '24'
+                        landDistrict: CARIBOU
+                        plan: '16'
+                        leaveProvince: false
+                        taxCertificate: true
+                        taxExpiryDate: '2024-02-28T08:01:00+00:00'
+                      ownerGroups:
+                        - groupId: 2
+                          type: JOINT
+                          status: ACTIVE
+                          tenancySpecified: true
+                          owners:
+                            - ownerId: 988777
+                              status: ACTIVE
+                              partyType: OWNER_IND
+                              individualName:
+                                first: SHERLOCK
+                                last: HOLMES
+                              address:
+                                street: 6665 238TH STREET
+                                city: LANGLEY
+                                region: BC
+                                country: CA
+                                postalCode: V3A 6H4
+                              phoneNumber: '6044620279'
+                              type: JOINT
+                            - ownerId: 988778
+                              status: ACTIVE
+                              partyType: OWNER_IND
+                              individualName:
+                                first: JOHN
+                                last: WATSON
+                              address:
+                                street: 6665 238TH STREET
+                                city: LANGLEY
+                                region: BC
+                                country: CA
+                                postalCode: V3A 6H4
+                              phoneNumber: '6044620279'
+                              type: JOINT
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  schemas:
+    address:
+      title: address
+      description: 'Capture address information for an entity. If the country code is Canada or the US, region and postal code are required.'
+      type: object
+      properties:
+        street:
+          type: string
+          description: 'Street address and name. '
+        city:
+          type: string
+          description: 'City, Town, or Village.'
+        region:
+          type: string
+          description: 'For Canada or USA, 2 character region code matching the country code.'
+          minLength: 2
+          maxLength: 2
+        country:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: 2 Character ISO 3166-1 Alpha-2 Country Code.
+        postalCode:
+          type: string
+          description: 'Postal Code in A1A 1A1 format for Canada, or zip code for US addresses.'
+        streetAdditional:
+          type: string
+          description: Additional address field.
+      required:
+        - street
+        - city
+      x-examples:
+        address-example-1:
+          street: 721 Fort St.
+          city: Victoria
+          region: BC
+          country: CA
+          postalCode: A1A 1A1
+    baseInformation:
+      type: object
+      title: baseInformation
+      description: <p>Base information about a MANUFACTURED HOME REGISTRATION.</p>
+      properties:
+        year:
+          type: integer
+          minimum: 1900
+          maximum: 2100
+          description: Year of manufacture of the home.
+        make:
+          type: string
+          description: Make of home (or manufacturer's name).
+        model:
+          type: string
+          description: Model name.
+        circa:
+          type: boolean
+          description: True if the year value is uncertain.
+          default: false
+      required:
+        - year
+      x-examples:
+        mhr-new-request:
+          year: 2018
+          make: WATSON IND. (ALTA)
+          model: DUCHESS
+          circa: false
+    batchRegistration:
+      title: Manufactured Home Registration Information
+      x-stoplight:
+        id: 2d06a843570f7
+      type: object
+      description: <p>This object holds information for a manufactured home registration. Previous location is conditionally included when the registration changes the home location. Previous owner groups are conditionally included when the registration changes the home owners. A note is included when the registration creates a unit note or has an expiry date and time./p>
+      properties:
+        attentionReference:
+          type: string
+          description: The registration document attention or reference information.
+          example: GWB14768.100
+        clientReferenceId:
+          $ref: '#/components/schemas/clientReferenceId'
+        createDateTime:
+          $ref: '#/components/schemas/createDateTime'
+        declaredValue:
+          type: integer
+          description: The declared value of the manufactured home as a number in Canadian dollars.
+        description:
+          $ref: '#/components/schemas/description'
+        documentDescription:
+          type: string
+          description: A description of the registration report document.
+          example: MANUFACTURED HOME REGISTRATION
+        documentId:
+          type: string
+          description: Unique registration document ID/number required for new registrations as a reference to the decal; assigned by the Manufactured Home Registry staff.
+          example: '80043823'
+        documentRegistrationNumber:
+          type: string
+          description: The document registration number that uniquely identifies a registration. Assigned by the application and returned in a response.
+          example: '00442217'
+        documentType:
+          $ref: '#/components/schemas/documentType'
+        hasCaution:
+          type: boolean
+          description: 'Included in the response, true if a caution on the manufacuted home exists that has not expired and has not been cancelled. Allows for cautions that have been continued or extended.'
+          example: false
+          default: false
+        location:
+          $ref: '#/components/schemas/location'
+        mhrNumber:
+          type: string
+          description: Unique manufactured home registration number assigned by the Manufactured Home Registry.
+        note:
+          $ref: '#/components/schemas/note'
+        ownLand:
+          type: boolean
+          description: True if the manufactured home is located on land that the owners own or have a registered lease of not less than 3 years.
+          example: false
+        ownerGroups:
+          type: array
+          description: Contains information about the manufactured home owners. At least one owner group is required when submitting a new registration request.
+          items:
+            $ref: '#/components/schemas/ownerGroup'
+        previousLocation:
+          $ref: '#/components/schemas/location'
+        previousOwnerGroups:
+          type: array
+          description: Contains information about the previos owners of a manufactured home when a registration changes ownership.
+          items:
+            $ref: '#/components/schemas/ownerGroup'
+        registrationType:
+          $ref: '#/components/schemas/registrationType'
+        status:
+          $ref: '#/components/schemas/status'
+        submittingParty:
+          $ref: '#/components/schemas/party'
+      required:
+        - createDateTime
+        - description
+        - documentDescription
+        - documentId
+        - documentRegistrationNumber
+        - documentType
+        - location
+        - mhrNumber
+        - ownerGroups
+        - registrationType
+        - status
+        - submittingParty
+      x-examples:
+        REG_101-example:
+          mhrNumber: '108092'
+          createDateTime: '2023-12-29T22:09:02+00:00'
+          registrationType: MHREG
+          status: ACTIVE
+          declaredValue: 0
+          documentDescription: MANUFACTURED HOME REGISTRATION
+          documentId: '80888004'
+          documentRegistrationNumber: '00550150'
+          ownLand: true
+          attentionReference: NEIL GAIMAN
+          clientReferenceId: UT-MHREG-SOLE
+          submittingParty:
+            businessName: ABC TEST COMPANY
+            address:
+              street: 222 SUMMER STREET
+              city: VICTORIA
+              region: BC
+              country: CA
+              postalCode: V8W 2V8
+            emailAddress: bsmith@abc-search.com
+          location:
+            locationId: 200168
+            status: ACTIVE
+            locationType: OTHER
+            address:
+              street: 71-8676 BLANSHARD STREET
+              streetAdditional: SECOND FLOOR
+              city: VICTORIA
+              region: BC
+              country: CA
+              postalCode: A1A 1A1
+            lot: '24'
+            landDistrict: CARIBOU
+            plan: '16'
+            leaveProvince: false
+            taxCertificate: false
+          description:
+            status: ACTIVE
+            sectionCount: 1
+            csaNumber: '3847656'
+            csaStandard: ''
+            engineerName: GREAT ENGINEERING INC.
+            baseInformation:
+              make: MODULINE
+              model: ADVENTURE X-5000
+              circa: false
+              year: 2011
+            rebuiltRemarks: ''
+            otherRemarks: ''
+            manufacturer: Test MH
+            engineerDate: '2023-08-24T07:00:01+00:00'
+            sections:
+              - serialNumber: 022000A011739
+                lengthFeet: 60
+                lengthInches: 0
+                widthFeet: 12
+                widthInches: 0
+          ownerGroups:
+            - groupId: 1
+              type: SOLE
+              status: ACTIVE
+              tenancySpecified: true
+              owners:
+                - ownerId: 988774
+                  status: ACTIVE
+                  partyType: OWNER_IND
+                  individualName:
+                    first: MARY-ANNE
+                    last: BICKNELL
+                  address:
+                    street: 6665 238TH STREET
+                    city: LANGLEY
+                    region: BC
+                    country: CA
+                    postalCode: V3A 6H4
+                  phoneNumber: '6044620279'
+                  type: SOLE
+          hasCaution: false
+          documentType: REG_101
+        REG_103-example:
+          mhrNumber: '108092'
+          createDateTime: '2023-12-29T22:11:01+00:00'
+          registrationType: PERMIT
+          status: ACTIVE
+          declaredValue: 0
+          documentDescription: TRANSPORT PERMIT
+          documentId: '80888005'
+          documentRegistrationNumber: '00550151'
+          clientReferenceId: UT-PERMIT
+          attentionReference: Anne Patchett
+          submittingParty:
+            businessName: ABC UNIT TEST COMPANY
+            address:
+              street: 222 SUMMER STREET
+              city: VICTORIA
+              region: BC
+              country: CA
+              postalCode: V8W 2V8
+            emailAddress: bsmith@abc-search.com
+          note:
+            documentId: '80888005'
+            documentType: REG_103
+            status: ACTIVE
+            remarks: ''
+            createDateTime: '2023-12-29T22:11:01+00:00'
+            documentDescription: TRANSPORT PERMIT
+            documentRegistrationNumber: '00550151'
+            expiryDateTime: '2024-01-28T00:00:00+00:00'
+          hasCaution: false
+          description:
+            sectionCount: 1
+            csaNumber: '3847656'
+            csaStandard: ''
+            engineerName: GREAT ENGINEERING INC.
+            baseInformation:
+              make: MODULINE
+              model: ADVENTURE X-5000
+              circa: false
+              year: 2011
+            rebuiltRemarks: ''
+            otherRemarks: ''
+            manufacturer: Test MH
+            engineerDate: '2023-08-24T07:00:01+00:00'
+            sections:
+              - serialNumber: 022000A011739
+                lengthFeet: 60
+                lengthInches: 0
+                widthFeet: 12
+                widthInches: 0
+          ownerGroups:
+            - groupId: 1
+              type: SOLE
+              status: ACTIVE
+              tenancySpecified: true
+              owners:
+                - ownerId: 988774
+                  status: ACTIVE
+                  partyType: OWNER_IND
+                  individualName:
+                    first: MARY-ANNE
+                    last: BICKNELL
+                  address:
+                    street: 6665 238TH STREET
+                    city: LANGLEY
+                    region: BC
+                    country: CA
+                    postalCode: V3A 6H4
+                  phoneNumber: '6044620279'
+                  type: SOLE
+          documentType: REG_103
+          previousLocation:
+            locationId: 200168
+            status: ACTIVE
+            locationType: OTHER
+            address:
+              street: 71-8676 BLANSHARD STREET
+              streetAdditional: SECOND FLOOR
+              city: VICTORIA
+              region: BC
+              country: CA
+              postalCode: A1A 1A1
+            lot: '24'
+            landDistrict: CARIBOU
+            plan: '16'
+            leaveProvince: false
+            taxCertificate: false
+          location:
+            locationId: 200169
+            status: ACTIVE
+            locationType: OTHER
+            address:
+              street: 8300 GALLAGHER LK FRONTAGE RD
+              city: NELSON
+              region: BC
+              country: CA
+              postalCode: ''
+            lot: '24'
+            landDistrict: CARIBOU
+            plan: '16'
+            leaveProvince: false
+            taxCertificate: true
+            taxExpiryDate: '2024-02-28T08:01:00+00:00'
+        TRAN-example:
+          mhrNumber: '108092'
+          createDateTime: '2023-12-29T22:27:24+00:00'
+          registrationType: TRANS
+          status: ACTIVE
+          declaredValue: 200634
+          documentDescription: TRANSFER DUE TO SALE OR GIFT
+          documentId: '80888006'
+          documentRegistrationNumber: '00550152'
+          clientReferenceId: UT-TEST-TRANS
+          attentionReference: UT-TESTING
+          submittingParty:
+            businessName: ABC UNIT TEST LTD.
+            address:
+              street: 303 - 895 FORT STREET
+              city: VICTORIA
+              region: BC
+              country: CA
+              postalCode: V8W 1H5
+          transferDate: '2023-12-23T08:00:00+00:00'
+          consideration: '$200,634.00'
+          ownLand: true
+          hasCaution: false
+          documentType: TRAN
+          description:
+            sectionCount: 1
+            csaNumber: '3847656'
+            csaStandard: ''
+            engineerName: GREAT ENGINEERING INC.
+            baseInformation:
+              make: MODULINE
+              model: ADVENTURE X-5000
+              circa: false
+              year: 2011
+            rebuiltRemarks: ''
+            otherRemarks: ''
+            manufacturer: Test MH
+            engineerDate: '2023-08-24T07:00:01+00:00'
+            sections:
+              - serialNumber: 022000A011739
+                lengthFeet: 60
+                lengthInches: 0
+                widthFeet: 12
+                widthInches: 0
+          location:
+            locationId: 200169
+            status: ACTIVE
+            locationType: OTHER
+            address:
+              street: 8300 GALLAGHER LK FRONTAGE RD
+              city: NELSON
+              region: BC
+              country: CA
+              postalCode: ''
+            lot: '24'
+            landDistrict: CARIBOU
+            plan: '16'
+            leaveProvince: false
+            taxCertificate: true
+            taxExpiryDate: '2024-02-28T08:01:00+00:00'
+          previousOwnerGroups:
+            - groupId: 1
+              type: SOLE
+              status: ACTIVE
+              tenancySpecified: true
+              owners:
+                - ownerId: 988774
+                  status: ACTIVE
+                  partyType: OWNER_IND
+                  individualName:
+                    first: MARY-ANNE
+                    last: BICKNELL
+                  address:
+                    street: 6665 238TH STREET
+                    city: LANGLEY
+                    region: BC
+                    country: CA
+                    postalCode: V3A 6H4
+                  phoneNumber: '6044620279'
+                  type: SOLE
+          ownerGroups:
+            - groupId: 2
+              type: JOINT
+              status: ACTIVE
+              tenancySpecified: true
+              owners:
+                - ownerId: 988777
+                  status: ACTIVE
+                  partyType: OWNER_IND
+                  individualName:
+                    first: SHERLOCK
+                    last: HOLMES
+                  address:
+                    street: 6665 238TH STREET
+                    city: LANGLEY
+                    region: BC
+                    country: CA
+                    postalCode: V3A 6H4
+                  phoneNumber: '6044620279'
+                  type: JOINT
+                - ownerId: 988778
+                  status: ACTIVE
+                  partyType: OWNER_IND
+                  individualName:
+                    first: JOHN
+                    last: WATSON
+                  address:
+                    street: 6665 238TH STREET
+                    city: LANGLEY
+                    region: BC
+                    country: CA
+                    postalCode: V3A 6H4
+                  phoneNumber: '6044620279'
+                  type: JOINT
+        EXRS-example:
+          mhrNumber: '108092'
+          createDateTime: '2023-12-29T22:34:43+00:00'
+          registrationType: EXEMPTION_RES
+          status: EXEMPT
+          declaredValue: 0
+          documentDescription: RESIDENTIAL EXEMPTION
+          documentId: '80888007'
+          documentRegistrationNumber: '00550153'
+          clientReferenceId: UT-EXEMPTION
+          attentionReference: JACKSON POLLOCK
+          submittingParty:
+            personName:
+              first: JOHN
+              last: SMITH
+              middle: B
+            address:
+              street: 222 SUMMER STREET
+              city: VICTORIA
+              region: BC
+              country: CA
+              postalCode: V8W 2V8
+            emailAddress: jbsmith@gmail.com
+            phoneNumber: '2504930122'
+          note:
+            documentId: '80888007'
+            documentType: EXRS
+            status: ACTIVE
+            remarks: RESIDENTIAL EXEMPTION test
+            createDateTime: '2023-12-29T22:34:43+00:00'
+            documentDescription: RESIDENTIAL EXEMPTION
+            documentRegistrationNumber: '00550153'
+            effectiveDateTime: '2023-12-29T22:34:43+00:00'
+            givingNoticeParty:
+              personName:
+                first: PABLO
+                last: PICASSO
+              address:
+                street: 1222 SUMMER STREET
+                city: VICTORIA
+                region: BC
+                country: CA
+                postalCode: V8W 2V8
+              phoneNumber: '2508289999'
+            destroyed: false
+          hasCaution: false
+          location:
+            locationId: 200169
+            status: ACTIVE
+            locationType: OTHER
+            address:
+              street: 8300 GALLAGHER LK FRONTAGE RD
+              city: NELSON
+              region: BC
+              country: CA
+              postalCode: ''
+            lot: '24'
+            landDistrict: CARIBOU
+            plan: '16'
+            leaveProvince: false
+            taxCertificate: true
+            taxExpiryDate: '2024-02-28T08:01:00+00:00'
+          ownerGroups:
+            - groupId: 2
+              type: JOINT
+              status: ACTIVE
+              tenancySpecified: true
+              owners:
+                - ownerId: 988777
+                  status: ACTIVE
+                  partyType: OWNER_IND
+                  individualName:
+                    first: SHERLOCK
+                    last: HOLMES
+                  address:
+                    street: 6665 238TH STREET
+                    city: LANGLEY
+                    region: BC
+                    country: CA
+                    postalCode: V3A 6H4
+                  phoneNumber: '6044620279'
+                  type: JOINT
+                - ownerId: 988778
+                  status: ACTIVE
+                  partyType: OWNER_IND
+                  individualName:
+                    first: JOHN
+                    last: WATSON
+                  address:
+                    street: 6665 238TH STREET
+                    city: LANGLEY
+                    region: BC
+                    country: CA
+                    postalCode: V3A 6H4
+                  phoneNumber: '6044620279'
+                  type: JOINT
+          documentType: EXRS
+          description:
+            sectionCount: 1
+            csaNumber: '3847656'
+            csaStandard: ''
+            engineerName: GREAT ENGINEERING INC.
+            baseInformation:
+              make: MODULINE
+              model: ADVENTURE X-5000
+              circa: false
+              year: 2011
+            rebuiltRemarks: ''
+            otherRemarks: ''
+            manufacturer: Test MH
+            engineerDate: '2023-08-24T07:00:01+00:00'
+            sections:
+              - serialNumber: 022000A011739
+                lengthFeet: 60
+                lengthInches: 0
+                widthFeet: 12
+                widthInches: 0
+        EXNR-example:
+          mhrNumber: '108092'
+          createDateTime: '2023-12-29T22:46:23+00:00'
+          registrationType: EXEMPTION_NON_RES
+          status: EXEMPT
+          declaredValue: 0
+          documentDescription: NON-RESIDENTIAL EXEMPTION
+          documentId: '80888008'
+          documentRegistrationNumber: '00550154'
+          clientReferenceId: UT-EXEMPTION-EXNR
+          attentionReference: JAMES HILTON
+          submittingParty:
+            personName:
+              first: JOHN
+              last: SMITH
+              middle: B
+            address:
+              street: 222 SUMMER STREET
+              city: VICTORIA
+              region: BC
+              country: CA
+              postalCode: V8W 2V8
+            emailAddress: jbsmith@gmail.com
+            phoneNumber: '2504930122'
+          note:
+            documentId: '80888008'
+            documentType: EXNR
+            status: ACTIVE
+            remarks: EXNR test.
+            createDateTime: '2023-12-29T22:46:23+00:00'
+            documentDescription: NON-RESIDENTIAL EXEMPTION
+            documentRegistrationNumber: '00550154'
+            effectiveDateTime: '2023-12-29T22:46:23+00:00'
+            givingNoticeParty:
+              personName:
+                first: CAMERON
+                last: ANDERSON
+                middle: WALLACE
+              address:
+                street: 1222 SUMMER STREET
+                city: VICTORIA
+                region: BC
+                country: CA
+                postalCode: V8W 2V8
+              phoneNumber: '2508289999'
+            destroyed: true
+            expiryDateTime: '2023-08-22T06:59:59+00:00'
+          nonResidential: true
+          hasCaution: false
+          location:
+            locationId: 200169
+            status: ACTIVE
+            locationType: OTHER
+            address:
+              street: 8300 GALLAGHER LK FRONTAGE RD
+              city: NELSON
+              region: BC
+              country: CA
+              postalCode: ''
+            lot: '24'
+            landDistrict: CARIBOU
+            plan: '16'
+            leaveProvince: false
+            taxCertificate: true
+            taxExpiryDate: '2024-02-28T08:01:00+00:00'
+          ownerGroups:
+            - groupId: 2
+              type: JOINT
+              status: ACTIVE
+              tenancySpecified: true
+              owners:
+                - ownerId: 988777
+                  status: ACTIVE
+                  partyType: OWNER_IND
+                  individualName:
+                    first: SHERLOCK
+                    last: HOLMES
+                  address:
+                    street: 6665 238TH STREET
+                    city: LANGLEY
+                    region: BC
+                    country: CA
+                    postalCode: V3A 6H4
+                  phoneNumber: '6044620279'
+                  type: JOINT
+                - ownerId: 988778
+                  status: ACTIVE
+                  partyType: OWNER_IND
+                  individualName:
+                    first: JOHN
+                    last: WATSON
+                  address:
+                    street: 6665 238TH STREET
+                    city: LANGLEY
+                    region: BC
+                    country: CA
+                    postalCode: V3A 6H4
+                  phoneNumber: '6044620279'
+                  type: JOINT
+          documentType: EXNR
+          description:
+            sectionCount: 1
+            csaNumber: '3847656'
+            csaStandard: ''
+            engineerName: GREAT ENGINEERING INC.
+            baseInformation:
+              make: MODULINE
+              model: ADVENTURE X-5000
+              circa: false
+              year: 2011
+            rebuiltRemarks: ''
+            otherRemarks: ''
+            manufacturer: Test MH
+            engineerDate: '2023-08-24T07:00:01+00:00'
+            sections:
+              - serialNumber: 022000A011739
+                lengthFeet: 60
+                lengthInches: 0
+                widthFeet: 12
+                widthInches: 0
+        EXRE-example:
+          mhrNumber: '108092'
+          createDateTime: '2023-12-29T22:54:28+00:00'
+          registrationType: REG_STAFF_ADMIN
+          status: ACTIVE
+          documentDescription: RESCIND EXEMPTION
+          documentId: '80888009'
+          documentRegistrationNumber: '00550155'
+          clientReferenceId: UT-ADMIN-EXRE
+          attentionReference: JANE GIBSON
+          submittingParty:
+            businessName: ABC UNIT TEST COMPANY
+            address:
+              street: 222 SUMMER STREET
+              city: VICTORIA
+              region: BC
+              country: CA
+              postalCode: V8W 2V8
+            emailAddress: bsmith@abc-search.com
+          documentType: EXRE
+          hasCaution: false
+          description:
+            sectionCount: 1
+            csaNumber: '3847656'
+            csaStandard: ''
+            engineerName: GREAT ENGINEERING INC.
+            baseInformation:
+              make: MODULINE
+              model: ADVENTURE X-5000
+              circa: false
+              year: 2011
+            rebuiltRemarks: ''
+            otherRemarks: ''
+            manufacturer: Test MH
+            engineerDate: '2023-08-24T07:00:01+00:00'
+            sections:
+              - serialNumber: 022000A011739
+                lengthFeet: 60
+                lengthInches: 0
+                widthFeet: 12
+                widthInches: 0
+          location:
+            locationId: 200169
+            status: ACTIVE
+            locationType: OTHER
+            address:
+              street: 8300 GALLAGHER LK FRONTAGE RD
+              city: NELSON
+              region: BC
+              country: CA
+              postalCode: ''
+            lot: '24'
+            landDistrict: CARIBOU
+            plan: '16'
+            leaveProvince: false
+            taxCertificate: true
+            taxExpiryDate: '2024-02-28T08:01:00+00:00'
+          ownerGroups:
+            - groupId: 2
+              type: JOINT
+              status: ACTIVE
+              tenancySpecified: true
+              owners:
+                - ownerId: 988777
+                  status: ACTIVE
+                  partyType: OWNER_IND
+                  individualName:
+                    first: SHERLOCK
+                    last: HOLMES
+                  address:
+                    street: 6665 238TH STREET
+                    city: LANGLEY
+                    region: BC
+                    country: CA
+                    postalCode: V3A 6H4
+                  phoneNumber: '6044620279'
+                  type: JOINT
+                - ownerId: 988778
+                  status: ACTIVE
+                  partyType: OWNER_IND
+                  individualName:
+                    first: JOHN
+                    last: WATSON
+                  address:
+                    street: 6665 238TH STREET
+                    city: LANGLEY
+                    region: BC
+                    country: CA
+                    postalCode: V3A 6H4
+                  phoneNumber: '6044620279'
+                  type: JOINT
+    clientReferenceId:
+      type: string
+      description: An optional client reference identifier associated with a change. Provided to facilitate client tracking of MHR activity. Identical in use to a Folio Tag.
+      example: A-00004241
+    createDateTime:
+      type: string
+      format: date-time
+      description: 'Generated by the MHR system and included in a response, the date and time a record is created in the system.'
+      example: '2020-02-21T18:56:00+00:00'
+    description:
+      title: description
+      type: object
+      description: This object holds a description of a manufacture home. Provide either a certification CSA number or an engineer date and name.
+      properties:
+        manufacturer:
+          type: string
+          description: The manufacturer of the home.
+        baseInformation:
+          $ref: '#/components/schemas/baseInformation'
+        sectionCount:
+          type: integer
+          minimum: 1
+          maximum: 4
+          description: The number of sections in the manufactured home.
+        sections:
+          type: array
+          description: 'Contains information about the manufactured home sections. At least one item is required, maximum four.'
+          items:
+            $ref: '#/components/schemas/sectionInformation'
+        csaNumber:
+          type: string
+          description: The assigned certification CSA number.
+        csaStandard:
+          type: string
+          description: The CSA standard code.
+        engineerDate:
+          type: string
+          format: date-time
+          description: 'The date of the engineering inspection in the ISO 8601 format YYYY-MM-DDThh:mm:ssTZD.'
+        engineerName:
+          type: string
+          description: The name of the engineer who performed the inspection.
+        rebuiltRemarks:
+          type: string
+          description: Comments on the rebuilt status of the home.
+        otherRemarks:
+          type: string
+          description: Other comments on the home.
+      required:
+        - manufacturer
+        - baseInformation
+        - sections
+        - sectionCount
+      x-examples:
+        description-example:
+          manufacturer: STARLINE
+          baseInformation:
+            year: 2018
+            make: WATSON IND. (ALTA)
+            model: DUCHESS
+          sectionCount: 1
+          sections:
+            - serialNumber: 52D70556
+              lengthFeet: 52
+              lengthInches: 0
+              widthFeet: 12
+              widthInches: 0
+          csaNumber: '786356'
+          csaStandard: 'Z240,'
+          rebuiltRemarks: 'REBUILT AS A DOUBLE WIDE, MAKE/MODEL CUSTOM, YEAR 1995'
+          otherRemarks: 'BC SAFETY AUTHORITY #339556, PERMIT# EL-721296-2018'
+    documentType:
+      type: string
+      enum:
+        - REG_101
+        - REG_102
+        - REG_103
+        - REG_103E
+        - ADDI
+        - ATTA
+        - AFFE
+        - CAU
+        - CAUC
+        - CAUE
+        - COMP
+        - CONF
+        - COUR
+        - DEAT
+        - DNCH
+        - EXNR
+        - EXRE
+        - EXRS
+        - FZE
+        - INTE
+        - INTW
+        - LETA
+        - MAID
+        - MAIL
+        - MARR
+        - MEAM
+        - NAMV
+        - NCON
+        - NCAN
+        - NPUB
+        - NRED
+        - PDEC
+        - PUBA
+        - REBU
+        - REGC
+        - REST
+        - STAT
+        - TAXN
+        - THAW
+        - TRAN
+        - WHAL
+        - WILL
+        - AMEND_PERMIT
+        - CANCEL_PERMIT
+        - REGC_CLIENT
+        - REGC_STAFF
+      description: <p>The set of request document types supported by this API when creating and cancelling notes. Some document types are for registrations that can only be submitted by Registries staff.<ul><li>REG_101 - MANUFACTURED HOME REGISTRATION</li><li>REG_102 - DECAL REPLACEMENT</li><li>REG_103 - TRANSPORT PERMIT</li><li>REG_103E - EXTEND TRANSPORT PERMIT</li><li>CAU - CAUTION</li><li>CAUC - CONTINUE CAUTION</li><li>CAUE - EXTEND CAUTION</li><li>COUR - COURT RESCIND ORDER</li><li>EXNR - NON-RESIDENTIAL EXEMPTION</li><li>EXRE - RESCIND EXEMPTION</li><li>EXRS - RESIDENTIAL EXEMPTION</li><li>FZE - REGISTRARS FREEZE</li><li>NCAN - CANCEL NOTE</li><li>NCON - CONFIDENTIAL NOTE</li><li>NPUB - PUBLIC NOTE</li><li>NRED - NOTICE OF REDEMPTION</li><li>REGC - REG. CORRECTION</li><li>REST - RESTRAINING ORDER</li><li>TAXN - TAX SALE NOTICE</li><li>THAW - REMOVE FREEZE</li><li>AMEND_PERMIT - AMEND A TRANSPORT PERMIT</li><li>CANCEL_PERMIT - CANCEL A TRANSPORT PERMIT</li><li>REGC_CLIENT - REGISTRY CORRECTION - CLIENT ERROR OR OMISSION</li><li>REGC_STAFF - REGISTRY CORRECTION - STAFF ERROR OR OMISSION</li></ul></p>
+      example: EXRS
+    errorResponse:
+      type: object
+      properties:
+        errorMessage:
+          type: string
+          description: Gateway message identifying the source of the error.
+        rootCause:
+          type: string
+          description: Details of the error condition from the component generating the error.
+      description: Object to hold an MHR request error.
+      required:
+        - errorMessage
+      x-examples:
+        error-example-1:
+          errorMessage: 'API security error: API key check failed.'
+          rootCause: 'InvalidApiKey: Invalid ApiKey'
+    individualName:
+      title: individualName
+      type: object
+      description: An individual full name for a manufactured home owner that is a person.
+      properties:
+        first:
+          type: string
+          description: First name.
+        last:
+          type: string
+          description: Last Name.
+        middle:
+          type: string
+          description: Middle or Second Name.
+      required:
+        - first
+        - last
+      x-examples:
+        individual-name-example-1:
+          first: Robert
+          last: Smith
+          middle: James
+    location:
+      title: location
+      type: object
+      description: This object represents a manufacture home location. TaxExpiryDate should only be included if a tax certificate exists and a valid date has been provided.
+      properties:
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - DRAFT
+            - HISTORICAL
+          description: The status of the locaton. Assigned by the MHR application and included in a response.
+        locationType:
+          type: string
+          enum:
+            - MANUFACTURER
+            - MH_PARK
+            - RESERVE
+            - STRATA
+            - OTHER
+          description: The locaton type. Use OTHER if the type is not known. MANUFACTURER - dealer's or manufacturer's lot. MH_PARK - Manufacturer home park (other than a strata park). RESERVE - Indian Reserve.
+        parkName:
+          type: string
+          description: The name of the location park.
+        pad:
+          type: string
+          description: The location pad.
+        address:
+          $ref: '#/components/schemas/address'
+        leaveProvince:
+          type: boolean
+          description: Flag indicating the location of the manufactured home is no longer in the province.
+          default: false
+        pidNumber:
+          type: string
+          description: Parcel identifier number without dashes.
+          default: ''
+          example: '011625490'
+        taxCertificate:
+          type: boolean
+          description: Flag indicating a tax cerfificate has been provided.
+          default: false
+        taxExpiryDate:
+          type: string
+          format: date-time
+          description: The tax certificate expiry date as date-time. Omit if no value provided.
+        exceptionPlan:
+          type: string
+          description: Exception plan number or description.
+          example: EXCEPT PART INCLUDED IN PLAN 7152
+          default: ''
+        dealerName:
+          type: string
+          description: The name of the manufacured home dealer.
+          default: ''
+        additionalDescription:
+          type: string
+          description: Additional location information.
+          example: SPALLUMCHEEN INDIAN RESERVE NO. 2
+          default: ''
+        legalDescription:
+          type: string
+          description: LTSA parcel identifier legal description. May be submitted with new registrations requests. In the future it may be included in search results.
+          example: PARCEL C (O3806) OF LOT 10 DISTRICT LOT 9778 CARIBOO DISTRICT PLAN 2289
+          default: ''
+        lot:
+          type: string
+          description: LTSA lot number.
+          example: '3'
+          default: ''
+        parcel:
+          type: string
+          description: LTSA parcel description.
+          example: A (69860M)
+          default: ''
+        block:
+          type: string
+          description: LTSA block number.
+          example: '14'
+          default: ''
+        districtLot:
+          type: string
+          description: LTSA district lot number.
+          example: '4913'
+          default: ''
+        partOf:
+          type: string
+          description: Part of abbreviated description derived from the LTSA legal description.
+          example: NE 1/4
+          default: ''
+        section:
+          type: string
+          description: LTSA section number.
+          example: '34'
+          default: ''
+        township:
+          type: string
+          description: LTSA township number.
+          example: '84'
+          default: ''
+        range:
+          type: string
+          description: LTSA range number.
+          example: '25'
+          default: ''
+        meridian:
+          type: string
+          description: Abbreviated meridian description derived from the LTSA legal description of the meridian.
+          example: W6M
+          default: ''
+        landDisrtict:
+          type: string
+          description: LTSA district description.
+          example: CARIBOU
+          default: ''
+        plan:
+          type: string
+          description: LTSA plan number.
+          example: '71177'
+          default: ''
+        bandName:
+          type: string
+          description: 'Required if the location type is RESERVE, otherwise not used. Represents the name of the band.'
+          example: Ts'kw'aylaxw First Nation
+          default: ''
+        reserveNumber:
+          type: string
+          description: 'Required if the location type is RESERVE, otherwise not used. Represents the band reserve number.'
+          example: '514'
+          default: ''
+      required:
+        - address
+      x-examples:
+        location-example:
+          status: ACTIVE
+          locationType: MH_PARK
+          parkName: HIDDEN VALLEY TRAILER COURT
+          pad: '20'
+          address:
+            street: 940 BLANSHARD STREET
+            city: VICTORIA
+            region: BC
+            country: CA
+            postalCode: ' '
+          leaveProvince: false
+          pidNumber: '011625490'
+          taxCertificate: false
+          dealerName: NOR-TEC DESIGN GROUP LTD.
+          additionalDescription: ''
+          lot: '3'
+          parcel: A (69860M)
+          block: ''
+          districtLot: ''
+          partOf: ''
+          section: '34'
+          township: '78'
+          range: '16'
+          meridian: ''
+          landDistrict: PEACE RIVER
+          plan: ''
+        location-reserve-example:
+          status: ACTIVE
+          locationType: RESERVE
+          address:
+            street: 940 BLANSHARD STREET
+            city: VICTORIA
+            region: BC
+            country: CA
+            postalCode: ' '
+          leaveProvince: false
+          additionalDescription: Additional description of Indian Reserve here.
+          bandName: SPALLUMCHEEN
+          reserveNumber: '2'
+    note:
+      title: unit note
+      type: object
+      description: '<p>This object represents a manufacture home registration note (unit note) as well as the registration of a unit note for a subset of document types. If the document type is NCAN, cancelledDocumentType, cancelledDocumentDescription, and cancelledDocumentRegistrationNumber are conditionally included as the values for the unit note that has been cancelled.</p><p>For the exemption EXRS and EXNR document types, expiryDateTime represents the destroyed date if provided. If a destroyed date is submitted the destroyed flag is set to true.</p>'
+      properties:
+        documentType:
+          $ref: '#/components/schemas/documentType'
+        documentId:
+          type: string
+          description: The unique document ID for the registration associated with the note.
+        documentRegistrationNumber:
+          type: string
+          description: The unique document registration number for the registration associated with the note.
+        documentDescription:
+          type: string
+          description: A description of the document type.
+          example: RESIDENTIAL EXEMPTION
+        createDateTime:
+          $ref: '#/components/schemas/createDateTime'
+        effectiveDateTime:
+          type: string
+          format: date-time
+          description: 'The date and time the unit note is effective. If not included in the request it will set to the registration timestamp. For some document types it may be in the past. It is in the ISO 8601 format YYYY-MM-DDThh:mm:ssTZD.'
+          example: '2023-05-30T20:12:32+00:00'
+        expiryDateTime:
+          type: string
+          format: date-time
+          description: The date and time of the unit note expiry.
+          example: '2023-09-01T06:59:59+00:00'
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - CANCELLED
+            - EXPIRED
+          description: 'The status of the note, set by the system and included in API responses.'
+        remarks:
+          type: string
+          description: Additional information about the registration.
+        givingNoticeParty:
+          $ref: '#/components/schemas/party'
+        destroyed:
+          type: boolean
+          description: True if the unit note is for an EXRS or EXNR document type and destroyed/expiry date exists. Set by the system and included in API responses.
+          default: false
+        cancelledDocumentType:
+          $ref: '#/components/schemas/documentType'
+        cancelledDocumentDescription:
+          type: string
+          description: Conditionally included with the NCAN document type as the document type description for the unit note registration that has been cancelled.
+          example: NOTICE OF CAUTION
+        cancelledDocumentRegistrationNumber:
+          type: string
+          description: Conditionally included with the NCAN document type as the unique document registration number for the unit note registration that has been cancelled.
+      required:
+        - documentType
+      x-examples:
+        exrs-example:
+          documentType: EXRS
+          documentId: '10104509'
+          documentRegistrationNumber: '00500243'
+          documentDescription: RESIDENTIAL EXEMPTION
+          createDateTime: '2023-06-21T18:56:00+00:00'
+          effectiveDateTime: '2023-06-21T18:56:00+00:00'
+          remarks: HOME IS TO BE USED AS A STORAGE SHED
+          givingNoticeParty:
+            businessName: 'ALEX MARR, BARRISTER & SOLICITOR'
+            address:
+              street: 172 BATTLE STREET
+              city: KAMLOOPS
+              region: BC
+              country: CA
+              postalCode: V2C 2L2
+            phoneNumber: '2508289998'
+          status: ACTIVE
+          destroyed: false
+        ncan-example:
+          cancelledDocumentDescription: NOTICE OF CAUTION
+          cancelledDocumentRegistrationNumber: 503921
+          cancelledDocumentType: CAU
+          documentType: NCAN
+          documentId: '10104509'
+          documentRegistrationNumber: '00500243'
+          documentDescription: CANCEL NOTE
+          createDateTime: '2023-07-04T18:56:00+00:00'
+          effectiveDateTime: '2023-07-04T18:56:00+00:00'
+          remarks: CONTINUED UNTIL FURTHER ORDER OF THE COURT
+          givingNoticeParty:
+            businessName: 'ALEX MARR, BARRISTER & SOLICITOR'
+            address:
+              street: 172 BATTLE STREET
+              city: KAMLOOPS
+              region: BC
+              country: CA
+              postalCode: V2C 2L2
+            phoneNumber: '2508289998'
+          status: ACTIVE
+          destroyed: false
+    owner:
+      title: owner
+      type: object
+      description: This object represents a manufacture home owner.
+      properties:
+        ownerId:
+          type: integer
+          description: 'Assigned by the application and returned in responses, ownerId is a unique identifier of the owner.'
+        individualName:
+          $ref: '#/components/schemas/individualName'
+        organizationName:
+          type: string
+          description: The organization/business name of the owner.
+        phoneNumber:
+          type: string
+          description: 'The owner phone number formatted as only digits: no spaces, periods, or dashes.'
+          default: ''
+          example: '6044620279'
+        address:
+          $ref: '#/components/schemas/address'
+        type:
+          type: string
+          enum:
+            - JOINT
+            - SOLE
+            - COMMON
+            - JT
+            - SO
+            - TC
+          description: The type of owner group. JOINT - joint tenancy; SOLE - sole ownership; COMMON - tenants in common; JT - joint tenancy (deprecated); SO - sole ownership (deprecated); TC - tenants in common (deprecated).
+        partyType:
+          type: string
+          enum:
+            - OWNER_IND
+            - OWNER_BUS
+            - EXECUTOR
+            - TRUSTEE
+            - TRUST
+            - ADMINISTRATOR
+          description: 'The type of owner. Always included in responses. Only required in requests when specifying an executor, trustee, trust, or administrator. OWNER_IND - individual owner; OWNER_BUS - organization or business owner; EXECUTOR - executor of an estate; TRUSTEE - trustee executor of an estate; TRUST - beneficiary company; ADMINISTRATOR - administrator of an estate.'
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - EXEMPT
+            - PREVIOUS
+          description: The status of the owner.
+        suffix:
+          type: string
+          description: The business/organization or individual name suffix.
+        description:
+          type: string
+          description: 'Required and only used when the partyType value is EXECUTOR, TRUSTEE, TRUST, or ADMINISTRATOR. Describes the party.'
+          example: 'EXECUTOR OF THE ESTATE OF LOIS MAE STEWART, DECEASED'
+        deathCertificateNumber:
+          type: string
+          description: 'Include only for transfer due to death registration types when the owner is in the deleteOwnerGroups, is an individual, and is deceased.'
+          example: 234232432-2
+        deathDateTime:
+          type: string
+          format: date-time
+          example: '2021-02-21T18:56:00+00:00'
+          description: Include only for transfer due to death registration types when the owner in the deleteOwnerGroups is deceased. Must be in the past when the registration is submitted.
+        corpNumber:
+          type: string
+          description: Optional business company number. Include in a request if available and the added owner is a business/organziation.
+          example: '0850942'
+        deathCorpNumber:
+          type: string
+          description: 'Include only for transfer due to death registration types when the owner is in the deleteOwnerGroups, not added, and is a business/organization.'
+          example: '0721064'
+      x-examples:
+        business-example:
+          ownerId: 1
+          organizationName: SAGE HILL INC.
+          address:
+            street: 3122B LYNNLARK PLACE
+            city: VICTORIA
+            region: BC
+            country: CA
+            postalCode: A1A 1A1
+          type: SO
+          status: EXEMPT
+          corpNumber: '0624812'
+        individual-example:
+          ownerId: 2
+          individualName:
+            first: James
+            last: Smith
+          address:
+            street: 3122B LYNNLARK PLACE
+            city: VICTORIA
+            region: BC
+            country: CA
+            postalCode: A1A 1A1
+          type: SO
+          phoneNumber: '6044620279'
+          status: ACTIVE
+        trustee-example:
+          ownerId: 1
+          individualName:
+            first: CHRISTOPHER
+            last: SMART
+          address:
+            street: 3122B LYNNLARK PLACE
+            city: VICTORIA
+            region: BC
+            country: CA
+            postalCode: A1A 1A1
+          type: JOINT
+          partyType: EXECUTOR
+          description: 'EXECUTOR OF THE ESTATE OF LOIS MAE STEWART, DECEASED'
+          status: ACTIVE
+        trand-deceased-example:
+          ownerId: 2
+          individualName:
+            first: JANET
+            last: SMITH
+          address:
+            street: 3122B LYNNLARK PLACE
+            city: VICTORIA
+            region: BC
+            country: CA
+            postalCode: A1A 1A1
+          type: JOINT
+          partyType: OWNER_IND
+          deathCertificateNumber: 23423423442-2
+          deathDateTime: '2021-02-21T18:56:00+00:00'
+    ownerGroup:
+      title: ownerGroup
+      type: object
+      description: '<p>This object represents a manufactured home owner group. Owner sequence is implied by the position in the array. The JT, SO, and TC types are deprecated and will be removed in the future. Interest, interestNumerator, and interestDenominator are only included when there are multiple owner groups. A JOINT group type must have at least 2 owners. If a JOINT group type has an owner partyType value of EXECUTER, TRUSTEE, or ADMINISTRATOR, all owners within the group must have the identical partyType value. A tenancy type of NA (Not Applicable) applies to a multiple active owner group scenario where a group owner is a TRUSTEE, EXECUTOR, or ADMINISTRATOR.</p><p>Mulitple Owner Group Rules:<ul><li>The COMMON type can only be submitted when there is more than 1 group.</li><li>InterestNumerator and interestDenominator are required.</li><li>If interest is provided the value should be UNDIVIDED.</li><li>The sum of the interestNumerator values across all groups must equal the interestDenominator (when adjusted to use a common denominator).</li></ul></p><p>Valid owner group scenarios:<ul><li>A single owner group with 1 owner and a type value of SOLE.</li><li>A single owner group with 2 or more owners and a type value of JOINT.</li><li>Multiple owner groups each of which has 1 owner and a type value of COMMON.</li><li>Multiple owner groups each of which has 2 or more owners and a type value of JOINT.</li><li>Multiple owner groups which contain a combination of COMMON and JOINT types. Each group with a COMMON type contains 1 owner. Each group with a JOINT type contains 2 or more owners.</li></ul></p>'
+      properties:
+        groupId:
+          type: integer
+          description: Assigned by the system if not provided. Starts with 1 and increments for each group associated with a home.
+          example: 1
+        owners:
+          type: array
+          description: Contains information about the manufactured home owners. At least one owner is required. If the type is Sole Ownership (SOLE) only 1 owner is allowed.
+          items:
+            $ref: '#/components/schemas/owner'
+        interest:
+          type: string
+          description: Describes the group ownership portion as a fraction. Does not apply and may be omitted for the Sole Ownership (SOLE) type.
+          example: UNDIVIDED 1/2
+        interestNumerator:
+          type: integer
+          description: Represents the group ownership portion as the numerator of a fraction. Does not apply and may be omitted for the Sole Ownership (SOLE) type.
+          example: 1
+        interestDenominator:
+          type: integer
+          description: Represents the group ownership portion as the denominator of a fraction.  Does not apply and may be omitted for the Sole Ownership (SOLE) type.
+          example: 2
+        type:
+          type: string
+          enum:
+            - COMMON
+            - JOINT
+            - NA
+            - SOLE
+            - JT
+            - SO
+            - TC
+          description: 'The type of owner group (tenancy type). Not Applicable (NA) applies to a multiple active owner group scenario where a group owner is a TRUSTEE, EXECUTOR, or ADMINISTRATOR. COMMON - tenants in common; JOINT - joint tenancy; NA - Not Applicable; SOLE - sole ownership; JT - joint tenancy (deprecated); SO - sole ownership (deprecated); TC - tenants in common (deprecated).'
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - EXEMPT
+            - PREVIOUS
+          description: The status of the owner group.
+        tenancySpecified:
+          type: boolean
+          description: 'Flag indicating details on the JT or TC types are included. If false, no interest or interest numerator is provided.'
+          default: false
+      required:
+        - owners
+        - type
+      x-examples:
+        group-sole-example:
+          groupId: 1
+          owners:
+            - individualName:
+                first: James
+                last: Smith
+              address:
+                street: 3122B LYNNLARK PLACE
+                city: VICTORIA
+                region: BC
+                country: CA
+                postalCode: A1A 1A1
+              phoneNumber: '6044620279'
+          type: SOLE
+        group-common-example:
+          groupId: 1
+          owners:
+            - individualName:
+                first: MARY-ANNE
+                last: BICKNELL
+              address:
+                street: 6665 238TH STREET
+                city: LANGLEY
+                region: BC
+                country: CA
+                postalCode: V3A 6H4
+          type: COMMON
+          interest: UNDIVIDED
+          interestNumerator: 3
+          interestDenominator: 5
+        group-joint-example:
+          groupId: 2
+          owners:
+            - individualName:
+                first: MARY-ANNE
+                last: BICKNELL
+              address:
+                street: 6665 238TH STREET
+                city: LANGLEY
+                region: BC
+                country: CA
+                postalCode: V3A 6H4
+            - individualName:
+                first: JAMES
+                last: JOHNSON
+              address:
+                street: 6665 238TH STREET
+                city: LANGLEY
+                region: BC
+                country: CA
+                postalCode: V3A 6H4
+          type: JOINT
+          interest: UNDIVIDED
+          interestNumerator: 2
+          interestDenominator: 5
+    party:
+      title: party
+      type: object
+      description: 'This object holds information about a submitting party for a new registration. If using a client code in a request do not include the name, address, or email address. If not using a client code, include either an individual name or a business name, but not both. In the future the emailAddress property may become mandatory.'
+      x-examples:
+        business-new-request:
+          businessName: ABC SEARCHING COMPANY
+          address:
+            street: 222 SUMMER STREET
+            city: VICTORIA
+            region: BC
+            country: CA
+            postalCode: V8W 2V8
+          emailAddress: bsmith@abc-search.com
+        individual-response:
+          personName:
+            first: Michael
+            last: Smith
+          address:
+            street: 520 Johnson St
+            city: Victoria
+            region: BC
+            country: CA
+            postalCode: V8S 2V4
+          emailAddress: msmith@gmail.com
+          phoneNumber: '2504930122'
+          phoneExtension: ''
+          partyId: 1321064
+        code-example:
+          code: '5000009'
+      properties:
+        code:
+          type: string
+          description: 'Submitting Party''s Client Code.  If supplied, name (person or business), address, and email address do not need to be supplied.'
+        personName:
+          $ref: '#/components/schemas/individualName'
+        businessName:
+          type: string
+          description: Legal business name.
+        address:
+          $ref: '#/components/schemas/address'
+        phoneNumber:
+          type: string
+          description: The contact phone number of the individual or business without an extension value.
+          example: '2504930122'
+        phoneExtension:
+          type: string
+          description: The contact phone number extension value.
+          example: '546'
+        emailAddress:
+          type: string
+          description: The email address of the individual or business.
+          format: email
+          example: bsmith@abc-search.com
+    registrationType:
+      type: string
+      enum:
+        - DECAL_REPLACE
+        - EXEMPTION_NON_RES
+        - EXEMPTION_RES
+        - MHREG
+        - MHREG_CONVERSION
+        - PERMIT
+        - PERMIT_EXTENSION
+        - REG_STAFF_ADMIN
+        - TRAND
+        - TRANS
+        - TRANS_AFFIDAVIT
+        - TRANS_ADMIN
+        - TRANS_WILL
+        - AMENDMENT
+      description: <p>The set of registration types supported by this API.<ol><li>DECAL_REPLACE - replace an MH registration decal</li><li>EXEMPTION_NON_RES - non-residential exemption</li><li>EXEMPTION_RES - residential exemption</li><li>MHREG - manufactured home registration</li><li>MHREG_CONVERSION - manufactured home original paper form registration converted to an electronic version</li><li>PERMIT - transport permit</li><li>PERMIT_EXTENSION - extend a transport permit</li><li>REG_STAFF_ADMIN</li>registries staff administration registration<li>TRAND - TRANSFER DUE TO SURVIVING JOINT TENANT(S)</li><li>TRANS - TRANSFER DUE TO SALE OR GIFT</li><li>TRANS_AFFIDAVIT - TRANSFER TO EXECUTOR – ESTATE UNDER $25000 WITH WILL</li><li>TRANS_ADMIN - TRANSFER TO ADMINISTRATOR – GRANT OF ADMINISTRATION</li><li>TRANS_WILL - TRANSFER TO EXECUTOR – GRANT OF PROBATE WITH WILL.</li><li>AMENDMENT - AMENDMENT TO A MANUFACTURED HOME</li></ol></p>
+      example: TRANS
+    sectionInformation:
+      type: object
+      title: sectionInformation
+      description: <p>Section information for a MANUFACTURED HOME REGISTRATION. A manufactured home must have at least 1 section.</p>
+      properties:
+        serialNumber:
+          type: string
+          description: Serial number of the manufactured home section.
+        lengthFeet:
+          type: integer
+          minimum: 1
+          maximum: 100
+          description: Length feet measurement for the section.
+        lengthInches:
+          type: integer
+          minimum: 0
+          maximum: 11
+          description: Length inches measurement for the section.
+        widthFeet:
+          type: integer
+          minimum: 1
+          maximum: 100
+          description: Width feet measurement for the section.
+        widthInches:
+          type: integer
+          minimum: 0
+          maximum: 11
+          description: Width inches measurement for the section.
+      required:
+        - serialNumber
+        - lengthFeet
+        - widthFeet
+      x-examples:
+        mhr-section-1:
+          serialNumber: 52D70556
+          lengthFeet: 52
+          lengthInches: 0
+          widthFeet: 12
+          widthInches: 0
+    status:
+      type: string
+      enum:
+        - ACTIVE
+        - CANCELLED
+        - DRAFT
+        - EXEMPT
+        - FROZEN
+      description: '<p>The status of a manufactured home: one of ACTIVE (registered), CANCELLED, DRAFT, EXEMPT, or FROZEN. FROZEN is a temporary state where only BC Registries staff can make a change to the manufactured home.</p>'
+      example: ACTIVE
+  securitySchemes:
+    api_key:
+      type: apiKey
+      description: API Gateway issued API key for a consumer with the MHR product assigned to their BC Registries account. Required for all requests.
+      name: x-apikey
+      in: header
+  responses:
+    BadRequest:
+      description: 'The server cannot or will not process the request due to an apparent client error (e.g., malformed request syntax, size too large, invalid request message framing, or deceptive request routing).'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          examples:
+            example-1:
+              value:
+                errorMessage: API invalid JSON payload or required field missing.
+                rootCause: '{"fault":{"faultstring":"Failed to execute the ExtractVariables: EV-request-create","detail":{"errorcode":"steps.extractvariables.ExecutionFailed"}}}'
+    Unauthorized:
+      description: 'Similar to 403 Forbidden, but specifically for use when authentication is required and has failed or has not yet been provided. The user does not have valid authentication credentials for the target resource.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          examples:
+            example-1:
+              value:
+                errorMessage: 'API security error: API key check failed.'
+                rootCause: 'InvalidApiKey: Invalid ApiKey'
+    InternalServerError:
+      description: 'A generic error message, given when an unexpected condition was encountered and no more specific message is suitable.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+          examples:
+            example-1:
+              value:
+                errorMessage: 'API unexpected error. If error persists, contact API support.'
+                rootCause: '{"fault":{"faultstring":"Execution of ServiceCallout SC-Request-JWT failed. Reason: ResponseCode 400 is treated as error","detail":{"errorcode":"steps.servicecallout.ExecutionFailed"}}}'
+  parameters:
+    accountId:
+      name: Account-Id
+      in: header
+      description: The account that the user is operating on behalf of.
+      required: true
+      schema:
+        type: string
+      example: PS91871
+  headers:
+    AccessControlAllowOrigin:
+      schema:
+        type: string
+        description: Access-Control-Allow-Origin
+        x-examples:
+          notify_1:
+            value: ''
+    AccessControlAllowMethods:
+      schema:
+        type: string
+        description: Access-Control-Allow-Methods
+        x-examples:
+          notify_1:
+            value: 'GET, PUT, POST, PATCH'
+    AccessControlAllowHeaders:
+      schema:
+        type: string
+        description: Access-Control-Allow-Headers
+        x-examples:
+          notify_1:
+            value: 'content-type, accept, x-apikey, authorization'
+    AccessControlMaxAge:
+      schema:
+        type: integer
+        description: Access-Control-Max-Age
+        x-examples:
+          notify_1:
+            value: 3628800
+tags:
+  - name: Registration
+security:
+  - api_key: []
