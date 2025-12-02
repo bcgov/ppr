@@ -94,6 +94,7 @@ def session(db, request):  # pylint: disable=redefined-outer-name
 
     def commit():
         db.session.flush()
+        db.session.expire_all()
 
     # patch commit method
     old_commit = db.session.commit

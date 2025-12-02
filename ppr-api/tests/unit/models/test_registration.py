@@ -763,26 +763,38 @@ def test_save_amendment(session):
     assert 'documentId' not in result
 
 
-def test_save_amendment_trust(session):
+@pytest.mark.parametrize('desc, action_1, action_2', [
+    ('add and remove', 'add', 'remove'),
+    ('consecutive adds', 'add', 'add'),
+    ('remove and add', 'remove', 'add'),
+    ('consecutive removes', 'remove', 'remove')
+])
+def test_save_amendment_trust(session, desc, action_1, action_2):
     """Assert that creating an amendment statement adding/removing a trust indenture contains all expected elements."""
-    json_data = copy.deepcopy(AMENDMENT_STATEMENT)
-    del json_data['createDateTime']
-    del json_data['amendmentRegistrationNumber']
-    del json_data['payment']
-    del json_data['documentId']
-    del json_data['courtOrderInformation']
-    del json_data['addTrustIndenture']
-    del json_data['addSecuredParties']
-    del json_data['deleteSecuredParties']
-    del json_data['addDebtors']
-    del json_data['deleteDebtors']
-    del json_data['addVehicleCollateral']
-    del json_data['deleteVehicleCollateral']
-    del json_data['addGeneralCollateral']
-    del json_data['deleteGeneralCollateral']
-    json_data['changeType'] = 'AM'
-    json_data['removeTrustIndenture'] = True
+    def json_builder(action):
+        json_data = copy.deepcopy(AMENDMENT_STATEMENT)
+        del json_data['createDateTime']
+        del json_data['amendmentRegistrationNumber']
+        del json_data['payment']
+        del json_data['documentId']
+        del json_data['courtOrderInformation']
+        del json_data['addTrustIndenture']
+        del json_data['addSecuredParties']
+        del json_data['deleteSecuredParties']
+        del json_data['addDebtors']
+        del json_data['deleteDebtors']
+        del json_data['addVehicleCollateral']
+        del json_data['deleteVehicleCollateral']
+        del json_data['addGeneralCollateral']
+        del json_data['deleteGeneralCollateral']
+        json_data['changeType'] = 'AM'
+        if action == 'add':
+            json_data['addTrustIndenture'] = True
+        else:
+            json_data['removeTrustIndenture'] = True
+        return json_data
 
+    json_data = json_builder(action_1)
     financing_statement = FinancingStatement.find_by_financing_id(200000000)
     assert financing_statement
     registration = Registration.create_from_json(json_data,
@@ -799,25 +811,10 @@ def test_save_amendment_trust(session):
     assert result['amendmentRegistrationNumber']
     assert result['createDateTime']
     assert result['registeringParty']
-    assert result['removeTrustIndenture']
+    key = f'{action_1}TrustIndenture'
+    assert result[key]
 
-    json_data = copy.deepcopy(AMENDMENT_STATEMENT)
-    del json_data['createDateTime']
-    del json_data['amendmentRegistrationNumber']
-    del json_data['payment']
-    del json_data['documentId']
-    del json_data['courtOrderInformation']
-    del json_data['removeTrustIndenture']
-    del json_data['addSecuredParties']
-    del json_data['deleteSecuredParties']
-    del json_data['addDebtors']
-    del json_data['deleteDebtors']
-    del json_data['addVehicleCollateral']
-    del json_data['deleteVehicleCollateral']
-    del json_data['addGeneralCollateral']
-    del json_data['deleteGeneralCollateral']
-    json_data['changeType'] = 'AM'
-    json_data['addTrustIndenture'] = True
+    json_data = json_builder(action_2)
 
     registration = Registration.create_from_json(json_data,
                                                  'AMENDMENT',
@@ -833,7 +830,8 @@ def test_save_amendment_trust(session):
     assert result['amendmentRegistrationNumber']
     assert result['createDateTime']
     assert result['registeringParty']
-    assert result['addTrustIndenture']
+    key = f'{action_2}TrustIndenture'
+    assert result[key]
 
 
 def test_save_amendment_from_draft(session):
