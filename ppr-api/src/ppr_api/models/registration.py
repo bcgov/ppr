@@ -199,9 +199,10 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
             if self.financing_statement.trust_indenture:
                 for trust_indenture in self.financing_statement.trust_indenture:
                     if self.id == trust_indenture.registration_id:
-                        registration["addTrustIndenture"] = True
-                    elif self.id == trust_indenture.registration_id_end:
-                        registration["removeTrustIndenture"] = True
+                        if trust_indenture.trust_indenture == TrustIndenture.TRUST_INDENTURE_YES:
+                            registration["addTrustIndenture"] = True
+                        elif trust_indenture.trust_indenture == TrustIndenture.TRUST_INDENTURE_NO:
+                            registration["removeTrustIndenture"] = True
             if (
                 "addTrustIndenture" not in registration
                 and self.trust_indenture
