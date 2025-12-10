@@ -304,21 +304,68 @@ TC_GROUP_TRANSFER_DELETE_2 = [
         'groupId': 3,
         'owners': [
             {
-            'organizationName': 'BRANDON CONSTRUCTION MANAGEMENT LTD.',
-            'address': {
-                'street': '3122B LYNNLARK PLACE',
-                'city': 'VICTORIA',
-                'region': 'BC',
-                'postalCode': ' ',
-                'country': 'CA'
-            },
-            'phoneNumber': '6041234567'
+                'organizationName': 'BRANDON CONSTRUCTION MANAGEMENT LTD.',
+                'address': {
+                    'street': '3122B LYNNLARK PLACE',
+                    'city': 'VICTORIA',
+                    'region': 'BC',
+                    'postalCode': ' ',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567'
             }
         ],
         'type': 'COMMON',
         'interest': 'UNDIVIDED',
         'interestNumerator': 4,
         'interestDenominator': 10
+    }
+]
+TC_GROUP_TRANSFER_DELETE_3 = [
+    {
+        'groupId': 2,
+        'owners': [
+            {
+                'individualName': {
+                    'first': 'James',
+                    'last': 'Smith'
+                },
+                'address': {
+                    'street': '3122B LYNNLARK PLACE',
+                    'city': 'VICTORIA',
+                    'region': 'BC',
+                    'postalCode': ' ',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567'
+            }
+        ],
+        'type': 'COMMON',
+        'interest': 'UNDIVIDED',
+        'interestNumerator': 1,
+        'interestDenominator': 2
+    }, {
+        'groupId': 3,
+        'owners': [
+            {
+                'individualName': {
+                    'first': 'James',
+                    'last': 'Smith'
+                },
+                'address': {
+                    'street': '3122B LYNNLARK PLACE',
+                    'city': 'VICTORIA',
+                    'region': 'BC',
+                    'postalCode': ' ',
+                    'country': 'CA'
+                },
+                'phoneNumber': '6041234567'
+            }
+        ],
+        'type': 'NA',
+        'interest': 'UNDIVIDED',
+        'interestNumerator': 1,
+        'interestDenominator': 2
     }
 ]
 

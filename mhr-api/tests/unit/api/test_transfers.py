@@ -30,6 +30,8 @@ from mhr_api.services.authz import BCOL_HELP_ROLE, MHR_ROLE, STAFF_ROLE, COLIN_R
                                    REGISTER_MH
 from tests.unit.services.utils import create_header, create_header_account
 from tests.unit.utils.test_transfer_data import (
+    TC_GROUP_TRANSFER_ADD2,
+    TC_GROUP_TRANSFER_DELETE_3,
     TRAND_DELETE_GROUPS,
     TRAND_ADD_GROUPS,
     EXEC_DELETE_GROUPS,
@@ -100,6 +102,14 @@ TEST_CREATE_DATA_TRANSFER = [
     ('Invalid schema validation WILL', '000900', [MHR_ROLE, TRANSFER_SALE_BENEFICIARY],
      HTTPStatus.BAD_REQUEST, 'PS12345', 'WILL'),
 ]
+# testdata pattern is ({description}, {mhr_num}, {death_reg_type})
+TEST_CREATE_TRANS_AFTER_TRANS_DEATH = [
+    ('TRANS after TRANS_ADMIN', '000900', MhrRegistrationTypes.TRANS_ADMIN),
+    ('TRANS after TRANS_AFFIDAVIT', '000900', MhrRegistrationTypes.TRANS_AFFIDAVIT),
+    ('TRANS after TRANS_WILL', '000900', MhrRegistrationTypes.TRANS_WILL),
+    ('TRANS after TRAND', '000920', MhrRegistrationTypes.TRAND)
+]
+
 
 @pytest.mark.parametrize('desc,mhr_num,roles,status,account', TEST_CREATE_DATA)
 def test_create(session, client, jwt, desc, mhr_num, roles, status, account):
@@ -249,3 +259,83 @@ def test_create_tran_doc(session, client, jwt, desc, mhr_num, roles, status, acc
         reg_report: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(doc.registration_id)
         assert reg_report
         assert reg_report.batch_registration_data
+
+
+@pytest.mark.parametrize('desc, mhr_num, death_reg_type', TEST_CREATE_TRANS_AFTER_TRANS_DEATH)
+def test_create_groups_transfer_after_trasfer_death(session, client, jwt, desc, mhr_num, death_reg_type):
+    """Assert that a post transfer registration works as expected after transfer due to death registration."""
+    # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
+    current_app.config.update(AUTH_SVC_URL=MOCK_AUTH_URL)
+
+    # test transfer due to death
+    headers = None
+    json_data_1 = copy.deepcopy(TRANSFER)
+    del json_data_1['documentId']
+
+    del json_data_1['documentDescription']
+    del json_data_1['createDateTime']
+    del json_data_1['payment']
+    json_data_1['mhrNumber'] = mhr_num
+
+    json_data_1['registrationType'] = death_reg_type
+    if death_reg_type == MhrRegistrationTypes.TRAND:
+        json_data_1['deleteOwnerGroups'] = copy.deepcopy(TRAND_DELETE_GROUPS)
+        json_data_1['addOwnerGroups'] = copy.deepcopy(TRAND_ADD_GROUPS)
+    elif death_reg_type == MhrRegistrationTypes.TRANS_ADMIN:
+        json_data_1['deleteOwnerGroups'] = copy.deepcopy(ADMIN_DELETE_GROUPS)
+        json_data_1['addOwnerGroups'] = copy.deepcopy(ADMIN_ADD_GROUPS)
+    elif death_reg_type == MhrRegistrationTypes.TRANS_WILL:
+        json_data_1['deleteOwnerGroups'] = copy.deepcopy(WILL_DELETE_GROUPS)
+        json_data_1['addOwnerGroups'] = copy.deepcopy(EXEC_ADD_GROUPS)
+    else:
+        json_data_1['deleteOwnerGroups'] = copy.deepcopy(EXEC_DELETE_GROUPS)
+        json_data_1['addOwnerGroups'] = copy.deepcopy(EXEC_ADD_GROUPS)
+    if death_reg_type == MhrRegistrationTypes.TRANS_AFFIDAVIT:
+        json_data_1['declaredValue'] = 25000
+
+    if death_reg_type != MhrRegistrationTypes.TRAND:
+        json_data_1['deleteOwnerGroups'][0]['tenancySpecified'] = True
+        json_data_1['deleteOwnerGroups'][0]['type'] = 'NA'
+        json_data_1['addOwnerGroups'][0]['tenancySpecified'] = True
+        json_data_1['addOwnerGroups'][0]['type'] = 'NA'
+    json_data_1['addOwnerGroups'][0]['interest'] = 'Undivided'
+    json_data_1['addOwnerGroups'][0]['interestDenominator'] = 2
+    json_data_1['addOwnerGroups'][0]['interestNumerator'] = 1
+
+    headers = create_header_account(jwt, [STAFF_ROLE], 'UT-TEST', 'PS12345')
+
+    response_1 = client.post('/api/v1/transfers/' + mhr_num,
+                             json=json_data_1,
+                             headers=headers,
+                             content_type='application/json')
+
+    assert response_1.status_code == HTTPStatus.CREATED
+
+    # test transfer after previous transfer
+    json_data_2 = copy.deepcopy(TRANSFER)
+    del json_data_2['documentId']
+    del json_data_2['documentDescription']
+    del json_data_2['createDateTime']
+    del json_data_2['payment']
+    json_data_2['mhrNumber'] = mhr_num
+    json_data_2['addOwnerGroups'] = copy.deepcopy(TC_GROUP_TRANSFER_ADD2)
+    if death_reg_type != MhrRegistrationTypes.TRAND:
+        json_data_2['deleteOwnerGroups'] = copy.deepcopy(TC_GROUP_TRANSFER_DELETE_3)
+    else:
+        json_data_2['deleteOwnerGroups'] = copy.deepcopy(TRAND_ADD_GROUPS)
+        json_data_2['deleteOwnerGroups'][0]['groupId'] = 2
+
+    response_2 = client.post('/api/v1/transfers/' + mhr_num,
+                             json=json_data_2,
+                             headers=headers,
+                             content_type='application/json')
+
+    assert response_2.status_code == HTTPStatus.CREATED
+    response_json = response_2.json
+    assert response_json
+    assert len(response_json['addOwnerGroups']) == 2
+    if death_reg_type != MhrRegistrationTypes.TRAND:
+        assert len(response_json['deleteOwnerGroups']) == 2
+    else:
+        assert len(response_json['deleteOwnerGroups']) == 1
