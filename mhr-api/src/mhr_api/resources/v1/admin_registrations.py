@@ -135,7 +135,7 @@ def save_registration(req: request, request_json: dict, current_reg: MhrRegistra
         req, current_reg, request_json, account_id, group, get_transaction_type(request_json)
     )
     logger.debug(f"building admin reg response json for {mhr_number}")
-    registration.change_registrations = current_reg.change_registrations
+    registration.change_registrations = [current_reg, *current_reg.change_registrations]
     response_json = registration.json
     # logger.info(response_json)
     response_json = registration_json_utils.set_home_status_json(current_reg, response_json, existing_status)
