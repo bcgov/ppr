@@ -343,7 +343,7 @@ def create_change_registration(draft: MhrDraft, current_reg: MhrRegistration) ->
     draft_json = draft.draft
     if draft.registration_type == MhrRegistrationTypes.PERMIT.value:
         new_reg = create_permit_registration(draft_json, current_reg, new_reg)
-    elif draft.registration_type == MhrRegistrationTypes.TRANS.value:
+    elif draft.registration_type in (MhrRegistrationTypes.TRANS.value, MhrRegistrationTypes.TRAND.value):
         new_reg = create_transfer_registration(draft_json, current_reg, new_reg)
     elif draft.registration_type in (
         MhrRegistrationTypes.EXEMPTION_NON_RES.value,

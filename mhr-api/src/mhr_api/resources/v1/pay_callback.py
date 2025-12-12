@@ -320,7 +320,7 @@ def complete_registration(draft: MhrDraft, base_reg: MhrRegistration, request_js
             existing_status: str = base_reg.status_type
             new_reg = cc_payment_utils.create_change_registration(draft, base_reg)
             queue_permit(draft, base_reg, new_reg, current_location, existing_status)
-        elif reg_type == MhrRegistrationTypes.TRANS:
+        elif reg_type in (MhrRegistrationTypes.TRANS, MhrRegistrationTypes.TRAND):
             base_reg.current_view = True
             current_owners = reg_utils.get_active_owners(base_reg)
             new_reg = cc_payment_utils.create_change_registration(draft, base_reg)
