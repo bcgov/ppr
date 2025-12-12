@@ -76,7 +76,7 @@ def post_notes(mhr_number: str):  # pylint: disable=too-many-return-statements,t
             request, current_reg, request_json, account_id, group, get_transaction_type(request_json)
         )
         logger.debug(f"building note response json for {mhr_number}")
-        registration.change_registrations = current_reg.change_registrations
+        registration.change_registrations = [current_reg, *current_reg.change_registrations]
         response_json = registration.json
         # Return report if request header Accept MIME type is application/pdf.
         if resource_utils.is_pdf(request):

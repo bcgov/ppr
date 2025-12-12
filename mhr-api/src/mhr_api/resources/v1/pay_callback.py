@@ -254,7 +254,7 @@ def queue_permit(
 
 def queue_transfer(draft: MhrDraft, current_reg: MhrRegistration, new_reg: MhrRegistration, current_owners):
     """Set up the registration verification report generation."""
-    new_reg.change_registrations = current_reg.change_registrations
+    new_reg.change_registrations = [current_reg, *current_reg.change_registrations]
     response_json = new_reg.json
     current_reg.current_view = True
     current_json = current_reg.new_registration_json
