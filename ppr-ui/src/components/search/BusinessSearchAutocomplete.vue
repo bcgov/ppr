@@ -22,7 +22,7 @@
             <v-list-item disabled>
               <v-row class="auto-complete-sticky-row">
                 <v-col cols="24">
-                  <p><span v-if="!isPPR">Active </span>B.C. Businesses:</p>
+                  <p><span v-if="!isPprSearch">Active </span>B.C. Businesses:</p>
                 </v-col>
               </v-row>
             </v-list-item>
@@ -39,7 +39,7 @@
                 <v-tooltip
                   location="right"
                   content-class="start-tooltip py-5"
-                  :disabled="isPPR"
+                  :disabled="isPprSearch"
                 >
                   <template #activator="{ props }">
                     <v-icon
@@ -63,11 +63,14 @@
                 @mousedown="!isBusinessTypeSPGP(result.legalType) && selectResult(i)"
               >
                 <v-row class="auto-complete-row">
-                  <v-col cols="2">
+                  <v-col
+                    v-if="!isPprDebtorLookup"
+                    cols="2"
+                  >
                     {{ result.identifier }}
                   </v-col>
                   <v-col
-                    cols="8"
+                    :cols="!isPprDebtorLookup ? 8 : 10"
                     class="org-name"
                   >
                     {{ result.name }}
@@ -89,11 +92,11 @@
             class="pa-5"
           >
             <p class="auto-complete-sticky-row">
-              <span v-if="!isPPR">Active </span>B.C. Businesses:
+              <span v-if="!isPprSearch">Active </span>B.C. Businesses:
             </p>
             <p class="mt-2">
               <strong>
-                No <span v-if="!isPPR">active </span>B.C. businesses found.
+                No <span v-if="!isPprSearch">active </span>B.C. businesses found.
               </strong>
             </p>
             <p class="mt-2">
@@ -108,7 +111,7 @@
 
 <script lang="ts">
 import { defineComponent, reactive, toRefs, watch, computed } from 'vue'
-import type { SearchResponseI } from '@/interfaces'
+import type { SearchPartyResultI, SearchResponseI, SearchResultI } from '@/interfaces'
 import { useSearch } from '@/composables/useSearch'
 import { BusinessTypes } from '@/enums/business-types'
 import { debounce } from 'lodash'
@@ -127,7 +130,7 @@ export default defineComponent({
     showDropdown: {
       type: Boolean
     },
-    isPPR: {
+    isPprSearch: {
       type: Boolean,
       default: false
     },
@@ -135,6 +138,10 @@ export default defineComponent({
       type: String,
       default: 'Ensure you have entered the correct, full legal name of the organization before entering the phone' +
           ' number and mailing address.'
+    },
+    isPprDebtorLookup: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['searchValue', 'searching'],
@@ -157,19 +164,43 @@ export default defineComponent({
       )
     })
 
+
+    function filterDuplicateNames(items: Array<SearchResultI>): Array<SearchResultI> {
+      const seen = new Set<string>()
+      return items.filter(item => {
+        if (seen.has(item.name)) {
+          console.log('duplicate found: ' + item.name)
+          return false // skip duplicates
+        }
+        seen.add(item.name)
+        return true // keep first occurrence
+      }) as SearchResultI[]
+    }
+
+
     const updateAutoCompleteResults = async (searchValue: string) => {
+      let filteredResults: Array<SearchResultI> = []
       localState.searching = true
-      const response: SearchResponseI = await searchBusiness(searchValue, props.isPPR)
+      const response: SearchResponseI = await searchBusiness(searchValue, props.isPprSearch)
+
+      if (props.isPprDebtorLookup) {
+        filteredResults = filterDuplicateNames(response?.searchResults?.results as Array<SearchResultI>)
+      }
+
       // check if results are still relevant before updating list
       if (searchValue === props.searchValue && response?.searchResults?.results) {
-        localState.autoCompleteResults = response.searchResults.results
+        localState.autoCompleteResults = props.isPprDebtorLookup
+          ? filteredResults
+          : response.searchResults.results
       }
       localState.searching = false
     }
 
+
     const isBusinessTypeSPGP = (businessType: BusinessTypes): boolean => {
       // include all business types for PPR business searches
-      return [BusinessTypes.GENERAL_PARTNERSHIP, BusinessTypes.SOLE_PROPRIETOR].includes(businessType) && !props.isPPR
+      return [BusinessTypes.GENERAL_PARTNERSHIP, BusinessTypes.SOLE_PROPRIETOR].includes(businessType) &&
+        !props.isPprSearch
     }
 
     const selectResult = (resultIndex: number) => {
