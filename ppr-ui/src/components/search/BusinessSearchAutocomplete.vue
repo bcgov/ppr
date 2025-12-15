@@ -169,7 +169,6 @@ export default defineComponent({
       const seen = new Set<string>()
       return items.filter(item => {
         if (seen.has(item.name)) {
-          console.log('duplicate found: ' + item.name)
           return false // skip duplicates
         }
         seen.add(item.name)
