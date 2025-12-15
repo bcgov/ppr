@@ -58,6 +58,22 @@ vv.scale = 1
 
 vi.stubGlobal('visualViewport', vv)
 
+// ESM-friendly mock preserving other exports
+vi.mock('h3', async (importOriginal) => {
+  const mod = await importOriginal<any>()
+  return {
+    ...mod,
+    createError: (input: any) => {
+      const message =
+        (input?.message ?? input?.statusMessage ?? 'Test: normalized error')
+      const statusCode = input?.statusCode ?? 500
+      // Return a minimal error-like object without throwing
+      return { statusCode, message, cause: input }
+    }
+  }
+})
+
+
 
 
 
