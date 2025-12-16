@@ -89,7 +89,7 @@
                   :search-value="autoCompleteSearchValue"
                   :set-auto-complete-is-active="autoCompleteIsActive"
                   :show-dropdown="$refs.debtorNameSearchField && $refs.debtorNameSearchField.isFocused"
-                  is-p-p-r
+                  is-ppr-search
                   @search-value="setSearchValue"
                   @searching="loadingSearchResults = $event"
                 />

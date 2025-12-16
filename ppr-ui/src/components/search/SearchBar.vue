@@ -99,7 +99,8 @@
 
         <BusinessSearchAutocomplete
           v-click-outside="setCloseAutoComplete"
-          is-p-p-r
+          is-ppr-search
+          is-ppr-debtor-lookup
           nil-search-text
           :search-value="autoCompleteSearchValue"
           :set-auto-complete-is-active="autoCompleteIsActive"
