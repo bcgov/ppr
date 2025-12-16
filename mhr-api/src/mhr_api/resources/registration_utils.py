@@ -393,6 +393,11 @@ def pay_and_save_admin(  # pylint: disable=too-many-arguments,too-many-positiona
         payment, pay_ref = pay_staff(req, request_json, trans_type, current_reg.mhr_number)
     else:
         payment, pay_ref = pay(req, request_json, account_id, trans_type, current_reg.mhr_number)
+        if pay_ref.get("ccPayment"):
+            logger.info("Payment response CC method.")
+            request_json = setup_cc_draft(request_json, pay_ref, account_id, token.get("username", None), user_group)
+            return cc_payment_utils.save_change_cc_draft(current_reg, request_json)
+
     invoice_id = pay_ref["invoiceId"]
     # Try to save the registration: failure throws an exception.
     try:

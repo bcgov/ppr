@@ -134,6 +134,8 @@ def save_registration(req: request, request_json: dict, current_reg: MhrRegistra
     registration = reg_utils.pay_and_save_admin(
         req, current_reg, request_json, account_id, group, get_transaction_type(request_json)
     )
+    if registration.reg_json and registration.reg_json.get("paymentPending"):
+        return jsonify(registration.reg_json), HTTPStatus.ACCEPTED
     logger.debug(f"building admin reg response json for {mhr_number}")
     registration.change_registrations = [current_reg, *current_reg.change_registrations]
     response_json = registration.json
