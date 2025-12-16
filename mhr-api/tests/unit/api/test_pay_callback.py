@@ -23,6 +23,7 @@ import pytest
 from flask import current_app
 from registry_schemas.example_data.mhr import ADMIN_REGISTRATION, EXEMPTION, PERMIT, REGISTRATION, TRANSFER
 
+from mhr_api.exceptions import BusinessException
 from mhr_api.models import MhrDraft, MhrRegistration, SearchRequest, SearchResult
 from mhr_api.models.mhr_draft import DRAFT_PAY_PENDING_PREFIX
 from mhr_api.models.search_result import SCORE_PAY_PENDING
@@ -75,6 +76,7 @@ TEST_CALLBACK_DATA = [
     ('Valid permit extension', HTTPStatus.OK, PERMIT, "000931", MhrRegistrationTypes.PERMIT_EXTENSION.value, "20000105"),
     ('Valid amendment', HTTPStatus.OK, PERMIT, "000931", MhrRegistrationTypes.PERMIT_EXTENSION.value, "20000106"),
     ('Valid permit cancelled', HTTPStatus.OK, ADMIN_REGISTRATION_CANCELLED, "000931", MhrRegistrationTypes.REG_STAFF_ADMIN.value, "20000107"),
+    ('Invalid admin reg', HTTPStatus.OK, ADMIN_REGISTRATION, "000931", MhrRegistrationTypes.REG_STAFF_ADMIN.value, "20000100"),
     ('Invalid no key', HTTPStatus.UNAUTHORIZED, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
     ('Invalid missing payload', HTTPStatus.BAD_REQUEST, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
     ('Invalid missing status', HTTPStatus.BAD_REQUEST, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
@@ -227,6 +229,10 @@ def test_pay_callback(session, client, jwt, desc, status, draft_json, mhr_num, r
     if desc.startswith('Valid'):
         reg = MhrRegistration.find_by_mhr_number(mhr_num, "PS12345", reg_type=reg_type)
         assert reg
+    if desc == 'Invalid admin reg':
+        with pytest.raises(BusinessException) as err:
+            MhrRegistration.find_by_mhr_number(mhr_num, "PS12345", reg_type=reg_type)
+            assert err.status_code == HTTPStatus.NOT_FOUND
 
 
 @pytest.mark.parametrize('desc,invoice_id,search_id', TEST_SEARCH_ID_DATA)
