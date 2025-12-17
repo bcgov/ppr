@@ -30,6 +30,7 @@ from mhr_api.models.queries import (
     QUERY_ACCOUNT_ADD_REG_DOC,
     QUERY_ACCOUNT_ADD_REG_MHR,
     QUERY_ACCOUNT_DEFAULT,
+    QUERY_ACCOUNT_STAFF_NO_FILTER,
     QUERY_BATCH_MANUFACTURER_MHREG,
     QUERY_BATCH_MANUFACTURER_MHREG_DEFAULT,
     QUERY_PERMIT_COUNT,
@@ -868,6 +869,7 @@ def find_all_by_account_id(params: AccountRegistrationParams):
     registrations = []
     try:
         query = text(build_account_query(params))
+        # logger.info(query)
         if params.has_filter() and params.filter_reg_start_date and params.filter_reg_end_date:
             start_ts = model_utils.search_ts(params.filter_reg_start_date, True)
             end_ts = model_utils.search_ts(params.filter_reg_end_date, False)
@@ -1058,6 +1060,8 @@ def __collapse_results(results):
 def build_account_query(params: AccountRegistrationParams) -> str:
     """Build the account registration summary query."""
     query_text: str = QUERY_ACCOUNT_DEFAULT
+    if not params.has_filter() and params.account_id == STAFF_ROLE:
+        query_text = QUERY_ACCOUNT_STAFF_NO_FILTER
     if not params.has_filter() and not params.has_sort():
         query_text += DEFAULT_SORT_ORDER
         return query_text

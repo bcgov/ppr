@@ -157,6 +157,11 @@ TEST_QUERY_FILTER_DATA = [
     ('PS12345', False, reg_utils.MANUFACTURER_NAME_PARAM, 'man', "'000903'", queries.REG_FILTER_MANUFACTURER_NAME),
     ('PS12345', True, reg_utils.MANUFACTURER_NAME_PARAM, 'man', "'000903'", queries.REG_FILTER_MANUFACTURER_NAME_COLLAPSE)
 ]
+# testdata pattern is ({filter_name}, {filter_value})
+TEST_QUERY_STAFF_DATA = [
+    (reg_utils.REG_TYPE_PARAM, 'TRANSPORT PERMIT'),
+    (None, None),
+]
 
 # testdata pattern is ({account_id}, {collapse}, {start_value}, {end_value}, {mhr_numbers}, {expected_clause})
 TEST_QUERY_FILTER_DATA_DATE = [
@@ -387,6 +392,41 @@ def test_account_reg_filter(session, account_id, collapse, filter_name, filter_v
     # current_app.logger.info(filter_clause)
     # current_app.logger.info(filter_query)
     assert filter_query.find(filter_clause) > 0
+    if account_id != STAFF_ROLE:
+        assert filter_query.find("AND mr.registration_ts > now() - interval '14 days'") < 1
+
+
+@pytest.mark.parametrize('filter_name,filter_value', TEST_QUERY_STAFF_DATA)
+def test_account_reg_staff(session, filter_name, filter_value):
+    """Assert that account registration reg staff with no filters is as expected."""
+    params: AccountRegistrationParams = AccountRegistrationParams(account_id=STAFF_ROLE,
+                                                                  collapse=True,
+                                                                  sbc_staff=False)
+    if filter_name and filter_value:
+        if filter_name == reg_utils.REG_TS_PARAM:
+            params.filter_registration_date = filter_value
+        elif filter_name == reg_utils.STATUS_PARAM:
+            params.filter_status_type = filter_value
+        elif filter_name == reg_utils.REG_TYPE_PARAM:
+            params.filter_registration_type = filter_value
+        elif filter_name == reg_utils.MHR_NUMBER_PARAM:
+            params.filter_mhr_number = filter_value
+        elif filter_name == reg_utils.CLIENT_REF_PARAM:
+            params.filter_client_reference_id = filter_value
+        elif filter_name == reg_utils.SUBMITTING_NAME_PARAM:
+            params.filter_submitting_name = filter_value
+        elif filter_name == reg_utils.USER_NAME_PARAM:
+            params.filter_username = filter_value
+        elif filter_name == reg_utils.DOCUMENT_ID_PARAM:
+            params.filter_document_id = filter_value
+        elif filter_name == reg_utils.MANUFACTURER_NAME_PARAM:
+            params.filter_manufacturer = filter_value
+
+    filter_query: str = reg_utils.build_account_query(params)
+    if filter_name and filter_value:
+        assert filter_query.find("AND mr.registration_ts > now() - interval '14 days'") < 1
+    else:
+        assert filter_query.find("AND mr.registration_ts > now() - interval '14 days'") > 0
 
 
 @pytest.mark.parametrize('account_id,collapse,start_value,end_value,mhr_numbers,expected_clause',
