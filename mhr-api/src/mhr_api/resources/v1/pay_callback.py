@@ -19,10 +19,18 @@ from flask import Blueprint, request
 from flask_cors import cross_origin
 
 from mhr_api.exceptions import DatabaseException
-from mhr_api.models import EventTracking, MhrDraft, MhrRegistration, MhrReviewRegistration, SearchResult
+from mhr_api.models import (
+    EventTracking,
+    MhrDraft,
+    MhrRegistration,
+    MhrReviewRegistration,
+    SearchResult,
+    registration_json_utils,
+)
 from mhr_api.models.mhr_draft import DRAFT_PAY_PENDING_PREFIX, DRAFT_STAFF_REVIEW_PREFIX
 from mhr_api.models.registration_json_utils import cleanup_owner_groups, sort_owner_groups
 from mhr_api.models.type_tables import (
+    MhrDocumentTypes,
     MhrOwnerStatusTypes,
     MhrRegistrationStatusTypes,
     MhrRegistrationTypes,
@@ -252,6 +260,19 @@ def queue_permit(
     queue_report(new_reg, draft, response_json, ReportTypes.MHR_TRANSPORT_PERMIT, current_json)
 
 
+def queue_admin_reg(
+    draft: MhrDraft, current_reg: MhrRegistration, new_reg: MhrRegistration, current_json: dict, existing_status
+):
+    """Set up the registration verification report generation (cancel permit)."""
+    new_reg.change_registrations = [current_reg, *current_reg.change_registrations]
+    response_json = new_reg.json
+    response_json = registration_json_utils.set_home_status_json(current_reg, response_json, existing_status)
+    if draft.draft.get("documentType") == MhrDocumentTypes.CANCEL_PERMIT:
+        response_json["previousLocation"] = current_json.get("location")
+
+    queue_report(new_reg, draft, response_json, ReportTypes.MHR_REGISTRATION_STAFF, current_json)
+
+
 def queue_transfer(draft: MhrDraft, current_reg: MhrRegistration, new_reg: MhrRegistration, current_owners):
     """Set up the registration verification report generation."""
     new_reg.change_registrations = [current_reg, *current_reg.change_registrations]
@@ -314,13 +335,17 @@ def complete_registration(draft: MhrDraft, base_reg: MhrRegistration, request_js
         if reg_type == MhrRegistrationTypes.MHREG:
             new_reg = cc_payment_utils.create_new_registration(draft)
             queue_new_reg(draft, base_reg, new_reg)
-        elif reg_type == MhrRegistrationTypes.PERMIT:
+        elif reg_type in (
+            MhrRegistrationTypes.PERMIT,
+            MhrRegistrationTypes.PERMIT_EXTENSION,
+            MhrRegistrationTypes.AMENDMENT,
+        ):
             base_reg.current_view = True
             current_location = reg_utils.get_active_location(base_reg)
             existing_status: str = base_reg.status_type
             new_reg = cc_payment_utils.create_change_registration(draft, base_reg)
             queue_permit(draft, base_reg, new_reg, current_location, existing_status)
-        elif reg_type == MhrRegistrationTypes.TRANS:
+        elif reg_type in (MhrRegistrationTypes.TRANS, MhrRegistrationTypes.TRAND):
             base_reg.current_view = True
             current_owners = reg_utils.get_active_owners(base_reg)
             new_reg = cc_payment_utils.create_change_registration(draft, base_reg)
@@ -328,6 +353,15 @@ def complete_registration(draft: MhrDraft, base_reg: MhrRegistration, request_js
         elif reg_type in (MhrRegistrationTypes.EXEMPTION_RES, MhrRegistrationTypes.EXEMPTION_NON_RES):
             new_reg = cc_payment_utils.create_change_registration(draft, base_reg)
             queue_exemption(draft, base_reg, new_reg)
+        elif (
+            reg_type == MhrRegistrationTypes.REG_STAFF_ADMIN
+            and draft.draft.get("documentType") == MhrDocumentTypes.CANCEL_PERMIT.value
+        ):
+            base_reg.current_view = True
+            current_json = base_reg.new_registration_json
+            existing_status: str = base_reg.status_type
+            new_reg = cc_payment_utils.create_change_registration(draft, base_reg)
+            queue_admin_reg(draft, base_reg, new_reg, current_json, existing_status)
         msg: str = None
         if new_reg:
             msg = PAY_REG_SUCCESS_MSG.format(reg_id=new_reg.id, mhr_num=new_reg.mhr_number)

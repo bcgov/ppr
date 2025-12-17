@@ -336,19 +336,47 @@ def create_exemption_registration(
     return new_reg
 
 
+def create_admin_registration(
+    json_data: dict, current_reg: MhrRegistration, new_reg: MhrRegistration
+) -> MhrRegistration:
+    """Create new admin registration (cancel permit) from the draft."""
+    if json_data.get("note") and json_data["note"].get("givingNoticeParty"):
+        notice_json = json_data["note"]["givingNoticeParty"]
+        new_reg.parties.append(MhrParty.create_from_json(notice_json, MhrPartyTypes.CONTACT, new_reg.id))
+    doc: MhrDocument = new_reg.documents[0]
+    if json_data.get("note"):
+        new_reg.notes = [
+            MhrNote.create_from_json(json_data.get("note"), new_reg.id, doc.id, new_reg.registration_ts, new_reg.id)
+        ]
+    if json_data.get("location"):
+        new_reg.locations.append(MhrLocation.create_from_json(json_data.get("location"), new_reg.id))
+    new_reg.save()
+    change_utils.save_permit(current_reg, json_data, new_reg.id)
+    return new_reg
+
+
 def create_change_registration(draft: MhrDraft, current_reg: MhrRegistration) -> MhrRegistration:
     """Create new change registration from the draft."""
     new_reg: MhrRegistration = create_basic_registration(draft)
     new_reg.documents[0].registration_id = current_reg.id
     draft_json = draft.draft
-    if draft.registration_type == MhrRegistrationTypes.PERMIT.value:
+    if draft.registration_type in (
+        MhrRegistrationTypes.PERMIT.value,
+        MhrRegistrationTypes.PERMIT_EXTENSION.value,
+        MhrRegistrationTypes.AMENDMENT.value,
+    ):
         new_reg = create_permit_registration(draft_json, current_reg, new_reg)
-    elif draft.registration_type == MhrRegistrationTypes.TRANS.value:
+    elif draft.registration_type in (MhrRegistrationTypes.TRANS.value, MhrRegistrationTypes.TRAND.value):
         new_reg = create_transfer_registration(draft_json, current_reg, new_reg)
     elif draft.registration_type in (
         MhrRegistrationTypes.EXEMPTION_NON_RES.value,
         MhrRegistrationTypes.EXEMPTION_RES.value,
     ):
         new_reg = create_exemption_registration(draft_json, current_reg, new_reg)
+    elif (
+        draft.registration_type == MhrRegistrationTypes.REG_STAFF_ADMIN.value
+        and draft.draft.get("documentType") == MhrDocumentTypes.CANCEL_PERMIT.value
+    ):
+        new_reg = create_admin_registration(draft_json, current_reg, new_reg)
     logger.info(f"New reg id={new_reg.id} type={new_reg.registration_type}, mhr#={new_reg.mhr_number}")
     return new_reg

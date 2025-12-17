@@ -21,8 +21,9 @@ from http import HTTPStatus
 
 import pytest
 from flask import current_app
-from registry_schemas.example_data.mhr import REGISTRATION, EXEMPTION, PERMIT, TRANSFER
+from registry_schemas.example_data.mhr import ADMIN_REGISTRATION, EXEMPTION, PERMIT, REGISTRATION, TRANSFER
 
+from mhr_api.exceptions import BusinessException
 from mhr_api.models import MhrDraft, MhrRegistration, SearchRequest, SearchResult
 from mhr_api.models.mhr_draft import DRAFT_PAY_PENDING_PREFIX
 from mhr_api.models.search_result import SCORE_PAY_PENDING
@@ -30,7 +31,7 @@ from mhr_api.models.type_tables import MhrRegistrationStatusTypes, MhrRegistrati
 from mhr_api.resources import cc_payment_utils
 from mhr_api.resources.registration_utils import setup_cc_draft
 from mhr_api.resources.v1.pay_callback import get_search_id
-
+from tests.unit.utils.test_registration_data import LOCATION_MANUFACTURER
 
 # Valid search test data
 MHR_NUMBER_JSON = {
@@ -59,12 +60,23 @@ PUB_SUB_PAYLOAD = {
     "statusCode": "COMPLETED",
     "filingIdentifier": ""
 }
+# valid registration data
+TRANSFER_DEATH = copy.deepcopy(TRANSFER)
+TRANSFER_DEATH["registrationType"] = MhrRegistrationTypes.TRAND.value
+ADMIN_REGISTRATION_CANCELLED = copy.deepcopy(ADMIN_REGISTRATION)
+ADMIN_REGISTRATION_CANCELLED["documentType"] = "CANCEL_PERMIT"
+ADMIN_REGISTRATION_CANCELLED["location"] = copy.deepcopy(LOCATION_MANUFACTURER)
 # testdata pattern is ({desc}, {status}, {draft_json}, {mhr_num}, {reg_type}, {invoice_id})
 TEST_CALLBACK_DATA = [
     ('Valid new reg', HTTPStatus.OK, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
     ('Valid exemption', HTTPStatus.OK, EXEMPTION, "000919", MhrRegistrationTypes.EXEMPTION_RES.value, "20000101"),
     ('Valid permit', HTTPStatus.OK, PERMIT, "000900", MhrRegistrationTypes.PERMIT.value, "20000102"),
     ('Valid transfer', HTTPStatus.OK, TRANSFER, "000919", MhrRegistrationTypes.TRANS.value, "20000103"),
+    ('Valid transfer to surviving joint tenant', HTTPStatus.OK, TRANSFER_DEATH, "000901", MhrRegistrationTypes.TRAND.value, "20000104"),
+    ('Valid permit extension', HTTPStatus.OK, PERMIT, "000931", MhrRegistrationTypes.PERMIT_EXTENSION.value, "20000105"),
+    ('Valid amendment', HTTPStatus.OK, PERMIT, "000931", MhrRegistrationTypes.PERMIT_EXTENSION.value, "20000106"),
+    ('Valid permit cancelled', HTTPStatus.OK, ADMIN_REGISTRATION_CANCELLED, "000931", MhrRegistrationTypes.REG_STAFF_ADMIN.value, "20000107"),
+    ('Invalid admin reg', HTTPStatus.OK, ADMIN_REGISTRATION, "000931", MhrRegistrationTypes.REG_STAFF_ADMIN.value, "20000100"),
     ('Invalid no key', HTTPStatus.UNAUTHORIZED, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
     ('Invalid missing payload', HTTPStatus.BAD_REQUEST, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
     ('Invalid missing status', HTTPStatus.BAD_REQUEST, REGISTRATION, None, MhrRegistrationTypes.MHREG.value, "20000100"),
@@ -93,18 +105,33 @@ def setup_registration(draft_json: dict, reg_type: str, invoice_id: str) -> dict
         del json_data['documentDescription']
         del json_data['createDateTime']
         json_data['nonResidential'] = False
-    elif reg_type == MhrRegistrationTypes.PERMIT.value:
+    elif reg_type in (
+        MhrRegistrationTypes.PERMIT.value,
+        MhrRegistrationTypes.PERMIT_EXTENSION.value,
+        MhrRegistrationTypes.AMENDMENT.value
+    ):
         del json_data['documentId']
         del json_data['documentRegistrationNumber']
         del json_data['documentDescription']
         del json_data['createDateTime']
         del json_data['payment']
         del json_data['note']
-    elif reg_type == MhrRegistrationTypes.TRANS.value:
+    elif reg_type in (
+        MhrRegistrationTypes.TRANS.value,
+        MhrRegistrationTypes.TRAND.value
+    ):
         del json_data['documentId']
         del json_data['documentDescription']
         del json_data['createDateTime']
         del json_data['payment']
+    elif reg_type == MhrRegistrationTypes.REG_STAFF_ADMIN.value:
+        del json_data['documentId']
+        del json_data['documentRegistrationNumber']
+        del json_data['documentDescription']
+        del json_data['createDateTime']
+        del json_data['updateDocumentId']
+        del json_data['payment']
+        del json_data['note']
     pay_ref: dict = copy.deepcopy(CC_PAYREF)
     if invoice_id:
         pay_ref["invoiceId"] = invoice_id
@@ -172,6 +199,7 @@ def test_pay_callback(session, client, jwt, desc, status, draft_json, mhr_num, r
         if reg_type == MhrRegistrationTypes.MHREG.value:
             new_draft: MhrDraft = MhrDraft.create_from_mhreg_json(json_data, "PS12345", "username@idir")
             new_draft.save()
+            mhr_num = new_draft.mhr_number
             json_data["mhrNumber"] = new_draft.mhr_number
             new_reg = cc_payment_utils.save_new_cc_draft(json_data, new_draft)
         else:
@@ -198,6 +226,13 @@ def test_pay_callback(session, client, jwt, desc, status, draft_json, mhr_num, r
                         headers=headers,
                         content_type='application/json')
         assert rv.status_code in (HTTPStatus.NOT_FOUND, HTTPStatus.BAD_REQUEST, HTTPStatus.OK)
+    if desc.startswith('Valid'):
+        reg = MhrRegistration.find_by_mhr_number(mhr_num, "PS12345", reg_type=reg_type)
+        assert reg
+    if desc == 'Invalid admin reg':
+        with pytest.raises(BusinessException) as err:
+            MhrRegistration.find_by_mhr_number(mhr_num, "PS12345", reg_type=reg_type)
+            assert err.status_code == HTTPStatus.NOT_FOUND
 
 
 @pytest.mark.parametrize('desc,invoice_id,search_id', TEST_SEARCH_ID_DATA)
