@@ -238,7 +238,7 @@ SELECT r.id, r.registration_number, r.registration_ts, r.registration_type, r.re
                 SELECT CONCAT_WS(' ', NULLIF(TRIM(u.firstname), ''), NULLIF(TRIM(u.lastname), ''))
                 FROM users u
                 WHERE u.username = r.user_id FETCH FIRST 1 ROWS ONLY
-            ), '') END) AS registering_name,
+            ), '') END) AS registering_name
   FROM registrations r, registration_types rt, financing_statements fs
  WHERE r.registration_type = rt.registration_type
    AND fs.id = r.financing_id
