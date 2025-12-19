@@ -14,15 +14,22 @@
 """Resource helper utilities for processing requests."""
 from http import HTTPStatus
 
-from flask import current_app, jsonify, request
+from flask import current_app, g, jsonify, request
 
 from ppr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
-from ppr_api.models import EventTracking, MailReport, Party, Registration, VerificationReport, search_utils
+from ppr_api.models import EventTracking, MailReport, Party, Registration, User, VerificationReport, search_utils
 from ppr_api.models import utils as model_utils
 from ppr_api.models.registration import AccountRegistrationParams, CrownChargeTypes, MiscellaneousTypes, PPSATypes
 from ppr_api.models.search_utils import AccountSearchParams
 from ppr_api.models.type_tables import RegistrationTypes
-from ppr_api.services.authz import is_bcol_help, is_reg_staff_account, is_sbc_office_account, user_orgs
+from ppr_api.services.authz import (
+    account_org,
+    is_bcol_help,
+    is_from_api_gw,
+    is_reg_staff_account,
+    is_sbc_office_account,
+    user_orgs,
+)
 from ppr_api.services.payment import TransactionTypes
 from ppr_api.services.payment.exceptions import SBCPaymentException
 from ppr_api.services.queue_service import GoogleQueueService
@@ -408,6 +415,17 @@ def check_access_registration(token: str, staff: bool, account_id: str, statemen
             ),
             status_code=HTTPStatus.UNAUTHORIZED,
         )
+
+
+def patch_api_gw_user_if_missing(raw_jwt: str, account_id: str):
+    """Ensure user record exists for the given API Gateway request."""
+    token = g.jwt_oidc_token_info
+    if not is_from_api_gw(token):
+        return None
+
+    org_info = account_org(raw_jwt, account_id) or {}
+    user = User.get_or_create_user_by_jwt(token, account_id, org_info.get("name"))
+    return user
 
 
 def no_fee_amendment(registration_type: str) -> bool:

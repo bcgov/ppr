@@ -261,6 +261,13 @@ def is_all_staff_account(account_id: str) -> bool:
     return account_id is not None and account_id in (STAFF_ROLE, BCOL_HELP)
 
 
+def is_from_api_gw(token: dict) -> bool:
+    """Return True if login source is from API Gateway."""
+    if token and token.get("loginSource") == "API_GW":
+        return True
+    return False
+
+
 def get_mhr_group(jwt: JwtManager) -> str:  # pylint: disable=too-many-return-statements
     """Obtain the mhr user group/role by inspecting the web token. Use to conditionally check profile settings."""
     if jwt.validate_roles([STAFF_ROLE]):
