@@ -30,11 +30,13 @@ mhr_account_reg_vw = PGView(
                                         WHERE r2.mhr_number = r.mhr_number
                                           AND og2.registration_id = r2.id
                                           AND r2.id <= r.id)) AS owner_names,       
-        (SELECT CASE WHEN r.user_id IS NULL THEN ''
-                     ELSE (SELECT CASE WHEN u.lastname = '' or u.lastname IS NULL THEN u.firstname
-                                  ELSE u.firstname || ' ' || u.lastname END
-                             FROM users u
-                            WHERE u.username = r.user_id FETCH FIRST 1 ROWS ONLY) END) AS registering_name,
+        (SELECT CASE
+          WHEN r.user_id IS NULL OR r.user_id = '' THEN ''
+          ELSE COALESCE((
+            SELECT CONCAT_WS(' ', NULLIF(TRIM(u.firstname), ''), NULLIF(TRIM(u.lastname), ''))
+            FROM users u
+            WHERE u.username = r.user_id FETCH FIRST 1 ROWS ONLY
+          ), '') END) AS registering_name,
         d.document_id,
         d.document_registration_number,
         (SELECT d2.document_type

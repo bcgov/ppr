@@ -232,11 +232,13 @@ SELECT r.id, r.registration_number, r.registration_ts, r.registration_type, r.re
            AND p.registration_id_end IS NULL
            AND p.party_type = 'SP') AS secured_party,
        r.client_reference_id,
-       (SELECT CASE WHEN r.user_id IS NULL THEN ''
-                    ELSE (SELECT CASE WHEN u.lastname = '' or u.lastname IS NULL THEN u.firstname
-                                 ELSE u.firstname || ' ' || u.lastname END
-                            FROM users u
-                           WHERE u.username = r.user_id FETCH FIRST 1 ROWS ONLY) END) AS registering_name
+       (SELECT CASE
+            WHEN r.user_id IS NULL OR r.user_id = '' THEN ''
+            ELSE COALESCE((
+                SELECT CONCAT_WS(' ', NULLIF(TRIM(u.firstname), ''), NULLIF(TRIM(u.lastname), ''))
+                FROM users u
+                WHERE u.username = r.user_id FETCH FIRST 1 ROWS ONLY
+            ), '') END) AS registering_name,
   FROM registrations r, registration_types rt, financing_statements fs
  WHERE r.registration_type = rt.registration_type
    AND fs.id = r.financing_id
