@@ -71,11 +71,13 @@ SELECT d.draft_number, d.create_ts, d.registration_type,
                            d.draft -> 'submittingParty' -> 'personName' ->> 'last')
                  END
             ELSE '' END submitting_party,
-       (SELECT CASE WHEN d.user_id IS NULL THEN ''
-                    ELSE (SELECT CASE WHEN u.lastname = '' or u.lastname IS NULL THEN u.firstname
-                                 ELSE u.firstname || ' ' || u.lastname END
-                            FROM users u
-                           WHERE u.username = d.user_id FETCH FIRST 1 ROWS ONLY) END) AS registering_name,
+       (SELECT CASE
+            WHEN d.user_id IS NULL OR d.user_id = '' THEN ''
+            ELSE COALESCE((
+                SELECT CONCAT_WS(' ', NULLIF(TRIM(u.firstname), ''), NULLIF(TRIM(u.lastname), ''))
+                FROM users u
+                WHERE u.username = d.user_id FETCH FIRST 1 ROWS ONLY
+            ), '') END) AS registering_name,
        d.mhr_number,
        CASE WHEN d.registration_type = 'MHREG' or d.mhr_number IS NULL THEN 0
             ELSE (SELECT COUNT(r.id)

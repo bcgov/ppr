@@ -17,12 +17,12 @@
 Test-Suite to ensure that the /party-codes endpoint is working as expected.
 """
 import copy
-from http import HTTPStatus
 import json
-from ppr_api.utils.validators.party_validator import validate_registration_parties
+from http import HTTPStatus
+from unittest.mock import MagicMock, patch
 
 import pytest
-from flask import current_app
+from flask import current_app, g
 
 from ppr_api.exceptions import BusinessException, DatabaseException, ResourceErrorCodes
 from ppr_api.models import Registration, VerificationReport
@@ -30,10 +30,10 @@ from ppr_api.reports import ReportTypes
 from ppr_api.resources import utils as resource_utils
 from ppr_api.services.authz import PPR_ROLE
 from ppr_api.services.payment.exceptions import SBCPaymentException
+from ppr_api.utils.validators.party_validator import validate_registration_parties
 from tests.unit.services.utils import helper_create_jwt
 from tests.unit.utils.test_financing_validator import FINANCING
 from tests.unit.utils.test_registration_validator import AMENDMENT_VALID
-
 
 MOCK_URL_NO_KEY = 'https://test.api.connect.gov.bc.ca/mockTarget/auth/api/v1/'
 # testdata pattern is ({description}, {account id}, {has name})
@@ -422,3 +422,28 @@ def test_same_party(session, client, jwt, desc, rp_json, sp_json, same, same_add
         assert result
     else:
         assert not result
+
+
+@pytest.mark.parametrize('desc, from_api_gw', [
+    ('non API user', False),
+    ('API user', True),
+])
+def test_patch_api_gw_user_if_missing(session, client, jwt, desc, from_api_gw):
+    """Assert that patching API gateway user if missing works as expected."""
+    g.jwt_oidc_token_info = {'loginSource': 'API_GW' if from_api_gw else 'BCSC'}
+    mock_user = MagicMock()
+
+    with (
+        patch('ppr_api.resources.utils.is_from_api_gw', return_value=from_api_gw),
+        patch('ppr_api.resources.utils.account_org', return_value={'name': 'org_name'}) as mock_account_org,
+        patch('ppr_api.resources.utils.User.get_or_create_user_by_jwt', return_value=mock_user) as mock_get_or_create
+    ):
+        res = resource_utils.patch_api_gw_user_if_missing('raw-jwt', '1234')
+        if not from_api_gw:
+            assert res is None
+            mock_account_org.assert_not_called()
+            mock_get_or_create.assert_not_called()
+        else:
+            assert res
+            mock_account_org.assert_called_once()
+            mock_get_or_create.assert_called_once()

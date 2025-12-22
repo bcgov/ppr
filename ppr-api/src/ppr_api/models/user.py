@@ -84,7 +84,7 @@ class User(db.Model):
         )
 
     @classmethod
-    def create_from_jwt_token(cls, token: dict, account_id: str = None):
+    def create_from_jwt_token(cls, token: dict, account_id: str = None, org_name: str = None):
         """Create a user record from the provided JWT token.
 
         Use the values found in the vaild JWT for the realm
@@ -94,12 +94,18 @@ class User(db.Model):
             # TODO: schema doesn't parse from token need to figure that out ... LATER!
             # s = KeycloakUserSchema()
             # u = s.load(data=token, partial=True)
-            firstname = token.get("given_name", None)
-            if not firstname:
-                firstname = token.get("firstname", None)
-            lastname = token.get("family_name", None)
-            if not lastname:
-                lastname = token.get("lastname", None)
+            login_source = token.get("loginSource", None)
+            if login_source == "API_GW":
+                firstname = ""
+                lastname = org_name
+            else:
+                firstname = token.get("given_name", None)
+                if not firstname:
+                    firstname = token.get("firstname", None)
+                lastname = token.get("family_name", None)
+                if not lastname:
+                    lastname = token.get("lastname", None)
+
             user = User(
                 username=token.get("username", None),
                 firstname=firstname,
@@ -108,7 +114,7 @@ class User(db.Model):
                 sub=token["sub"],
                 account_id=account_id,
                 idp_userid=token["idp_userid"],
-                login_source=token["loginSource"],
+                login_source=login_source,
             )
             user.creation_date = model_utils.now_ts()
             logger.debug("Creating user from JWT:{}; User:{}".format(token, user))
@@ -118,7 +124,7 @@ class User(db.Model):
         return None
 
     @classmethod
-    def get_or_create_user_by_jwt(cls, jwt_oidc_token, account_id: str = None):
+    def get_or_create_user_by_jwt(cls, jwt_oidc_token, account_id: str = None, org_name: str = None):
         """Return a valid user for audit tracking purposes."""
         # GET existing or CREATE new user based on the JWT info
         try:
@@ -126,7 +132,7 @@ class User(db.Model):
             logger.debug(f"finding user: {jwt_oidc_token}")
             if not user:
                 logger.debug(f"didnt find user, attempting to create new user:{jwt_oidc_token}")
-                user = User.create_from_jwt_token(jwt_oidc_token, account_id)
+                user = User.create_from_jwt_token(jwt_oidc_token, account_id, org_name)
 
             return user
         except Exception as err:  # noqa: B902; just logging and wrapping as BusinessException

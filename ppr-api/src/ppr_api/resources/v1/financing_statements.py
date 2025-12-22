@@ -85,6 +85,8 @@ def post_financing_statements():
         # Verify request JWT and account ID. BCOL helpdesk is not allowed to submit this request.
         if not authorized(account_id, jwt) or is_bcol_help(account_id):
             return resource_utils.unauthorized_error_response(account_id)
+        # Check and create a user if the request is from API Gateway
+        resource_utils.patch_api_gw_user_if_missing(jwt.get_token_auth_header(), account_id)
         request_json = request.get_json(silent=True)
         # Validate request data against the schema.
         valid_format, errors = schema_utils.validate(request_json, "financingStatement", "ppr")

@@ -37,11 +37,13 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
            AND p.registration_id_end IS NULL
            AND p.party_type = 'SP') AS secured_party,
        r.client_reference_id,
-       (SELECT CASE WHEN r.user_id IS NULL THEN ''
-                    ELSE (SELECT CASE WHEN u.lastname = '' or u.lastname IS NULL THEN u.firstname
-                                 ELSE u.firstname || ' ' || u.lastname END
-                            FROM users u
-                           WHERE u.username = r.user_id FETCH FIRST 1 ROWS ONLY) END) AS registering_name,
+       (SELECT CASE
+          WHEN r.user_id IS NULL OR r.user_id = '' THEN ''
+          ELSE COALESCE((
+            SELECT CONCAT_WS(' ', NULLIF(TRIM(u.firstname), ''), NULLIF(TRIM(u.lastname), ''))
+            FROM users u
+            WHERE u.username = r.user_id FETCH FIRST 1 ROWS ONLY
+          ), '') END) AS registering_name,
        r.account_id AS orig_account_id,
        r2.account_id AS base_account_id,
        (SELECT COUNT(vr.id)
@@ -97,11 +99,13 @@ SELECT r.registration_number, r.registration_ts, r.registration_type, r.registra
            AND p.registration_id_end IS NULL
            AND p.party_type = 'SP') AS secured_party,
        r.client_reference_id,
-       (SELECT CASE WHEN r.user_id IS NULL THEN ''
-                    ELSE (SELECT CASE WHEN u.lastname = '' or u.lastname IS NULL THEN u.firstname
-                                 ELSE u.firstname || ' ' || u.lastname END
-                            FROM users u
-                           WHERE u.username = r.user_id FETCH FIRST 1 ROWS ONLY) END) AS registering_name,
+       (SELECT CASE
+          WHEN r.user_id IS NULL OR r.user_id = '' THEN ''
+          ELSE COALESCE((
+            SELECT CONCAT_WS(' ', NULLIF(TRIM(u.firstname), ''), NULLIF(TRIM(u.lastname), ''))
+            FROM users u
+            WHERE u.username = r.user_id FETCH FIRST 1 ROWS ONLY
+          ), '') END) AS registering_name,
        r.account_id AS orig_account_id,
        r2.account_id AS base_account_id,
        (SELECT COUNT(vr.id)
