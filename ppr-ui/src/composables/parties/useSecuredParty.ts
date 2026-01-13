@@ -10,8 +10,8 @@ import { isObjectEqual } from '@/utils/validation-helper'
 import { storeToRefs } from 'pinia'
 import { SecuredPartyRestrictedList } from '@/resources'
 
-const initPerson = { first: '', middle: '', last: '' }
-const initAddress = {
+const createInitPerson = () => ({ first: '', middle: '', last: '' })
+const createInitAddress = () => ({
   street: '',
   streetAdditional: '',
   city: '',
@@ -19,7 +19,7 @@ const initAddress = {
   country: null,
   postalCode: '',
   deliveryInstructions: ''
-}
+})
 const { isPartiesValid } = useParty()
 
 export const useSecuredParty = (context?) => {
@@ -34,9 +34,9 @@ export const useSecuredParty = (context?) => {
   const localState = reactive({
     currentSecuredParty: {
       businessName: '',
-      personName: initPerson,
+      personName: createInitPerson(),
       emailAddress: '',
-      address: initAddress
+      address: createInitAddress()
     } as PartyIF,
     currentIsBusiness: null,
     partyType: null,
@@ -59,7 +59,7 @@ export const useSecuredParty = (context?) => {
       if (localState.currentSecuredParty.businessName) {
         localState.currentIsBusiness = true
         localState.partyType = SecuredPartyTypes.BUSINESS
-        localState.currentSecuredParty.personName = Object.assign({}, initPerson)
+        localState.currentSecuredParty.personName = createInitPerson()
       }
     } else if (activeIndex >= 0) {
       // deep copy so original object doesn't get modified
@@ -70,16 +70,16 @@ export const useSecuredParty = (context?) => {
       if (localState.currentSecuredParty.businessName) {
         localState.currentIsBusiness = true
         localState.partyType = SecuredPartyTypes.BUSINESS
-        localState.currentSecuredParty.personName = Object.assign({}, initPerson)
+        localState.currentSecuredParty.personName = createInitPerson()
       }
     } else {
       localState.partyType = null
       const blankSecuredParty = {
         businessName: '',
-        personName: Object.assign({}, initPerson),
+        personName: createInitPerson(),
         birthDate: '',
         emailAddress: '',
-        address: Object.assign({}, initAddress)
+        address: createInitAddress()
       }
       localState.currentSecuredParty = blankSecuredParty
     }
