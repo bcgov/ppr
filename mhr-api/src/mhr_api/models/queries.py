@@ -282,17 +282,17 @@ WHERE arv.mhr_number IN
 )
 REG_ORDER_BY_DATE = " ORDER BY arv.registration_ts DESC"
 REG_ORDER_BY_MHR_NUMBER = " ORDER BY arv.mhr_number"
-REG_ORDER_BY_REG_TYPE = " ORDER BY arv.document_type"
+REG_ORDER_BY_REG_TYPE = " ORDER BY arv.summary_snapshot ->> 'document_type'"
 REG_ORDER_BY_STATUS = " ORDER BY arv.status_type"
-REG_ORDER_BY_SUBMITTING_NAME = " ORDER BY arv.submitting_name"
+REG_ORDER_BY_SUBMITTING_NAME = " ORDER BY arv.summary_snapshot ->> 'submitting_name'"
 REG_ORDER_BY_CLIENT_REF = " ORDER BY arv.client_reference_id"
-REG_ORDER_BY_USERNAME = " ORDER BY arv.registering_name"
-REG_ORDER_BY_OWNER_NAME = " ORDER BY arv.owner_names"
+REG_ORDER_BY_USERNAME = " ORDER BY arv.summary_snapshot ->> 'registering_name'"
+REG_ORDER_BY_OWNER_NAME = " ORDER BY arv.summary_snapshot ->> 'owner_names'"
 REG_ORDER_BY_EXPIRY_DAYS = " ORDER BY arv.mhr_number"
-REG_ORDER_BY_DOCUMENT_ID = " ORDER BY arv.document_id"
-REG_ORDER_BY_MANUFACTURER_NAME = " ORDER BY arv.manufacturer_name"
-REG_ORDER_BY_CIVIC_ADDRESS = " ORDER BY arv.civic_address"
-REG_FILTER_REG_TYPE = " AND arv.document_type = '?'"
+REG_ORDER_BY_DOCUMENT_ID = " ORDER BY arv.summary_snapshot ->> 'document_id'"
+REG_ORDER_BY_MANUFACTURER_NAME = " ORDER BY arv.summary_snapshot ->> 'manufacturer_name'"
+REG_ORDER_BY_CIVIC_ADDRESS = " ORDER BY arv.summary_snapshot ->> 'civic_address'"
+REG_FILTER_REG_TYPE = " AND arv.summary_snapshot ->> 'document_type' = '?'"
 REG_FILTER_REG_TYPE_COLLAPSE = """
  AND arv.mhr_number IN (SELECT DISTINCT r2.mhr_number
                           FROM mhr_registrations r2, mhr_documents d2
@@ -309,12 +309,12 @@ REG_FILTER_STATUS_COLLAPSE = """
                            AND r2.registration_type IN ('MHREG', 'MHREG_CONVERSION')
                            AND r2.status_type = '?')
 """
-REG_FILTER_SUBMITTING_NAME = " AND position('?' in arv.submitting_name) > 0"
+REG_FILTER_SUBMITTING_NAME = " AND position('?' in arv.summary_snapshot ->> 'submitting_name') > 0"
 REG_FILTER_SUBMITTING_NAME_COLLAPSE = """
  AND arv.mhr_number IN (SELECT DISTINCT arv2.mhr_number
-                          FROM mhr_account_reg_vw arv2
+                          FROM mhr_registrations arv2
                          WHERE arv.mhr_number = arv2.mhr_number
-                           AND position('?' in arv2.submitting_name) > 0)
+                           AND position('?' in arv2.summary_snapshot ->> 'submitting_name') > 0)
 """
 REG_FILTER_CLIENT_REF = " AND position('?' in UPPER(arv.client_reference_id)) > 0"
 REG_FILTER_CLIENT_REF_COLLAPSE = """
@@ -323,7 +323,7 @@ REG_FILTER_CLIENT_REF_COLLAPSE = """
                          WHERE arv.mhr_number = r2.mhr_number
                            AND position('?' in UPPER(r2.client_reference_id)) > 0)
 """
-REG_FILTER_USERNAME = " AND position('?' in arv.registering_name) > 0"
+REG_FILTER_USERNAME = " AND position('?' in arv.summary_snapshot ->> 'registering_name') > 0"
 REG_FILTER_USERNAME_COLLAPSE = """
  AND arv.mhr_number IN (SELECT r2.mhr_number
                         FROM mhr_registrations r2, users u
@@ -341,7 +341,7 @@ REG_FILTER_DATE_COLLAPSE = """
                          WHERE arv.mhr_number = r2.mhr_number
                            AND r2.registration_ts BETWEEN :query_start AND :query_end)
 """
-REG_FILTER_DOCUMENT_ID = " AND position('?' in arv.document_id) > 0"
+REG_FILTER_DOCUMENT_ID = " AND position('?' in arv.summary_snapshot ->> 'document_id') > 0"
 REG_FILTER_DOCUMENT_ID_COLLAPSE = """
  AND arv.mhr_number IN (SELECT DISTINCT r2.mhr_number
                           FROM mhr_registrations r2, mhr_documents d2
@@ -349,12 +349,12 @@ REG_FILTER_DOCUMENT_ID_COLLAPSE = """
                            AND r2.id = d2.registration_id
                            AND position('?' in d2.document_id) > 0)
 """
-REG_FILTER_MANUFACTURER_NAME = " AND position('?' in arv.manufacturer_name) > 0"
+REG_FILTER_MANUFACTURER_NAME = " AND position('?' in arv.summary_snapshot ->> 'manufacturer_name') > 0"
 REG_FILTER_MANUFACTURER_NAME_COLLAPSE = """
  AND arv.mhr_number IN (SELECT DISTINCT arv2.mhr_number
-                          FROM mhr_account_reg_vw arv2
+                          FROM mhr_registrations arv2
                          WHERE arv.mhr_number = arv2.mhr_number
-                           AND position('?' in arv2.manufacturer_name) > 0)
+                           AND position('?' in arv2.summary_snapshot ->> 'manufacturer_name') > 0)
 """
 ACCOUNT_SORT_DESCENDING = " DESC"
 ACCOUNT_SORT_ASCENDING = " ASC"

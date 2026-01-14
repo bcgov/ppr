@@ -1631,8 +1631,20 @@ def test_create_exre_from_json(session, mhr_num, account_id, has_loc, has_desc, 
         assert not reg_json.get('deleteOwnerGroups')
 
 
+def helper_clear_summary_snapshot(mhr_number, account_id):
+    """Clear summary snapshot matching the mhr number for testing purpose."""
+    base_reg: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_number, account_id)
+    base_reg.summary_snapshot = None
+    base_reg.save()
+
+    for reg in base_reg.change_registrations:
+        reg.summary_snapshot = None
+        reg.save()
+
+
 @pytest.mark.parametrize('mhr_number, account_id', TEST_DATA_SUMMARY_MHR_NUM)
 def test_update_summay_snapshot_by_mhr_number(session, mhr_number, account_id):
+    helper_clear_summary_snapshot(mhr_number, account_id)
     MhrRegistration.update_summary_snapshot_by_mhr_number(mhr_number)
     base_reg: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_number, account_id)
 
@@ -1643,6 +1655,7 @@ def test_update_summay_snapshot_by_mhr_number(session, mhr_number, account_id):
 
 @pytest.mark.parametrize('reg_id, mhr_number, account_id', TEST_DATA_SUMMRY_REG_ID)
 def test_update_summary_snapshot_by_reg_id(session, reg_id, mhr_number, account_id):
+    helper_clear_summary_snapshot(mhr_number, account_id)
     MhrRegistration.update_summary_snapshot_by_reg_id(reg_id)
     base_reg: MhrRegistration = MhrRegistration.find_all_by_mhr_number(mhr_number, account_id)
 
