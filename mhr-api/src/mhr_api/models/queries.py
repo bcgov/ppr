@@ -97,7 +97,24 @@ select nextval('mhr_registration_id_seq') AS reg_id,
 QUERY_REG_ID_PKEY = """
 select nextval('mhr_registration_id_seq') AS reg_id
 """
-QUERY_ACCOUNT_REG_BASE = """
+UPDATE_QUERY_SUMMARY_SNAPSHOT_BASE = """
+UPDATE mhr_registrations r
+SET summary_snapshot = to_jsonb(arv)
+FROM mhr_account_reg_vw arv
+"""
+UPDATE_QUERY_SUMMARY_SNAPSHOT_BY_MHR_NUMBER = (
+    UPDATE_QUERY_SUMMARY_SNAPSHOT_BASE + """
+WHERE arv.mhr_number = :query_value1
+AND r.id = arv.registration_id
+""")
+UPDATE_QUERY_SUMMARY_SNAPSHOT_BY_REG_ID = (
+    UPDATE_QUERY_SUMMARY_SNAPSHOT_BASE + """
+WHERE arv.registration_id = :query_value1
+AND r.id = arv.registration_id
+"""
+)
+
+QUERY_ACCOUNT_REG_BASE_LAST = """
 SELECT arv.mhr_number, status_type, registration_ts, submitting_name, client_reference_id, registration_type,
        owner_names,
        registering_name, document_id, document_registration_number, last_doc_type, note_status, note_expiry,
@@ -132,6 +149,58 @@ SELECT arv.mhr_number, status_type, registration_ts, submitting_name, client_ref
       manufacturer_name,
       civic_address
   FROM mhr_account_reg_vw arv
+"""
+
+QUERY_ACCOUNT_REG_BASE = """
+SELECT arv.mhr_number,
+       arv.status_type,
+       registration_ts,
+       summary_snapshot ->> 'submitting_name' AS submitting_name,
+       client_reference_id,
+       registration_type,
+       summary_snapshot ->> 'owner_names' AS owner_names,
+       summary_snapshot ->>  'registering_name' AS registering_name,
+       summary_snapshot ->> 'document_id' AS document_id,
+       summary_snapshot ->> 'document_registration_number' AS document_registration_number,
+       summary_snapshot ->> 'last_doc_type' AS last_doc_type,
+        summary_snapshot ->> 'note_status' AS note_status,
+       (summary_snapshot ->> 'note_expiry')::timestamp AS note_expiry,
+       summary_snapshot ->> 'cancel_doc_type' AS cancel_doc_type,
+        summary_snapshot ->> 'frozen_doc_type' AS frozen_doc_type,
+        arv.account_id,
+        summary_snapshot ->> 'document_type_desc' AS document_type_desc,
+        summary_snapshot ->> 'ppr_lien_type' AS ppr_lien_type,
+        summary_snapshot ->> 'document_type' AS document_type,
+       summary_snapshot ->> 'doc_storage_url' AS doc_storage_url,
+       (SELECT COUNT(mer.id)
+          FROM mhr_extra_registrations mer
+         WHERE mer.mhr_number = arv.mhr_number
+           AND mer.account_id = arv.account_id
+           AND (mer.removed_ind IS NOT NULL AND mer.removed_ind = 'Y')) AS removed_count,
+       (SELECT COUNT(mer.id)
+          FROM mhr_extra_registrations mer
+         WHERE mer.mhr_number = arv.mhr_number
+           AND mer.account_id = :query_value1
+           AND mer.account_id != arv.account_id
+           AND (mer.removed_ind IS NULL OR mer.removed_ind != 'Y')) AS extra_reg_count,
+       summary_snapshot ->> 'location_type' AS location_type,
+        summary_snapshot ->> 'affirm_by' AS affirm_by,
+        COALESCE((summary_snapshot ->> 'report_count'), '0') AS report_count,
+       CASE WHEN arv.account_id IN ('ppr_staff', 'helpdesk')
+            THEN (SELECT u.account_id
+                   FROM users u
+                  WHERE arv.user_id = u.username
+                 ORDER BY u.id DESC
+                 FETCH FIRST 1 ROWS ONLY)
+            ELSE NULL END staff_account_id,
+       CASE WHEN arv.account_id != '0'
+            THEN (SELECT d.draft_number
+                   FROM mhr_drafts d
+                  WHERE arv.draft_id = d.id)
+            ELSE NULL END draft_number,
+      summary_snapshot ->> 'manufacturer_name' AS manufacturer_name,
+      summary_snapshot ->> 'civic_address' AS civic_address
+FROM mhr_registrations arv
 """
 
 QUERY_ACCOUNT_ADD_REG_MHR = (

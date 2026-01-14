@@ -69,6 +69,8 @@ from mhr_api.models.queries import (
     REG_ORDER_BY_SUBMITTING_NAME,
     REG_ORDER_BY_USERNAME,
     UPDATE_BATCH_REG_REPORT,
+    UPDATE_QUERY_SUMMARY_SNAPSHOT_BY_MHR_NUMBER,
+    UPDATE_QUERY_SUMMARY_SNAPSHOT_BY_REG_ID,
 )
 from mhr_api.models.type_tables import (
     MhrDocumentType,
@@ -861,6 +863,32 @@ def find_summary_by_doc_reg_number(account_id: str, doc_reg_number: str, staff: 
         return registrations[0] if registrations else {}
     except Exception as db_exception:  # noqa: B902; return nicer error
         logger.error("find_summary_by_doc_reg_number exception: " + str(db_exception))
+        raise DatabaseException(db_exception) from db_exception
+
+
+def update_summary_snapshot_by_mhr_number(mhr_number: str):
+    """Return the MHR registration summary snapshot matching the mhr number."""
+    try:
+        query = text(UPDATE_QUERY_SUMMARY_SNAPSHOT_BY_MHR_NUMBER)
+        result = db.session.execute(query, {"query_value1": mhr_number})
+        if result:
+            logger.debug(f"Updated mhr registration summary snapshot for mhr_number {mhr_number}.")
+        db.session.commit()
+    except Exception as db_exception:  # noqa: B902; return nicer error
+        logger.error("update_summary_snapshot_by_mhr_number exception: " + str(db_exception))
+        raise DatabaseException(db_exception) from db_exception
+
+
+def update_summary_snapshot_by_reg_id(registration_id: int):
+    """Return the MHR registration summary snapshot matching the registration id."""
+    try:
+        query = text(UPDATE_QUERY_SUMMARY_SNAPSHOT_BY_REG_ID)
+        result = db.session.execute(query, {"query_value1": registration_id})
+        if result:
+            logger.debug(f"Updated mhr registration summary snapshot for reg_id {registration_id}.")
+        db.session.commit()
+    except Exception as db_exception:  # noqa: B902; return nicer error
+        logger.error("update_summary_snapshot_by_registration_id exception: " + str(db_exception))
         raise DatabaseException(db_exception) from db_exception
 
 

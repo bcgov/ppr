@@ -16,7 +16,7 @@
 
 from http import HTTPStatus
 
-from sqlalchemy.dialects.postgresql import ENUM as PG_ENUM
+from sqlalchemy.dialects.postgresql import ENUM as PG_ENUM, JSONB
 
 import mhr_api.models.registration_change_utils as change_utils
 import mhr_api.models.registration_json_utils as reg_json_utils
@@ -79,6 +79,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
     pay_invoice_id = db.mapped_column("pay_invoice_id", db.Integer, nullable=True)
     pay_path = db.mapped_column("pay_path", db.String(256), nullable=True)
     user_id = db.mapped_column("user_id", db.String(1000), nullable=True)
+    summary_snapshot = db.mapped_column('summary_snapshot', JSONB)
 
     # parent keys
     draft_id = db.mapped_column("draft_id", db.Integer, db.ForeignKey("mhr_drafts.id"), nullable=False, index=True)
@@ -896,3 +897,13 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
         for section in json_data["description"]["sections"]:
             sections.append(MhrSection.create_from_json(section, registration_id))
         return sections
+
+    @classmethod
+    def update_summary_snapshot_by_mhr_number(cls, mhr_number: str):
+        """Update the MHR registration summary snapshot matching the mhr number."""
+        reg_utils.update_summary_snapshot_by_mhr_number(mhr_number)
+
+    @classmethod
+    def update_summary_snapshot_by_reg_id(cls, registration_id: int):
+        """Update the MHR registration summary snapshot matching the registration id."""
+        reg_utils.update_summary_snapshot_by_reg_id(registration_id)

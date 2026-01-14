@@ -174,6 +174,7 @@ def get_registration_callback_report(
         )
         if report_info.report_data.get("reviewId"):
             send_review_notification(report_info.report_data, response)
+        MhrRegistration.update_summary_snapshot_by_reg_id(registration_id)
         return {}, HTTPStatus.OK
     except ReportException as report_err:
         return registration_callback_error(
