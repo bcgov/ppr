@@ -103,12 +103,15 @@ SET summary_snapshot = to_jsonb(arv)
 FROM mhr_account_reg_vw arv
 """
 UPDATE_QUERY_SUMMARY_SNAPSHOT_BY_MHR_NUMBER = (
-    UPDATE_QUERY_SUMMARY_SNAPSHOT_BASE + """
+    UPDATE_QUERY_SUMMARY_SNAPSHOT_BASE
+    + """
 WHERE arv.mhr_number = :query_value1
 AND r.id = arv.registration_id
-""")
+"""
+)
 UPDATE_QUERY_SUMMARY_SNAPSHOT_BY_REG_ID = (
-    UPDATE_QUERY_SUMMARY_SNAPSHOT_BASE + """
+    UPDATE_QUERY_SUMMARY_SNAPSHOT_BASE
+    + """
 WHERE arv.registration_id = :query_value1
 AND r.id = arv.registration_id
 """

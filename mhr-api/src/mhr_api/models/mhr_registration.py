@@ -16,7 +16,8 @@
 
 from http import HTTPStatus
 
-from sqlalchemy.dialects.postgresql import ENUM as PG_ENUM, JSONB
+from sqlalchemy.dialects.postgresql import ENUM as PG_ENUM
+from sqlalchemy.dialects.postgresql import JSONB
 
 import mhr_api.models.registration_change_utils as change_utils
 import mhr_api.models.registration_json_utils as reg_json_utils
@@ -79,7 +80,7 @@ class MhrRegistration(db.Model):  # pylint: disable=too-many-instance-attributes
     pay_invoice_id = db.mapped_column("pay_invoice_id", db.Integer, nullable=True)
     pay_path = db.mapped_column("pay_path", db.String(256), nullable=True)
     user_id = db.mapped_column("user_id", db.String(1000), nullable=True)
-    summary_snapshot = db.mapped_column('summary_snapshot', JSONB)
+    summary_snapshot = db.mapped_column("summary_snapshot", JSONB)
 
     # parent keys
     draft_id = db.mapped_column("draft_id", db.Integer, db.ForeignKey("mhr_drafts.id"), nullable=False, index=True)
