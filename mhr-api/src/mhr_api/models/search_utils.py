@@ -148,7 +148,12 @@ SELECT mhr_number, status_type, registration_ts, city, serial_number, year_made,
        manufacturer_name, civic_address
   FROM mhr_search_serial_vw
  WHERE position(:query_value in serial_number) > 0
-  ORDER BY section_id 
+  ORDER BY 
+    CASE
+        WHEN serial_number = :query_value THEN 0
+        ELSE 1
+    END,
+    section_id
 """
 SEARCH_OWNER_BUS_QUERY = """
 SELECT mhr_number, status_type, registration_ts, city, serial_number, year_made, make, model, id,
