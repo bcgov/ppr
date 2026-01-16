@@ -1,11 +1,9 @@
 import { FilterTypes } from '@/enums'
 import { ReviewStatusTypes, ReviewRegTypes } from '@/composables/analystQueue/enums'
+import { enumToLabel } from '@/utils'
 
-const transformEnumToLabel = (enumValue: string): string => {
-  return enumValue
-    .split('_')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ')
+export const transformEnumToLabel = (enumValue?: string | null): string => {
+  return enumToLabel(enumValue)
 }
 
 export const queueTableColumns = [
