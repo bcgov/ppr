@@ -2,7 +2,8 @@
 import { h, resolveComponent, ref, computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAnalystQueueStore } from '@/store/analystQueue'
-import { queueTableColumns, transformEnumToLabel } from '@/composables/analystQueue'
+import { queueTableColumns } from '@/composables/analystQueue'
+import { enumToLabel } from '@/utils'
 
 const { setMhrInformation } = useStore()
 const { goToRoute } = useNavigation()
@@ -50,7 +51,7 @@ const renderStatusChip = (col) => ({ row }) => {
       class: 'size-full text-md text-center flex justify-center',
       variant: 'subtle',
       color
-    }, () => transformEnumToLabel(status))
+    }, () => enumToLabel(status))
   }
 
 const renderSortableHeader = (columnData) => ({ column }: any) => {

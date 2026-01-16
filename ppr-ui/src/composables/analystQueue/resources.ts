@@ -2,10 +2,6 @@ import { FilterTypes } from '@/enums'
 import { ReviewStatusTypes, ReviewRegTypes } from '@/composables/analystQueue/enums'
 import { enumToLabel } from '@/utils'
 
-export const transformEnumToLabel = (enumValue?: string | null): string => {
-  return enumToLabel(enumValue)
-}
-
 export const queueTableColumns = [
     { id: 'mhrNumber',
       header: 'Registration Number',
@@ -29,7 +25,7 @@ export const queueTableColumns = [
         type: FilterTypes.SELECT,
         placeholder: 'Status',
         options: Object.values(ReviewStatusTypes).map(status => ({
-            label: transformEnumToLabel(status),
+            label: enumToLabel(status),
             value: status
         })),
       },
@@ -47,7 +43,7 @@ export const queueTableColumns = [
         type: FilterTypes.SELECT,
         placeholder: 'Registration Type',
         options: Object.values(ReviewRegTypes).map(status => ({
-            label: transformEnumToLabel(status),
+            label: enumToLabel(status),
             value: status
         })),
       },
