@@ -125,6 +125,7 @@ def setup_test_data():
                 db.session,
                 os.path.join(os.getcwd(), ("test_data/postgres_data_files_ppr/" + filename)),
             )
+        execute_script(db.session, os.path.join(os.getcwd(), "test_data/postgres_create_last.sql"))
     except Exception as err:  # pylint: disable=broad-except # noqa F841;
         logger.error(f"setup_test_data failed: {str(err)}")
 

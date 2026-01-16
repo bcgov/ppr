@@ -97,7 +97,27 @@ select nextval('mhr_registration_id_seq') AS reg_id,
 QUERY_REG_ID_PKEY = """
 select nextval('mhr_registration_id_seq') AS reg_id
 """
-QUERY_ACCOUNT_REG_BASE = """
+UPDATE_QUERY_SUMMARY_SNAPSHOT_BASE = """
+UPDATE mhr_registrations r
+SET summary_snapshot = to_jsonb(arv)
+FROM mhr_account_reg_vw arv
+"""
+UPDATE_QUERY_SUMMARY_SNAPSHOT_BY_MHR_NUMBER = (
+    UPDATE_QUERY_SUMMARY_SNAPSHOT_BASE
+    + """
+WHERE arv.mhr_number = :query_value1
+AND r.id = arv.registration_id
+"""
+)
+UPDATE_QUERY_SUMMARY_SNAPSHOT_BY_REG_ID = (
+    UPDATE_QUERY_SUMMARY_SNAPSHOT_BASE
+    + """
+WHERE arv.registration_id = :query_value1
+AND r.id = arv.registration_id
+"""
+)
+
+QUERY_ACCOUNT_REG_BASE_LAST = """
 SELECT arv.mhr_number, status_type, registration_ts, submitting_name, client_reference_id, registration_type,
        owner_names,
        registering_name, document_id, document_registration_number, last_doc_type, note_status, note_expiry,
@@ -132,6 +152,58 @@ SELECT arv.mhr_number, status_type, registration_ts, submitting_name, client_ref
       manufacturer_name,
       civic_address
   FROM mhr_account_reg_vw arv
+"""
+
+QUERY_ACCOUNT_REG_BASE = """
+SELECT arv.mhr_number,
+       arv.status_type,
+       registration_ts,
+       summary_snapshot ->> 'submitting_name' AS submitting_name,
+       client_reference_id,
+       registration_type,
+       summary_snapshot ->> 'owner_names' AS owner_names,
+       summary_snapshot ->>  'registering_name' AS registering_name,
+       summary_snapshot ->> 'document_id' AS document_id,
+       summary_snapshot ->> 'document_registration_number' AS document_registration_number,
+       summary_snapshot ->> 'last_doc_type' AS last_doc_type,
+        summary_snapshot ->> 'note_status' AS note_status,
+       (summary_snapshot ->> 'note_expiry')::timestamp AS note_expiry,
+       summary_snapshot ->> 'cancel_doc_type' AS cancel_doc_type,
+        summary_snapshot ->> 'frozen_doc_type' AS frozen_doc_type,
+        arv.account_id,
+        summary_snapshot ->> 'document_type_desc' AS document_type_desc,
+        summary_snapshot ->> 'ppr_lien_type' AS ppr_lien_type,
+        summary_snapshot ->> 'document_type' AS document_type,
+       summary_snapshot ->> 'doc_storage_url' AS doc_storage_url,
+       (SELECT COUNT(mer.id)
+          FROM mhr_extra_registrations mer
+         WHERE mer.mhr_number = arv.mhr_number
+           AND mer.account_id = arv.account_id
+           AND (mer.removed_ind IS NOT NULL AND mer.removed_ind = 'Y')) AS removed_count,
+       (SELECT COUNT(mer.id)
+          FROM mhr_extra_registrations mer
+         WHERE mer.mhr_number = arv.mhr_number
+           AND mer.account_id = :query_value1
+           AND mer.account_id != arv.account_id
+           AND (mer.removed_ind IS NULL OR mer.removed_ind != 'Y')) AS extra_reg_count,
+       summary_snapshot ->> 'location_type' AS location_type,
+        summary_snapshot ->> 'affirm_by' AS affirm_by,
+        COALESCE((summary_snapshot ->> 'report_count'), '0') AS report_count,
+       CASE WHEN arv.account_id IN ('ppr_staff', 'helpdesk')
+            THEN (SELECT u.account_id
+                   FROM users u
+                  WHERE arv.user_id = u.username
+                 ORDER BY u.id DESC
+                 FETCH FIRST 1 ROWS ONLY)
+            ELSE NULL END staff_account_id,
+       CASE WHEN arv.account_id != '0'
+            THEN (SELECT d.draft_number
+                   FROM mhr_drafts d
+                  WHERE arv.draft_id = d.id)
+            ELSE NULL END draft_number,
+      summary_snapshot ->> 'manufacturer_name' AS manufacturer_name,
+      summary_snapshot ->> 'civic_address' AS civic_address
+FROM mhr_registrations arv
 """
 
 QUERY_ACCOUNT_ADD_REG_MHR = (
@@ -210,17 +282,17 @@ WHERE arv.mhr_number IN
 )
 REG_ORDER_BY_DATE = " ORDER BY arv.registration_ts DESC"
 REG_ORDER_BY_MHR_NUMBER = " ORDER BY arv.mhr_number"
-REG_ORDER_BY_REG_TYPE = " ORDER BY arv.document_type"
+REG_ORDER_BY_REG_TYPE = " ORDER BY arv.summary_snapshot ->> 'document_type'"
 REG_ORDER_BY_STATUS = " ORDER BY arv.status_type"
-REG_ORDER_BY_SUBMITTING_NAME = " ORDER BY arv.submitting_name"
+REG_ORDER_BY_SUBMITTING_NAME = " ORDER BY arv.summary_snapshot ->> 'submitting_name'"
 REG_ORDER_BY_CLIENT_REF = " ORDER BY arv.client_reference_id"
-REG_ORDER_BY_USERNAME = " ORDER BY arv.registering_name"
-REG_ORDER_BY_OWNER_NAME = " ORDER BY arv.owner_names"
+REG_ORDER_BY_USERNAME = " ORDER BY arv.summary_snapshot ->> 'registering_name'"
+REG_ORDER_BY_OWNER_NAME = " ORDER BY arv.summary_snapshot ->> 'owner_names'"
 REG_ORDER_BY_EXPIRY_DAYS = " ORDER BY arv.mhr_number"
-REG_ORDER_BY_DOCUMENT_ID = " ORDER BY arv.document_id"
-REG_ORDER_BY_MANUFACTURER_NAME = " ORDER BY arv.manufacturer_name"
-REG_ORDER_BY_CIVIC_ADDRESS = " ORDER BY arv.civic_address"
-REG_FILTER_REG_TYPE = " AND arv.document_type = '?'"
+REG_ORDER_BY_DOCUMENT_ID = " ORDER BY arv.summary_snapshot ->> 'document_id'"
+REG_ORDER_BY_MANUFACTURER_NAME = " ORDER BY arv.summary_snapshot ->> 'manufacturer_name'"
+REG_ORDER_BY_CIVIC_ADDRESS = " ORDER BY arv.summary_snapshot ->> 'civic_address'"
+REG_FILTER_REG_TYPE = " AND arv.summary_snapshot ->> 'document_type' = '?'"
 REG_FILTER_REG_TYPE_COLLAPSE = """
  AND arv.mhr_number IN (SELECT DISTINCT r2.mhr_number
                           FROM mhr_registrations r2, mhr_documents d2
@@ -237,12 +309,12 @@ REG_FILTER_STATUS_COLLAPSE = """
                            AND r2.registration_type IN ('MHREG', 'MHREG_CONVERSION')
                            AND r2.status_type = '?')
 """
-REG_FILTER_SUBMITTING_NAME = " AND position('?' in arv.submitting_name) > 0"
+REG_FILTER_SUBMITTING_NAME = " AND position('?' in arv.summary_snapshot ->> 'submitting_name') > 0"
 REG_FILTER_SUBMITTING_NAME_COLLAPSE = """
  AND arv.mhr_number IN (SELECT DISTINCT arv2.mhr_number
-                          FROM mhr_account_reg_vw arv2
+                          FROM mhr_registrations arv2
                          WHERE arv.mhr_number = arv2.mhr_number
-                           AND position('?' in arv2.submitting_name) > 0)
+                           AND position('?' in arv2.summary_snapshot ->> 'submitting_name') > 0)
 """
 REG_FILTER_CLIENT_REF = " AND position('?' in UPPER(arv.client_reference_id)) > 0"
 REG_FILTER_CLIENT_REF_COLLAPSE = """
@@ -251,7 +323,7 @@ REG_FILTER_CLIENT_REF_COLLAPSE = """
                          WHERE arv.mhr_number = r2.mhr_number
                            AND position('?' in UPPER(r2.client_reference_id)) > 0)
 """
-REG_FILTER_USERNAME = " AND position('?' in arv.registering_name) > 0"
+REG_FILTER_USERNAME = " AND position('?' in arv.summary_snapshot ->> 'registering_name') > 0"
 REG_FILTER_USERNAME_COLLAPSE = """
  AND arv.mhr_number IN (SELECT r2.mhr_number
                         FROM mhr_registrations r2, users u
@@ -269,7 +341,7 @@ REG_FILTER_DATE_COLLAPSE = """
                          WHERE arv.mhr_number = r2.mhr_number
                            AND r2.registration_ts BETWEEN :query_start AND :query_end)
 """
-REG_FILTER_DOCUMENT_ID = " AND position('?' in arv.document_id) > 0"
+REG_FILTER_DOCUMENT_ID = " AND position('?' in arv.summary_snapshot ->> 'document_id') > 0"
 REG_FILTER_DOCUMENT_ID_COLLAPSE = """
  AND arv.mhr_number IN (SELECT DISTINCT r2.mhr_number
                           FROM mhr_registrations r2, mhr_documents d2
@@ -277,12 +349,12 @@ REG_FILTER_DOCUMENT_ID_COLLAPSE = """
                            AND r2.id = d2.registration_id
                            AND position('?' in d2.document_id) > 0)
 """
-REG_FILTER_MANUFACTURER_NAME = " AND position('?' in arv.manufacturer_name) > 0"
+REG_FILTER_MANUFACTURER_NAME = " AND position('?' in arv.summary_snapshot ->> 'manufacturer_name') > 0"
 REG_FILTER_MANUFACTURER_NAME_COLLAPSE = """
  AND arv.mhr_number IN (SELECT DISTINCT arv2.mhr_number
-                          FROM mhr_account_reg_vw arv2
+                          FROM mhr_registrations arv2
                          WHERE arv.mhr_number = arv2.mhr_number
-                           AND position('?' in arv2.manufacturer_name) > 0)
+                           AND position('?' in arv2.summary_snapshot ->> 'manufacturer_name') > 0)
 """
 ACCOUNT_SORT_DESCENDING = " DESC"
 ACCOUNT_SORT_ASCENDING = " ASC"

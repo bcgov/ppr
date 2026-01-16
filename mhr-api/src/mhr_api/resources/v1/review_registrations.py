@@ -159,6 +159,7 @@ def approve_registration(review_id: int, review_reg: MhrReviewRegistration):
     current_owners = reg_utils.get_active_owners(current_reg)
     update_registration_status(review_reg, current_reg)
     new_reg: MhrRegistration = staff_review_utils.create_change_registration(draft, current_reg, review_reg)
+    MhrRegistration.update_summary_snapshot_by_mhr_number(new_reg.mhr_number)
     queue_transfer_report(review_id, draft, current_reg, new_reg, current_owners)
     update_draft(draft)
 

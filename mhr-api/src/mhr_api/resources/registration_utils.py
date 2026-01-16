@@ -190,6 +190,7 @@ def pay_and_save_registration(  # pylint: disable=too-many-arguments,too-many-po
         registration.pay_invoice_id = int(invoice_id)
         registration.pay_path = pay_ref["receipt"]
         registration.save()
+        MhrRegistration.update_summary_snapshot_by_mhr_number(draft.mhr_number)
         return registration
     except Exception as db_exception:  # noqa: B902; handle all db related errors.
         logger.error(SAVE_ERROR_MESSAGE.format(account_id, "registration", str(db_exception)))
@@ -235,6 +236,7 @@ def pay_and_save_transfer(req: request, current_reg: MhrRegistration, request_js
             current_reg.save_transfer(request_json, registration.id)
         elif MhrRegistration.is_exre_transfer(current_reg, request_json):
             current_reg.save_transfer(request_json, registration.id)
+        MhrRegistration.update_summary_snapshot_by_mhr_number(current_reg.mhr_number)
         return registration
     except Exception as db_exception:  # noqa: B902; handle all db related errors.
         logger.error(SAVE_ERROR_MESSAGE.format(account_id, "registration", str(db_exception)))
@@ -274,6 +276,7 @@ def pay_and_save_exemption(  # pylint: disable=too-many-arguments,too-many-posit
         registration.pay_path = pay_ref["receipt"]
         registration.save()
         current_reg.save_exemption(registration.id)
+        MhrRegistration.update_summary_snapshot_by_mhr_number(current_reg.mhr_number)
         return registration
     except Exception as db_exception:  # noqa: B902; handle all db related errors.
         logger.error(SAVE_ERROR_MESSAGE.format(account_id, "registration", str(db_exception)))
@@ -331,6 +334,7 @@ def pay_and_save_permit(  # pylint: disable=too-many-arguments,too-many-position
         registration.save()
         if current_reg.id and current_reg.id > 0 and current_reg.locations:
             change_utils.save_permit(current_reg, request_json, registration.id)
+        MhrRegistration.update_summary_snapshot_by_mhr_number(current_reg.mhr_number)
         return registration
     except Exception as db_exception:  # noqa: B902; handle all db related errors.
         logger.error(SAVE_ERROR_MESSAGE.format(account_id, "registration", str(db_exception)))
@@ -365,6 +369,7 @@ def pay_and_save_note(  # pylint: disable=too-many-arguments,too-many-positional
         registration.save()
         if request_json.get("cancelDocumentId") and request_json["note"].get("documentType") == MhrDocumentTypes.NCAN:
             save_cancel_note(current_reg, request_json, registration.id)
+        MhrRegistration.update_summary_snapshot_by_mhr_number(current_reg.mhr_number)
         return registration
     except Exception as db_exception:  # noqa: B902; handle all db related errors.
         logger.error(SAVE_ERROR_MESSAGE.format(account_id, "registration", str(db_exception)))
@@ -425,6 +430,7 @@ def pay_and_save_admin(  # pylint: disable=too-many-arguments,too-many-positiona
             save_admin(current_reg, request_json, registration.id)
         elif request_json.get("documentType") == MhrDocumentTypes.CANCEL_PERMIT and current_reg:
             change_utils.save_permit(current_reg, request_json, registration.id)
+        MhrRegistration.update_summary_snapshot_by_mhr_number(current_reg.mhr_number)
         return registration
     except Exception as db_exception:  # noqa: B902; handle all db related errors.
         logger.error(SAVE_ERROR_MESSAGE.format(account_id, "registration", str(db_exception)))

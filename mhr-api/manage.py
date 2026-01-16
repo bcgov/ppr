@@ -76,6 +76,7 @@ def create_test_data():
     sorted_names = sorted(filenames)
     for filename in sorted_names:
         execute_script(db.session, os.path.join(os.getcwd(), ("test_data/postgres_data_files_ppr/" + filename)))
+    execute_script(db.session, os.path.join(os.getcwd(), "test_data/postgres_create_last.sql"))
 
 
 if __name__ == "__main__":

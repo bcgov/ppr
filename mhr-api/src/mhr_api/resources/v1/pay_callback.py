@@ -365,6 +365,7 @@ def complete_registration(draft: MhrDraft, base_reg: MhrRegistration, request_js
         msg: str = None
         if new_reg:
             msg = PAY_REG_SUCCESS_MSG.format(reg_id=new_reg.id, mhr_num=new_reg.mhr_number)
+            MhrRegistration.update_summary_snapshot_by_mhr_number(new_reg.mhr_number)
         cc_payment_utils.track_event("10", draft.user_id, HTTPStatus.OK, msg)
         return update_draft(draft)
     except Exception as default_err:  # noqa: B902; return nicer default error
