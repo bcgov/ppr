@@ -23,7 +23,7 @@ from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.models import SearchRequest, SearchResult
 from mhr_api.models import utils as model_utils
 from mhr_api.resources import utils as resource_utils
-from mhr_api.services.authz import authorized, is_staff_account
+from mhr_api.services.authz import authorized, is_qualifier_user, is_staff_account
 from mhr_api.utils.auth import jwt
 from mhr_api.utils.logging import logger
 
@@ -52,10 +52,13 @@ def post_searches():
 
         request_json = request.get_json(silent=True)
         wildcard_search: bool = request.args.get(WILDCARD_PARAM)
+        is_reg_staff = is_staff_account(account_id, jwt)
+        is_qs = is_qualifier_user(jwt)
         request_json = staff_update(request_json, is_staff_account(account_id, jwt), wildcard_search)
+        request_json = search_general_update(request_json, is_reg_staff, is_qs)
         # Validate request against the schema.
         valid_format, errors = schema_utils.validate(request_json, "searchQuery", "mhr")
-        extra_validation_msg = validate_search(request_json, is_staff_account(account_id, jwt))
+        extra_validation_msg = validate_search(request_json, is_reg_staff)
         if not valid_format or extra_validation_msg != "":
             return resource_utils.validation_error_response(errors, VAL_ERROR, extra_validation_msg)
         # Perform any extra data validation such as start and end dates here
@@ -135,6 +138,14 @@ def staff_update(request_json: dict, reg_staff: bool, wildcard_search: bool) -> 
         name = request_json["criteria"].get("ownerName")
         if name and not name.get("first"):
             request_json["criteria"]["ownerName"]["first"] = ""
+    return request_json
+
+
+def search_general_update(request_json: dict, reg_staff: bool, qs_group: bool) -> dict:
+    """Conditionally add search parameter to request."""
+    if not qs_group and not reg_staff:
+        return request_json
+    request_json["prioritizeExactMatch"] = True
     return request_json
 
 
