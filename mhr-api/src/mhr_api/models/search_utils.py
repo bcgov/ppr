@@ -200,7 +200,9 @@ def search_by_serial_number(request_json):
     serial_num: str = request_json["criteria"]["value"]
     logger.info(f"search_by_serial_number search value={serial_num}.")
     try:
-        query_text: str = SEARCH_SERIAL_QUERY_BASE if not request_json.get("wildcardSearch") else SEARCH_SERIAL_WILD_QUERY_BASE
+        query_text: str = (
+            SEARCH_SERIAL_QUERY_BASE if not request_json.get("wildcardSearch") else SEARCH_SERIAL_WILD_QUERY_BASE
+        )
         if request_json.get("prioritizeExactMatch"):
             query_text += SEARCH_SERIAL_PRIORITIZE_EXACT_MATCH_ORDER
         else:
