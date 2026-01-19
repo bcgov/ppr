@@ -356,18 +356,19 @@ TEST_MHR_NUMBER_DATA = [
     ('900', '000900'),
     ('00900', '000900')
 ]
-# testdata pattern is ({search_value}, {count}, {mhr_num1}, {result_val1}, {mhr_num2}, {result_val2})
+# testdata pattern is ({search_value}, {count}, {mhr_num1}, {result_val1}, {mhr_num2}, {result_val2}, {wildcard})
 TEST_SERIAL_NUMBER_DATA = [
-    ('999999', 0, None, None, None, None),
-    ('S60009493', 2, '000903', 'S60009493', '00904', '9493'),
-    ('003000ZA002773B', 1, '000903', '003000ZA002773B', None, None),
-    ('PHH310OR1812828CRCM', 1, '000903', 'PHH310OR1812828CRCM', None, None),
-    ('0310282AB', 1, '000904', '0310282AB', None, None),
-    ('681323', 1, '000903', '681323', None, None),
-    ('681324', 1, '000905', '681324', None, None),
-    ('A4820717A', 1, '000904', 'A4820717A', '000905', 'A4820717B'),
-    ('D1644', 2, '000901', 'D1644', '000902', '03A001644'),
-    ('WIN24440204003A', 1, '000902', 'WIN24440204003A', '000902', 'WIN24440204003B')
+    ('999999', 0, None, None, None, None, False),
+    ('S60009493', 2, '000903', 'S60009493', '00904', '9493', False),
+    ('003000ZA002773B', 1, '000903', '003000ZA002773B', None, None, False),
+    ('PHH310OR1812828CRCM', 1, '000903', 'PHH310OR1812828CRCM', None, None, False),
+    ('0310282AB', 1, '000904', '0310282AB', None, None, False),
+    ('681323', 1, '000903', '681323', None, None, False),
+    ('681324', 1, '000905', '681324', None, None, False),
+    ('A4820717A', 1, '000904', 'A4820717A', '000905', 'A4820717B', False),
+    ('D1644', 2, '000901', 'D1644', '000902', '03A001644', False),
+    ('WIN24440204003A', 1, '000902', 'WIN24440204003A', '000902', 'WIN24440204003B', False),
+    ('9987', 2, '000907', '9987', '000906', '998765', True)
 ]
 
 # testdata pattern is ({last_name}, {first_name}, count)
@@ -554,11 +555,13 @@ def test_search_mhr_number(session, mhr_number, expected_number):
     assert result['results'][0]['mhrNumber'] == expected_number
 
 
-@pytest.mark.parametrize('search_value,count,mhr1,result1,mhr2,result2', TEST_SERIAL_NUMBER_DATA)
-def test_search_serial(session, search_value, count, mhr1, result1, mhr2, result2):
+@pytest.mark.parametrize('search_value,count,mhr1,result1,mhr2,result2,wildcard', TEST_SERIAL_NUMBER_DATA)
+def test_search_serial(session, search_value, count, mhr1, result1, mhr2, result2, wildcard):
     """Assert that a valid search returns the expected serial number search result."""
     test_data = copy.deepcopy(SERIAL_NUMBER_JSON)
     test_data['criteria']['value'] = search_value
+    if wildcard:
+        test_data['wildcardSearch'] = True
 
     query: SearchRequest = SearchRequest.create_from_json(test_data, 'PS12345', 'UNIT_TEST')
     query.search()
@@ -584,6 +587,11 @@ def test_search_serial(session, search_value, count, mhr1, result1, mhr2, result
                     match_count += 1
                     assert match['serialNumber'].find(result2) != -1
         assert match_count > 0
+
+        if wildcard:
+            assert len(result['results']) > 1
+            assert result['results'][0]['serialNumber'] == search_value
+            assert result['results'][-1]['serialNumber'] != search_value
 
 
 @pytest.mark.parametrize('last_name,first_name,count', TEST_OWNER_IND_DATA)

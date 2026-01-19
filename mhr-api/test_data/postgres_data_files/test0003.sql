@@ -109,7 +109,7 @@ INSERT INTO mhr_descriptions(id, status_type, registration_id, csa_number, csa_s
 ;
 INSERT INTO mhr_sections(id, registration_id, status_type, compressed_key, serial_number, length_feet, length_inches,
                                width_feet, width_inches, change_registration_id)
-    VALUES(200000016, 200000008, 'ACTIVE', mhr_serial_compressed_key('998765'), '998765', 60, 10, 14, 11,
+    VALUES(200000016, 200000008, 'ACTIVE', mhr_serial_compressed_key('9987'), '9987', 60, 10, 14, 11,
            200000008)
 ;
 INSERT INTO mhr_documents(id, document_type, registration_id, document_id, document_registration_number, attention_reference, 
