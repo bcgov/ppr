@@ -275,6 +275,13 @@ def is_all_staff_account(account_id: str) -> bool:
     return account_id is not None and account_id in (STAFF_ROLE, ASSETS_HELP)
 
 
+def is_qualified_supplier(jwt: JwtManager) -> bool:
+    """Return True if the user is the qualified supplier."""
+    if jwt and get_group(jwt) in [DEALERSHIP_GROUP, MANUFACTURER_GROUP, QUALIFIED_USER_GROUP]:
+        return True
+    return False
+
+
 def get_group(jwt: JwtManager) -> str:  # pylint: disable=too-many-return-statements
     """Obtain the user group/role by inspecting the web token."""
     if jwt.validate_roles([STAFF_ROLE]):

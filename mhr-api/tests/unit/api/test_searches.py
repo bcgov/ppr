@@ -23,7 +23,7 @@ from http import HTTPStatus
 import pytest
 from flask import current_app
 
-from mhr_api.resources.v1.searches import validate_search, staff_update, VAL_ERROR_FIRST_MISSING
+from mhr_api.resources.v1.searches import validate_search, staff_update, search_general_update, VAL_ERROR_FIRST_MISSING
 from mhr_api.models.utils import format_ts, now_ts_offset
 from mhr_api.services.authz import COLIN_ROLE, MHR_ROLE, STAFF_ROLE
 from mhr_api.utils.logging import logger
@@ -149,6 +149,13 @@ TEST_STAFF_UPDATE_DATA = [
     (None, False, None, False)
 ]
 
+# testdata pattern is ({staff}, {qs_user}, {exact_match})
+TEST_GENERAL_UPDATE_DATA = [
+    (False, False, False),
+    (True, False, True),
+    (False, True, True),
+    (True, True, True),  # non-existing scenario but should go through
+]
 # testdata pattern is ({first_name}, {staff}, {error_msg})
 TEST_EXTRA_VALIDATION_DATA = [
     ('J', True, ''),
@@ -245,6 +252,20 @@ def test_staff_update(session, client, jwt, first_name, staff, change_value, wil
         assert result.get('wildcardSearch')
     else:
         assert not result.get('wildcardSearch')
+
+
+@pytest.mark.parametrize('staff,qs_user,exact_match', TEST_GENERAL_UPDATE_DATA)
+def test_search_general_update(session, client, jwt, staff, qs_user, exact_match):
+    """Assert that the conditional search update to prioritize exact match works as expected."""
+    json_data = copy.deepcopy(ORG_NAME_JSON)
+
+    result = search_general_update(json_data, staff, qs_user)
+
+    assert result
+    if exact_match:
+        assert result.get('prioritizeExactMatch')
+    else:
+        assert not result.get('prioritizeExactMatch')
 
 
 @pytest.mark.parametrize('first_name,staff,err_msg', TEST_EXTRA_VALIDATION_DATA)
