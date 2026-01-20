@@ -275,9 +275,9 @@ def is_all_staff_account(account_id: str) -> bool:
     return account_id is not None and account_id in (STAFF_ROLE, ASSETS_HELP)
 
 
-def is_qualifier_user(jwt: JwtManager) -> bool:
-    """Return True if the user is in the qualifier user group."""
-    if jwt and get_group(jwt) == QUALIFIED_USER_GROUP:
+def is_qualified_supplier(jwt: JwtManager) -> bool:
+    """Return True if the user is the qualified supplier."""
+    if jwt and get_group(jwt) in [DEALERSHIP_GROUP, MANUFACTURER_GROUP, QUALIFIED_USER_GROUP]:
         return True
     return False
 

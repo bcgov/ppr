@@ -23,7 +23,7 @@ from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.models import SearchRequest, SearchResult
 from mhr_api.models import utils as model_utils
 from mhr_api.resources import utils as resource_utils
-from mhr_api.services.authz import authorized, is_qualifier_user, is_staff_account
+from mhr_api.services.authz import authorized, is_qualified_supplier, is_staff_account
 from mhr_api.utils.auth import jwt
 from mhr_api.utils.logging import logger
 
@@ -53,7 +53,7 @@ def post_searches():
         request_json = request.get_json(silent=True)
         wildcard_search: bool = request.args.get(WILDCARD_PARAM)
         is_reg_staff = is_staff_account(account_id, jwt)
-        is_qs = is_qualifier_user(jwt)
+        is_qs = is_qualified_supplier(jwt)
         request_json = staff_update(request_json, is_staff_account(account_id, jwt), wildcard_search)
         request_json = search_general_update(request_json, is_reg_staff, is_qs)
         # Validate request against the schema.
