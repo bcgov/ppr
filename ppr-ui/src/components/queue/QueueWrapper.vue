@@ -3,7 +3,7 @@ import { h, resolveComponent, ref, computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAnalystQueueStore } from '@/store/analystQueue'
 import { queueTableColumns } from '@/composables/analystQueue'
-import { FilterTypes } from '@/enums'
+import { enumToLabel } from '@/utils'
 
 const { setMhrInformation } = useStore()
 const { goToRoute } = useNavigation()
@@ -38,19 +38,20 @@ const filterTable = (columnId, filterValue) => {
 }
 
 const renderStatusChip = (col) => ({ row }) => {
+    const status = row.getValue('statusType') as string
     const color = {
       APPROVED: 'success' as const,
       DECLINED: 'error' as const,
       PAY_CANCELLED: 'neutral' as const,
       NEW: 'warning' as const
-    }[row.getValue('statusType') as string]
+    }[status]
 
     return h(UBadge, {
       as: 'div',
       class: 'size-full text-md text-center flex justify-center',
       variant: 'subtle',
       color
-    }, () => row.getValue('statusType'))
+    }, () => enumToLabel(status))
   }
 
 const renderSortableHeader = (columnData) => ({ column }: any) => {

@@ -221,11 +221,12 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { useStore } from '@/store/store'
-import { formatExpiryDate, pacificDate } from '@/utils'
+import { enumToLabel, formatExpiryDate, pacificDate } from '@/utils'
 import type { RegistrationTypeIF } from '@/interfaces'
 import { MhApiStatusTypes, MhUIStatusTypes, RouteNames } from '@/enums'
 import { useMhrCorrections, useMhrInformation, useNavigation, useTransportPermits } from '@/composables'
 import { storeToRefs } from 'pinia'
+import { useAnalystQueueStore } from '@/store/analystQueue'
 import { MhrCorrectionClient, MhrCorrectionStaff, MhrPublicAmendment } from '@/resources'
 import MhrStatusCorrection from '@/components/mhrRegistration/MhrStatusCorrection.vue'
 import { InfoChip, UpdatedBadge } from '@/components/common'
@@ -256,6 +257,8 @@ export default defineComponent({
       getMhrOriginalTransportPermitRegStatus,
       isMhrReRegistration
     } = storeToRefs(useStore())
+
+    const { queueTransfer } = storeToRefs(useAnalystQueueStore())
     const { isRouteName } = useNavigation()
     const { isFrozenMhr, isCancelledMhr } = useMhrInformation()
     const { initMhrCorrection, isMhrChangesEnabled, isMhrCorrection } = useMhrCorrections()
@@ -287,13 +290,18 @@ export default defineComponent({
         return 'No Expiry'
       }),
       statusType: computed((): string => {
-        const regStatus = getMhrInformation.value.statusType
+        // On the analyst queue transfer page, reflect the current review status.
+        if (isRouteName(RouteNames.MHR_QUEUE_TRANSFER)) {
+          return enumToLabel(queueTransfer.value?.status)
+        }
+
+        const regStatus = getMhrInformation.value?.statusType || ''
 
         if (localState.showRestoredStatusBadge) return MhUIStatusTypes.ACTIVE
 
-        return isFrozenMhr.value || regStatus === MhApiStatusTypes.DRAFT
-          ? MhUIStatusTypes.ACTIVE
-          : regStatus[0] + regStatus.toLowerCase().slice(1).replace(/_/g, ' ')
+        if (isFrozenMhr.value || regStatus === MhApiStatusTypes.DRAFT) return MhUIStatusTypes.ACTIVE
+
+        return enumToLabel(regStatus)
       }),
       header: computed((): string => {
         const numberType = getRegistrationNumber.value ? 'Base' : 'Manufactured Home'

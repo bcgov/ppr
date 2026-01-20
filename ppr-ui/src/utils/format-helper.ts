@@ -50,6 +50,14 @@ export function toTitleCase (value: string): string {
 }
 
 /**
+ * Formats enum-like strings (eg, "IN_REVIEW") into a human-friendly label ("In Review").
+ */
+export function enumToLabel (value?: string | null): string {
+  const normalized = String(value || '').replace(/_/g, ' ').trim()
+  return normalized ? multipleWordsToTitleCase(normalized, false) : ''
+}
+
+/**
  * Formats a string of multiple words to title case for display.
  * @param value the string of multiple words to format
  * @param excludeWords whether to exclude certain prepositions and conjunctions
