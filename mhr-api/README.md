@@ -4,8 +4,8 @@ BC Registries MHR API
 
 ## Background
 
-
 ## Technology Stack Used
+
 * Python, Flask, GCP Cloud Storage
 * Postgres -  SQLAlchemy, psycopg2-binary
 
@@ -15,16 +15,18 @@ BC Registries MHR API
 
 ## Documnentation
 
-GitHub Pages (https://guides.github.com/features/pages/) are a neat way to document you application/project.
+GitHub Pages (<https://guides.github.com/features/pages/>) are a neat way to document you application/project.
 
 ## Security
 
 ## Files in this repository
 
 ## Environment Variables
+
 Copy '.env.sample' to '.env' and replace the values
 
 ### Development Setup
+
 Run `poetry install`
 
 Run `poetry shell`
@@ -34,31 +36,36 @@ See the src/database README for the database instance set up.
 To load/reload unit test data run python manage.py create_test_data
 
 ### Bump version
+
 Run `poetry version (patch, minor, major, prepatch, preminor, premajor, prerelease)`
 
 ### Running the db migration
+
 If modifying the database definition run `poetry run flask db migrate -m "xxx"`
-Note: PPR API and MHR API share the same database so the migration scripts need to be synchronized. 
+Note: PPR API and MHR API share the same database so the migration scripts need to be synchronized.
 Run `poetry run flask db upgrade`
 Run `poetry run flask db downgrade`
 
 ### Running the Doc-API
+
 Run `poetry run flask run`
 
 ### Running Linting
+
 Run `poetry run isort . --check`
 Run `poetry run black . --check`
 Run `poetry run pylint src`
 Run `poetry run flake8 src`
 
 ### Running Unit Tests
+
 - For all tests run `poetry run pytest -v -s`
-- For an individual file run `poetry run pytest -v -s ./tests/unit/api/filename.py`
-- For an individual test case run `poetry run pytest -v -s ./tests/unit/api/filename.py::test-case-name`
+* For an individual file run `poetry run pytest -v -s ./tests/unit/api/filename.py`
+* For an individual test case run `poetry run pytest -v -s ./tests/unit/api/filename.py::test-case-name`
 
 ## Deployment
 
-See https://github.com/bcgov/bcregistry-sre/blob/main/.github/workflows/doc-api-cd-gcp.yaml
+See <https://github.com/bcgov/bcregistry-sre/blob/main/.github/workflows/doc-api-cd-gcp.yaml>
 
 ## Getting Help or Reporting an Issue
 
@@ -86,3 +93,4 @@ By participating in this project you agree to abide by its terms.
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
+    
