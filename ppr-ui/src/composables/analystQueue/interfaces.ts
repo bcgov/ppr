@@ -33,6 +33,7 @@ export interface QueueReviewStepIF {
     createDateTime: string
     staffNote: string
     statusType: ReviewStatusTypes
+    declinedReasonType?: ReviewDecisionTypes
     username: string
 }
 

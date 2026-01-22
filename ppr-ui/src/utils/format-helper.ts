@@ -50,10 +50,13 @@ export function toTitleCase (value: string): string {
 }
 
 /**
- * Formats enum-like strings (eg, "IN_REVIEW") into a human-friendly label ("In Review").
+ * Formats enum-like values (eg, "IN_REVIEW") into a human-friendly label ("In Review").
+ *
+ * Accepts `unknown` so callers can pass TypeScript enums directly (string enums are not
+ * assignable to `string`), while still producing predictable output.
  */
-export function enumToLabel (value?: string | null): string {
-  const normalized = String(value || '').replace(/_/g, ' ').trim()
+export function enumToLabel (value?: unknown): string {
+  const normalized = String(value ?? '').replace(/_/g, ' ').trim()
   return normalized ? multipleWordsToTitleCase(normalized, false) : ''
 }
 

@@ -2,11 +2,12 @@ import type {
   DateRangeFilterIF,
   QueueDetailIF,
   QueueSummaryIF,
-  QueueReviewUpdatePayloadIF
+  QueueReviewUpdatePayloadIF,
+  QueueReviewStepIF
 } from "@/composables/analystQueue/interfaces"
 import { queueTableColumns, ReviewStatusTypes } from "@/composables"
-import { getReviews } from "@/utils/mhr-api-helper"
-import { computed, ref, watch } from 'vue'
+import { getQueuedTransfer, getReviews } from "@/utils/mhr-api-helper"
+import { computed, ref } from 'vue'
 
 
 export const useAnalystQueueStore = defineStore('mhr/queue', () => {
@@ -18,9 +19,17 @@ export const useAnalystQueueStore = defineStore('mhr/queue', () => {
   // Review
   const queueTransfer = ref<QueueDetailIF>(null)
   const reviewId = ref<string>(null)
+
+  const queueTransferStatus = computed(() => {
+    return queueTransfer.value?.status ?? (queueTransfer.value as any)?.statusType
+  })
   
   // Review Decision State
   const reviewDecision = ref<QueueReviewUpdatePayloadIF>({})
+
+  const shouldShowReviewDecision = computed(() => {
+    return [ReviewStatusTypes.IN_REVIEW, ReviewStatusTypes.APPROVED, ReviewStatusTypes.DECLINED].includes(queueTransferStatus.value)
+  })
   
   // Error state for validation messages
   const validationErrors = ref({
@@ -28,12 +37,45 @@ export const useAnalystQueueStore = defineStore('mhr/queue', () => {
     general: ''
   })
   
-  const isValidate = ref(false)
-
  const getQueueTabledata = async () => {
   isQueueTableDataLoading.value = true
   queueTableData.value = await getReviews()
   isQueueTableDataLoading.value = false
+ }
+
+ /**
+  * Hydrates the local `reviewDecision` draft from the current `queueTransfer` record.
+  *
+  * - Uses the latest item in `queueTransfer.reviewSteps` when present, otherwise falls back
+  *   to the top-level `queueTransferStatus`.
+  * - Copies the notes fields so the decision component can show/edit them.
+  * - Only sets `declinedReasonType` when the latest decision is `DECLINED` to avoid carrying
+  *   stale decline reasons when a review is `NEW`, `IN_REVIEW`, or `APPROVED`.
+  */
+ const hydrateReviewDecisionFromQueueTransfer = () => {
+  const steps = (queueTransfer.value?.reviewSteps || []) as QueueReviewStepIF[]
+  const latestStep = steps.length ? steps[steps.length - 1] : undefined
+  const statusType = latestStep?.statusType || queueTransferStatus.value
+
+  const nextDecision: QueueReviewUpdatePayloadIF = {
+    statusType,
+    staffNote: latestStep?.staffNote || '',
+    clientNote: latestStep?.clientNote || '',
+    changeNote: latestStep?.changeNote || '',
+  }
+
+  if (statusType === ReviewStatusTypes.DECLINED && latestStep?.declinedReasonType) {
+    nextDecision.declinedReasonType = latestStep.declinedReasonType
+  }
+
+  reviewDecision.value = nextDecision
+ }
+
+ const loadQueueTransfer = async (id: string) => {
+  reviewId.value = id
+  queueTransfer.value = await getQueuedTransfer(id)
+  hydrateReviewDecisionFromQueueTransfer()
+  return queueTransfer.value
  }
 
  const filteredQueueReviews = computed(() => {
@@ -94,8 +136,14 @@ const showClearFilterButton = computed(() => {
   })
 })
 
-const isReviewable = computed(() => {
-  return [ReviewStatusTypes.NEW, ReviewStatusTypes.IN_REVIEW].includes(queueTransfer.value?.status)
+// Allow assigning/unassigning while NEW or IN_REVIEW.
+const isAssignable = computed(() => {
+  return [ReviewStatusTypes.NEW, ReviewStatusTypes.IN_REVIEW].includes(queueTransferStatus.value)
+})
+
+// Allow review decision + submit only while IN_REVIEW.
+const isInReview = computed(() => {
+  return queueTransferStatus.value === ReviewStatusTypes.IN_REVIEW
 })
 
 
@@ -145,7 +193,7 @@ const assignees = computed(() => {
         return true
       } else {
         validationErrors.value.declineReasonType = 'Please select a reason for declining'
-        return true
+        return false
       }
     }
     
@@ -160,13 +208,15 @@ const assignees = computed(() => {
     filteredQueueReviews,
     columnFilters,
     showClearFilterButton,
-    isReviewable,
+    isAssignable,
+    isInReview,
+    shouldShowReviewDecision,
     queueTransfer,
     reviewId,
     reviewDecision,
     validationErrors,
-    isValidate,
     getQueueTabledata,
+    loadQueueTransfer,
     toggleColumnsVisibility,
     validateReviewDecision
   }
