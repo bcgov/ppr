@@ -1,32 +1,60 @@
 <script setup lang="ts">
 import { ReviewDecisionTypes, ReviewStatusTypes } from '@/composables';
-import { computed } from 'vue';
+import { enumToLabel } from '@/utils';
+import { computed, watch } from 'vue';
 import { useAnalystQueueStore } from '@/store/analystQueue';
 import { storeToRefs } from 'pinia';
 
-const { reviewDecision, validationErrors, isValidate } = storeToRefs(useAnalystQueueStore())
-const { validateReviewDecision } = useAnalystQueueStore()
+const { reviewDecision, validationErrors, isInReview } = storeToRefs(useAnalystQueueStore())
 
-const showHiddenComponent = computed(() => 
-  reviewDecision.value.statusType === ReviewStatusTypes.DECLINED 
-  || reviewDecision.value.statusType === ReviewStatusTypes.APPROVED
-)
 
+const isReadonly = computed(() => !isInReview.value)
+const isApproved = computed(() => reviewDecision.value.statusType === ReviewStatusTypes.APPROVED)
+const isDeclined = computed(() => reviewDecision.value.statusType === ReviewStatusTypes.DECLINED)
+
+/// Options for the decline reason select dropdown
+const declineReasonItems = computed(() => {
+
+  return Object.values(ReviewDecisionTypes).map((value) => ({
+    text: enumToLabel(value),
+    value
+  }))
+})
+
+/// Label for the declined reason to show in readonly mode
+const declinedReasonLabel = computed(() => {
+  return reviewDecision.value?.declinedReasonType
+    ? enumToLabel(reviewDecision.value.declinedReasonType)
+    : ''
+})
+
+/// Update the review decision status type when a button is clicked
 const updateReviewDecision = (statusType: ReviewStatusTypes) => {
-  reviewDecision.value = { statusType: statusType }
+  if (!isInReview.value) return
+  reviewDecision.value = { ...reviewDecision.value, statusType }
 }
 
-watch([isValidate, reviewDecision], () => {
-  if (isValidate.value) {
-    validateReviewDecision()
+// Clear the decline-reason error as soon as a reason is selected.
+watch(() => reviewDecision.value?.declinedReasonType, (val) => {
+  if (val) validationErrors.value.declineReasonType = ''
+})
+
+// Clear the general error once a decision is picked.
+watch(() => reviewDecision.value?.statusType, (val) => {
+  if (val) validationErrors.value.general = ''
+
+  // If decision is not Declined, ensure decline reason is cleared.
+  if (val && val !== ReviewStatusTypes.DECLINED && reviewDecision.value?.declinedReasonType) {
+    const { declinedReasonType, ...rest } = reviewDecision.value as any
+    reviewDecision.value = rest
   }
-}, { deep: true })
+})
 
 </script>
 
 <template>
-     <div 
-      :class="validationErrors.general || validationErrors.declineReasonType ? 'border-error-left' : ''">
+    <div
+  :class="validationErrors.general || validationErrors.declineReasonType ? 'border-error-left' : ''">
          <div :class="'font-bold text-gray-900 bg-bcGovColor-gray2 px-[1.4rem] py-[12px] rounded-t'">
             <div class="flex justify-between">
                 <div class="flex">
@@ -42,7 +70,7 @@ watch([isValidate, reviewDecision], () => {
          </div>
          
          <div class="col-span-9">
-             <div class="flex gap-[10px]">
+           <div v-if="!isReadonly" class="flex gap-[10px]">
                  <UButton
                    size="md"
                    color="error"
@@ -70,23 +98,28 @@ watch([isValidate, reviewDecision], () => {
                    Approve
                  </UButton>
              </div>
+
+             <div v-else class="text-gray-900">
+               <div class="font-bold">{{ enumToLabel(reviewDecision.statusType) }}</div>
+             </div>
              
              <div v-if="validationErrors.general" class="text-red-600 text-sm mt-2">
                {{ validationErrors.general }}
              </div>
            
-           <div v-if="showHiddenComponent" class="mt-4 rounded animate-slide-down">
+           <div v-if="isDeclined" class="mt-4 rounded animate-slide-down">
              
              <div class="space-y-4">
-               <div v-if="reviewDecision.statusType === ReviewStatusTypes.DECLINED">
-                 <USelect
-                   v-model="reviewDecision.declineReasonType"
-                   :items="Object.values(ReviewDecisionTypes)"
-                   item-title="text"
-                   item-value="value"
-                   placeholder="Reason for decline (will be included in client email)"
-                   size="lg"
-                   :ui="{ 
+              <template v-if="!isReadonly">
+                <div v-if="!isApproved" class="space-y-4">
+                  <USelect
+                    v-model="reviewDecision.declinedReasonType"
+                    :items="declineReasonItems"
+                    label-key="text"
+                    value-key="value"
+                    placeholder="Reason for decline (will be included in client email)"
+                    size="lg"
+                    :ui="{ 
                         base: [
                             'border-b-[1px] w-full h-[60px] focus:shadow-none data-[state=open]:shadow-none',
                             'data-[state=open]:border-blue-350',
@@ -95,21 +128,21 @@ watch([isValidate, reviewDecision], () => {
                         item: 'hover:text-blue-500 hover:bg-bcGovGray-100', 
                         placeholder: validationErrors.declineReasonType ? 'text-error' : 'text-bcGovGray-700'
                     }"
-                 />
-                 <div v-if="validationErrors.declineReasonType" class="text-red-600 text-sm mt-1">
-                   {{ validationErrors.declineReasonType }}
-                 </div>
-               </div>
-               
-               <div>
-                 <UTextarea
-                   v-model="reviewDecision.staffNote"
-                   placeholder="Staff note (internal)"
-                   size="lg"
-                   :rows="4"
-                   :maxlength="2000"
-                   class="w-full"
-                   :ui="{ 
+                  />
+                  <div v-if="validationErrors.declineReasonType" class="text-red-600 text-sm mt-1">
+                    {{ validationErrors.declineReasonType }}
+                  </div>
+                </div>
+
+                <div v-if="!isApproved">
+                  <UTextarea
+                    v-model="reviewDecision.staffNote"
+                    placeholder="Staff note (internal)"
+                    size="lg"
+                    :rows="4"
+                    :maxlength="2000"
+                    class="w-full"
+                    :ui="{ 
                         slots:{
                             base: [
                               'border-bcGovGray-700 focus:shadow-none',
@@ -118,11 +151,26 @@ watch([isValidate, reviewDecision], () => {
                         },
                         base: 'border-b-1 placeholder:text-bcGovGray-700'
                     }"
-                 />
-                 <div class="text-xs text-gray-500 mt-1 text-end">
-                   {{ reviewDecision.staffNote?.length }} / 2000
+                  />
+                  <div class="text-xs text-gray-500 mt-1 text-end">
+                    {{ reviewDecision.staffNote?.length }} / 2000
                  </div>
                </div>
+              </template>
+
+              <template v-else>
+                <div v-if="isDeclined" class="space-y-4">
+                  <div>
+                    <div class="text-sm text-gray-500">Reason for decline</div>
+                    <div class="font-bold">{{ declinedReasonLabel || '—' }}</div>
+                  </div>
+
+                  <div>
+                    <div class="text-sm text-gray-500">Staff note (internal)</div>
+                    <div class="whitespace-pre-wrap">{{ reviewDecision.staffNote || '—' }}</div>
+                  </div>
+                </div>
+              </template>
              </div>
            </div>
          </div>

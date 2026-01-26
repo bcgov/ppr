@@ -2,9 +2,9 @@
 import { HomeOwners } from '@/pages'
 import { getFeatureFlag, parseSubmittingPartyToAccountInfo } from '@/utils'
 import AccountInfo from '@/components/common/AccountInfo.vue'
-import { getQueuedTransfer } from '@/utils/mhr-api-helper'
 import type { MhrTransferApiIF } from '@/interfaces'
 import AttentionReview from '@/components/common/AttentionReview.vue'
+import ReviewDecision from '@/components/queue/ReviewDecision.vue'
 
 const { goToDash } = useNavigation()
 const { initDraftMhrInformation } = useMhrInformation()
@@ -12,23 +12,29 @@ const {
   getMhrInformation, isRoleStaffReg, getMhrTransferCurrentHomeOwnerGroups, getMhrAccountSubmittingParty
 } = storeToRefs(useStore())
 
-const { queueTransfer, reviewId, isReviewable } = storeToRefs(useAnalystQueueStore())
+const analystQueueStore = useAnalystQueueStore()
+const { queueTransfer, reviewId, shouldShowReviewDecision } = storeToRefs(analystQueueStore)
 
 const isLoading = ref(false)
 
 onMounted(async () => {
   isLoading.value = true
   // On Mounted: route to dashboard if the feature flag is false, no reviewId, or not staff
-  if (!getFeatureFlag('enable-analyst-queue') || !getMhrInformation.value?.reviewId || !isRoleStaffReg.value) {
-   goToDash()
+  try {
+    // Route to dashboard if the feature flag is false, no reviewId, or not staff.
+    if (!getFeatureFlag('enable-analyst-queue') || !getMhrInformation.value?.reviewId || !isRoleStaffReg.value) {
+      goToDash()
+      return
+    }
+
+    reviewId.value = getMhrInformation.value.reviewId
+
+    // Fetch the queued transfer details and initialize the draft.
+    queueTransfer.value = await analystQueueStore.loadQueueTransfer(reviewId.value)
+    await initDraftMhrInformation(queueTransfer.value as unknown as MhrTransferApiIF)
+  } finally {
+    isLoading.value = false
   }
-  reviewId.value = getMhrInformation.value?.reviewId
-
-  // Fetch the queued transfer details and initialize the draft
-  queueTransfer.value = await getQueuedTransfer(getMhrInformation.value?.reviewId)
-  await initDraftMhrInformation(queueTransfer.value as MhrTransferApiIF)
-  isLoading.value = false
-
 })
 </script>
 <template>
@@ -94,8 +100,8 @@ onMounted(async () => {
           <UploadedDocuments :document-list="queueTransfer?.documents" />
         </section>
 
-        <section v-if="isReviewable" class="my-9">
-          <QueueReviewDecision />
+        <section v-if="shouldShowReviewDecision" class="my-9">
+          <ReviewDecision />
         </section>
       </main>
     </div>

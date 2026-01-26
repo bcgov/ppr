@@ -2,8 +2,9 @@
 import { ReviewStatusTypes } from '@/composables';
 import { useAnalystQueueStore } from '@/store/analystQueue';
 import { updateQueuedTransfer } from '@/utils/mhr-api-helper'
+import type { QueueReviewUpdatePayloadIF } from '@/composables/analystQueue/interfaces'
 
-const { queueTransfer, reviewId, isReviewable, isValidate, reviewDecision } = storeToRefs(useAnalystQueueStore())
+const { queueTransfer, reviewId, isAssignable, isInReview, reviewDecision, validationErrors } = storeToRefs(useAnalystQueueStore())
 const { validateReviewDecision } = useAnalystQueueStore()
 
 const isAssigned = computed(() => {
@@ -28,18 +29,38 @@ const updateAssignee = async () => {
 }
 
 const submitReview = async () => {
-  isValidate.value = true
-  if(!validateReviewDecision()) {
+  if (!validateReviewDecision()) {
     return
   }
-  isValidate.value = false
-  // await updateQueuedTransfer(
-  //   reviewId.value, 
-  //   reviewDecision.value
-  // )
-  
-  // Navigate to dashboard after successful submission
-  emit('go-to-dash')
+
+  const statusType = reviewDecision.value?.statusType
+  const payload: QueueReviewUpdatePayloadIF = { statusType }
+
+  // Per workflow: only include staff note + decline reason when Declined.
+  if (statusType === ReviewStatusTypes.DECLINED) {
+    payload.staffNote = reviewDecision.value?.staffNote
+    payload.declinedReasonType = reviewDecision.value?.declinedReasonType
+  }
+
+  try {
+    const updated = await updateQueuedTransfer(
+      reviewId.value,
+      payload
+    )
+
+    if (!updated) {
+      validationErrors.value.general = 'Unable to submit review decision.'
+      return
+    }
+
+    // Keep local state in sync so UI updates immediately.
+    queueTransfer.value = updated
+
+    // Navigate to dashboard after successful submission.
+    emit('go-to-dash')
+  } catch (e: any) {
+    validationErrors.value.general = e?.message || 'Unable to submit review decision.'
+  }
 }
 
 const emit = defineEmits(['go-to-dash']) 
@@ -56,7 +77,7 @@ const emit = defineEmits(['go-to-dash'])
                 <strong>Assignee:</strong> {{ assigneeName }}
                </div>
               <UButton
-                v-if="isReviewable"
+                v-if="isAssignable"
                 variant="outline"
                 color="primary"
                 size="md"
@@ -69,7 +90,7 @@ const emit = defineEmits(['go-to-dash'])
         </div>
         <div class="lg:col-span-3 flex justify-end space-x-3">
           <UButton
-            v-if="isReviewable"
+            v-if="isInReview"
             color="primary"
             size="md"
             class="rounded-sm"
