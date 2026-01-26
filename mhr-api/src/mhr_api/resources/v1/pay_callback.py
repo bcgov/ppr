@@ -319,16 +319,26 @@ def complete_registration(draft: MhrDraft, base_reg: MhrRegistration, request_js
         logger.info(f"Completing registration for pay status={status} reg_type={reg_type}")
         if request_json.get("statusCode") in (StatusCodes.CANCELLED.value, StatusCodes.DELETED.value):
             cc_payment_utils.track_event("05", draft.user_id, HTTPStatus.OK, PAY_CANCELLED_MSG)
-            if str(draft.draft_number).startswith(DRAFT_STAFF_REVIEW_PREFIX):
+            if draft.registration_type in [
+                MhrRegistrationTypes.TRANS_WILL,
+                MhrRegistrationTypes.TRANS_ADMIN,
+                MhrRegistrationTypes.TRANS_AFFIDAVIT,
+            ]:
                 review_reg: MhrReviewRegistration = MhrReviewRegistration.find_by_invoice_id(int(invoice_id))
                 if review_reg:
                     logger.info(f"Cancelled/deleted payment updating staff review reg id={review_reg.id}")
                     review_reg.save_update(STAFF_REVIEW_PAY_CANCELLED, "System Pay API Callback")
             return update_draft(draft)
-        if str(draft.draft_number).startswith(DRAFT_STAFF_REVIEW_PREFIX):
+        if draft.registration_type in [
+            MhrRegistrationTypes.TRANS_WILL,
+            MhrRegistrationTypes.TRANS_ADMIN,
+            MhrRegistrationTypes.TRANS_AFFIDAVIT,
+        ]:
             review_reg: MhrReviewRegistration = MhrReviewRegistration.find_by_invoice_id(int(invoice_id))
             if review_reg:
                 logger.info(f"Completed payment updating staff review reg id={review_reg.id}")
+                draft.draft_number = DRAFT_STAFF_REVIEW_PREFIX + draft.draft_number[1:]
+                draft.save()
                 review_reg.save_update(STAFF_REVIEW_PAY_NEW, "System Pay API Callback")
                 return {}, HTTPStatus.OK
         new_reg: MhrRegistration = None
