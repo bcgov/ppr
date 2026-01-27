@@ -64,6 +64,16 @@ class Report:  # pylint: disable=too-few-public-methods
             return self.get_registration_cover_pdf()
         if self._report_key == ReportTypes.MHR_REGISTRATION_STAFF:
             return self.get_registration_staff_pdf()
+
+        add_cover = self._report_key == ReportTypes.MHR_TRANSFER
+
+        # Generate the cover page for specific non-staff reports
+        if add_cover:
+            logger.debug("Generate cover letter for specific non-staff report")
+            cover_content, cover_status, cover_headers = self.get_registration_cover_pdf()
+            if cover_status != HTTPStatus.OK:
+                return cover_content, cover_status, cover_headers
+
         logger.debug("Account {0} report type {1} setting up report data.".format(self._account_id, self._report_key))
         data = self._setup_report_data()
         url = current_app.config.get("REPORT_SVC_URL") + SINGLE_URI
@@ -85,6 +95,14 @@ class Report:  # pylint: disable=too-few-public-methods
                 "Account {0} response status: {1} error: {2}.".format(self._account_id, response.status_code, content)
             )
             return jsonify(message=content), response.status_code, None
+
+        # Merge the cover letter and registration reports if applicable.
+        if add_cover:
+            files = []
+            files.append(cover_content)
+            files.append(response.content)
+            return Report.batch_merge(files)
+
         return response.content, response.status_code, {"Content-Type": "application/pdf"}
 
     def get_search_pdf(self):
@@ -136,27 +154,33 @@ class Report:  # pylint: disable=too-few-public-methods
     def get_registration_cover_pdf(self):
         """Render a registration cover letter report."""
         logger.debug(f"Account {self._account_id} setting up reg cover report data.")
-        self._report_key = ReportTypes.MHR_REGISTRATION_COVER
-        data = self._setup_report_data()
-        url = current_app.config.get("REPORT_SVC_URL") + SINGLE_URI
-        meta_data = report_utils.get_report_meta_data(self._report_key)
-        files = report_utils.get_report_files(data, self._report_key, False)
-        headers = Report.get_headers()
-        response_cover = requests.post(url=url, headers=headers, data=meta_data, files=files, timeout=1800.0)
-        logger.debug(
-            "Account {0} report type {1} response status: {2}.".format(
-                self._account_id, self._report_key, response_cover.status_code
-            )
-        )
-        if response_cover.status_code != HTTPStatus.OK:
-            content = ResourceErrorCodes.REPORT_ERR + ": " + response_cover.content.decode("ascii")
-            logger.error(
-                "Account {0} response status: {1} error: {2}.".format(
-                    self._account_id, response_cover.status_code, content
+        original_report_key = self._report_key
+        original_report_data = copy.deepcopy(self._report_data)
+        try:
+            self._report_key = ReportTypes.MHR_REGISTRATION_COVER
+            data = self._setup_report_data()
+            url = current_app.config.get("REPORT_SVC_URL") + SINGLE_URI
+            meta_data = report_utils.get_report_meta_data(self._report_key)
+            files = report_utils.get_report_files(data, self._report_key, False)
+            headers = Report.get_headers()
+            response_cover = requests.post(url=url, headers=headers, data=meta_data, files=files, timeout=1800.0)
+            logger.debug(
+                "Account {0} report type {1} response status: {2}.".format(
+                    self._account_id, self._report_key, response_cover.status_code
                 )
             )
-            return jsonify(message=content), response_cover.status_code, None
-        return response_cover.content, response_cover.status_code, {"Content-Type": "application/pdf"}
+            if response_cover.status_code != HTTPStatus.OK:
+                content = ResourceErrorCodes.REPORT_ERR + ": " + response_cover.content.decode("ascii")
+                logger.error(
+                    "Account {0} response status: {1} error: {2}.".format(
+                        self._account_id, response_cover.status_code, content
+                    )
+                )
+                return jsonify(message=content), response_cover.status_code, None
+            return response_cover.content, response_cover.status_code, {"Content-Type": "application/pdf"}
+        finally:
+            self._report_key = original_report_key
+            self._report_data = original_report_data
 
     def get_registration_staff_pdf(self):
         """Render a staff MH registration report with cover letter."""
