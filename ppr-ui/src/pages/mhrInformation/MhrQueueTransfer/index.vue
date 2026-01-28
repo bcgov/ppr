@@ -3,6 +3,7 @@ import { HomeOwners } from '@/pages'
 import { getFeatureFlag, parseSubmittingPartyToAccountInfo } from '@/utils'
 import AccountInfo from '@/components/common/AccountInfo.vue'
 import type { MhrTransferApiIF } from '@/interfaces'
+import AuditHistory from '@/components/queue/AuditHistory.vue'
 import AttentionReview from '@/components/common/AttentionReview.vue'
 import ReviewDecision from '@/components/queue/ReviewDecision.vue'
 
@@ -13,7 +14,7 @@ const {
 } = storeToRefs(useStore())
 
 const analystQueueStore = useAnalystQueueStore()
-const { queueTransfer, reviewId, shouldShowReviewDecision } = storeToRefs(analystQueueStore)
+const { queueTransfer, reviewId, isInReview } = storeToRefs(analystQueueStore)
 
 const isLoading = ref(false)
 
@@ -50,6 +51,13 @@ onMounted(async () => {
     <div v-else class="grid grid-cols-1 lg:grid-cols-12">
       <!-- Main column -->
       <main class="lg:col-span-9 pr-2 footer-view-container">
+        <section class="my-9">
+          <AuditHistory
+            :steps="queueTransfer?.reviewSteps || []"
+            :count="queueTransfer?.reviewSteps?.length || 0"
+          />
+        </section>
+
         <!-- Review Header -->
         <header class="review-header mt-10 rounded-top">
           <v-icon
@@ -100,7 +108,7 @@ onMounted(async () => {
           <UploadedDocuments :document-list="queueTransfer?.documents" />
         </section>
 
-        <section v-if="shouldShowReviewDecision" class="my-9">
+        <section v-if="isInReview" class="my-9">
           <ReviewDecision />
         </section>
       </main>
