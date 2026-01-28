@@ -26,10 +26,6 @@ export const useAnalystQueueStore = defineStore('mhr/queue', () => {
   
   // Review Decision State
   const reviewDecision = ref<QueueReviewUpdatePayloadIF>({})
-
-  const shouldShowReviewDecision = computed(() => {
-    return [ReviewStatusTypes.IN_REVIEW, ReviewStatusTypes.APPROVED, ReviewStatusTypes.DECLINED].includes(queueTransferStatus.value)
-  })
   
   // Error state for validation messages
   const validationErrors = ref({
@@ -210,7 +206,6 @@ const assignees = computed(() => {
     showClearFilterButton,
     isAssignable,
     isInReview,
-    shouldShowReviewDecision,
     queueTransfer,
     reviewId,
     reviewDecision,

@@ -13,7 +13,7 @@ const {
 } = storeToRefs(useStore())
 
 const analystQueueStore = useAnalystQueueStore()
-const { queueTransfer, reviewId, shouldShowReviewDecision } = storeToRefs(analystQueueStore)
+const { queueTransfer, reviewId, isInReview } = storeToRefs(analystQueueStore)
 
 const isLoading = ref(false)
 
@@ -100,7 +100,7 @@ onMounted(async () => {
           <UploadedDocuments :document-list="queueTransfer?.documents" />
         </section>
 
-        <section v-if="shouldShowReviewDecision" class="my-9">
+        <section v-if="isInReview" class="my-9">
           <ReviewDecision />
         </section>
       </main>
