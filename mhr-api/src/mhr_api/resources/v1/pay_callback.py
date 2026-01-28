@@ -309,7 +309,9 @@ def queue_transfer(draft: MhrDraft, current_reg: MhrRegistration, new_reg: MhrRe
     queue_report(new_reg, draft, response_json, ReportTypes.MHR_TRANSFER, current_json)
 
 
-def complete_registration(draft: MhrDraft, base_reg: MhrRegistration, request_json: dict, invoice_id: str):
+def complete_registration(
+    draft: MhrDraft, base_reg: MhrRegistration, request_json: dict, invoice_id: str
+):  # pylint: disable=too-many-statements
     """Process the registration based on the payload status and draft registration type."""
     invoice_id: str = draft.user_id
     try:
