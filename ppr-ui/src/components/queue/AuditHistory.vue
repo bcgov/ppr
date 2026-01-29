@@ -73,7 +73,7 @@ const toggleExpanded = () => {
       <button
         type="button"
         class="text-blue-600 hover:text-blue-700 flex items-center gap-1"
-        :aria-expanded=isExpanded
+        :aria-expanded="isExpanded"
         aria-controls="audit-history-content"
         @click="toggleExpanded"
       >
