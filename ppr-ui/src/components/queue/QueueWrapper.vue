@@ -3,7 +3,7 @@ import { h, resolveComponent, ref, computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAnalystQueueStore } from '@/store/analystQueue'
 import { queueTableColumns } from '@/composables/analystQueue'
-import { enumToLabel } from '@/utils'
+import { enumToLabel } from '@/utils/format-helper'
 
 const { setMhrInformation } = useStore()
 const { goToRoute } = useNavigation()

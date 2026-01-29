@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { enumToLabel } from '@/utils'
+import { enumToLabel } from '@/utils/format-helper'
 import { ReviewStatusTypes } from '@/composables/analystQueue/enums'
 import { pacificDate } from '@/utils'
 import type { QueueReviewStepIF } from '@/composables/analystQueue/interfaces'
@@ -73,13 +73,15 @@ const toggleExpanded = () => {
       <button
         type="button"
         class="text-blue-600 hover:text-blue-700 flex items-center gap-1"
+        :aria-expanded=isExpanded
+        aria-controls="audit-history-content"
         @click="toggleExpanded"
       >
         <span>{{ label }}</span>
         <UIcon :name="isExpanded ? 'i-mdi-chevron-up' : 'i-mdi-chevron-down'" class="w-5 h-5" />
       </button>
 
-      <div v-if="isExpanded" class="mt-4">
+      <div v-if="isExpanded" id="audit-history-content" class="mt-4">
           <div class="space-y-4">
             <div
               v-for="(step, index) in sortedSteps"
