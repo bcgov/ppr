@@ -143,10 +143,25 @@ SELECT mhr_number, status_type, registration_ts, city, serial_number, year_made,
  WHERE compressed_key = mhr_serial_compressed_key(:query_value)
 """
 SEARCH_SERIAL_WILD_QUERY_BASE = """
+WITH exact AS (
+    SELECT mhr_number, status_type, registration_ts, city, serial_number, year_made, make, model, id, owner_info,
+       manufacturer_name, civic_address, section_id
+    FROM mhr_search_serial_vw
+    WHERE compressed_key = mhr_serial_compressed_key(:query_value)
+),
+combined AS (
+    SELECT *
+    FROM exact
+UNION ALL
+    SELECT mhr_number, status_type, registration_ts, city, serial_number, year_made, make, model, id, owner_info,
+        manufacturer_name, civic_address, section_id
+    FROM mhr_search_serial_vw
+    WHERE position(:query_value in serial_number) > 0
+    AND NOT EXISTS (SELECT 1 FROM exact)
+)
 SELECT mhr_number, status_type, registration_ts, city, serial_number, year_made, make, model, id, owner_info,
        manufacturer_name, civic_address
-  FROM mhr_search_serial_vw
- WHERE position(:query_value in serial_number) > 0
+FROM combined
 """
 SEARCH_SERIAL_DEAULT_ORDER = """
 ORDER BY section_id

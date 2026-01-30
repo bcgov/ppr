@@ -357,20 +357,23 @@ TEST_MHR_NUMBER_DATA = [
     ('00900', '000900')
 ]
 # testdata pattern is
-# ({search_value}, {count}, {mhr_num1}, {result_val1}, {mhr_num2}, {result_val2}, {wildcard}, {exact_match})
+# ({search_value}, {count}, {mhr_num1}, {result_val1}, {mhr_num2}, {result_val2}, {wildcard}, {prioritize}, {exact_match_found})
 TEST_SERIAL_NUMBER_DATA = [
-    ('999999', 0, None, None, None, None, False, False),
-    ('S60009493', 2, '000903', 'S60009493', '00904', '9493', False, False),
-    ('003000ZA002773B', 1, '000903', '003000ZA002773B', None, None, False, False),
-    ('PHH310OR1812828CRCM', 1, '000903', 'PHH310OR1812828CRCM', None, None, False, False),
-    ('0310282AB', 1, '000904', '0310282AB', None, None, False, False),
-    ('681323', 1, '000903', '681323', None, None, False, False),
-    ('681324', 1, '000905', '681324', None, None, False, False),
-    ('A4820717A', 1, '000904', 'A4820717A', '000905', 'A4820717B', False, False),
-    ('D1644', 2, '000901', 'D1644', '000902', '03A001644', False, False),
-    ('WIN24440204003A', 1, '000902', 'WIN24440204003A', '000902', 'WIN24440204003B', False, False),
-    ('9987', 2, '000907', '9987', '000906', '998765', True, False),
-    ('9987', 2, '000907', '9987', '000906', '998765', True, True)
+    ('999999', 0, None, None, None, None, False, False, False),
+    ('S60009493', 2, '000903', 'S60009493', '00904', '9493', False, False, False),
+    ('003000ZA002773B', 1, '000903', '003000ZA002773B', None, None, False, False, False),
+    ('PHH310OR1812828CRCM', 1, '000903', 'PHH310OR1812828CRCM', None, None, False, False, False),
+    ('0310282AB', 1, '000904', '0310282AB', None, None, False, False, False),
+    ('681323', 1, '000903', '681323', None, None, False, False, False),
+    ('681324', 1, '000905', '681324', None, None, False, False, False),
+    ('A4820717A', 1, '000904', 'A4820717A', '000905', 'A4820717B', False, False, False),
+    ('D1644', 2, '000901', 'D1644', '000902', '03A001644', False, False, False),
+    ('WIN24440204003A', 1, '000902', 'WIN24440204003A', '000902', 'WIN24440204003B', False, False, False),
+    ('998', 2, '000907', '998765', '000906', 'M998765', True, False, False),
+    ('998', 2, '000907', '998765', '000906', 'M998765', True, True, False),
+    ('998', 0, None, None, None, None, False, False, False),
+    ('998765', 2, '000907', '998765', '000906', 'M998765', True, False, True),
+    ('998765', 2, '000907', '998765', '000906', 'M998765', True, True, True),
 ]
 
 # testdata pattern is ({last_name}, {first_name}, count)
@@ -557,14 +560,17 @@ def test_search_mhr_number(session, mhr_number, expected_number):
     assert result['results'][0]['mhrNumber'] == expected_number
 
 
-@pytest.mark.parametrize('search_value,count,mhr1,result1,mhr2,result2,wildcard,exact_match', TEST_SERIAL_NUMBER_DATA)
-def test_search_serial(session, search_value, count, mhr1, result1, mhr2, result2, wildcard, exact_match):
+@pytest.mark.parametrize(
+    'search_value,count,mhr1,result1,mhr2,result2,wildcard,prioritize,exact_match_found', TEST_SERIAL_NUMBER_DATA)
+def test_search_serial(
+    session, search_value, count, mhr1, result1, mhr2, result2, wildcard, prioritize, exact_match_found
+):
     """Assert that a valid search returns the expected serial number search result."""
     test_data = copy.deepcopy(SERIAL_NUMBER_JSON)
     test_data['criteria']['value'] = search_value
     if wildcard:
         test_data['wildcardSearch'] = True
-    if exact_match:
+    if prioritize:
         test_data['prioritizeExactMatch'] = True
 
     query: SearchRequest = SearchRequest.create_from_json(test_data, 'PS12345', 'UNIT_TEST')
@@ -593,13 +599,14 @@ def test_search_serial(session, search_value, count, mhr1, result1, mhr2, result
         assert match_count > 0
 
         if wildcard:
-            assert len(result['results']) > 1
-            if exact_match:
-                assert result['results'][0]['serialNumber'] == search_value
-                assert result['results'][-1]['serialNumber'] != search_value
-        elif exact_match:
-            assert len(result['results']) == 1
-            assert result['results'][0]['serialNumber'] == search_value
+            assert len(result['results']) == count
+            if exact_match_found:
+                if prioritize:
+                    assert result['results'][0]['serialNumber'] == search_value
+                    assert result['results'][-1]['serialNumber'] != search_value
+                else:
+                    assert result['results'][0]['serialNumber'] != search_value
+                    assert result['results'][-1]['serialNumber'] == search_value
 
 
 @pytest.mark.parametrize('last_name,first_name,count', TEST_OWNER_IND_DATA)

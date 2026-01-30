@@ -44,7 +44,7 @@ describe('Test result table with no results', () => {
     expect(datatable.length).toBe(0)
     const noResultsInfo = wrapper.findAll(noResultsDiv)
     expect(noResultsInfo.length).toBe(1)
-    expect(noResultsInfo.at(0).text()).toContain('Nil Result')
+    expect(noResultsInfo.at(0).text()).toContain('No Result')
     expect(noResultsInfo.at(0).text()).toContain('No registered liens or encumbrances')
     expect(wrapper.findAll(generateResult).length).toBe(1)
   })
