@@ -294,7 +294,7 @@
     >
       <v-col>
         <p class="no-results-title pt-10">
-          <b>Nil Result</b>
+          <b>No Result</b>
         </p>
         <p class="pt-2">
           No registered liens or encumbrances have been found on file that match EXACTLY to the

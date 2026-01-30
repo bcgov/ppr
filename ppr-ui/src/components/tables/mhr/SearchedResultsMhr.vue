@@ -459,7 +459,7 @@
     >
       <v-col cols="8">
         <p class="no-results-title ma-0 pt-10">
-          <b>Nil Result</b>
+          <b>No Result</b>
         </p>
         <p class="ma-0 pt-2">
           No registered homes can be found to match the
