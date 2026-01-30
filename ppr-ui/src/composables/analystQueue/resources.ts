@@ -1,6 +1,6 @@
 import { FilterTypes } from '@/enums'
 import { ReviewStatusTypes, ReviewRegTypes } from '@/composables/analystQueue/enums'
-import { enumToLabel } from '@/utils'
+import { enumToLabel } from '@/utils/format-helper'
 
 export const queueTableColumns = [
     { id: 'mhrNumber',
