@@ -4,9 +4,9 @@ export const parseAccountToSubmittingParty = (accountInfo: AccountInfoIF): Submi
   return {
     businessName: accountInfo.name,
     address: accountInfo.mailingAddress,
-    emailAddress: accountInfo.accountAdmin.email,
-    phoneNumber: accountInfo.accountAdmin.phone,
-    phoneExtension: accountInfo.accountAdmin.phoneExtension
+    emailAddress: accountInfo.accountAdmin?.email,
+    phoneNumber: accountInfo.accountAdmin?.phone,
+    phoneExtension: accountInfo.accountAdmin?.phoneExtension
   }
 }
 export const parseSubmittingPartyToAccountInfo = (party: PartyIF): AccountInfoIF => {

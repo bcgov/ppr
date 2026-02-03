@@ -25,23 +25,23 @@
               </thead>
 
               <!-- Table Body -->
-              <tbody v-if="registeringParty.length > 0">
-              <tr v-if="showEditParty">
-                <td
-                  colspan="5"
-                  class="pa-0"
-                >
-                  <v-expand-transition>
-                    <div class="edit-Party-container pa-0 col-12">
-                      <edit-party
-                        :is-registering-party="true"
-                        :is-edit-mode="true"
-                        @reset-event="resetData"
-                      />
-                    </div>
-                  </v-expand-transition>
-                </td>
-              </tr>
+              <tbody v-if="registeringParty.length > 0 && Object.keys(registeringParty[0]).length">
+                <tr v-if="showEditParty">
+                  <td
+                    colspan="5"
+                    class="pa-0"
+                  >
+                    <v-expand-transition>
+                      <div class="edit-Party-container pa-0 col-12">
+                        <edit-party
+                          :is-registering-party="true"
+                          :is-edit-mode="true"
+                          @reset-event="resetData"
+                        />
+                      </div>
+                    </v-expand-transition>
+                  </td>
+                </tr>
                 <tr
                   v-for="item in registeringParty"
                   v-else

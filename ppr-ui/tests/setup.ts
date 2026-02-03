@@ -11,18 +11,44 @@ config.global.stubs = {
   // Works for locally-registered or auto-imported components
   ConnectFeeWidget: {
     template: '<div data-testid="fee-widget-stub"></div>',
-  },
-
-  // If your project uses kebab-case in templates (Nuxt auto-imports)
-  'ConnectFeeWidget': {
-    template: '<div data-testid="fee-widget-stub"></div>',
-  },
+  }
 }
 
 // Mock useI18n globally
 vi.stubGlobal('useI18n', () => ({
   t: (k: string) => k,      // echo key
   locale: { value: 'en' }   // minimal shape if you read locale
+}))
+
+vi.mock('@/utils/auth-helper', () => ({
+  getRegisteringPartyFromAuth: vi.fn(() =>
+    Promise.resolve({})),
+  getStaffRegisteringParty: vi.fn(() =>
+    Promise.resolve({})),
+  getAccountInfoFromAuth: vi.fn().mockResolvedValue({
+    name: 'Test Business',
+    personName: {
+      first: '',
+      last: '',
+      middle: ''
+    },
+    id: '12345',
+    isBusinessAccount: false,
+    mailingAddress: {
+      street: '123 Main St',
+      city: 'Test City',
+      province: 'BC',
+      postalCode: 'V1V 1V1',
+      country: 'CA'
+    },
+    accountAdmin: {
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john@example.com',
+      phone: '250-123-4567',
+      phoneExtension: '123'
+    }
+  })
 }))
 
 // keycloak-js: return a no-op client that always "initializes"
@@ -32,6 +58,7 @@ vi.mock('keycloak-js', () => ({
     login: vi.fn(),
     logout: vi.fn(),
     updateToken: vi.fn().mockResolvedValue(true),
+    isTokenExpired: vi.fn().mockReturnValue(false),
     token: 'test-token',
     authenticated: true,
   })),

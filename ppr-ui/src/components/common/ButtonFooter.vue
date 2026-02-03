@@ -44,7 +44,7 @@
             </v-btn>
           </span>
           <span
-            v-if="buttonConfig.showSaveResume"
+            v-if="buttonConfig?.showSaveResume"
             class="pr-3"
           >
             <v-btn
@@ -57,7 +57,7 @@
             </v-btn>
           </span>
           <v-btn
-            v-if="buttonConfig.showSave"
+            v-if="buttonConfig?.showSave"
             id="reg-save-btn"
             variant="outlined"
             color="primary"
@@ -77,7 +77,7 @@
             class="float-right pl-6"
             @click="submitNext"
           >
-            {{ buttonConfig.nextText }}
+            {{ buttonConfig?.nextText }}
             <v-icon
               color="white"
               class="pt-1"
@@ -86,7 +86,7 @@
             </v-icon>
           </v-btn>
           <span
-            v-if="buttonConfig.showBack"
+            v-if="buttonConfig?.showBack"
             class="pr-3"
           >
             <v-btn

@@ -56,6 +56,7 @@ describe('RegisteringParty store undo test', () => {
     await store.setAddSecuredPartiesAndDebtors({
       registeringParty:
       {
+        partyId: '1',
         businessName: 'ABC REGISTERING COMPANY LTD.',
         address: {
           street: '1234 Fort St.',
@@ -107,7 +108,8 @@ describe('Test result table with error', () => {
 
   it('renders and displays correct elements for no results', async () => {
     expect(wrapper.findComponent(RegisteringParty).exists()).toBe(true)
-    expect(wrapper.vm.registeringParty.length).toBe(0)
+    expect(wrapper.vm.registeringParty.length).toBe(1)
+    expect(wrapper.vm.registeringParty).toStrictEqual([{}])
     expect(wrapper.find('.registering-table').exists()).toBe(true)
     const noResultsDisplay = wrapper.findAll('tr td')
     expect(noResultsDisplay.at(0).text()).toContain('We were unable to retrieve Registering Party')

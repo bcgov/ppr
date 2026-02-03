@@ -22,7 +22,7 @@ export default defineNuxtConfig({
   ],
 
   imports: {
-    dirs: ['store', 'composables', 'enums', 'interfaces', 'utils']
+    dirs: ['components', 'store', 'composables', 'enums', 'interfaces', 'utils']
   },
 
   app: {

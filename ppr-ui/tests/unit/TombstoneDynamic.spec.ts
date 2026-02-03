@@ -119,9 +119,9 @@ describe('TombstoneDynamic component - MHR', () => {
   })
 
   it('renders Tombstone component properly for Mhr', async () => {
-    const tombstoneDynamic = wrapper.findComponent(TombstoneDynamic)
+    const tombstoneDynamic = await wrapper.findComponent(TombstoneDynamic)
     await nextTick()
-    expect(wrapper.findComponent(TombstoneDynamic).exists()).toBe(true)
+    expect(tombstoneDynamic.exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain('Manufactured Home Registration Number ' +
@@ -134,9 +134,9 @@ describe('TombstoneDynamic component - MHR', () => {
 
   it('renders Tombstone component properly for Mhr Cancelled', async () => {
     await store.setMhrInformation({ ...mockedMhrInformation, statusType: 'CANCELLED' })
-    const tombstoneDynamic = wrapper.findComponent(TombstoneDynamic)
+    const tombstoneDynamic = await wrapper.findComponent(TombstoneDynamic)
     await nextTick()
-    expect(wrapper.findComponent(TombstoneDynamic).exists()).toBe(true)
+    expect(tombstoneDynamic.exists()).toBe(true)
     const header = wrapper.findAll(tombstoneHeader)
     expect(header.length).toBe(1)
     expect(header.at(0).text()).toContain('Manufactured Home Registration Number ' +
