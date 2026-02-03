@@ -37,7 +37,7 @@ describe('Mhr Registration', () => {
     await nextTick()
   })
 
-  it.only('renders and displays the Mhr Registration View', async () => {
+  it('renders and displays the Mhr Registration View', async () => {
     await store.setRegistrationType(MhrRegistrationType)
     await nextTick()
     expect(wrapper.findComponent(MhrRegistration).exists()).toBe(true)

@@ -25,7 +25,7 @@ vi.mock('@/utils/auth-helper', () => ({
     Promise.resolve({})),
   getStaffRegisteringParty: vi.fn(() =>
     Promise.resolve({})),
-  getAccountInfoFromAuth: vi.fn().mockResolvedValue({
+  getAccountInfoFromAuth: vi.fn(() =>Promise.resolve({
     name: 'Test Business',
     personName: {
       first: '',
@@ -48,7 +48,7 @@ vi.mock('@/utils/auth-helper', () => ({
       phone: '250-123-4567',
       phoneExtension: '123'
     }
-  })
+  }))
 }))
 
 // keycloak-js: return a no-op client that always "initializes"
