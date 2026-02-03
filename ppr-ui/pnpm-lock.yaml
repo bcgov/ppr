@@ -152,7 +152,7 @@ importers:
         version: 12.1.0(eslint-plugin-import-x@4.16.1(@typescript-eslint/utils@8.46.3(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
       '@nuxtjs/i18n':
         specifier: ^9.5.4
-        version: 9.5.6(@vue/compiler-dom@3.5.20)(eslint@9.39.1(jiti@2.6.1))(magicast@0.5.1)(rollup@4.52.5)(vue@3.5.20(typescript@5.9.3))
+        version: 9.5.6(@vue/compiler-dom@3.5.22)(eslint@9.39.1(jiti@2.6.1))(magicast@0.5.1)(rollup@4.52.5)(vue@3.5.20(typescript@5.9.3))
       '@originjs/vite-plugin-commonjs':
         specifier: ^1.0.3
         version: 1.0.3
@@ -174,15 +174,9 @@ importers:
       '@vitejs/plugin-vue':
         specifier: ^6.0.1
         version: 6.0.1(vite@7.1.12(@types/node@22.19.0)(jiti@2.6.1)(lightningcss@1.30.2)(sass-embedded@1.93.3)(sass@1.93.3)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))(vue@3.5.20(typescript@5.9.3))
-      '@vue/compiler-dom':
-        specifier: 3.5.20
-        version: 3.5.20
       '@vue/compiler-sfc':
         specifier: 3.5.20
         version: 3.5.20
-      '@vue/server-renderer':
-        specifier: 3.5.20
-        version: 3.5.20(vue@3.5.20(typescript@5.9.3))
       '@vue/test-utils':
         specifier: ^2.4.6
         version: 2.4.6
@@ -8664,12 +8658,12 @@ snapshots:
 
   '@intlify/shared@9.14.5': {}
 
-  '@intlify/unplugin-vue-i18n@6.0.8(@vue/compiler-dom@3.5.20)(eslint@9.39.1(jiti@2.6.1))(rollup@4.52.5)(typescript@5.9.3)(vue-i18n@10.0.8(vue@3.5.20(typescript@5.9.3)))(vue@3.5.20(typescript@5.9.3))':
+  '@intlify/unplugin-vue-i18n@6.0.8(@vue/compiler-dom@3.5.22)(eslint@9.39.1(jiti@2.6.1))(rollup@4.52.5)(typescript@5.9.3)(vue-i18n@10.0.8(vue@3.5.20(typescript@5.9.3)))(vue@3.5.20(typescript@5.9.3))':
     dependencies:
       '@eslint-community/eslint-utils': 4.9.0(eslint@9.39.1(jiti@2.6.1))
       '@intlify/bundle-utils': 10.0.1(vue-i18n@10.0.8(vue@3.5.20(typescript@5.9.3)))
       '@intlify/shared': 11.1.12
-      '@intlify/vue-i18n-extensions': 8.0.0(@intlify/shared@11.1.12)(@vue/compiler-dom@3.5.20)(vue-i18n@10.0.8(vue@3.5.20(typescript@5.9.3)))(vue@3.5.20(typescript@5.9.3))
+      '@intlify/vue-i18n-extensions': 8.0.0(@intlify/shared@11.1.12)(@vue/compiler-dom@3.5.22)(vue-i18n@10.0.8(vue@3.5.20(typescript@5.9.3)))(vue@3.5.20(typescript@5.9.3))
       '@rollup/pluginutils': 5.3.0(rollup@4.52.5)
       '@typescript-eslint/scope-manager': 8.46.3
       '@typescript-eslint/typescript-estree': 8.46.3(typescript@5.9.3)
@@ -8693,12 +8687,12 @@ snapshots:
 
   '@intlify/utils@0.13.0': {}
 
-  '@intlify/vue-i18n-extensions@8.0.0(@intlify/shared@11.1.12)(@vue/compiler-dom@3.5.20)(vue-i18n@10.0.8(vue@3.5.20(typescript@5.9.3)))(vue@3.5.20(typescript@5.9.3))':
+  '@intlify/vue-i18n-extensions@8.0.0(@intlify/shared@11.1.12)(@vue/compiler-dom@3.5.22)(vue-i18n@10.0.8(vue@3.5.20(typescript@5.9.3)))(vue@3.5.20(typescript@5.9.3))':
     dependencies:
       '@babel/parser': 7.28.5
     optionalDependencies:
       '@intlify/shared': 11.1.12
-      '@vue/compiler-dom': 3.5.20
+      '@vue/compiler-dom': 3.5.22
       vue: 3.5.20(typescript@5.9.3)
       vue-i18n: 10.0.8(vue@3.5.20(typescript@5.9.3))
 
@@ -9526,11 +9520,11 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  '@nuxtjs/i18n@9.5.6(@vue/compiler-dom@3.5.20)(eslint@9.39.1(jiti@2.6.1))(magicast@0.5.1)(rollup@4.52.5)(vue@3.5.20(typescript@5.9.3))':
+  '@nuxtjs/i18n@9.5.6(@vue/compiler-dom@3.5.22)(eslint@9.39.1(jiti@2.6.1))(magicast@0.5.1)(rollup@4.52.5)(vue@3.5.20(typescript@5.9.3))':
     dependencies:
       '@intlify/h3': 0.6.1
       '@intlify/shared': 10.0.8
-      '@intlify/unplugin-vue-i18n': 6.0.8(@vue/compiler-dom@3.5.20)(eslint@9.39.1(jiti@2.6.1))(rollup@4.52.5)(typescript@5.9.3)(vue-i18n@10.0.8(vue@3.5.20(typescript@5.9.3)))(vue@3.5.20(typescript@5.9.3))
+      '@intlify/unplugin-vue-i18n': 6.0.8(@vue/compiler-dom@3.5.22)(eslint@9.39.1(jiti@2.6.1))(rollup@4.52.5)(typescript@5.9.3)(vue-i18n@10.0.8(vue@3.5.20(typescript@5.9.3)))(vue@3.5.20(typescript@5.9.3))
       '@intlify/utils': 0.13.0
       '@miyaneee/rollup-plugin-json5': 1.2.0(rollup@4.52.5)
       '@nuxt/kit': 3.20.0(magicast@0.5.1)
