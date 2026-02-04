@@ -8,7 +8,7 @@
     "strictNullChecks": false,
     "jsx": "preserve",
     "importHelpers": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "experimentalDecorators": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
@@ -23,9 +23,8 @@
       "vuetify"
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"],
+      "~/*": ["./*"]
     },
     "lib": [
       "esnext",
@@ -38,12 +37,13 @@
     "src/**/*.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
-    "*.d.ts"
+    "*.d.ts",
+    "**/*.spec.ts",
+    "vitest.config.ts"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "**/*.spec.ts",
     "**/*.test.ts"
   ]
 }

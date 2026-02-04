@@ -3,11 +3,20 @@ import { QsInformation, UserAccess } from '@/pages'
 import { ButtonFooter, Stepper } from '@/components/common'
 import QsSelectAccess from '@/pages/userAccess/QsSelectAccess.vue'
 import { MhrSubTypes, RouteNames } from '@/enums'
-import { defaultFlagSet } from '@/utils'
 import { useStore } from '@/store/store'
 import { createComponent } from './utils'
 import { nextTick } from 'vue'
 import { createPinia, setActivePinia } from 'pinia'
+
+vi.mock('@/composables/userAccess/useUserAccess', () => ({
+  useUserAccess: () => ({
+    initUserAccess: vi.fn(),
+    setQsDefaultValidation: vi.fn(),
+    setQsInformationModel: vi.fn(),
+    getCurrentUser: { value: null },
+    hasQsApplicationData: { value: false }
+  })
+}))
 
 describe('UserAccess', () => {
   let wrapper, store, pinia

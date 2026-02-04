@@ -166,8 +166,12 @@ export default defineComponent({
 
 
     function filterDuplicateNames(items: Array<SearchResultI>): Array<SearchResultI> {
+      if (!items || items.length === 0) {
+        return []
+      }
+
       const seen = new Set<string>()
-      return items.filter(item => {
+      return items?.filter(item => {
         if (seen.has(item.name)) {
           return false // skip duplicates
         }

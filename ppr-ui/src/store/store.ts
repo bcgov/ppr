@@ -100,7 +100,6 @@ import type { CancelUnitNoteIF, UnitNoteIF } from '@/interfaces/unit-note-interf
 export const useStore = defineStore('assetsStore', () => {
   // State Model
   const state = ref({ ...stateModel })
-  const { isMhrCorrection } = useMhrCorrections()
 
   /** PPR Getters **/
 
@@ -593,7 +592,7 @@ export const useStore = defineStore('assetsStore', () => {
   const getMhrButtonFooterConfig = computed<ButtonConfigIF[]>(() => {
     return isMhrManufacturerRegistration.value
       ? MHRManufacturerButtonFooterConfig
-      : isMhrCorrection ? MHRCorrectionButtonFooterConfig : MHRButtonFooterConfig
+      : MHRButtonFooterConfig
   })
   const isBusySaving = computed<boolean>(() => {
     return false

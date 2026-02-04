@@ -197,6 +197,7 @@ export const mockedPayment1: PaymentIF = {
 }
 
 export const mockedRegisteringParty1: PartyIF = {
+  partyId: '1',
   businessName: 'ABC REGISTERING COMPANY LTD.',
   address: mockedAddress1
 }
@@ -468,7 +469,7 @@ export const mockedMhrInformationExempt: MhRegistrationSummaryIF = {
   ownerNames: 'MARY-ANNE BICKNELL',
   path: '/mhr/api/v1/registrations/150575',
   registrationDescription: 'MANUFACTURED HOME REGISTRATION',
-  statusType: MhApiStatusTypes.EXEMPT.toLocaleLowerCase(),
+  statusType: 'Exempt',
   submittingParty: 'ABC SUBMITTING COMPANY',
   username: 'BUSINESS REGISTRY TEST 1'
 }

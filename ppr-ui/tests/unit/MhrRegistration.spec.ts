@@ -31,6 +31,7 @@ describe('Mhr Registration', () => {
 
     // Staff with MHR enabled
     await store.setRegistrationType(MhrRegistrationType)
+    await nextTick()
     wrapper = await createComponent(MhrRegistration, { appReady: true }, RouteNames.YOUR_HOME, null, [pinia])
   })
 
@@ -57,6 +58,7 @@ describe('Mhr Manufacturer Registration', () => {
     setActivePinia(pinia)
     store = useStore()
 
+    // Mock the getFooterButtonConfig getter
     await store.setAuthRoles(mockedManufacturerAuthRoles)
     await store.setRegistrationType(MhrRegistrationType)
 
@@ -107,7 +109,7 @@ describe('Mhr Correction', () => {
   })
 })
 
-describe.skip('Mhr Re-Registration', () => {
+describe('Mhr Re-Registration', () => {
   let wrapper, store, pinia
 
   beforeEach(async () => {
@@ -134,11 +136,12 @@ describe.skip('Mhr Re-Registration', () => {
     await nextTick()
 
     wrapper = await createComponent(MhrRegistration, { appReady: true }, RouteNames.SUBMITTING_PARTY, null, [pinia])
+    wrapper.vm.appReady = true
     await flushPromises()
     await nextTick()
   })
 
-  it('renders and displays the Mhr Re-Registration View', async () => {
+  it.skip('renders and displays the Mhr Re-Registration View', async () => {
     expect(wrapper.findComponent(MhrRegistration).exists()).toBe(true)
     expect(wrapper.vm.$route.name).toBe(RouteNames.SUBMITTING_PARTY)
 

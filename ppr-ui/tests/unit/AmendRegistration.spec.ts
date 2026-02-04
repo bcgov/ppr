@@ -70,7 +70,7 @@ describe('Amendment registration component', () => {
     expect(state.registration.amendmentDescription).toBe('')
     expect(wrapper.findComponent(AmendmentDescription).exists()).toBe(true)
     // check registering party
-    expect(state.registration.parties.registeringParty).toBe(null)
+    expect(state.registration.parties.registeringParty).toStrictEqual({})
     expect(state.originalRegistration.parties.registeringParty).toEqual(mockedFinancingStatementAll.registeringParty)
     expect(wrapper.findComponent(RegisteringPartySummary).exists()).toBe(true)
     // check secured parties

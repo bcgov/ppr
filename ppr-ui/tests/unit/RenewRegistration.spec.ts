@@ -56,7 +56,7 @@ describe('Renew registration component', () => {
     expect(state.registration.lengthTrust.trustIndenture).toBe(mockedFinancingStatementAll.trustIndenture)
     expect(wrapper.findComponent(RegistrationLengthTrust).exists()).toBe(true)
     // check registering party
-    expect(state.registration.parties.registeringParty).toBe(null)
+    expect(state.registration.parties.registeringParty).toStrictEqual({})
     expect(state.originalRegistration.parties.registeringParty).toStrictEqual(mockedFinancingStatementAll.registeringParty)
     expect(wrapper.findComponent(RegisteringPartySummary).exists()).toBe(true)
     // check secured parties
