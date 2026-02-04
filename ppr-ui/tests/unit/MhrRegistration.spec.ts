@@ -33,20 +33,14 @@ describe('Mhr Registration', () => {
     await store.setRegistrationType(MhrRegistrationType)
     await nextTick()
     wrapper = await createComponent(MhrRegistration, { appReady: true }, RouteNames.YOUR_HOME, null, [pinia])
-    await store.setRegistrationType(MhrRegistrationType)
-    await nextTick()
   })
 
   it('renders and displays the Mhr Registration View', async () => {
-    await store.setRegistrationType(MhrRegistrationType)
-    await nextTick()
     expect(wrapper.findComponent(MhrRegistration).exists()).toBe(true)
     expect(wrapper.find('#registration-header').text()).toBe('Manufactured Home Registration')
   })
 
   it('renders and displays the correct sub components', async () => {
-    await store.setRegistrationType(MhrRegistrationType)
-    await nextTick()
     // Stepper
     expect(wrapper.findComponent(Stepper).exists()).toBe(true)
     // Action button footers
