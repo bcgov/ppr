@@ -4,7 +4,14 @@ import { useAnalystQueueStore } from '@/store/analystQueue';
 import { updateQueuedTransfer } from '@/utils/mhr-api-helper'
 import type { QueueReviewUpdatePayloadIF } from '@/composables/analystQueue/interfaces'
 
-const { queueTransfer, reviewId, isAssignable, isInReview, reviewDecision, validationErrors } = storeToRefs(useAnalystQueueStore())
+const {
+  queueTransfer,
+  reviewId,
+  isAssignable,
+  isDecisionAllowed,
+  reviewDecision,
+  validationErrors
+} = storeToRefs(useAnalystQueueStore())
 const { validateReviewDecision } = useAnalystQueueStore()
 
 const isAssigned = computed(() => {
@@ -90,7 +97,7 @@ const emit = defineEmits(['go-to-dash'])
         </div>
         <div class="lg:col-span-3 flex justify-end space-x-3">
           <UButton
-            v-if="isInReview"
+            v-if="isDecisionAllowed"
             color="primary"
             size="md"
             class="rounded-sm"
