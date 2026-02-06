@@ -99,6 +99,10 @@ export default defineComponent({
     filterLabel: {
       type: String,
       default: ''
+    },
+    searchInput: {
+      type: String,
+      default: ''
     }
   },
   emits: ['selected'],
@@ -146,26 +150,46 @@ export default defineComponent({
         // Staff Only Options
         if (isRoleStaff.value || isRoleStaffReg.value) {
           allSearchTypes.push(...SearchTypes, ...MHRSearchTypes)
-          return allSearchTypes
         } else {
           // Client Only Blocks
           if (hasPprEnabled.value && hasMhrEnabled.value) {
             allSearchTypes.push(...SearchTypes, ...MHRSearchTypes)
-            return allSearchTypes
-          }
-
-          if (hasPprEnabled.value) {
+          } else if (hasPprEnabled.value) {
             allSearchTypes.push(...SearchTypes)
-            return allSearchTypes.slice(1)
-          }
-
-          if (hasMhrEnabled.value) {
+            allSearchTypes.splice(0, 1)
+          } else if (hasMhrEnabled.value) {
             allSearchTypes.push(...MHRSearchTypes)
-            return allSearchTypes.slice(1)
+            allSearchTypes.splice(0, 1)
           }
         }
 
-        return allSearchTypes
+        // If searchInput is provided, sort by relevance first, then alphabetically
+        const input = (typeof props.searchInput === 'string' ? props.searchInput.trim().toLowerCase() : '')
+        return allSearchTypes.sort((a, b) => {
+          // Keep headers at the top of their group
+          if (a.class === 'search-list-header' && b.class !== 'search-list-header') return -1;
+          if (a.class !== 'search-list-header' && b.class === 'search-list-header') return 1;
+          if (a.class === 'search-list-header' && b.class === 'search-list-header') return 0;
+
+          if (input) {
+            const aText = (a.searchTypeUI || '').toLowerCase();
+            const bText = (b.searchTypeUI || '').toLowerCase();
+            // Items that start with the input are most relevant
+            const aStarts = aText.startsWith(input);
+            const bStarts = bText.startsWith(input);
+            if (aStarts && !bStarts) return -1;
+            if (!aStarts && bStarts) return 1;
+            // Items that contain the input are next most relevant
+            const aContains = aText.includes(input);
+            const bContains = bText.includes(input);
+            if (aContains && !bContains) return -1;
+            if (!aContains && bContains) return 1;
+            // Otherwise, sort alphabetically
+            return aText.localeCompare(bText);
+          }
+          // No input: sort alphabetically
+          return (a.searchTypeUI || '').localeCompare(b.searchTypeUI || '');
+        });
       }),
       isSingleSearchOption: computed((): boolean => {
         return ((hasPprEnabled.value && !hasMhrEnabled.value) || (!hasPprEnabled.value && hasMhrEnabled.value)) &&
