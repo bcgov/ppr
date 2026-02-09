@@ -8,7 +8,7 @@ const {
   queueTransfer,
   reviewId,
   isAssignable,
-  isDecisionAllowed,
+  isUserAssignee,
   reviewDecision,
   validationErrors
 } = storeToRefs(useAnalystQueueStore())
@@ -97,7 +97,7 @@ const emit = defineEmits(['go-to-dash'])
         </div>
         <div class="lg:col-span-3 flex justify-end space-x-3">
           <UButton
-            v-if="isDecisionAllowed"
+            v-if="isUserAssignee"
             color="primary"
             size="md"
             class="rounded-sm"

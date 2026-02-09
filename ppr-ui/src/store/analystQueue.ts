@@ -132,13 +132,16 @@ const showClearFilterButton = computed(() => {
   })
 })
 
-const isDecisionAllowed = computed(() => {
+const isUserAssignee = computed(() => {
   const assetsStore = useStore()
   const userFirstName = assetsStore.getUserFirstName
   const userLastName = assetsStore.getUserLastName
   const userName = `${userFirstName} ${userLastName}`
-  const isUserAssignee = userName === queueTransfer.value?.assigneeName
-  return isUserAssignee && isInReview.value
+  return userName === queueTransfer.value?.assigneeName
+})
+
+const isDecisionAllowed = computed(() => {
+  return isUserAssignee.value && isInReview.value
 })
 
 // Allow assigning/unassigning while NEW or IN_REVIEW.
@@ -206,7 +209,6 @@ const assignees = computed(() => {
 
 
  return {
-    isDecisionAllowed,
     assignees,
     queueTableData,
     columnsToShow,
@@ -215,6 +217,8 @@ const assignees = computed(() => {
     showClearFilterButton,
     isAssignable,
     isInReview,
+    isUserAssignee,
+    isDecisionAllowed,
     queueTransfer,
     reviewId,
     reviewDecision,
