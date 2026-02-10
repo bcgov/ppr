@@ -47,9 +47,23 @@ const formatDateTimeParts = (dateTime?: string) => {
   }
 }
 
-const getStatusLabel = (statusType: ReviewStatusTypes) => {
-  if (statusType === ReviewStatusTypes.DECLINED) return 'Rejected'
-  return enumToLabel(statusType)
+
+const getActionDescription = (step: QueueReviewStepIF) => {
+  if (step.statusType === ReviewStatusTypes.DECLINED) {
+    return 'Registration Rejected'
+  } 
+  else if (step.statusType === ReviewStatusTypes.NEW) {
+    const match = step.changeNote?.match(/Removing assignee (.+?)(?:\.)?$/i)
+    const newAssignee = match ? match[1].trim() : ''
+    return `Reviewer <span class="font-normal gray7">${newAssignee}</span> unassigned`
+  }
+  else if (step.statusType === ReviewStatusTypes.IN_REVIEW) {
+    return 'Reviewer assigned'
+  }
+  else if (step.statusType === ReviewStatusTypes.APPROVED) {
+    return 'Registration Approved'
+  }
+  return enumToLabel(step.statusType)
 }
 
 const toggleExpanded = () => {
@@ -97,7 +111,7 @@ const toggleExpanded = () => {
                 </v-col>
                 <v-col cols="12" sm="7" class="space-y-2">
                   <div class="font-bold text-gray-900">
-                    Registration {{ getStatusLabel(step.statusType) }}
+                    <span v-html="getActionDescription(step)"/>
                     <span v-if="step.username" class="font-normal gray7">
                       (by {{ step.username }})
                     </span>
