@@ -53,7 +53,7 @@ const getActionDescription = (step: QueueReviewStepIF) => {
     return 'Registration Rejected'
   } 
   else if (step.statusType === ReviewStatusTypes.NEW) {
-    const match = step.changeNote.match(/Removing assignee (.+?)(?:\.)?$/i)
+    const match = step.changeNote?.match(/Removing assignee (.+?)(?:\.)?$/i)
     const newAssignee = match ? match[1].trim() : ''
     return `Reviewer <span class="font-normal gray7">${newAssignee}</span> unassigned`
   }
