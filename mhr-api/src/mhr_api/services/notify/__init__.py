@@ -74,7 +74,7 @@ class Notify:
                 )
         return res.status_code
 
-    def send_review_declined(self, reg_data: dict, reason: str) -> HTTPStatus:
+    def send_review_declined(self, reg_data: dict, reason: str, report_link: str) -> HTTPStatus:
         """Send a Staff review declined email to the registering party email address."""
         mhr_number: str = reg_data.get("mhrNumber")
         if not self.notify_review_config or not self.notify_review_config.get("bodyDecline"):

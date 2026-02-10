@@ -116,8 +116,8 @@ class MhrReviewRegistration(db.Model):
         try:
             new_status: str = request_json.get("statusType")
             change_msg: str = f"Current status={self.status_type.value}, new status={new_status}."
-            if request_json.get("payRefund"):
-                change_msg += request_json.get("payRefund")
+            if request_json.get("payRefundInfo"):
+                change_msg += request_json.get("payRefundInfo")
             if not self.document_id and request_json.get("documentId"):
                 change_msg += f" Adding document ID {self.document_id}"
                 self.document_id = request_json.get("documentId")

@@ -1,0 +1,156 @@
+{
+    "mhrNumber": "150004",
+    "declaredValue": 1000,
+    "consideration": "",
+    "transferDate": "",
+    "ownLand": true,
+    "registrationType": "TRANS_WILL",
+    "submittingParty": {
+        "businessName": "TEST BUSINESS",
+        "personName": {
+            "first": "",
+            "middle": "",
+            "last": ""
+        },
+        "address": {
+            "city": "TEST",
+            "country": "CA",
+            "postalCode": "V0V 1H1",
+            "region": "BC",
+            "street": "1234 TEST ST"
+        }
+    },
+    "clientReferenceId": "123456",
+    "addOwnerGroups": [
+        {
+            "groupId": 1,
+            "owners": [
+                {
+                    "ownerId": 3,
+                    "phoneNumber": "",
+                    "phoneExtension": "",
+                    "suffix": "",
+                    "description": "Executor of the will of TEST1 TEST1, deceased",
+                    "address": {
+                        "country": "CA",
+                        "street": "200-940 Blanshard St",
+                        "streetAdditional": "",
+                        "city": "Victoria",
+                        "region": "BC",
+                        "postalCode": "V8W 3E6",
+                        "deliveryInstructions": ""
+                    },
+                    "action": "ADDED",
+                    "partyType": "EXECUTOR",
+                    "individualName": {
+                        "first": "TEST3",
+                        "last": "TEST3"
+                    },
+                    "groupId": 1
+                }
+            ],
+            "status": "ACTIVE",
+            "tenancySpecified": true,
+            "type": "SOLE",
+            "action": "DELETED"
+        }
+    ],
+    "deleteOwnerGroups": [
+        {
+            "groupId": 1,
+            "owners": [
+                {
+                    "address": {
+                        "city": "VICTORIA",
+                        "country": "CA",
+                        "postalCode": "V8W 3E6",
+                        "region": "BC",
+                        "street": "200-940 BLANSHARD ST"
+                    },
+                    "individualName": {
+                        "first": "TEST1",
+                        "last": "TEST1"
+                    },
+                    "ownerId": 997067,
+                    "partyType": "OWNER_IND",
+                    "status": "ACTIVE",
+                    "type": "JOINT",
+                    "action": "DELETED",
+                    "groupId": 1,
+                    "supportingDocument": "PROBATE_GRANT"
+                },
+                {
+                    "address": {
+                        "city": "VICTORIA",
+                        "country": "CA",
+                        "postalCode": "V8W 3E6",
+                        "region": "BC",
+                        "street": "200-940 BLANSHARD ST"
+                    },
+                    "individualName": {
+                        "first": "TEST2",
+                        "last": "TEST2"
+                    },
+                    "ownerId": 997068,
+                    "partyType": "OWNER_IND",
+                    "status": "ACTIVE",
+                    "type": "JOINT",
+                    "groupId": 1,
+                    "action": "DELETED",
+                    "supportingDocument": "DEATH_CERT",
+                    "deathDateTime": "2026-01-20",
+                    "deathCertificateNumber": "123",
+                    "hasDeathCertificate": true
+                }
+            ],
+            "status": "ACTIVE",
+            "tenancySpecified": true,
+            "type": "NA",
+            "action": "DELETED"
+        }
+    ],
+    "affirmByName": "TEST AFFIRM BY NAME",
+    "reviewPending": true,
+    "payment": {
+        "invoiceId": "54922",
+        "receipt": "/api/v1/payment-requests/54922/receipts",
+        "ccPayment": true,
+        "paymentActionRequired": true,
+        "paymentPortalURL": "{PAYMENT_PORTAL_URL}/{invoice_id}/{return_URL}"
+    },
+    "accountId": "1234",
+    "username": "test",
+    "usergroup": "mhr_qualified_user",
+    "paymentPending": true,
+    "status": "IN_REVIEW",
+    "documentDescription": "TRANSFER TO EXECUTOR - GRANT OF PROBATE WITH WILL",
+    "assigneeName": "Business Registry Test 1",
+    "reviewSteps": [
+        {
+            "createDateTime": "2026-02-09T18:49:21+00:00",
+            "statusType": "NEW",
+            "staffNote": "",
+            "username": "System Pay API Callback",
+            "clientNote": "",
+            "changeNote": "Current status=PAY_PENDING, new status=NEW. Removing assignee None."
+        },
+        {
+            "createDateTime": "2026-02-09T19:00:35+00:00",
+            "statusType": "IN_REVIEW",
+            "staffNote": "",
+            "username": "Business Registry Test 1",
+            "clientNote": "",
+            "changeNote": "Current status=NEW, new status=IN_REVIEW. Setting assignee Business Registry Test 1."
+        }
+    ],
+    "statusType": "DECLINED",
+    "declinedReasonType": "NON_COMPLIANCE",
+    "staffNote": "Test Refund Reason",
+    "payRefund": {
+        "isPartialRefund": false,
+        "message": "'Your transaction has been cancelled. We will not request the initial payment from your bank.'",
+        "refundAmount": "50.00",
+        "refundId": 1234
+    },
+    "createDateTime": "2026-02-10T18:23:20+00:00"
+}

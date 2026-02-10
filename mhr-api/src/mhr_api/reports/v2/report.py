@@ -20,6 +20,7 @@ import requests
 from flask import current_app, jsonify
 
 from mhr_api.exceptions import ResourceErrorCodes
+from mhr_api.models import registration_utils as reg_utils
 from mhr_api.models import utils as model_utils
 from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationTypes, MhrTenancyTypes
 from mhr_api.reports import ppr_report_utils
@@ -345,7 +346,10 @@ class Report:  # pylint: disable=too-few-public-methods
             and "payment" in self._report_data
         ):
             report_id = self._report_data["payment"]["invoiceId"]
-        elif self._report_key == ReportTypes.MHR_REGISTRATION and self._report_data.get("mhrNumber"):
+        elif self._report_key in (
+            ReportTypes.MHR_REGISTRATION,
+            ReportTypes.MHR_TOD_REJECTION,
+        ) and self._report_data.get("mhrNumber"):
             report_id = self._report_data.get("mhrNumber")
         return report_id
 
@@ -467,6 +471,15 @@ class Report:  # pylint: disable=too-few-public-methods
                 self._report_data["documentDescription"] = report_utils.format_description(
                     self._report_data["documentDescription"]
                 )
+        elif self._report_key == ReportTypes.MHR_TOD_REJECTION:
+            self._report_data["address"] = report_utils.set_registration_cover(self._report_data)
+            self._report_data["registrationDescription"] = reg_utils.get_registration_description(
+                self._report_data["registrationType"]
+            )
+            self._report_data["registrationDescription"] = report_utils.format_description(
+                self._report_data["registrationDescription"]
+            )
+            self._report_data["createDateTime"] = Report._to_report_datetime(self._report_data["createDateTime"], False)
         else:
             if self._report_key == ReportTypes.SEARCH_DETAIL_REPORT:
                 self._set_search_additional_message()
@@ -1062,6 +1075,13 @@ class ReportMeta:  # pylint: disable=too-few-public-methods
             "reportDescription": "MHRAdminRegistration",
             "fileName": "adminRegistrationV2",
             "metaTitle": "REPLACED",
+            "metaSubtitle": " Manufactured Home Act",
+            "metaSubject": "",
+        },
+        ReportTypes.MHR_TOD_REJECTION: {
+            "reportDescription": "MHRTODRejection",
+            "fileName": "rejectionV2",
+            "metaTitle": "REJECTION NOTICE",
             "metaSubtitle": " Manufactured Home Act",
             "metaSubject": "",
         },

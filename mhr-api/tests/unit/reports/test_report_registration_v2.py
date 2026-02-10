@@ -53,6 +53,8 @@ TRANSFER_TEST_AFFIDAVIT_DATAFILE = 'tests/unit/reports/data/trans-test-example-a
 TRANSFER_TEST_AFFIDAVIT_PDFFILE = 'tests/unit/reports/data/trans-test-example-affidavit.pdf'
 TRANSFER_TEST_ADMIN_DATAFILE = 'tests/unit/reports/data/trans-test-example-admin.json'
 TRANSFER_TEST_ADMIN_PDFFILE = 'tests/unit/reports/data/trans-test-example-admin.pdf'
+TOD_REJECTION_TEST_DATAFILE = 'tests/unit/reports/data/tod-rejection-test-example.json'
+TOD_REJECTION_TEST_PDFFILE = 'tests/unit/reports/data/tod-rejection-test-example.pdf'
 
 EXEMPTION_TEST_RES_DATAFILE = 'tests/unit/reports/data/exempt-res-test-example.json'
 EXEMPTION_TEST_RES_PDFFILE = 'tests/unit/reports/data/exempt-res-test-example.pdf'
@@ -335,6 +337,19 @@ def test_admin_reg(session, client, jwt):
         check_response(content, status, ADMIN_TEST_PDFFILE)
 
 
+def test_tod_rejection(session, client, jwt):
+    """Assert that generation of a test report is as expected."""
+    # setup
+    if is_report_v2() and not is_ci_testing():
+        json_data = get_json_from_file(TOD_REJECTION_TEST_DATAFILE)
+        report = Report(json_data, '1234', ReportTypes.MHR_TOD_REJECTION, '')
+        # test
+        content, status, headers = report.get_pdf()
+        assert headers
+        # verify
+        check_response(content, status, TOD_REJECTION_TEST_PDFFILE)
+
+
 def get_json_from_file(data_file: str):
     """Get json data from report data file."""
     text_data = None
@@ -361,9 +376,9 @@ def check_response(content, status_code, filename: str = None):
 
 
 def is_report_v2() -> bool:
-    return  current_app.config.get('REPORT_VERSION', '') == REPORT_VERSION_V2
+    return current_app.config.get('REPORT_VERSION', '') == REPORT_VERSION_V2
 
 
 def is_ci_testing() -> bool:
     """Check unit test environment: exclude most reports for CI testing."""
-    return  current_app.config.get("DEPLOYMENT_ENV", "testing") == "testing"
+    return current_app.config.get("DEPLOYMENT_ENV", "testing") == "testing"

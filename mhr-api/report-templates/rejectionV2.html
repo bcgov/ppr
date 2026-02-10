@@ -1,0 +1,105 @@
+[[macros.html]]
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{{ meta_title }}</title>
+    <meta charset="UTF-8">
+    <meta name="author" content="BC Registries and Online Services">
+    [[v2/stylePageRegistration.html]]
+    [[v2/style.html]]
+  </head>
+  <body class="rejection-notice">
+    <div class="container ml-3">
+        <table class="cover-data-table">
+            <tr>
+              <td class="cover-data">{{ createDateTime }}</td>
+              <td class="cover-data right">MH {{ mhrNumber }}</td>
+            </tr>
+        
+            <tr>
+              <td class="cover-data"></td>
+              <td class="cover-data right">
+                {% if clientReferenceId is defined and clientReferenceId != '' %}
+                  Folio Number: {{ clientReferenceId }}</td>
+                {% else %}
+                  &nbsp;
+                {% endif %}
+            </tr>
+          </table>
+    </div>
+    <div class="container ml-3 mt-4">
+      {% if address %}        
+        {% if address.line5 is not defined %}        
+          {% if address.line3 %}
+          <table class="cover-data-table mt-0" role="presentation">
+          {% else %}
+          <table class="cover-data-table mt-8" role="presentation">
+          {% endif %}
+            <tr>
+              <td>
+                <div>{{ address.line1 }}</div>
+                <div>{{ address.line2 }}</div>
+                {% if address.line3 %}
+                  <div>
+                    {% set breaks3 = address.line3.split('\n') %}
+                    {% for item in breaks3 %}
+                       {{ item }}
+                        {% if not loop.last %}
+                            &nbsp;&nbsp;
+                        {% endif %}
+                    {% endfor %}
+                    </div>
+                {% endif %}
+                <div>
+                  {% set breaks = address.line4.split('\n') %}
+                  {% for item in breaks %}
+                     {{ item }}
+                     {% if not loop.last %}
+                        &nbsp;&nbsp;
+                     {% endif %}
+                  {% endfor %}
+                </div>
+              </td>
+            </tr>
+          </table> 
+        {% else %}
+          <table class="cover-data-table-5 mtn-1-1" role="presentation">
+            <tr>
+                <td>
+                <div>{{ address.line1 }}</div>
+                <div>{{ address.line2 }}</div>
+                <div>{{ address.line3 }}</div>
+                <div>
+                  {% set breaks = address.line4.split('\n') %}
+                  {% for item in breaks %}
+                     {{ item }}
+                     {% if not loop.last %}
+                        &nbsp;&nbsp;
+                     {% endif %}
+                  {% endfor %}
+                </div>
+                <div>{{ address.line5 }}</div>
+                </td>
+            </tr>  
+          </table> 
+        {% endif %}
+      {% endif %}
+    </div>
+    <div class="container cover-data mt-11 ml-3">
+     Dear {{address.line1}},
+     <div class="cover-data mt-4">Re: <span class="bold">{{registrationDescription}}</span></div>
+     <div class="cover-data mt-4">BC Registries staff have reviewed your {{registrationDescription}} application, and it has been rejected for the following reason(s):</div>
+    <div class="cover-data mt-4"><span class="bold">{{staffNote}}</span></div>
+    <div class="cover-data mt-4">A refund of <span class="bold">${{payRefund.refundAmount}}</span> has been issued to your original payment method. The processing time is typically 3-5 business days.</div>
+    
+    <div class="cover-data mt-4">Please do not hesitate to contact us should you have any questions or concerns pertaining to this letter.</div>
+    
+    <div class="cover-data mt-8">Yours truly,</div>
+    <!-- TODO: signature -->
+    <div class="mt-16"></div>
+    <div class="cover-data bold mt-4">Sharon Merlino</div>
+    <div class="cover-data">Registry Analyst</div>
+    </div>    
+</body>
+</html>
