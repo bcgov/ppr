@@ -55,7 +55,7 @@ const getActionDescription = (step: QueueReviewStepIF) => {
   else if (step.statusType === ReviewStatusTypes.NEW) {
     const match = step.changeNote.match(/Removing assignee (.+?)(?:\.)?$/i)
     const newAssignee = match ? match[1].trim() : ''
-    return `Reviewer <span class="font-normal grey7">${newAssignee}</span> unassigned`
+    return `Reviewer <span class="font-normal gray7">${newAssignee}</span> unassigned`
   }
   else if (step.statusType === ReviewStatusTypes.IN_REVIEW) {
     return 'Reviewer assigned'
