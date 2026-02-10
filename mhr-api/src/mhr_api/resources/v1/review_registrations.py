@@ -345,7 +345,6 @@ def get_rejection_report_link(review_reg: MhrReviewRegistration, declined_data: 
     try:
         report_data = review_reg.json
         report_data.update(declined_data)
-        logger.info(report_data)
         raw_data, status_code, _ = get_callback_pdf(
             report_data, review_reg.id, ReportTypes.MHR_TOD_REJECTION, None, None
         )
