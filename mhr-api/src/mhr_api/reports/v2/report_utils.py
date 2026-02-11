@@ -27,15 +27,18 @@ HEADER_COVER_PATH = "/static/v2/header_cover.html"
 HEADER_MAIL_PATH = "/static/v2/header_mail.html"
 HEADER_REG_PATH = "/static/v2/header_registration.html"
 HEADER_REG_COVER_PATH = "/static/v2/header_registration_cover.html"
+HEADER_TOD_REJECTION_PATH = "/static/v2/header_tod_rejection.html"
 FOOTER_PATH = "/static/v2/footer.html"
 FOOTER_COVER_PATH = "/static/v2/footer_cover.html"
 FOOTER_MAIL_PATH = "/static/v2/footer_mail.html"
 FOOTER_REG_COVER_PATH = "/static/v2/footer_registration_cover.html"
+FOOTER_TOD_REJECTION_PATH = "/static/v2/footer_tod_rejection.html"
 HEADER_TITLE_REPLACE = "{{TITLE}}"
 HEADER_SUBTITLE_REPLACE = "{{SUBTITLE}}"
 HEADER_SUBJECT_REPLACE = "{{SUBJECT}}"
 FOOTER_TEXT_REPLACE = "{{FOOTER-TEXT}}"
 MARGIN_TOP_REG_REPORT = 1.93
+MARGIN_BOTTOM_REG_REPORT = 1.5
 # marginTop 1.5 bottom 0.75
 REPORT_META_DATA = {
     "marginTop": 1.25,
@@ -61,6 +64,7 @@ class ReportTypes(BaseEnum):
     MHR_REGISTRATION_STAFF = "mhrRegistrationStaff"
     MHR_TRANSFER = "mhrTransfer"
     MHR_TRANSPORT_PERMIT = "mhrTransportPermit"
+    MHR_TOD_REJECTION = "mhrTODRejection"
     SEARCH_DETAIL_REPORT = "searchDetail"
     # Gotenberg
     SEARCH_TOC_REPORT = "searchTOC"
@@ -75,10 +79,12 @@ class Config:  # pylint: disable=too-few-public-methods
     HEADER_MAIL_TEMPLATE: str = None
     HEADER_REG_TEMPLATE: str = None
     HEADER_REG_COVER_TEMPLATE: str = None
+    HEADER_TOD_REJECTION_TEMPLATE: str = None
     FOOTER_TEMPLATE: str = None
     FOOTER_COVER_TEMPLATE: str = None
     FOOTER_REG_COVER_TEMPLATE: str = None
     FOOTER_MAIL_TEMPLATE: str = None
+    FOOTER_TOD_REJECTION_TEMPLATE: str = None
 
     @classmethod
     def get_header_template(cls) -> str:
@@ -129,6 +135,18 @@ class Config:  # pylint: disable=too-few-public-methods
         return cls.HEADER_REG_COVER_TEMPLATE
 
     @classmethod
+    def get_tod_rejection_header_template(cls) -> str:
+        """Fetch Transfer on Death rejection notice header template data from the file system."""
+        if not cls.HEADER_TOD_REJECTION_TEMPLATE:
+            file_path = current_app.config.get("REPORT_TEMPLATE_PATH", "") + HEADER_TOD_REJECTION_PATH
+            try:
+                cls.HEADER_TOD_REJECTION_TEMPLATE = Path(file_path).read_text(encoding="UTF-8")
+                logger.info(f"Loaded ToD rejection header file from path {file_path}")
+            except Exception as err:  # noqa: B902; just logging
+                logger.error(f"Error loading ToD rejection header template from path={file_path}: " + str(err))
+        return cls.HEADER_TOD_REJECTION_TEMPLATE
+
+    @classmethod
     def get_mail_header_template(cls) -> str:
         """Fetch mail registration header template data from the file system."""
         if not cls.HEADER_MAIL_TEMPLATE:
@@ -163,6 +181,18 @@ class Config:  # pylint: disable=too-few-public-methods
             except Exception as err:  # noqa: B902; just logging
                 logger.error(f"Error loading mail cover footer template from path={file_path}: " + str(err))
         return cls.FOOTER_COVER_TEMPLATE
+
+    @classmethod
+    def get_tod_rejection_footer_template(cls) -> str:
+        """Fetch Transfer on Death rejection notice footer template data from the file system."""
+        if not cls.FOOTER_TOD_REJECTION_TEMPLATE:
+            file_path = current_app.config.get("REPORT_TEMPLATE_PATH", "") + FOOTER_TOD_REJECTION_PATH
+            try:
+                cls.FOOTER_TOD_REJECTION_TEMPLATE = Path(file_path).read_text(encoding="UTF-8")
+                logger.info(f"Loaded ToD rejection footer file from path {file_path}")
+            except Exception as err:  # noqa: B902; just logging
+                logger.error(f"Error loading ToD rejection footer template from path={file_path}: " + str(err))
+        return cls.FOOTER_TOD_REJECTION_TEMPLATE
 
     @classmethod
     def get_mail_footer_template(cls) -> str:
@@ -235,6 +265,12 @@ def get_cover_reg_header_data(title: str, subtitle: str) -> str:
     return None
 
 
+def get_tod_rejection_header_data() -> str:
+    """Get Transfer on Death rejection notice report header."""
+    template = Config().get_tod_rejection_header_template()
+    return template
+
+
 def get_footer_data(footer_text: str, mail: bool = False) -> str:
     """Get report footer with the provided text."""
     if mail:
@@ -267,6 +303,12 @@ def get_cover_reg_footer_data() -> str:
     return template
 
 
+def get_tod_rejection_footer_data() -> str:
+    """Get Transfer on Death rejection notice report footer."""
+    template = Config().get_tod_rejection_footer_template()
+    return template
+
+
 def get_report_meta_data(report_type: str = "") -> dict:
     """Get gotenberg report configuration data."""
     if not report_type or report_type not in (
@@ -278,10 +320,12 @@ def get_report_meta_data(report_type: str = "") -> dict:
         ReportTypes.MHR_EXEMPTION,
         ReportTypes.MHR_ADMIN_REGISTRATION,
         ReportTypes.MHR_NOTE,
+        ReportTypes.MHR_TOD_REJECTION,
     ):
         return copy.deepcopy(REPORT_META_DATA)
     data = copy.deepcopy(REPORT_META_DATA)
-    data["marginTop"] = MARGIN_TOP_REG_REPORT
+    if report_type == ReportTypes.MHR_TOD_REJECTION:
+        data["marginBottom"] = MARGIN_BOTTOM_REG_REPORT
     return data
 
 
@@ -305,6 +349,7 @@ def get_report_files(  # pylint: disable=too-many-branches
         ReportTypes.MHR_EXEMPTION,
         ReportTypes.MHR_ADMIN_REGISTRATION,
         ReportTypes.MHR_NOTE,
+        ReportTypes.MHR_TOD_REJECTION,
     ):
         if report_type in (
             ReportTypes.SEARCH_BODY_REPORT,
@@ -312,6 +357,7 @@ def get_report_files(  # pylint: disable=too-many-branches
             ReportTypes.SEARCH_TOC_REPORT,
             ReportTypes.MHR_REGISTRATION_COVER,
             ReportTypes.MHR_TRANSFER,
+            ReportTypes.MHR_TOD_REJECTION,
         ):
             title_text = request_data["templateVars"].get("meta_title", "")
         elif report_type == ReportTypes.MHR_NOTE:
@@ -343,12 +389,15 @@ def get_report_files(  # pylint: disable=too-many-branches
         ReportTypes.MHR_TRANSPORT_PERMIT,
         ReportTypes.MHR_NOTE,
         ReportTypes.MHR_ADMIN_REGISTRATION,
+        ReportTypes.MHR_TOD_REJECTION,
     ):
         subject_text = request_data["templateVars"].get("meta_subject", "")
         if report_type == ReportTypes.MHR_COVER:
             files["header.html"] = get_cover_header_data(title_text, subtitle_text, subject_text)
         elif report_type == ReportTypes.MHR_REGISTRATION_COVER:
             files["header.html"] = get_cover_reg_header_data(title_text, subtitle_text)
+        elif report_type == ReportTypes.MHR_TOD_REJECTION:
+            files["header.html"] = get_tod_rejection_header_data()
         else:
             files["header.html"] = get_reg_header_data(title_text, subtitle_text, subject_text, mail)
     else:
@@ -357,6 +406,8 @@ def get_report_files(  # pylint: disable=too-many-branches
         files["footer.html"] = get_cover_footer_data(footer_text)
     elif report_type == ReportTypes.MHR_REGISTRATION_COVER:
         files["footer.html"] = get_cover_reg_footer_data()
+    elif report_type == ReportTypes.MHR_TOD_REJECTION:
+        files["footer.html"] = get_tod_rejection_footer_data()
     else:
         files["footer.html"] = get_footer_data(footer_text, mail)
     return files

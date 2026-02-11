@@ -1,0 +1,93 @@
+<html>
+  <head>
+    <style>
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            -webkit-print-color-adjust: exact;
+            font-size: 10px;
+        }
+
+        .footer {
+            width: 100%;
+            padding: 6px 0 16px 0;
+        }
+
+        .footer-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+
+        .footer-table td {
+            vertical-align: top;
+            padding: 0;
+            font-family: 'BC Sans' !important;
+            color: #174078 !important;
+            font-size: 10px;
+        }
+
+        .footer-table td:nth-child(1) {
+            width: 40%;
+            text-align: left;
+            padding-left: 51px;
+        }
+
+        .footer-table td:nth-child(2) {
+            width: 30%;
+            text-align: left;
+        }
+
+        .footer-table td:nth-child(3) {
+            width: 30%;
+            text-align: left;
+            padding-right: 34px;
+        }
+
+        .separator {
+            border-bottom: 1px solid #94A2BC;
+            width: calc(100% - 102px); /* 34*3 */
+            margin: 2px 34px 8px 51px;
+        }
+
+        .footer-text {
+            font-family: 'BC Sans' !important;
+            color: #174078 !important;
+            font-size: 10px;
+            text-align: left;
+        }
+
+        .bold {
+            font-family: 'BCSans-Bold', sans-serif !important;
+            font-weight: bold !important;
+            color: #174078;
+        }
+
+    </style>
+  </head>
+  <body>
+    <div class="footer">
+        <div class="reg-info">
+            <div class="separator"></div>
+        </div>
+        <table class="footer-table">
+            <tr>
+                <td class="col-left">
+                    <div class="footer-text bold">Ministry of Citizens’ Services</div>
+                    <div class="footer-text">BC Registries and Online Services</div>
+                </td>
+                <td class="col-mid">
+                    <div class="footer-text">Mailing Address:</div>
+                    <div class="footer-text">PO Box 9431 Stn Pro Govt</div>
+                    <div class="footer-text">Victoria, BC V8W 9V3</div>
+                </td>
+                <td class="col-right">
+                    <div class="footer-text">Courier Address:</div>
+                    <div class="footer-text">200 - 940 Blanshard Street</div>
+                    <div class="footer-text">Victoria, BC V8W 3E6</div>
+                </td>
+            </tr>
+        </table>
+    </div>
+  </body>
+</html>
