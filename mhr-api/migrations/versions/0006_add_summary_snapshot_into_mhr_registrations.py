@@ -1,4 +1,4 @@
-"""0006_add_meta_into_mhr_registrations
+"""0006_add_summary_snapshot_into_mhr_registrations
 
 Revision ID: aed708d88460
 Revises: 793f7c153047
