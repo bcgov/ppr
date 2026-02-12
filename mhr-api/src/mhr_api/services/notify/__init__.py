@@ -74,7 +74,7 @@ class Notify:
                 )
         return res.status_code
 
-    def send_review_declined(self, reg_data: dict, reason: str, report_link: str) -> HTTPStatus:
+    def send_review_declined(self, reg_data: dict, reason: str, rejection_url: str) -> HTTPStatus:
         """Send a Staff review declined email to the registering party email address."""
         mhr_number: str = reg_data.get("mhrNumber")
         if not self.notify_review_config or not self.notify_review_config.get("bodyDecline"):
@@ -100,7 +100,7 @@ class Notify:
         subject: str = str(self.notify_review_config.get("subjectDecline")).format(mhr_number=mhr_number)
         invoice_id: str = reg_data["payment"].get("invoiceId")
         body: str = str(self.notify_review_config.get("bodyDecline")).format(
-            reg_type=doc_desc, mhr_number=mhr_number, reason=reason, invoice_id=invoice_id
+            reg_type=doc_desc, mhr_number=mhr_number, reason=reason, invoice_id=invoice_id, rejection_url=rejection_url
         )
         body = body.replace("$", "\n")
         payload = copy.deepcopy(EMAIL_DATA_TEMPLATE)

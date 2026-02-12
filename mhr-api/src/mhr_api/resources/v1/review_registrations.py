@@ -14,7 +14,8 @@
 """API endpoints for requests to view and update staff review registrations."""
 from http import HTTPStatus
 
-from flask import Blueprint, g, jsonify, request
+import requests
+from flask import Blueprint, current_app, g, jsonify, request
 from flask_cors import cross_origin
 
 from mhr_api.exceptions import BusinessException, DatabaseException
@@ -34,6 +35,7 @@ from mhr_api.resources.v1.transfers import set_owner_edit
 from mhr_api.services.authz import authorized, is_staff
 from mhr_api.services.doc_service import doc_id_lookup_staff
 from mhr_api.services.notify import Notify
+from mhr_api.services.payment.client import SBCPaymentClient
 from mhr_api.services.payment.exceptions import SBCPaymentException
 from mhr_api.services.payment.payment import Payment
 from mhr_api.utils.auth import jwt
@@ -345,6 +347,7 @@ def get_rejection_report_link(review_reg: MhrReviewRegistration, declined_data: 
     try:
         report_data = review_reg.json
         report_data.update(declined_data)
+        filing_date = report_data.get("createDateTime")
         raw_data, status_code, _ = get_callback_pdf(
             report_data, review_reg.id, ReportTypes.MHR_TOD_REJECTION, None, None
         )
@@ -354,14 +357,40 @@ def get_rejection_report_link(review_reg: MhrReviewRegistration, declined_data: 
         if status_code not in (HTTPStatus.OK, HTTPStatus.CREATED):
             logger.error(f"Error generating rejection report for reviewId={review_reg.id}, status code={status_code}")
             return None
-        link = upload_rejection_report(raw_data, review_reg.document_id)
-        return link
+        res = upload_rejection_report(raw_data, review_reg.document_id, filing_date, review_reg.id)
+        review_reg.drs_id = res.get("documentServiceId")
+        review_reg.save()
+        return res.get("documentURL")
     except Exception as err:
         logger.warning(f"Rejection report generation & uploading for reviewId={review_reg.id} failed: {err}")
         return None
 
 
-def upload_rejection_report(report, document_id) -> str:
+def upload_rejection_report(report: bytes, document_id: str, filing_date: str, review_id: str) -> dict:
     """Upload generated rejection report to Document Record System, return URL"""
-    # TODO
-    return "placeholder-link"
+    try:
+        if not report or not document_id or not filing_date:
+            logger.warning(
+                "Skip uploading rejection report, ",
+                f"report_data={bool(report)}, documentId={document_id}, filingDate={filing_date}",
+            )
+            return None
+        drs_url = current_app.config.get("DOC_SERVICE_URL")
+        url = f"{drs_url}/documents/MHR/CORR"
+        token = SBCPaymentClient.get_sa_token()
+        headers = {
+            "Authorization": "Bearer " + token,
+            "Content-Type": "application/pdf",
+            "Account-Id": "system",
+        }
+        params = {"consumerDocumentId": document_id, "consumerFilingDate": filing_date}
+        res = requests.post(url=url, headers=headers, data=report, params=params, timeout=20)
+        if res.status_code != HTTPStatus.CREATED:
+            logger.warning(
+                f"Error uploading rejection report to DRS for reviewId={review_id}, status code={res.status_code}"
+            )
+            return None
+        return res.json()
+    except Exception as err:
+        logger.warning(f"Error uploading rejection report to DRS for reviewId={review_id}: {err}")
+        return None

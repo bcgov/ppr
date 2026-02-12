@@ -58,6 +58,7 @@ class MhrReviewRegistration(db.Model):
     user_id = db.mapped_column("user_id", db.String(1000), nullable=True)
     document_id = db.mapped_column("document_id", db.String(20), nullable=True)
     priority = db.mapped_column("priority", db.Boolean, nullable=False, index=True)
+    drs_id = db.mapped_column("drs_id", db.String(20), nullable=True)
 
     # parent keys
     registration_type = db.mapped_column(

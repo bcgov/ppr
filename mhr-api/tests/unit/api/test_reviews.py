@@ -18,18 +18,20 @@ Test-Suite to ensure that the /documents endpoint is working as expected.
 """
 import copy
 from http import HTTPStatus
+from unittest.mock import MagicMock, patch
 
 import pytest
+import requests
 
-from mhr_api.services.authz import COLIN_ROLE, MHR_ROLE, STAFF_ROLE, QUALIFIED_USER_GROUP
-from mhr_api.models import MhrDraft, MhrReviewRegistration, MhrReviewStep, utils as model_utils
+from mhr_api.models import MhrDraft, MhrReviewRegistration, MhrReviewStep
+from mhr_api.models import utils as model_utils
 from mhr_api.models.mhr_review_step import DeclinedReasonTypes
 from mhr_api.models.type_tables import MhrRegistrationTypes, MhrReviewStatusTypes
-from mhr_api.resources.v1.review_registrations import validate_status_type, validate_review
+from mhr_api.resources.v1.review_registrations import upload_rejection_report, validate_review, validate_status_type
+from mhr_api.services.authz import COLIN_ROLE, MHR_ROLE, QUALIFIED_USER_GROUP, STAFF_ROLE
+from mhr_api.services.payment.client import SBCPaymentClient
 from mhr_api.utils.logging import logger
-
 from tests.unit.services.utils import create_header, create_header_account
-
 
 PAYREF = {
      "invoiceId": "88888888",
@@ -164,7 +166,14 @@ TEST_DATA_IN_REVIEW = [
     ('Declined invalid reason', "first last", MhrReviewStatusTypes.DECLINED.value, "JUNK", None, False),
     ('Declined other no note', "first last", MhrReviewStatusTypes.DECLINED.value, DeclinedReasonTypes.OTHER.value, None, False),
     ('Valid declined other note', "first last", MhrReviewStatusTypes.DECLINED.value, DeclinedReasonTypes.OTHER.value, "note", True),
- ]
+]
+# testdata pattern is ({desc}, {test_id}, {report_data}, {document_id}, {filing_date})
+TEST_DATA_REJECTION_REPORT = [
+    ('Valid', 191000000, b'test-report-data', '0100000000', '1970-01-01'),
+    ('Invalid no report data', 191000000, None, '0100000000', '1970-01-01'),
+    ('Invalid no document id', 191000000, b'test-report-data', None, '1970-01-01'),
+    ('Invalid no filing date', 191000000, b'test-report-data', '0100000000', None)
+]
 
 
 @pytest.mark.parametrize('desc,username,status,reason,note,valid', TEST_DATA_IN_REVIEW)
@@ -272,6 +281,34 @@ def test_patch_review(session, client, jwt, desc, roles, status, has_account, te
         assert resp_json
         assert resp_json.get("registrationType")
         assert resp_json.get("payment")
+
+
+@pytest.mark.parametrize('desc,test_id,report_data, document_id, filing_date', TEST_DATA_REJECTION_REPORT)
+def test_upload_rejection_report(session, client, jwt, desc, test_id, report_data, document_id, filing_date):
+    """Assert that upload rejection report works as expected."""
+    review_reg = create_review_reg(test_id)
+    with patch.object(SBCPaymentClient, "get_sa_token", return_value="mock-token"):
+        with patch.object(requests, "post") as post_mock:
+            res_mock = MagicMock()
+            res_mock.status_code = HTTPStatus.CREATED
+            res_mock.json_return_value = {"documentURL": "mock-document-url"}
+            post_mock.return_value = res_mock
+            result = upload_rejection_report(report_data, document_id, filing_date, review_reg.id)
+
+    if desc.startswith('Invalid'):
+        assert result is None
+        return
+
+    assert result
+    post_mock.assert_called_once()
+    _, kwargs = post_mock.call_args
+
+    assert kwargs["headers"]["Authorization"] == "Bearer mock-token"
+    assert kwargs["data"] == report_data
+    assert kwargs["params"] == {
+        "consumerDocumentId": document_id,
+        "consumerFilingDate": filing_date,
+    }
 
 
 def create_review_reg(test_id: int) -> MhrReviewRegistration:
