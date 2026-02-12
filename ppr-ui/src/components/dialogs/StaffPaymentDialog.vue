@@ -73,8 +73,9 @@ export default defineComponent({
   },
   emits: ['proceed'],
   setup (props, { emit }) {
-    const { setStaffPayment, setSearchCertified, setFolioOrReferenceNumber } = useStore()
-    const { getStaffPayment } = storeToRefs(useStore())
+    const store = useStore()
+    const { setStaffPayment, setSearchCertified } = store
+    const { getStaffPayment } = storeToRefs(store)
     const localState = reactive({
       certify: false,
       valid: false,
@@ -114,10 +115,6 @@ export default defineComponent({
         if (localState.valid) {
           setSearchCertified(localState.certify)
           setStaffPayment(localState.staffPaymentData)
-          // Update FolioOrReferenceNumber only when submitting and payment option is BCOL
-          if (localState.staffPaymentData.option === StaffPaymentOptions.BCOL && localState.staffPaymentData.folioNumber) {
-            setFolioOrReferenceNumber(localState.staffPaymentData.folioNumber)
-          }
           emit('proceed', val)
         }
         // is false... they cancelled or closed the box
@@ -132,7 +129,6 @@ export default defineComponent({
           isPriority: false
         }
         setStaffPayment(pd)
-        // reset certified
         localState.certify = false
         localState.validating = false
         setSearchCertified(localState.certify)

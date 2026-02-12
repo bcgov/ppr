@@ -158,6 +158,20 @@ function staffPaymentParameters (staffPayment: StaffPaymentIF) {
   return paymentParams
 }
 
+function syncClientReferenceIdWithStaffFolio<T extends Record<string, any>> (
+  payload: T,
+  staffPayment: StaffPaymentIF
+): T {
+  if (staffPayment?.option === StaffPaymentOptions.BCOL && staffPayment?.folioNumber) {
+    return {
+      ...payload,
+      clientReferenceId: staffPayment.folioNumber
+    }
+  }
+
+  return payload
+}
+
 export const successfulPPRResponses = [
   StatusCodes.OK,
   StatusCodes.CREATED,
@@ -238,7 +252,8 @@ export async function staffSearch (
     extraParams = extraParams + '&'
   }
   extraParams = extraParams + paymentParams
-  return search(searchCriteria, extraParams)
+  const syncedCriteria = syncClientReferenceIdWithStaffFolio(searchCriteria, staffPayment)
+  return search(syncedCriteria, extraParams)
 }
 
 // Save a new financing statement (staff)
@@ -252,7 +267,8 @@ export async function staffFinancingStatement (
     extraParams = '?'
   }
   extraParams = extraParams + paymentParams
-  return createFinancingStatement(statement, extraParams)
+  const syncedStatement = syncClientReferenceIdWithStaffFolio(statement, staffPayment)
+  return createFinancingStatement(syncedStatement, extraParams)
 }
 
 // Save a new financing statement (staff)
@@ -266,7 +282,8 @@ export async function staffAmendment (
     extraParams = '?'
   }
   extraParams = extraParams + paymentParams
-  return createAmendmentStatement(statement, extraParams)
+  const syncedStatement = syncClientReferenceIdWithStaffFolio(statement, staffPayment)
+  return createAmendmentStatement(syncedStatement, extraParams)
 }
 
 export async function staffDischarge (
@@ -279,7 +296,8 @@ export async function staffDischarge (
     extraParams = '?'
   }
   extraParams = extraParams + paymentParams
-  return createDischarge(discharge, extraParams)
+  const syncedDischarge = syncClientReferenceIdWithStaffFolio(discharge, staffPayment)
+  return createDischarge(syncedDischarge, extraParams)
 }
 
 export async function staffRenewal (
@@ -292,7 +310,8 @@ export async function staffRenewal (
     extraParams = '?'
   }
   extraParams = extraParams + paymentParams
-  return createRenewal(renewal, extraParams)
+  const syncedRenewal = syncClientReferenceIdWithStaffFolio(renewal, staffPayment)
+  return createRenewal(syncedRenewal, extraParams)
 }
 
 // Update selected matches in search response (search step 2a)
