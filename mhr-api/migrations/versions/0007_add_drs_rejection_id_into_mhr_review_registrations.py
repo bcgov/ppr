@@ -1,4 +1,4 @@
-"""0007_add_drs_id_into_mhr_review_registrations
+"""0007_add_drs_rejection_id_into_mhr_review_registrations
 
 Revision ID: 639ae66d100b
 Revises: aed708d88460
@@ -16,8 +16,8 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('mhr_review_registrations', sa.Column('drs_id', sa.String(length=20), nullable=True),)
+    op.add_column('mhr_review_registrations', sa.Column('drs_rejection_id', sa.String(length=20), nullable=True),)
 
 
 def downgrade():
-    op.drop_column('mhr_review_registrations', 'drs_id')
+    op.drop_column('mhr_review_registrations', 'drs_rejection_id')
