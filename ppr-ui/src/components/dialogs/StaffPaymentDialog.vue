@@ -73,8 +73,9 @@ export default defineComponent({
   },
   emits: ['proceed'],
   setup (props, { emit }) {
-    const { setStaffPayment, setSearchCertified } = useStore()
-    const { getStaffPayment } = storeToRefs(useStore())
+    const store = useStore()
+    const { setStaffPayment, setSearchCertified } = store
+    const { getStaffPayment } = storeToRefs(store)
     const localState = reactive({
       certify: false,
       valid: false,
@@ -128,7 +129,6 @@ export default defineComponent({
           isPriority: false
         }
         setStaffPayment(pd)
-        // reset certified
         localState.certify = false
         localState.validating = false
         setSearchCertified(localState.certify)
