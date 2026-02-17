@@ -540,8 +540,19 @@ class SBCPaymentClient(BaseClient):
         invoice_id = str(invoice_data["id"])
         receipt_path = api_url.replace("https://", "")
         receipt_path = receipt_path[receipt_path.find("/") : None] + PATH_RECEIPT.format(invoice_id=invoice_id)
+        account_name = invoice_data.get("paymentAccount", {}).get("accountName", "")
+        invoice_references = invoice_data.get("references", [])
+        if invoice_references:
+            invoice_number = invoice_references[0].get("invoiceNumber")
+        else:
+            invoice_number = None
         # Return the pay reference to include in the API response.
-        pay_reference = {"invoiceId": invoice_id, "receipt": receipt_path}
+        pay_reference = {
+            "invoiceId": invoice_id,
+            "receipt": receipt_path,
+            "accountName": account_name,
+            "invoiceNumber": invoice_number,
+        }
         if invoice_data.get("paymentMethod", "") in (PaymentMethods.CC.value, PaymentMethods.DIRECT_PAY.value):
             pay_reference["ccPayment"] = True
             pay_reference["paymentActionRequired"] = invoice_data.get("isPaymentActionRequired")

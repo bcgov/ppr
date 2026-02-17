@@ -116,7 +116,8 @@
         "receipt": "/api/v1/payment-requests/54922/receipts",
         "ccPayment": true,
         "paymentActionRequired": true,
-        "paymentPortalURL": "{PAYMENT_PORTAL_URL}/{invoice_id}/{return_URL}"
+        "paymentPortalURL": "{PAYMENT_PORTAL_URL}/{invoice_id}/{return_URL}",
+        "accountName": "TEST ACCOUNT NAME"
     },
     "accountId": "1234",
     "username": "test",

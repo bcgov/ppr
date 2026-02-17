@@ -14,7 +14,7 @@
         <table class="cover-data-table">
             <tr>
               <td class="cover-data">{{ createDateTime }}</td>
-              <td class="cover-data right">MH {{ mhrNumber }}</td>
+              <td class="cover-data right">Manufactured Home Registration Number: {{ mhrNumber }}</td>
             </tr>
         
             <tr>
@@ -88,16 +88,28 @@
     </div>
     <div class="container cover-data mt-11 ml-3">
      Dear {{address.line1}},
-     <div class="cover-data mt-4">Re: <span class="bold">{{registrationDescription}}</span></div>
-     <div class="cover-data mt-4">BC Registries staff have reviewed your {{registrationDescription}} application, and it has been rejected for the following reason(s):</div>
-    <div class="cover-data mt-4"><span class="bold">{{staffNote}}</span></div>
-    <div class="cover-data mt-4">A refund of <span class="bold">${{payRefund.refundAmount}}</span> has been issued to your original payment method. The processing time is typically 3-5 business days.</div>
+     <div class="cover-data mt-4">Re: <span class="bold">Declined - {{registrationDescription}}</span></div>
+     <div class="cover-data mt-4">BC Registries staff have reviewed your {{registrationDescription}} application, and your request was declined for the following reason(s):</div>
+    <div class="cover-data mt-4"><span class="bold">{{declinedReason}}</span></div>
+    <div class="cover-data mt-4">A refund of <span class="bold">${{payRefund.refundAmount}}</span> has been issued. The processing time is typically 3-5 business days.</div>
+
+    <div class="cover-data mt-4"><span class="bold">Account Name:</span> {{payment.accountName}}</div>
+    <div class="cover-data"><span class="bold">Payment Method:</span> 
+      {% if payment.ccPayment %}
+        Credit Card
+      {% else %}
+        Pre-Authorized Debit
+      {% endif %}
+    </div>
+    <div class="cover-data"><span class="bold">Transaction ID:</span> {{payment.invoiceId}}</div>
+    {% if payment.invoiceNumber %}
+    <div class="cover-data"><span class="bold">Invoice Reference Number:</span> {{payment.invoiceNumber}}</div>
+    {% endif %}
     
-    <div class="cover-data mt-4">Please do not hesitate to contact us should you have any questions or concerns pertaining to this letter.</div>
+    <div class="cover-data mt-4">If you have questions, please contact us to discuss further actions.</div>
     
-    <div class="cover-data mt-8">Yours truly,</div>
-    <!-- TODO: signature -->
-    <div class="mt-16"></div>
+    <div class="cover-data mt-4">Yours truly,</div>
+    <div class="mt-4"></div>
     <div class="cover-data bold mt-4">Sharon Merlino</div>
     <div class="cover-data">Registry Analyst</div>
     </div>    

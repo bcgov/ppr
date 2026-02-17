@@ -191,6 +191,7 @@ def decline_registration(review_id: int, review_reg: MhrReviewRegistration, requ
         reason: str = request_json.get("declinedReasonType")
         if request_json.get("staffNote"):
             reason += ": " + request_json.get("staffNote")
+        request_json["declinedReason"] = reason
         request_json["createDateTime"] = model_utils.format_ts(model_utils.now_ts())
         report_link = get_rejection_report_link(review_reg, request_json)
         notify: Notify = Notify(**{"review": True})
@@ -358,9 +359,10 @@ def get_rejection_report_link(review_reg: MhrReviewRegistration, declined_data: 
             logger.error(f"Error generating rejection report for reviewId={review_reg.id}, status code={status_code}")
             return None
         res = upload_rejection_report(raw_data, review_reg.document_id, filing_date, review_reg.id)
-        review_reg.drs_rejection_id = res.get("documentServiceId")
-        review_reg.save()
-        return res.get("documentURL")
+        if res:
+            review_reg.drs_rejection_id = res.get("documentServiceId")
+            review_reg.save()
+        return res.get("documentURL") if res else None
     except Exception as err:
         logger.warning(f"Rejection report generation & uploading for reviewId={review_reg.id} failed: {err}")
         return None
