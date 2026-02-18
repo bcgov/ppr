@@ -114,6 +114,8 @@ SORT_ASCENDING = "ascending"
 SORT_DESCENDING = "descending"
 DOC_ID_QUALIFIED_CLAUSE = ",  get_mhr_doc_qualified_id() AS doc_id"
 DOC_ID_MANUFACTURER_CLAUSE = ",  get_mhr_doc_manufacturer_id() AS doc_id"
+QUERY_NEXT_QUALIFIED_DOC_ID = "select get_mhr_doc_qualified_id()"
+QUERY_NEXT_MANUFACTURER_DOC_ID = "select get_mhr_doc_manufacturer_id()"
 DOC_ID_GOV_AGENT_CLAUSE = ",  get_mhr_doc_gov_agent_id() AS doc_id"
 DOC_ID_STAFF_CLAUSE = ",  get_mhr_doc_staff_id() AS doc_id"
 BATCH_DOC_NAME_MANUFACTURER_MHREG = "batch-manufacturer-mhreg-report-{time}.pdf"
@@ -440,6 +442,16 @@ def get_change_generated_values(registration, draft, user_group: str = None, sta
     elif staff_doc_id:
         registration.doc_id = staff_doc_id
     return registration
+
+
+def get_qs_document_id(user_group: str) -> str:
+    """Get db generated qualifed supplier document ID based on the user group. Only intended for DRS integration."""
+    query: str = QUERY_NEXT_QUALIFIED_DOC_ID
+    if user_group is not None and user_group == MANUFACTURER_GROUP:
+        query = QUERY_NEXT_MANUFACTURER_DOC_ID
+    result = db.session.execute(text(query))
+    row = result.first()
+    return str(row[0])
 
 
 def get_registration_id() -> int:

@@ -21,10 +21,14 @@ from http import HTTPStatus
 import pytest
 from flask import current_app
 
-from mhr_api.services.authz import COLIN_ROLE, MHR_ROLE, STAFF_ROLE
+from mhr_api.services.authz import MHR_ROLE, STAFF_ROLE, COLIN_ROLE, REQUEST_EXEMPTION_RES, \
+                                   TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY, REQUEST_TRANSPORT_PERMIT, \
+                                   REGISTER_MH
 from tests.unit.services.utils import create_header, create_header_account
 
 
+MANUFACTURER_ROLES = [MHR_ROLE, TRANSFER_SALE_BENEFICIARY, REQUEST_TRANSPORT_PERMIT, REGISTER_MH]
+QUALIFIED_USER = [MHR_ROLE, REQUEST_EXEMPTION_RES, TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY]
 # testdata pattern is ({desc}, {roles}, {status}, {has_account}, {doc_id}, {exists}, {valid})
 TEST_VERIFY_ID_DATA = [
     ('Missing account', [MHR_ROLE], HTTPStatus.BAD_REQUEST, False, '40583993', True, True),
@@ -46,6 +50,13 @@ TEST_DATA_GET = [
     ('Not exists checksum', [MHR_ROLE], HTTPStatus.NOT_FOUND, True, '79289202'),
     ('Not exists no checksum staff', [MHR_ROLE, STAFF_ROLE], HTTPStatus.NOT_FOUND, True, '1001000000'),
     ('Invalid checksum', [MHR_ROLE], HTTPStatus.BAD_REQUEST, True, '79289200')
+]
+# testdata pattern is ({desc}, {roles}, {status}, {has_account}, {start_digit})
+TEST_DATA_QS_DOC_ID_DATA = [
+    ('Missing account', [MHR_ROLE], HTTPStatus.BAD_REQUEST, False, None),
+    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, None),
+    ('Valid request QS lawyyer/notary', QUALIFIED_USER, HTTPStatus.OK, True, '1'),
+    ('Valid request QS manufacturer', MANUFACTURER_ROLES, HTTPStatus.OK, True, '8'),
 ]
 
 
@@ -93,3 +104,23 @@ def test_get_document(session, client, jwt, desc, roles, status, has_account, do
         current_app.logger.debug(response)
         assert response
         assert response['documentId'] == doc_id
+
+
+@pytest.mark.parametrize('desc,roles,status,has_account,start_digit', TEST_DATA_QS_DOC_ID_DATA)
+def test_get_qs_doc_id(session, client, jwt, desc, roles, status, has_account, start_digit):
+    """Assert that the get QS document id endpoint works as expected."""
+    headers = None
+    # setup
+    if has_account:
+        headers = create_header_account(jwt, roles)
+    else:
+        headers = create_header(jwt, roles)
+    # test
+    rv = client.get('/api/v1/documents/qs-document-ids',headers=headers)
+
+    # check
+    assert rv.status_code == status
+    if rv.status_code == HTTPStatus.OK:
+        response = rv.json
+        assert response
+        assert str(response.get("documentId")).startswith(start_digit)

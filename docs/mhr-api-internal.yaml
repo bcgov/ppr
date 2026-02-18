@@ -722,6 +722,46 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+
+  '/mhr/api/v1/documents/qs-document-ids':
+    parameters:
+      - $ref: '#/components/parameters/accountId'
+    get:
+      tags:
+        - Registration
+      summary: Retrieve a Qualified Supplier document ID for a new staff review registration.
+      description: For MHR registrations that are submitted by qualified suppliers and reviewed by staff, retrieve a document ID to save in DRS before the registration is submitted for review. Intended to only be called once per registration, and only when the registration is submitted by a qualified supplier and will be reviewed by staff.
+      operationId: get-qs-document-id
+      responses:
+        '200':
+          description: OK
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/AccessControlAllowOrigin'
+            Access-Control-Allow-Methods:
+              $ref: '#/components/headers/AccessControlAllowMethods'
+            Access-Control-Allow-Headers:
+              $ref: '#/components/headers/AccessControlAllowHeaders'
+            Access-Control-Max-Age:
+              $ref: '#/components/headers/AccessControlMaxAge'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/documentId'
+              examples:
+                /api/v1/documents/qs-document-ids/get:
+                  summary: Request a QS document ID response.
+                  value:
+                    documentId: '10109535'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   '/mhr/api/v1/documents/verify/{documentId}':
     parameters:
       - $ref: '#/components/parameters/accountId'
@@ -3155,13 +3195,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   '/mhr/api/v1/reviews/{reviewId}':
     parameters:
-      - name: reviewId
-        in: path
-        description: 'The identifier of a staff review registration.  If an invalid value is submitted then the response is a [404] status code.'
-        required: true
-        schema:
-          type: string
-        example: '123'
+      - $ref: '#/components/parameters/reviewId'
       - name: Account-Id
         in: header
         description: The account that the user is operating on behalf of.
@@ -5178,6 +5212,13 @@ components:
           csaStandard: 'Z240,'
           rebuiltRemarks: 'REBUILT AS A DOUBLE WIDE, MAKE/MODEL CUSTOM, YEAR 1995'
           otherRemarks: 'BC SAFETY AUTHORITY #339556, PERMIT# EL-721296-2018'
+    documentId:
+      type: object
+      description: The unique identifier of one or more documents that are associated with a single MH registration.
+      properties:
+        documentId:
+          type: string
+          example: '10590422'
     documentSummary:
       title: documentSummary
       type: object

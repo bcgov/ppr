@@ -15,11 +15,12 @@
 
 from http import HTTPStatus
 
-from flask import Blueprint, request
+from flask import Blueprint, jsonify, request
 from flask_cors import cross_origin
 
 from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.models import MhrRegistration
+from mhr_api.models.registration_utils import get_qs_document_id
 from mhr_api.models.type_tables import MhrRegistrationTypes
 from mhr_api.reports.v2.report_utils import ReportTypes
 from mhr_api.resources import registration_utils as reg_utils
@@ -125,6 +126,33 @@ def get_documents(document_id: str):  # pylint: disable=too-many-return-statemen
         return resource_utils.business_exception_response(exception)
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception, account_id, "GET MH document id=" + document_id)
+    except Exception as default_exception:  # noqa: B902; return nicer default error
+        return resource_utils.default_exception_response(default_exception)
+
+
+@bp.route("/qs-document-ids", methods=["GET", "OPTIONS"])
+@cross_origin(origin="*")
+@jwt.requires_auth
+def get_qs_document_ids():
+    """Get a unique qualified supplier document ID based on the user token for DRS integration."""
+    try:
+        # Quick check: must provide an account ID.
+        account_id = resource_utils.get_account_id(request)
+        if account_id is None:
+            return resource_utils.account_required_response()
+        user_group: str = get_group(jwt)
+        logger.info(f"get next QS document_id starting account_id={account_id} user group={user_group}")
+        # Verify request JWT and account ID
+        if not authorized(account_id, jwt):
+            return resource_utils.unauthorized_error_response(account_id)
+        if is_staff(jwt):
+            logger.warning("Get QS document ID endpoint is not intended for staff users.")
+        doc_id: str = get_qs_document_id(user_group)
+        logger.info(f"New group {user_group} doc Id={doc_id}")
+        response_json = {"documentId": doc_id}
+        return jsonify(response_json), HTTPStatus.OK
+    except DatabaseException as db_exception:
+        return resource_utils.db_exception_response(db_exception, account_id, "GET QS document id")
     except Exception as default_exception:  # noqa: B902; return nicer default error
         return resource_utils.default_exception_response(default_exception)
 

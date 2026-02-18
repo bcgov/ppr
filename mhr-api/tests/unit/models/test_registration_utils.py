@@ -117,6 +117,12 @@ TEST_DATA_MHR_CHECK = [
     ('Invalid exists', '000900', False),
     ('Invalid too high', '999900', False)
 ]
+# testdata pattern is ({description}, {group_id}, {start_digit})
+TEST_DATA_DOC_ID = [
+    ('QS Dealer', DEALERSHIP_GROUP, '1'),
+    ('QS lawyer/notary', QUALIFIED_USER_GROUP, '1'),
+    ('QS manufacturer', MANUFACTURER_GROUP, '8')
+]
 # testdata pattern is ({account_id}, {sort_criteria}, {sort_order}, {mhr_numbers}, {expected_clause})
 TEST_QUERY_ORDER_DATA = [
     ('PS12345', None, None, "'000900'", queries.REG_ORDER_BY_DATE),
@@ -301,6 +307,14 @@ def test_validate_mhr_number(session, desc, mhr_number, valid):
     """Assert that the staff new MH MHR number check works as expected."""
     result: bool = reg_utils.validate_mhr_number(mhr_number)
     assert result == valid
+
+
+@pytest.mark.parametrize('desc, user_group, start_digit', TEST_DATA_DOC_ID)
+def test_qs_doc_id(session, desc, user_group, start_digit):
+    """Assert that the QS get next document id works as expected."""
+    result: str = reg_utils.get_qs_document_id(user_group)
+    assert result
+    assert result.startswith(start_digit)
 
 
 @pytest.mark.parametrize('account_id,sort_criteria,sort_order,mhr_numbers,expected_clause', TEST_QUERY_ORDER_DATA)
