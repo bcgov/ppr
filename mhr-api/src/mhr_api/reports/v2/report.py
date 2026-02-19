@@ -954,6 +954,7 @@ class Report:  # pylint: disable=too-few-public-methods
             ReportTypes.MHR_NOTE,
             ReportTypes.MHR_TRANSPORT_PERMIT,
             ReportTypes.MHR_REGISTRATION_COVER,
+            ReportTypes.MHR_TOD_REJECTION,
         ):
             reg_num = self._report_data.get("mhrNumber", "")
             self._report_data["footer_content"] = f"Manufactured Home Registration #{reg_num}"
