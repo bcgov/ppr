@@ -380,10 +380,13 @@ def upload_rejection_report(report: bytes, document_id: str, filing_date: str, r
         drs_url = current_app.config.get("DOC_SERVICE_URL")
         url = f"{drs_url}/documents/MHR/CORR"
         token = SBCPaymentClient.get_sa_token()
+        apikey: str = current_app.config.get("DOC_SERVICE_KEY")
+        account_id = current_app.config.get("DOC_SERVICE_ACCOUNT_ID")
         headers = {
+            "x-apikey": apikey,
             "Authorization": "Bearer " + token,
             "Content-Type": "application/pdf",
-            "Account-Id": "system",
+            "Account-Id": account_id,
         }
         params = {"consumerDocumentId": document_id, "consumerFilingDate": filing_date}
         res = requests.post(url=url, headers=headers, data=report, params=params, timeout=20)

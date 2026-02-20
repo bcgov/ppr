@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mhr-api"
-version = "2.1.12"
+version = "2.1.13"
 description = ""
 authors = ["dlovett <doug@daxiom.com>"]
 license = "BSD 3"
