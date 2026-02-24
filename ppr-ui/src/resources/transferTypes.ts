@@ -416,9 +416,17 @@ export const ClientTransferTypes: Array<TransferTypeSelectIF> = [
   }
 ]
 
+const toDTypesForLawyersAndQSNotary: Array<TransferTypeSelectIF> = (() => {
+  const header = transferDueToDeathTypes[0]
+  const survivingJointTenant = transferDueToDeathTypes.find(
+    type => type.transferType === ApiTransferTypes.SURVIVING_JOINT_TENANT
+  )
+  return survivingJointTenant ? [header, survivingJointTenant] : [header]
+})()
+
 export const QualifiedSupplierTransferTypes = (): Array<TransferTypeSelectIF> => {
   return [
     ...ClientTransferTypes,
-    ...(getFeatureFlag('mhr-transfer-enable-tod') ? transferDueToDeathTypes : [])
+    ...(getFeatureFlag('mhr-transfer-enable-tod') ? transferDueToDeathTypes : toDTypesForLawyersAndQSNotary)
   ]
 }
