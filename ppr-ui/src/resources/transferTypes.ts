@@ -416,9 +416,11 @@ export const ClientTransferTypes: Array<TransferTypeSelectIF> = [
   }
 ]
 
+const toDTypesForLawyersAndQSNotary: Array<TransferTypeSelectIF> = transferDueToDeathTypes.slice(0, 2);
+
 export const QualifiedSupplierTransferTypes = (): Array<TransferTypeSelectIF> => {
   return [
     ...ClientTransferTypes,
-    ...(getFeatureFlag('mhr-transfer-enable-tod') ? transferDueToDeathTypes : [])
+    ...(getFeatureFlag('mhr-transfer-enable-tod') ? transferDueToDeathTypes : toDTypesForLawyersAndQSNotary)
   ]
 }
