@@ -354,6 +354,11 @@ describe('Button events', () => {
 
     vi.useFakeTimers()
     await multiClickWrapper.vm.submitNext()
+
+    // Assert submitting is true and button is disabled
+    expect(multiClickWrapper.vm.submitting).toBe(true)
+    expect(multiClickWrapper.find('#reg-next-btn').attributes().disabled).toBeDefined()
+
     vi.advanceTimersByTime(3000)
     await multiClickWrapper.vm.submitNext()
     await flushPromises()

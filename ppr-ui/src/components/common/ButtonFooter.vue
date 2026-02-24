@@ -237,7 +237,7 @@ export default defineComponent({
         draft = await mhrDraftHandler()
       } else {
         const stateModel: StateModelIF = getStateModel.value
-        draft = await throttleSubmitStatementDraft(stateModel)
+        draft = await submitStatement(stateModel)
         prevDraftId = stateModel.registration?.draft?.financingStatement?.documentId || ''
       }
 
@@ -336,7 +336,7 @@ export default defineComponent({
       const stateModel: StateModelIF = getStateModel.value
       if (checkValid()) {
         // API call here
-        const apiResponse: FinancingStatementIF = await throttleSubmitStatement(stateModel)
+        const apiResponse: FinancingStatementIF = await submitStatement(stateModel)
         if (apiResponse.error !== undefined) {
           // Emit error message.
           emit('error', apiResponse.error)
@@ -366,7 +366,7 @@ export default defineComponent({
       }
     }
 
-    const throttleSubmitStatement = async (stateModel: StateModelIF): Promise<FinancingStatementIF> => {
+    const submitStatement = async (stateModel: StateModelIF): Promise<FinancingStatementIF> => {
       const statement = await saveFinancingStatement(
         stateModel,
         userSelectedPaymentMethod.value === ConnectPaymentMethod.DIRECT_PAY
