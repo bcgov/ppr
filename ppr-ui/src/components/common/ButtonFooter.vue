@@ -73,7 +73,7 @@
           <v-btn
             id="reg-next-btn"
             color="primary"
-            :disabled="lastStepBcol"
+            :disabled="lastStepBcol || submitting"
             class="float-right pl-6"
             @click="submitNext"
           >
@@ -291,12 +291,19 @@ export default defineComponent({
         }
 
         if (checkValid()) {
+          // Prevents multiple submits (i.e. double click)
+          if (localState.submitting) {
+            return
+          }
+          localState.submitting = true
+
           if (localState.isStaffReg) {
             localState.staffPaymentDialogDisplay = true
           } else {
             submitFinancingStatement()
           }
         } else {
+          localState.submitting = false
           // emit registration incomplete error
           const error: ErrorIF = {
             statusCode: 400,
@@ -333,6 +340,8 @@ export default defineComponent({
         if (apiResponse.error !== undefined) {
           // Emit error message.
           emit('error', apiResponse.error)
+          // set submitting to false to allow user to try submitting again after error
+          localState.submitting = false
         } else if (apiResponse.paymentPending) {
           goToPay(apiResponse.payment?.invoiceId, null, `pprReg-${apiResponse.documentId}`)
         } else {
@@ -347,6 +356,7 @@ export default defineComponent({
           await goToRoute(localState.buttonConfig.nextRouteName as RouteNames)
         }
       } else {
+        localState.submitting = false
         // emit registation incomplete error
         const error: ErrorIF = {
           statusCode: 400,
@@ -356,16 +366,13 @@ export default defineComponent({
       }
     }
 
-    const throttleSubmitStatement = throttle(async (stateModel: StateModelIF): Promise<FinancingStatementIF> => {
-      // Prevents multiple submits (i.e. double click)
-      localState.submitting = true
+    const throttleSubmitStatement = async (stateModel: StateModelIF): Promise<FinancingStatementIF> => {
       const statement = await saveFinancingStatement(
         stateModel,
         userSelectedPaymentMethod.value === ConnectPaymentMethod.DIRECT_PAY
       )
-      localState.submitting = false
       return statement
-    }, 2000, { trailing: false })
+    }
 
     const throttleSubmitStatementDraft = throttle(async (stateModel: StateModelIF): Promise<DraftIF> => {
       // Prevents multiple submits (i.e. double click)

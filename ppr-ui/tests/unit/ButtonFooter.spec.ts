@@ -14,6 +14,9 @@ import { mockedManufacturerAuthRoles, mockedModelAmendmdmentAdd } from './test-d
 import type { ButtonConfigIF } from '@/interfaces'
 import { MhrRegistrationType } from '@/resources'
 import { createPinia, setActivePinia } from 'pinia'
+import { vi } from 'vitest'
+import * as navigationComposable from '@/composables/common/useNavigation'
+import * as registrationUtils from '@/utils'
 
 // Input field selectors / buttons
 const cancelBtn: string = '#reg-cancel-btn'
@@ -142,7 +145,7 @@ describe('New Financing Statement Registration Buttons Step 3', () => {
     wrapper = await createComponent(ButtonFooter, {
       currentStepName: RouteNames.ADD_COLLATERAL,
       navConfig: RegistrationButtonFooterConfig
-    }, RouteNames.ADD_COLLATERAL. null, [pinia])
+    }, RouteNames.ADD_COLLATERAL, null, [pinia])
   })
 
   it('renders with step 3 values', async () => {
@@ -321,6 +324,43 @@ describe('Button events', () => {
     await wrapper.vm.submitNext()
     await flushPromises()
     expect(getLastEvent(wrapper, 'registrationIncomplete')).not.toBeNull()
+  })
+
+  it('calls goToPay once when ppr Review Confirm is triggered', async () => {
+    const goToPayMock = vi.fn()
+    const useNavigationSpy = vi.spyOn(navigationComposable, 'useNavigation').mockReturnValue({
+      goToDash: vi.fn(),
+      goToRoute: vi.fn(),
+      goToPay: goToPayMock
+    } as any)
+    vi.spyOn(registrationUtils, 'saveFinancingStatement').mockResolvedValue({
+      paymentPending: true,
+      payment: { invoiceId: '12345' },
+      documentId: 'T1000001'
+    } as any)
+
+    const multiClickWrapper = await createComponent(ButtonFooter, {
+      currentStepName: RouteNames.REVIEW_CONFIRM,
+      navConfig: RegistrationButtonFooterConfig,
+      certifyValid: true
+    }, RouteNames.REVIEW_CONFIRM, null, [pinia])
+
+    store.getStateModel.registration = mockedModelAmendmdmentAdd.registration
+    store.getStateModel.registration.lengthTrust.valid = true
+    store.getStateModel.registration.parties.valid = true
+    store.getStateModel.registration.collateral.valid = true
+    store.isRoleStaffReg = { value: false }
+    await flushPromises()
+
+    vi.useFakeTimers()
+    await multiClickWrapper.vm.submitNext()
+    vi.advanceTimersByTime(3000)
+    await multiClickWrapper.vm.submitNext()
+    await flushPromises()
+
+    expect(goToPayMock).toHaveBeenCalledTimes(1)
+    vi.useRealTimers()
+    useNavigationSpy.mockRestore()
   })
 })
 
