@@ -1,3 +1,6 @@
+import os
+import sqlalchemy as sa
+
 import logging
 from logging.config import fileConfig
 
@@ -166,6 +169,12 @@ def run_migrations_online():
     connectable = get_engine()
 
     with connectable.connect() as connection:
+
+        owner_role = os.getenv("DB_OWNER_ROLE")
+        if owner_role:
+            safe_role = owner_role.replace('"', '""')  # Escape any quotes for SQL safety
+            connection.execute(sa.text(f'SET ROLE "{safe_role}"'))
+
         context.configure(
             connection=connection,
             target_metadata=get_metadata(),
