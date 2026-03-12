@@ -15,8 +15,11 @@
 import os
 
 from dotenv import find_dotenv, load_dotenv
+from google.cloud.sql.connector import Connector, IPTypes
 
 load_dotenv(find_dotenv())
+
+connector = Connector()
 
 
 class BaseConfig:
@@ -47,9 +50,15 @@ class Config(BaseConfig):
     APP_DB_NAME = os.getenv('APP_DATABASE_NAME', '')
     APP_DB_HOST = os.getenv('APP_DATABASE_HOST', '')
     APP_DB_PORT = os.getenv('APP_DATABASE_PORT', '5432')
+
+    # IAM Authentication
+    CLOUDSQL_INSTANCE_CONNECTION_NAME = os.getenv('CLOUDSQL_INSTANCE_CONNECTION_NAME')
+
     # POSTGRESQL
-        # POSTGRESQL
-    if (APP_DB_UNIX_SOCKET := os.getenv('APP_DATABASE_UNIX_SOCKET', None)):
+    if CLOUDSQL_INSTANCE_CONNECTION_NAME:
+        # Use IAM authentication with Cloud SQL connector
+        APP_DATABASE_URI = None  # Will use getconn_app() function instead
+    elif (APP_DB_UNIX_SOCKET := os.getenv('APP_DATABASE_UNIX_SOCKET', None)):
         APP_DATABASE_URI = f'postgresql://{APP_DB_USER}:{APP_DB_PASSWORD}@/{APP_DB_NAME}?host={APP_DB_UNIX_SOCKET}'
     else:
         APP_DATABASE_URI = f'postgresql://{APP_DB_USER}:{APP_DB_PASSWORD}@{APP_DB_HOST}:{APP_DB_PORT}/{APP_DB_NAME}'
@@ -59,12 +68,39 @@ class Config(BaseConfig):
     TRACKER_DB_NAME = os.getenv('TRACKER_DATABASE_NAME', '')
     TRACKER_DB_HOST = os.getenv('TRACKER_DATABASE_HOST', '')
     TRACKER_DB_PORT = os.getenv('TRACKER_DATABASE_PORT', '5432')
+
     # POSTGRESQL
-        # POSTGRESQL
-    if (TRACKER_DB_UNIX_SOCKET := os.getenv('TRACKER_DATABASE_UNIX_SOCKET', None)):
+    if CLOUDSQL_INSTANCE_CONNECTION_NAME:
+        # Use IAM authentication with Cloud SQL connector
+        TRACKER_DATABASE_URI = None  # Will use getconn_tracker() function instead
+    elif (TRACKER_DB_UNIX_SOCKET := os.getenv('TRACKER_DATABASE_UNIX_SOCKET', None)):
         TRACKER_DATABASE_URI = f'postgresql://{TRACKER_DB_USER}:{TRACKER_DB_PASSWORD}@/{TRACKER_DB_NAME}?host={TRACKER_DB_UNIX_SOCKET}'
     else:
         TRACKER_DATABASE_URI = f'postgresql://{TRACKER_DB_USER}:{TRACKER_DB_PASSWORD}@{TRACKER_DB_HOST}:{TRACKER_DB_PORT}/{TRACKER_DB_NAME}'
+
+    @staticmethod
+    def getconn_app():
+        """Get Cloud SQL IAM connection for APP database."""
+        return connector.connect(
+            os.environ['CLOUDSQL_INSTANCE_CONNECTION_NAME'],
+            'pg8000',
+            user=os.environ['APP_DATABASE_USERNAME'],
+            db=os.environ['APP_DATABASE_NAME'],
+            enable_iam_auth=True,
+            ip_type=IPTypes.PRIVATE,
+        )
+
+    @staticmethod
+    def getconn_tracker():
+        """Get Cloud SQL IAM connection for TRACKER database."""
+        return connector.connect(
+            os.environ['CLOUDSQL_INSTANCE_CONNECTION_NAME'],
+            'pg8000',
+            user=os.environ['TRACKER_DATABASE_USERNAME'],
+            db=os.environ['TRACKER_DATABASE_NAME'],
+            enable_iam_auth=True,
+            ip_type=IPTypes.PRIVATE,
+        )
     ACCOUNT_SVC_CLIENT_ID = os.getenv('ACCOUNT_SVC_CLIENT_ID')
     ACCOUNT_SVC_CLIENT_SECRET = os.getenv('ACCOUNT_SVC_CLIENT_SECRET')
     JWT_OIDC_TOKEN_URL = os.getenv('JWT_OIDC_TOKEN_URL')

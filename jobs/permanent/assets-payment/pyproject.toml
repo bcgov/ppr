@@ -16,6 +16,7 @@ phonenumbers = "8.13.39"
 notifications-python-client = "7.0.0"
 beautifulsoup4 = "4.12.3"
 pg8000 = "^1.31.2"
+cloud-sql-python-connector = "^1.20.0"
 cachecontrol = "^0.14.0"
 structured-logging = { git = "https://github.com/bcgov/sbc-connect-common.git", subdirectory = "python/structured-logging", branch = "main" }
 oauthlib = "^3.2.2"

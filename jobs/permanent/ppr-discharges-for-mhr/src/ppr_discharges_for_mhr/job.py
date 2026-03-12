@@ -61,7 +61,10 @@ def csv_export(db_conn: psycopg2.extensions.connection, query: str) -> Tuple[Opt
 def job(config):
 
     # Start the job tracker
-    job_tracker = JobTracker(**{'uri': config.TRACKER_DATABASE_URI})
+    if config.CLOUDSQL_INSTANCE_CONNECTION_NAME:
+        job_tracker = JobTracker(**{'getconn': config.getconn_tracker})
+    else:
+        job_tracker = JobTracker(**{'uri': config.TRACKER_DATABASE_URI})
     running_job_id = job_tracker.start_job(program_name=PROGRAM_NAME, job_name=JOB_NAME, job_state=JobStateEnum.RUNNING)
 
     try:
@@ -78,7 +81,10 @@ def job(config):
         logging.info(f'Format query: {query}')
 
         # Connect to the app database and do a CSV COPY of the query
-        db_conn = psycopg2.connect(dsn=config.APP_DATABASE_URI)
+        if config.CLOUDSQL_INSTANCE_CONNECTION_NAME:
+            db_conn = config.getconn_app()
+        else:
+            db_conn = psycopg2.connect(dsn=config.APP_DATABASE_URI)
         err, csv_buffer = csv_export(db_conn, query)
         logging.info('Completed the CSV Extract')
 
