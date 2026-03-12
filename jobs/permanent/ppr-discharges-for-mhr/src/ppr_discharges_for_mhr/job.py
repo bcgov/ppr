@@ -1,3 +1,4 @@
+import csv
 import io
 import sys
 from contextlib import suppress
@@ -35,19 +36,18 @@ EMAIL_SUBJECT: Final = '[BC Registries and Online Services] CSV File GENERATED {
 EMAIL_BODY: Final = '**Your csv file from PPR at the Business Registry has been generated.**\n\nTo access the file,.\n\n[[{0}]]({1})'
 
 def csv_export(db_conn: psycopg2.extensions.connection, query: str) -> Tuple[Optional[str], Optional[io.StringIO]]:
-    """Export a supplied query as CSV output and return a Tuple(error, Buffered StringIO)
-    
-    Use postgres COPY command to export a SQL query as a CSV file.
-    Write the output to a IO Buffer and return that.
-    """
+    """Export a supplied query as CSV output and return a Tuple(error, Buffered StringIO)."""
     try:
         db_cursor = db_conn.cursor()
-        sql_copy_str = f'COPY ({query}) TO STDOUT WITH CSV HEADER'
+        db_cursor.execute(query)
+        rows = db_cursor.fetchall()
         buffered_output = io.StringIO()
-        db_cursor.copy_expert(sql_copy_str, buffered_output)
+        writer = csv.writer(buffered_output)
+        writer.writerow([desc[0] for desc in db_cursor.description])
+        writer.writerows(rows)
         return None, buffered_output
-    except (psycopg2.Error, Exception) as err:
-        error_message = "Error: {err}, for query {query}".format(err=err, query=sql_copy_str)
+    except Exception as err:
+        error_message = "Error: {err}, for query {query}".format(err=err, query=query)
         logging.debug(error_message)
         return error_message, None
     finally:
