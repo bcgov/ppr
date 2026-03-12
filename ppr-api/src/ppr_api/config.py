@@ -26,8 +26,6 @@ import sys
 
 import requests
 
-from google.cloud.sql.connector import Connector, IPTypes
-connector = Connector()
 
 
 def get_mock_auth() -> str:
@@ -117,17 +115,20 @@ class Config:  # pylint: disable=too-few-public-methods
         "pool_timeout": int(DB_CONN_WAIT_TIMEOUT),
     }
     # POSTGRESQL
-    def getconn():
-        return connector.connect(
-            os.environ["CLOUDSQL_INSTANCE_CONNECTION_NAME"],
-            "pg8000",
-            user=os.environ["DATABASE_USERNAME"],
-            db=os.environ["DATABASE_NAME"],
-            enable_iam_auth=True,
-            ip_type=IPTypes.PRIVATE,
-        )
-
     if os.getenv("CLOUDSQL_INSTANCE_CONNECTION_NAME"):
+        from google.cloud.sql.connector import Connector, IPTypes
+        _connector = Connector()
+
+        def getconn():
+            return _connector.connect(
+                os.environ["CLOUDSQL_INSTANCE_CONNECTION_NAME"],
+                "pg8000",
+                user=os.environ["DATABASE_USERNAME"],
+                db=os.environ["DATABASE_NAME"],
+                enable_iam_auth=True,
+                ip_type=IPTypes.PRIVATE,
+            )
+
         SQLALCHEMY_DATABASE_URI = "postgresql+pg8000://"
         SQLALCHEMY_ENGINE_OPTIONS = {
             **SQLALCHEMY_ENGINE_OPTIONS,
