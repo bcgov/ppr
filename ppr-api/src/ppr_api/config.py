@@ -27,7 +27,6 @@ import sys
 import requests
 
 
-
 def get_mock_auth() -> str:
     """For CI unit tests get mock auth value."""
     try:
@@ -98,8 +97,8 @@ class Config:  # pylint: disable=too-few-public-methods
     DB_PASSWORD = os.getenv("DATABASE_PASSWORD", "")
     DB_NAME = os.getenv("DATABASE_NAME", "")
     DB_HOST = os.getenv("DATABASE_HOST", "")
-    DB_PORT = os.getenv("DATABASE_PORT", "5432") 
-    
+    DB_PORT = os.getenv("DATABASE_PORT", "5432")
+
     # Connection pool settings
     DB_MIN_POOL_SIZE = os.getenv("DATABASE_MIN_POOL_SIZE", "2")
     DB_MAX_POOL_SIZE = os.getenv("DATABASE_MAX_POOL_SIZE", "10")
@@ -117,6 +116,7 @@ class Config:  # pylint: disable=too-few-public-methods
     # POSTGRESQL
     if os.getenv("CLOUDSQL_INSTANCE_CONNECTION_NAME"):
         from google.cloud.sql.connector import Connector, IPTypes
+
         _connector = Connector()
 
         def getconn():
