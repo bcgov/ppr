@@ -119,14 +119,14 @@ class Config:  # pylint: disable=too-few-public-methods
 
         _connector = Connector()
 
-        def getconn():
+        def getconn(_connector=_connector, _IPTypes=IPTypes):
             return _connector.connect(
                 os.environ["CLOUDSQL_INSTANCE_CONNECTION_NAME"],
                 "pg8000",
                 user=os.environ["DATABASE_USERNAME"],
                 db=os.environ["DATABASE_NAME"],
                 enable_iam_auth=True,
-                ip_type=IPTypes.PRIVATE,
+                ip_type=_IPTypes.PRIVATE,
             )
 
         SQLALCHEMY_DATABASE_URI = "postgresql+pg8000://"
