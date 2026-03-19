@@ -19,4 +19,4 @@ jobs:
       app_name: "ppr-ui"
       working_directory: "./ppr-ui"
       codecov_flag: "pprui"
-      node_version: "22"
+      node_version: 24
