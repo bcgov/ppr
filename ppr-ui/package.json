@@ -2,6 +2,9 @@
   "name": "ppr-ui",
   "version": "6.0.9",
   "private": true,
+  "engines": {
+    "node": ">=24"
+  },
   "appName": "Assets UI",
   "connectLayerName": "Core UI",
   "type": "module",
