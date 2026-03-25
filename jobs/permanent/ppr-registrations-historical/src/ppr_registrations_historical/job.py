@@ -101,7 +101,10 @@ def job(config):
     job_message: str = '1. Update account discharged registrations.'
     try:
         logging.info('Getting database connection and cursor.')
-        db_conn = psycopg2.connect(dsn=config.APP_DATABASE_URI)
+        if config.CLOUDSQL_INSTANCE_CONNECTION_NAME:
+            db_conn = config.getconn()
+        else:
+            db_conn = psycopg2.connect(dsn=config.APP_DATABASE_URI)
         db_cursor = db_conn.cursor()
 
         # Update account ids for registrations discharged more than 30 days.

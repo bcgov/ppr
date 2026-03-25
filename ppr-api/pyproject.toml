@@ -44,6 +44,8 @@ datedelta = "^1.4"
 flask-jwt-oidc = "^0.7.0"
 flask-babel = "^4.0.0"
 registry-schemas = {git = "https://github.com/bcgov/registry-schemas.git", rev = "1.8.14"}
+psycopg2-binary = ">=2.9.10"
+cloud-sql-python-connector = "^1.20.0"
 
 
 [tool.poetry.group.test.dependencies]

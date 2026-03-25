@@ -15,8 +15,11 @@
 import os
 
 from dotenv import find_dotenv, load_dotenv
+from google.cloud.sql.connector import Connector, IPTypes
 
 load_dotenv(find_dotenv())
+
+connector = Connector()
 
 
 class BaseConfig:
@@ -48,12 +51,30 @@ class Config(BaseConfig):
     APP_DB_NAME = os.getenv("APP_DATABASE_NAME", "")
     APP_DB_HOST = os.getenv("APP_DATABASE_HOST", "")
     APP_DB_PORT = os.getenv("APP_DATABASE_PORT", "5432")
+
+    # IAM Authentication
+    CLOUDSQL_INSTANCE_CONNECTION_NAME = os.getenv("CLOUDSQL_INSTANCE_CONNECTION_NAME")
+
     # POSTGRESQL
-    # POSTGRESQL
-    if APP_DB_UNIX_SOCKET := os.getenv("APP_DATABASE_UNIX_SOCKET", None):
+    if CLOUDSQL_INSTANCE_CONNECTION_NAME:
+        # Use IAM authentication with Cloud SQL connector
+        APP_DATABASE_URI = None  # Will use getconn() function instead
+    elif APP_DB_UNIX_SOCKET := os.getenv("APP_DATABASE_UNIX_SOCKET", None):
         APP_DATABASE_URI = f"postgresql://{APP_DB_USER}:{APP_DB_PASSWORD}@/{APP_DB_NAME}?host={APP_DB_UNIX_SOCKET}"
     else:
         APP_DATABASE_URI = f"postgresql://{APP_DB_USER}:{APP_DB_PASSWORD}@{APP_DB_HOST}:{APP_DB_PORT}/{APP_DB_NAME}"
+
+    @staticmethod
+    def getconn():
+        """Get Cloud SQL IAM connection."""
+        return connector.connect(
+            os.environ["CLOUDSQL_INSTANCE_CONNECTION_NAME"],
+            "pg8000",
+            user=os.environ["APP_DATABASE_USERNAME"],
+            db=os.environ["APP_DATABASE_NAME"],
+            enable_iam_auth=True,
+            ip_type=IPTypes.PRIVATE,
+        )
 
     # Notify config
     NOTIFY_STATUS_RECIPIENTS = os.getenv("NOTIFY_STATUS_RECIPIENTS", "")
