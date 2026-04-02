@@ -370,6 +370,7 @@ describe('Business debtor search', () => {
 describe('MHR search', () => {
   let wrapper
   const select: SearchTypeIF = SearchTypes[4]
+  const serialNumberSelect: SearchTypeIF = MHRSearchTypes[4]
 
   beforeEach(async () => {
     await store.setUserInfo({
@@ -398,6 +399,22 @@ describe('MHR search', () => {
     expect(getLastEvent(wrapper, searchError)).toBeNull()
     // verify payment confirmation disabled, otherwise it would not have gotten the response yet
     expect(store.getStateModel.userInfo.settings.paymentConfirmationDialog).toBe(false)
+  })
+
+  it('uppercases MHR serial number before request params are built', async () => {
+    wrapper.vm.returnSearchSelection(serialNumberSelect)
+    wrapper.vm.selectedSearchType = serialNumberSelect
+    await nextTick()
+
+    wrapper.vm.searchValue = 'ab12cd'
+
+    expect(wrapper.vm.getSearchApiParams()).toStrictEqual({
+      type: APIMHRSearchTypes.MHRSERIAL_NUMBER,
+      criteria: {
+        value: 'AB12CD'
+      },
+      clientReferenceId: ''
+    })
   })
 })
 
