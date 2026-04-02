@@ -594,6 +594,9 @@ export default defineComponent({
     }
 
     const getCriteria = () => {
+      const isMHRSerialNumberSearch =
+        localState.selectedSearchType.searchTypeAPI === APIMHRMapSearchTypes.MHRSERIAL_NUMBER
+
       if (localState.isIndividual) {
         const first = cleanUpInput(localState.searchValueFirst)
         const second = cleanUpInput(localState.searchValueSecond) // Also used for middle name in MHR searches
@@ -609,7 +612,7 @@ export default defineComponent({
         return { debtorName: { business: cleanUpInput(localState.searchValue) } }
       } else {
         const cleanedSearchValue = cleanUpInput(localState.searchValue)
-        return { value: cleanedSearchValue }
+        return { value: isMHRSerialNumberSearch ? cleanedSearchValue?.toUpperCase() : cleanedSearchValue }
       }
     }
     const getSearchApiParams = (): SearchCriteriaIF => {
