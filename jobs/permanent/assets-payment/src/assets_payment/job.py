@@ -470,7 +470,10 @@ def job(config: Config, sa_token=None):
     db_cursor: psycopg2.extensions.cursor
     try:
         logger.info("Getting database connection and cursor.")
-        db_conn = psycopg2.connect(dsn=config.APP_DATABASE_URI)
+        if config.CLOUDSQL_INSTANCE_CONNECTION_NAME:
+            db_conn = config.getconn()
+        else:
+            db_conn = psycopg2.connect(dsn=config.APP_DATABASE_URI)
         db_cursor = db_conn.cursor()
 
         status_data = run_status_query(db_conn, db_cursor, config)

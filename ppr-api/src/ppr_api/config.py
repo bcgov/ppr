@@ -97,12 +97,7 @@ class Config:  # pylint: disable=too-few-public-methods
     DB_PASSWORD = os.getenv("DATABASE_PASSWORD", "")
     DB_NAME = os.getenv("DATABASE_NAME", "")
     DB_HOST = os.getenv("DATABASE_HOST", "")
-    DB_PORT = os.getenv("DATABASE_PORT", "5432")  # POSTGRESQL
-    # POSTGRESQL
-    if DB_UNIX_SOCKET := os.getenv("DATABASE_UNIX_SOCKET", None):
-        SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@/{DB_NAME}?host={DB_UNIX_SOCKET}"
-    else:
-        SQLALCHEMY_DATABASE_URI = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    DB_PORT = os.getenv("DATABASE_PORT", "5432")
 
     # Connection pool settings
     DB_MIN_POOL_SIZE = os.getenv("DATABASE_MIN_POOL_SIZE", "2")
@@ -118,6 +113,32 @@ class Config:  # pylint: disable=too-few-public-methods
         "pool_recycle": int(DB_CONN_TIMEOUT),
         "pool_timeout": int(DB_CONN_WAIT_TIMEOUT),
     }
+    # POSTGRESQL
+    if os.getenv("CLOUDSQL_INSTANCE_CONNECTION_NAME"):
+        from google.cloud.sql.connector import Connector, IPTypes
+
+        _connector = Connector()
+
+        def getconn(_connector=_connector, _IPTypes=IPTypes):
+            return _connector.connect(
+                os.environ["CLOUDSQL_INSTANCE_CONNECTION_NAME"],
+                "pg8000",
+                user=os.environ["DATABASE_USERNAME"],
+                db=os.environ["DATABASE_NAME"],
+                enable_iam_auth=True,
+                ip_type=_IPTypes.PRIVATE,
+            )
+
+        SQLALCHEMY_DATABASE_URI = "postgresql+pg8000://"
+        SQLALCHEMY_ENGINE_OPTIONS = {
+            **SQLALCHEMY_ENGINE_OPTIONS,
+            "creator": getconn,
+        }
+    else:
+        if DB_UNIX_SOCKET := os.getenv("DATABASE_UNIX_SOCKET", None):
+            SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@/{DB_NAME}?host={DB_UNIX_SOCKET}"
+        else:
+            SQLALCHEMY_DATABASE_URI = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
     # JWT_OIDC Settings
     JWT_OIDC_WELL_KNOWN_CONFIG = os.getenv("JWT_OIDC_WELL_KNOWN_CONFIG")

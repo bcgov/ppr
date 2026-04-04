@@ -43,22 +43,27 @@ class JobTracker:
         self.user = options.get('user')
         self.password = options.get('password')
         self.uri = options.get('uri')
+        self.getconn_func = options.get('getconn')
 
     def _connect(self) -> psycopg2.extensions.connection:
         """Internal function to create the database connection.
-        
+
         The underlying mechanism is a pool, so we can freely open/close without significant overhead.
         """
         if not self.conn:
-            if self.uri:
+            if self.getconn_func:
+                # Use IAM authentication with Cloud SQL connector
+                self.conn = self.getconn_func()
+            elif self.uri:
                 opts = {'dsn': self.uri}
+                self.conn = psycopg2.connect(**opts)
             else:
                 opts = {'host': self.host,
                         'port': self.port,
                         'dbname': self.dbname,
                         'user': self.user,
                         'password': self.password}
-            self.conn = psycopg2.connect(**opts)
+                self.conn = psycopg2.connect(**opts)
         return self.conn
 
     def _get_job_id(self, program_name: str, job_name: str) -> int:

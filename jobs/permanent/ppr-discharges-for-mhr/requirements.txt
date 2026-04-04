@@ -16,6 +16,8 @@ idna==3.3
 proto-plus==1.20.6
 protobuf==3.20.1
 psycopg2-binary==2.9.3
+pg8000==1.31.2
+cloud-sql-python-connector==1.20.0
 pyasn1-modules==0.2.8
 pyasn1==0.4.8
 python-dotenv==0.20.0
