@@ -223,7 +223,7 @@ def search_by_serial_number(request_json):
             query_text += SEARCH_SERIAL_PRIORITIZE_EXACT_MATCH_ORDER
         else:
             query_text += SEARCH_SERIAL_DEAULT_ORDER
-        logger.info(query_text)
+        # logger.info(query_text)
         query = text(query_text)
         result = db.session.execute(query, {"query_value": serial_num})
         return result
