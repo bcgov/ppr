@@ -213,6 +213,7 @@ def search_by_mhr_number(request_json):
 def search_by_serial_number(request_json):
     """Execute a search by serial number query."""
     serial_num: str = request_json["criteria"]["value"]
+    serial_num = serial_num.strip().upper()
     logger.info(f"search_by_serial_number search value={serial_num}.")
     try:
         query_text: str = (
@@ -224,7 +225,7 @@ def search_by_serial_number(request_json):
             query_text += SEARCH_SERIAL_DEAULT_ORDER
         # logger.info(query_text)
         query = text(query_text)
-        result = db.session.execute(query, {"query_value": serial_num.strip()})
+        result = db.session.execute(query, {"query_value": serial_num})
         return result
     except Exception as db_exception:  # noqa: B902; return nicer error
         logger.error("Search_by_serial_number exception: " + str(db_exception))

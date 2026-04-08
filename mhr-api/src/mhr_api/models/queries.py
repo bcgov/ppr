@@ -166,14 +166,19 @@ SELECT arv.mhr_number,
        summary_snapshot ->> 'document_id' AS document_id,
        summary_snapshot ->> 'document_registration_number' AS document_registration_number,
        summary_snapshot ->> 'last_doc_type' AS last_doc_type,
-        summary_snapshot ->> 'note_status' AS note_status,
+       summary_snapshot ->> 'note_status' AS note_status,
        (summary_snapshot ->> 'note_expiry')::timestamp AS note_expiry,
        summary_snapshot ->> 'cancel_doc_type' AS cancel_doc_type,
-        summary_snapshot ->> 'frozen_doc_type' AS frozen_doc_type,
-        arv.account_id,
-        summary_snapshot ->> 'document_type_desc' AS document_type_desc,
-        summary_snapshot ->> 'ppr_lien_type' AS ppr_lien_type,
-        summary_snapshot ->> 'document_type' AS document_type,
+       summary_snapshot ->> 'frozen_doc_type' AS frozen_doc_type,
+       arv.account_id,
+       summary_snapshot ->> 'document_type_desc' AS document_type_desc,
+       (SELECT CASE WHEN arv.registration_type NOT IN ('MHREG', 'MHREG_CONVERSION') THEN ''
+               ELSE (SELECT lcv.registration_type
+                       FROM mhr_lien_check_vw lcv
+                      WHERE lcv.mhr_number = arv.mhr_number
+                   ORDER BY lcv.base_registration_ts
+                  FETCH FIRST 1 ROWS ONLY) END) AS ppr_lien_type,
+       summary_snapshot ->> 'document_type' AS document_type,
        summary_snapshot ->> 'doc_storage_url' AS doc_storage_url,
        (SELECT COUNT(mer.id)
           FROM mhr_extra_registrations mer
@@ -187,8 +192,8 @@ SELECT arv.mhr_number,
            AND mer.account_id != arv.account_id
            AND (mer.removed_ind IS NULL OR mer.removed_ind != 'Y')) AS extra_reg_count,
        summary_snapshot ->> 'location_type' AS location_type,
-        summary_snapshot ->> 'affirm_by' AS affirm_by,
-        COALESCE((summary_snapshot ->> 'report_count'), '0') AS report_count,
+       summary_snapshot ->> 'affirm_by' AS affirm_by,
+       COALESCE((summary_snapshot ->> 'report_count'), '0') AS report_count,
        CASE WHEN arv.account_id IN ('ppr_staff', 'helpdesk')
             THEN (SELECT u.account_id
                    FROM users u
