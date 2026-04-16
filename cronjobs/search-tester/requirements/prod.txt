@@ -1,4 +1,4 @@
-Flask<2
+Flask>=3.0,<4
 Flask-Babel
 Flask-Migrate
 Flask-Moment
