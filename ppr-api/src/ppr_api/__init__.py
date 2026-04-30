@@ -48,12 +48,13 @@ def create_app(service_environment=APP_RUNNING_ENVIRONMENT, run_mode=None, **kwa
 
     if app.config.get("CLOUDSQL_INSTANCE_CONNECTION_NAME"):  # pragma: no cover
         from cloud_sql_connector import DBConfig
+
         db_config = DBConfig(
             instance_name=app.config["CLOUDSQL_INSTANCE_CONNECTION_NAME"],
             database=app.config.get("DB_NAME", ""),
             user=app.config.get("DB_USER", ""),
             ip_type=app.config["DB_IP_TYPE"],
-            pool_recycle = 60,
+            pool_recycle=60,
             schema="public",
         )
         app.config["SQLALCHEMY_ENGINE_OPTIONS"] = db_config.get_engine_options()

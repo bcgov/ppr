@@ -3538,7 +3538,7 @@ structlog = "^24.1.0"
 type = "git"
 url = "https://github.com/bcgov/sbc-connect-common.git"
 reference = "main"
-resolved_reference = "c898988d239dc261b2b186465a1887f15512c102"
+resolved_reference = "2a3d5a2d5b5ff3c905626f3193db5ed0af6d4952"
 subdirectory = "python/structured-logging"
 
 [[package]]
