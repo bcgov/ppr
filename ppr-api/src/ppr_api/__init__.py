@@ -19,7 +19,7 @@ This module is the API for the BC Registries Personal Property Registry system.
 import os
 
 from flask import Flask, redirect  # noqa: I001
-from flask_migrate import Migrate
+from flask_migrate import Migrate, upgrade
 from registry_schemas import __version__ as registry_schemas_version
 from sqlalchemy.sql import text
 
@@ -61,6 +61,14 @@ def create_app(service_environment=APP_RUNNING_ENVIRONMENT, run_mode=None, **kwa
 
     db.init_app(app)
     Migrate(app, db)
+
+    if app.config.get("DEPLOYMENT_ENV", "") == "testing":  # CI only run upgrade for unit testing.
+        logger.info("Running migration upgrade.")
+        with app.app_context():
+            upgrade(directory="migrations", revision="head", sql=False, tag=None)
+        # Alembic has it's own logging config, we'll need to restore our logging here.
+        setup_logging(os.path.join(os.path.abspath(os.path.dirname(__file__)), "logging.yaml"))
+        logger.info("Finished migration upgrade.")
 
     if run_mode == "migration":
         return app
