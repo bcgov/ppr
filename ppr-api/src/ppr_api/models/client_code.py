@@ -323,7 +323,7 @@ class ClientCode(db.Model):  # pylint: disable=too-many-instance-attributes
             query_code: str = party_code.strip() + "%"
             logger.debug(f"party code matching on {query_code}")
             query = text(CLIENT_CODE_BRANCH_QUERY)
-            results = db.session.execute(query, {"query_val": query_code})
+            results = db.session.execute(query, (query_code,))
             rows = results.fetchall()
             if rows is not None:
                 for row in rows:

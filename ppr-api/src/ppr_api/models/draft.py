@@ -124,7 +124,7 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
             max_results_size = int(current_app.config.get("ACCOUNT_DRAFTS_MAX_RESULTS"))
             results = db.session.execute(
                 text(model_utils.QUERY_ACCOUNT_DRAFTS),
-                {"query_account": account_id, "max_results_size": max_results_size},
+                (account_id, max_results_size),
             )
             rows = results.fetchall()
             if rows is not None:
