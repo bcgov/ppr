@@ -23,9 +23,10 @@ phonenumbers = "8.13.39"
 notifications-python-client = "7.0.0"
 beautifulsoup4 = "4.12.3"
 sqlalchemy-continuum = "^1.4.2"
-pg8000 = "^1.31.2"
 cachecontrol = "^0.14.0"
 structured-logging = { git = "https://github.com/bcgov/sbc-connect-common.git", subdirectory = "python/structured-logging", branch = "main" }
+cloud-sql-connector = { git = "https://github.com/bcgov/sbc-connect-common.git", subdirectory = "python/cloud-sql-connector", branch = "main" }
+
 oauthlib = "^3.2.2"
 Jinja2 = "^3.1.2"
 google-api-core = "^2.11.0"
@@ -47,7 +48,6 @@ registry-schemas = {git = "https://github.com/bcgov/registry-schemas.git", rev =
 
 
 [tool.poetry.group.test.dependencies]
-psycopg2-binary = "^2.9.9"
 pytest = "^8.2.2"
 pytest-cov = "^5.0.0"
 pytest-mock = "^3.14.0"

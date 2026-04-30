@@ -25,8 +25,13 @@ from ppr_api import models  # pylint: disable=unused-import
 from ppr_api import create_app
 from ppr_api.models import db
 
-APP = create_app()
-CLI = FlaskGroup(APP)  # replaces MANAGER
+
+def _create_app():
+    return create_app(run_mode="migration")
+
+
+APP = _create_app()
+CLI = FlaskGroup(create_app=_create_app)  # replaces MANAGER
 
 
 def execute_script(session, file_name):
