@@ -191,10 +191,7 @@ class MailReport(db.Model):
                 db.session.execute(update_statement, {"job_id": batch_job_id, "query_start": start})
             else:
                 update_statement = text(UPDATE_BATCH_JOB_DATE_RANGE)
-                db.session.execute(
-                    update_statement,
-                    {"job_id": batch_job_id, "query_start": start, "query_end": end},
-                )
+                db.session.execute(update_statement, {"job_id": batch_job_id, "query_start": start, "query_end": end})
             db.session.commit()
         except Exception as db_exception:  # noqa: B902; return nicer error
             logger.error("DB save_job_id exception: " + str(db_exception))

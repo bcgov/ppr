@@ -129,10 +129,7 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         reg_num = self.request_json["criteria"]["value"]
         row = None
         try:
-            result = db.session.execute(
-                text(search_utils.REG_NUM_QUERY),
-                {"query_value": reg_num.strip().upper()},
-            )
+            result = db.session.execute(text(search_utils.REG_NUM_QUERY), {"query_value": reg_num.strip().upper()})
             row = result.first()
         except Exception as db_exception:  # noqa: B902; return nicer error
             logger.error("DB search_by_registration_number exception: " + str(db_exception))
@@ -216,11 +213,13 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         search_value = self.request_json["criteria"]["debtorName"]["business"]
         rows = None
         try:
-            params = {
-                "query_bus_name": search_value.strip().upper(),
-                "query_bus_quotient": current_app.config.get("SIMILARITY_QUOTIENT_BUSINESS_NAME"),
-            }
-            result = db.session.execute(text(search_utils.BUSINESS_NAME_QUERY), params)
+            result = db.session.execute(
+                text(search_utils.BUSINESS_NAME_QUERY),
+                {
+                    "query_bus_name": search_value.strip().upper(),
+                    "query_bus_quotient": current_app.config.get("SIMILARITY_QUOTIENT_BUSINESS_NAME"),
+                },
+            )
             rows = result.fetchall()
         except Exception as db_exception:  # noqa: B902; return nicer error
             logger.error("DB search_by_business_name exception: " + str(db_exception))
@@ -261,26 +260,29 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             middle_name = self.request_json["criteria"]["debtorName"]["second"]
         rows = None
         try:
-            # pg8000 requires tuple/list for positional (%s) queries
             if middle_name is not None and middle_name.strip() != "" and middle_name.strip().upper() != "NONE":
-                params = {
-                    "query_last": last_name.strip().upper(),
-                    "query_first": first_name.strip().upper(),
-                    "query_middle": middle_name.strip().upper(),
-                    "query_last_quotient": quotient_last,
-                    "query_first_quotient": quotient_first,
-                    "query_default_quotient": quotient_default,
-                }
-                result = db.session.execute(text(search_utils.INDIVIDUAL_NAME_MIDDLE_QUERY), params)
+                result = db.session.execute(
+                    text(search_utils.INDIVIDUAL_NAME_MIDDLE_QUERY),
+                    {
+                        "query_last": last_name.strip().upper(),
+                        "query_first": first_name.strip().upper(),
+                        "query_middle": middle_name.strip().upper(),
+                        "query_last_quotient": quotient_last,
+                        "query_first_quotient": quotient_first,
+                        "query_default_quotient": quotient_default,
+                    },
+                )
             else:
-                params = {
-                    "query_last": last_name.strip().upper(),
-                    "query_first": first_name.strip().upper(),
-                    "query_last_quotient": quotient_last,
-                    "query_first_quotient": quotient_first,
-                    "query_default_quotient": quotient_default,
-                }
-                result = db.session.execute(text(search_utils.INDIVIDUAL_NAME_QUERY), params)
+                result = db.session.execute(
+                    text(search_utils.INDIVIDUAL_NAME_QUERY),
+                    {
+                        "query_last": last_name.strip().upper(),
+                        "query_first": first_name.strip().upper(),
+                        "query_last_quotient": quotient_last,
+                        "query_first_quotient": quotient_first,
+                        "query_default_quotient": quotient_default,
+                    },
+                )
             rows = result.fetchall()
         except Exception as db_exception:  # noqa: B902; return nicer error
             logger.error("DB search_by_individual_name exception: " + str(db_exception))
@@ -322,22 +324,25 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             if self.search_type == self.SearchTypes.BUSINESS_DEBTOR.value:
                 search_value = self.request_json["criteria"]["debtorName"]["business"]
                 quotient = current_app.config.get("SIMILARITY_QUOTIENT_BUSINESS_NAME")
-                params = {"query_bus_name": search_value, "query_bus_quotient": quotient}
-                result = db.session.execute(count_query, params)
+                result = db.session.execute(
+                    count_query, {"query_bus_name": search_value, "query_bus_quotient": quotient}
+                )
             elif self.search_type == self.SearchTypes.INDIVIDUAL_DEBTOR.value:
                 last_name = self.request_json["criteria"]["debtorName"]["last"]
                 first_name = self.request_json["criteria"]["debtorName"]["first"]
                 quotient_first = current_app.config.get("SIMILARITY_QUOTIENT_FIRST_NAME")
                 quotient_last = current_app.config.get("SIMILARITY_QUOTIENT_LAST_NAME")
                 quotient_default = current_app.config.get("SIMILARITY_QUOTIENT_DEFAULT")
-                params = {
-                    "query_last": last_name.strip().upper(),
-                    "query_first": first_name.strip().upper(),
-                    "query_first_quotient": quotient_first,
-                    "query_last_quotient": quotient_last,
-                    "query_default_quotient": quotient_default,
-                }
-                result = db.session.execute(count_query, params)
+                result = db.session.execute(
+                    count_query,
+                    {
+                        "query_last": last_name.strip().upper(),
+                        "query_first": first_name.strip().upper(),
+                        "query_first_quotient": quotient_first,
+                        "query_last_quotient": quotient_last,
+                        "query_default_quotient": quotient_default,
+                    },
+                )
             else:
                 search_value = self.request_json["criteria"]["value"]
                 result = db.session.execute(count_query, {"query_value": search_value})

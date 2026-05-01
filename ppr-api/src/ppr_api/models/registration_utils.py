@@ -885,20 +885,14 @@ def set_securities_notices_json(registration, json_data, registration_id):
 
 def update_account_reg_remove(account_id: str, reg_num: str) -> int:
     """Mark registrations created by an account as removed by appending _R to the account id."""
-    db.session.execute(
-        text(QUERY_UPDATE_ACCOUNT_ID_REMOVE),
-        {"query_account": account_id, "query_reg_num": reg_num},
-    )
+    db.session.execute(text(QUERY_UPDATE_ACCOUNT_ID_REMOVE), {"query_account": account_id, "query_reg_num": reg_num})
     logger.info(f"update_account_reg_remove account={account_id} reg_num={reg_num}")
     db.session.commit()
 
 
 def update_account_reg_restore(account_id: str, reg_num: str):
     """Mark registrations created by an account as restored by removing _R from the end of the account id."""
-    db.session.execute(
-        text(QUERY_UPDATE_ACCOUNT_ID_RESTORE),
-        {"query_account": account_id, "query_reg_num": reg_num},
-    )
+    db.session.execute(text(QUERY_UPDATE_ACCOUNT_ID_RESTORE), {"query_account": account_id, "query_reg_num": reg_num})
     logger.info(f"update_account_reg_restore account={account_id} reg_num={reg_num}")
     db.session.commit()
 
