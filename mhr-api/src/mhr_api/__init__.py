@@ -37,13 +37,26 @@ from mhr_api.utils.logging import logger, setup_logging
 setup_logging(os.path.join(os.path.abspath(os.path.dirname(__file__)), "logging.yaml"))  # important to do this first
 
 
-def create_app(service_environment=APP_RUNNING_ENVIRONMENT, **kwargs):
+def create_app(service_environment=APP_RUNNING_ENVIRONMENT, run_mode=None, **kwargs):
     """Return a configured Flask App using the Factory method."""
     app = Flask(__name__)
     app.config.from_object(config[service_environment])
     app.url_map.strict_slashes = False
 
     errorhandlers.init_app(app)
+
+    if app.config.get("CLOUDSQL_INSTANCE_CONNECTION_NAME"):  # pragma: no cover
+        from cloud_sql_connector import DBConfig
+
+        db_config = DBConfig(
+            instance_name=app.config["CLOUDSQL_INSTANCE_CONNECTION_NAME"],
+            database=app.config.get("DB_NAME", ""),
+            user=app.config.get("DB_USER", ""),
+            ip_type=app.config["DB_IP_TYPE"],
+            pool_recycle=60,
+            schema="public",
+        )
+        app.config["SQLALCHEMY_ENGINE_OPTIONS"] = db_config.get_engine_options()
 
     db.init_app(app)
     Migrate(app, db)
@@ -56,6 +69,9 @@ def create_app(service_environment=APP_RUNNING_ENVIRONMENT, **kwargs):
         logger.info("Finished db upgrade.")
     else:
         logger.info("Logging, migrate set up.")
+    
+    if run_mode == "migration":
+        return app
 
     rsbc_schemas.init_app(app)
     babel.init_app(app)
