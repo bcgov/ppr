@@ -213,16 +213,11 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         search_value = self.request_json["criteria"]["debtorName"]["business"]
         rows = None
         try:
-            result = db.session.execute(
-                text(search_utils.BUSINESS_NAME_QUERY),
-                (
-                    search_value.strip().upper(),
-                    search_value.strip().upper(),
-                    search_value.strip().upper(),
-                    search_value.strip().upper(),
-                    current_app.config.get("SIMILARITY_QUOTIENT_BUSINESS_NAME"),
-                ),
-            )
+            params = {
+                "query_bus_name": search_value.strip().upper(),
+                "query_bus_quotient": current_app.config.get("SIMILARITY_QUOTIENT_BUSINESS_NAME"),
+            }
+            result = db.session.execute(text(search_utils.BUSINESS_NAME_QUERY), params)
             rows = result.fetchall()
         except Exception as db_exception:  # noqa: B902; return nicer error
             logger.error("DB search_by_business_name exception: " + str(db_exception))
@@ -263,29 +258,26 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             middle_name = self.request_json["criteria"]["debtorName"]["second"]
         rows = None
         try:
+            # pg8000 requires tuple/list for positional (%s) queries
             if middle_name is not None and middle_name.strip() != "" and middle_name.strip().upper() != "NONE":
-                result = db.session.execute(
-                    text(search_utils.INDIVIDUAL_NAME_MIDDLE_QUERY),
-                    (
-                        last_name.strip().upper(),
-                        first_name.strip().upper(),
-                        middle_name.strip().upper(),
-                        quotient_last,
-                        quotient_first,
-                        quotient_default,
-                    ),
+                params = (
+                    last_name.strip().upper(),
+                    first_name.strip().upper(),
+                    middle_name.strip().upper(),
+                    quotient_last,
+                    quotient_first,
+                    quotient_default,
                 )
+                result = db.session.execute(text(search_utils.INDIVIDUAL_NAME_MIDDLE_QUERY), params)
             else:
-                result = db.session.execute(
-                    text(search_utils.INDIVIDUAL_NAME_QUERY),
-                    (
-                        last_name.strip().upper(),
-                        first_name.strip().upper(),
-                        quotient_last,
-                        quotient_first,
-                        quotient_default,
-                    ),
+                params = (
+                    last_name.strip().upper(),
+                    first_name.strip().upper(),
+                    quotient_last,
+                    quotient_first,
+                    quotient_default,
                 )
+                result = db.session.execute(text(search_utils.INDIVIDUAL_NAME_QUERY), params)
             rows = result.fetchall()
         except Exception as db_exception:  # noqa: B902; return nicer error
             logger.error("DB search_by_individual_name exception: " + str(db_exception))
@@ -327,25 +319,22 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
             if self.search_type == self.SearchTypes.BUSINESS_DEBTOR.value:
                 search_value = self.request_json["criteria"]["debtorName"]["business"]
                 quotient = current_app.config.get("SIMILARITY_QUOTIENT_BUSINESS_NAME")
-                result = db.session.execute(
-                    count_query, (search_value, search_value, search_value, search_value, quotient)
-                )
+                params = (search_value, search_value, search_value, search_value, quotient)
+                result = db.session.execute(count_query, params)
             elif self.search_type == self.SearchTypes.INDIVIDUAL_DEBTOR.value:
                 last_name = self.request_json["criteria"]["debtorName"]["last"]
                 first_name = self.request_json["criteria"]["debtorName"]["first"]
                 quotient_first = current_app.config.get("SIMILARITY_QUOTIENT_FIRST_NAME")
                 quotient_last = current_app.config.get("SIMILARITY_QUOTIENT_LAST_NAME")
                 quotient_default = current_app.config.get("SIMILARITY_QUOTIENT_DEFAULT")
-                result = db.session.execute(
-                    count_query,
-                    (
-                        last_name.strip().upper(),
-                        first_name.strip().upper(),
-                        quotient_first,
-                        quotient_last,
-                        quotient_default,
-                    ),
+                params = (
+                    last_name.strip().upper(),
+                    first_name.strip().upper(),
+                    quotient_first,
+                    quotient_last,
+                    quotient_default,
                 )
+                result = db.session.execute(count_query, params)
             else:
                 search_value = self.request_json["criteria"]["value"]
                 result = db.session.execute(count_query, (search_value,))
@@ -393,7 +382,6 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         if count < 1:
             return history_list
         try:
-            # Minimal pg8000 fix: only change if query uses %s placeholders; otherwise, pass dict as-is
             result = db.session.execute(text(query), query_params)
             rows = result.fetchall()
         except Exception as db_exception:  # noqa: B902; return nicer error

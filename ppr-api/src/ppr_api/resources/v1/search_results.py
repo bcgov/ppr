@@ -155,7 +155,11 @@ def get_search_results(search_id: str):  # pylint: disable=too-many-branches,too
         if search_id.find(("_" + REPORT_STATUS_PENDING)) != -1:
             search_id = search_id.replace(("_" + REPORT_STATUS_PENDING), "")
         logger.info(f"Fetching search detail for {search_id}.")
-        search_detail: SearchResult = SearchResult.find_by_search_id(search_id, True)
+        try:
+            search_id_int = int(search_id)
+        except (ValueError, TypeError):
+            return resource_utils.bad_request_response("Invalid searchId format.")
+        search_detail: SearchResult = SearchResult.find_by_search_id(search_id_int, True)
         if not search_detail:
             return resource_utils.not_found_error_response("searchId", search_id)
         # If no search selection (step 2) return an error. Could be results
@@ -245,7 +249,11 @@ def post_callback(search_id: str):  # pylint: disable=too-many-branches, too-man
                 "Max retries reached.",
             )
 
-        search_detail = SearchResult.find_by_search_id(search_id, False)
+        try:
+            search_id_int = int(search_id)
+        except (ValueError, TypeError):
+            return callback_error(resource_utils.CallbackExceptionCodes.INVALID_ID, search_id, HTTPStatus.BAD_REQUEST)
+        search_detail = SearchResult.find_by_search_id(search_id_int, False)
         if not search_detail:
             return callback_error(resource_utils.CallbackExceptionCodes.UNKNOWN_ID, search_id, HTTPStatus.NOT_FOUND)
 
@@ -347,7 +355,13 @@ def post_notifications(search_id: str):  # pylint: disable=too-many-branches, to
                 "Max retries reached.",
             )
 
-        search_detail = SearchResult.find_by_search_id(search_id, False)
+        try:
+            search_id_int = int(search_id)
+        except (ValueError, TypeError):
+            return notification_error(
+                resource_utils.CallbackExceptionCodes.INVALID_ID, search_id, HTTPStatus.BAD_REQUEST
+            )
+        search_detail = SearchResult.find_by_search_id(search_id_int, False)
         if not search_detail:
             return notification_error(resource_utils.CallbackExceptionCodes.UNKNOWN_ID, search_id, HTTPStatus.NOT_FOUND)
 
