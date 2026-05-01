@@ -25,6 +25,7 @@ from mhr_api import models  # pylint: disable=unused-import
 from mhr_api import create_app
 from mhr_api.models import db
 
+
 def _create_app():
     return create_app(run_mode="migration")
 
