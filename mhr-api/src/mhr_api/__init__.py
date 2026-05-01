@@ -69,7 +69,7 @@ def create_app(service_environment=APP_RUNNING_ENVIRONMENT, run_mode=None, **kwa
         logger.info("Finished db upgrade.")
     else:
         logger.info("Logging, migrate set up.")
-    
+
     if run_mode == "migration":
         return app
 
