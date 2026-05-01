@@ -65,6 +65,7 @@ def post_search_results(search_id: str):  # pylint: disable=too-many-branches,to
     try:
         if search_id is None:
             return resource_utils.path_param_error_response("search ID")
+        search_id_int = int(search_id)
 
         # Quick check: must provide an account ID.
         account_id = resource_utils.get_account_id(request)
@@ -78,7 +79,7 @@ def post_search_results(search_id: str):  # pylint: disable=too-many-branches,to
         request_json = None
         use_current_selection = request.args.get(USE_CURRENT_PARAM)
         if use_current_selection:
-            search_request = SearchRequest.find_by_id(search_id)
+            search_request = SearchRequest.find_by_id(search_id_int)
             request_json = search_request.updated_selection or []
         else:
             request_json = request.get_json(silent=True)
@@ -88,7 +89,7 @@ def post_search_results(search_id: str):  # pylint: disable=too-many-branches,to
                 return resource_utils.validation_error_response(errors, VAL_ERROR)
 
         # Perform any extra data validation such as start and end dates here
-        search_detail = SearchResult.validate_search_select(request_json, search_id)
+        search_detail = SearchResult.validate_search_select(request_json, search_id_int)
 
         # Large report threshold check, require/save callbackURL parameter.
         # UI may not request a report in step 2.

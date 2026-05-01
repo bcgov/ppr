@@ -153,10 +153,10 @@ class MailReport(db.Model):
             result_set = None
             if not end:
                 query = text(QUERY_FILTER_DATE_START)
-                result_set = db.session.execute(query, (start,))
+                result_set = db.session.execute(query, {"query_start": start})
             else:
                 query = text(QUERY_FILTER_DATE_RANGE)
-                result_set = db.session.execute(query, (start, end))
+                result_set = db.session.execute(query, {"query_start": start, "query_end": end})
             rows = result_set.fetchall()
             if rows is not None:
                 for row in rows:
@@ -188,10 +188,13 @@ class MailReport(db.Model):
         try:
             if not end:
                 update_statement = text(UPDATE_BATCH_JOB_DATE_START)
-                db.session.execute(update_statement, (batch_job_id, start))
+                db.session.execute(update_statement, {"job_id": batch_job_id, "query_start": start})
             else:
                 update_statement = text(UPDATE_BATCH_JOB_DATE_RANGE)
-                db.session.execute(update_statement, (batch_job_id, start, end))
+                db.session.execute(
+                    update_statement,
+                    {"job_id": batch_job_id, "query_start": start, "query_end": end},
+                )
             db.session.commit()
         except Exception as db_exception:  # noqa: B902; return nicer error
             logger.error("DB save_job_id exception: " + str(db_exception))
