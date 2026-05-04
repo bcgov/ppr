@@ -136,6 +136,7 @@ def put_searches(search_id: str):
     try:
         if search_id is None:
             return resource_utils.path_param_error_response("search ID")
+        search_id_int = int(search_id)
 
         # Quick check: must be staff or provide an account ID.
         account_id = resource_utils.get_account_id(request)
@@ -152,7 +153,7 @@ def put_searches(search_id: str):
         if not valid_format:
             return resource_utils.validation_error_response(errors, VAL_ERROR)
 
-        search_request = SearchRequest.find_by_id(search_id)
+        search_request = SearchRequest.find_by_id(search_id_int)
         if not search_request:
             return resource_utils.not_found_error_response("searchId", search_id)
 
@@ -176,6 +177,7 @@ def get_searches(search_id: str):
     try:
         if search_id is None:
             return resource_utils.path_param_error_response("search ID")
+        search_id_int = int(search_id)
 
         # Quick check: must be staff or provide an account ID.
         account_id = resource_utils.get_account_id(request)
@@ -186,7 +188,7 @@ def get_searches(search_id: str):
         if not authorized(account_id, jwt):
             return resource_utils.unauthorized_error_response(account_id)
 
-        search_request: SearchRequest = SearchRequest.find_by_id(search_id)
+        search_request: SearchRequest = SearchRequest.find_by_id(search_id_int)
         if not search_request or not search_request.search_result:
             return resource_utils.not_found_error_response("searchId", search_id)
         if search_request.search_result.is_payment_pending():
