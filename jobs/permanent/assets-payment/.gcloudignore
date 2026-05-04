@@ -5,10 +5,7 @@ venv
 .env*
 .eggs
 Makefile
-k8s
 manage.py
 migrations
-pre-hook-update-db.sh
-requirements
 test_data
 tests
