@@ -17,9 +17,10 @@ import json
 import sys
 from contextlib import suppress
 from http import HTTPStatus
-from typing import Final
+from typing import Any, Final
 
-import psycopg2
+from cloud_sql_connector import DBConfig, getconn
+from pg8000 import dbapi as pg8000
 
 from assets_payment.config import Config
 from assets_payment.services.notify import Notify
@@ -42,6 +43,9 @@ NOTIFY_STATUS_DATA = {
     "mhr_expired": -1,
     "mhr_review_expired": -1,
 }
+
+DbConnection = Any
+DbCursor = Any
 
 STATUS_QUERY = """
 SELECT (SELECT COUNT(e.id)
@@ -188,8 +192,8 @@ INSERT INTO mhr_review_steps
 
 
 def track_event(  # pylint: disable=too-many-positional-arguments,too-many-arguments
-    db_conn: psycopg2.extensions.connection,
-    db_cursor: psycopg2.extensions.cursor,
+    db_conn: DbConnection,
+    db_cursor: DbCursor,
     job_id: int,
     tracking_type: str,
     status: int,
@@ -204,15 +208,13 @@ def track_event(  # pylint: disable=too-many-positional-arguments,too-many-argum
         )
         db_cursor.execute(sql_statement)
         db_conn.commit()
-    except (psycopg2.Error, Exception) as err:
+    except Exception as err:
         db_conn.rollback()
         error_message = f"Error attempting event_tracking insert: {err}"
         logger.error(error_message)
 
 
-def restore_mhr_status(
-    db_conn: psycopg2.extensions.connection, db_cursor: psycopg2.extensions.cursor, mhr_numbers: str, draft_ids: str
-):
+def restore_mhr_status(db_conn: DbConnection, db_cursor: DbCursor, mhr_numbers: str, draft_ids: str):
     """Revert MHR home registrations locked due to a payment pending status to the previous active status."""
     try:
         if not db_conn or not db_cursor:
@@ -224,13 +226,13 @@ def restore_mhr_status(
         db_cursor.execute(sql_statement)
         db_conn.commit()
         logger.info(f"Restore MHR home status updated for draft ID's {draft_ids} mhr numbers {mhr_numbers}")
-    except (psycopg2.Error, Exception) as err:
+    except Exception as err:
         db_conn.rollback()
         error_message = f"Error attempting restore mhr base registration status {err}"
         logger.error(error_message)
 
 
-def restore_mhr_draft(db_conn: psycopg2.extensions.connection, db_cursor: psycopg2.extensions.cursor, draft_ids: str):
+def restore_mhr_draft(db_conn: DbConnection, db_cursor: DbCursor, draft_ids: str):
     """Revert MHR drafts in a payment pending state to the regular draft state."""
     try:
         if not db_conn or not db_cursor:
@@ -242,15 +244,13 @@ def restore_mhr_draft(db_conn: psycopg2.extensions.connection, db_cursor: psycop
         db_cursor.execute(sql_statement)
         db_conn.commit()
         logger.info(f"Restore MHR draft state updated for draft ID's {draft_ids}")
-    except (psycopg2.Error, Exception) as err:
+    except Exception as err:
         db_conn.rollback()
         error_message = f"Error attempting restore mhr draft state {err}"
         logger.error(error_message)
 
 
-def update_mhr_review_reg(
-    db_conn: psycopg2.extensions.connection, db_cursor: psycopg2.extensions.cursor, config: Config
-):
+def update_mhr_review_reg(db_conn: DbConnection, db_cursor: DbCursor, config: Config):
     """Update MHR expired cc payments staff registration review status type to PAY_CANCELLED."""
     try:
         if not db_conn or not db_cursor:
@@ -270,15 +270,13 @@ def update_mhr_review_reg(
         db_cursor.execute(UPDATE_MHR_REVIEW.format(expire_hours=config.MHR_EXPIRY_CLIENT_HOURS))
         db_conn.commit()
         logger.info(f"mhr_review_registrations status type updated for ID's {review_ids}")
-    except (psycopg2.Error, Exception) as err:
+    except Exception as err:
         db_conn.rollback()
         error_message = f"Error attempting update mhr review registrations status {err}"
         logger.error(error_message)
 
 
-def restore_ppr_status(
-    db_conn: psycopg2.extensions.connection, db_cursor: psycopg2.extensions.cursor, reg_numbers: str, draft_ids: str
-):
+def restore_ppr_status(db_conn: DbConnection, db_cursor: DbCursor, reg_numbers: str, draft_ids: str):
     """Unlock PPR base registrations locked due to a payment pending status."""
     try:
         if not db_conn or not db_cursor:
@@ -290,13 +288,13 @@ def restore_ppr_status(
         db_cursor.execute(sql_statement)
         db_conn.commit()
         logger.info(f"Restore PPR home status updated for draft ID's {draft_ids} base reg numbers {reg_numbers}")
-    except (psycopg2.Error, Exception) as err:
+    except Exception as err:
         db_conn.rollback()
         error_message = f"Error attempting restore PPR base registration status {err}"
         logger.error(error_message)
 
 
-def restore_ppr_draft(db_conn: psycopg2.extensions.connection, db_cursor: psycopg2.extensions.cursor, draft_ids: str):
+def restore_ppr_draft(db_conn: DbConnection, db_cursor: DbCursor, draft_ids: str):
     """Revert PPR drafts in a payment pending state to the regular draft state."""
     try:
         if not db_conn or not db_cursor:
@@ -308,15 +306,13 @@ def restore_ppr_draft(db_conn: psycopg2.extensions.connection, db_cursor: psycop
         db_cursor.execute(sql_statement)
         db_conn.commit()
         logger.info(f"Restore PPR draft state updated for draft ID's {draft_ids}")
-    except (psycopg2.Error, Exception) as err:
+    except Exception as err:
         db_conn.rollback()
         error_message = f"Error attempting restore PPR draft state {err}"
         logger.error(error_message)
 
 
-def run_status_query(
-    db_conn: psycopg2.extensions.connection, db_cursor: psycopg2.extensions.cursor, config: Config
-) -> dict:
+def run_status_query(db_conn: DbConnection, db_cursor: DbCursor, config: Config) -> dict:
     """Execute the summary information status query."""
     status_data: dict = copy.deepcopy(NOTIFY_STATUS_DATA)
     try:
@@ -334,15 +330,15 @@ def run_status_query(
         status_data["mhr_expired"] = int(row[5])
         status_data["mhr_review_expired"] = int(row[6])
         logger.info(f"Status query results: {str(status_data)}")
-    except (psycopg2.Error, Exception) as err:
+    except Exception as err:
         error_message = f"Error attempting to run status query: {err}"
         logger.error(error_message)
     return status_data
 
 
 def cancel_ppr_expired(  # pylint: disable=too-many-locals
-    db_conn: psycopg2.extensions.connection,
-    db_cursor: psycopg2.extensions.cursor,
+    db_conn: DbConnection,
+    db_cursor: DbCursor,
     config: Config,
     status_data: dict,
     pay_client: SBCPaymentClient,
@@ -393,15 +389,15 @@ def cancel_ppr_expired(  # pylint: disable=too-many-locals
         status_data["ppr_error_ids"] = error_draft_ids
         restore_ppr_status(db_conn, db_cursor, reg_numbers, draft_ids)
         restore_ppr_draft(db_conn, db_cursor, draft_ids)
-    except (psycopg2.Error, Exception) as err:
+    except Exception as err:
         error_message = f"Error attempting to cancel PPR expired payments: {err}"
         logger.error(error_message)
     return cancel_count
 
 
 def cancel_mhr_expired(  # pylint: disable=too-many-locals
-    db_conn: psycopg2.extensions.connection,
-    db_cursor: psycopg2.extensions.cursor,
+    db_conn: DbConnection,
+    db_cursor: DbCursor,
     config: Config,
     status_data: dict,
     pay_client: SBCPaymentClient,
@@ -456,7 +452,7 @@ def cancel_mhr_expired(  # pylint: disable=too-many-locals
         status_data["mhr_error_ids"] = error_draft_ids
         restore_mhr_status(db_conn, db_cursor, mhr_numbers, draft_ids)
         restore_mhr_draft(db_conn, db_cursor, draft_ids)
-    except (psycopg2.Error, Exception) as err:
+    except Exception as err:
         error_message = f"Error attempting to cancel MHR expired payments: {err}"
         logger.error(error_message)
     return cancel_count
@@ -466,11 +462,28 @@ def job(config: Config, sa_token=None):
     """Execute the job."""
     pay_client: SBCPaymentClient = SBCPaymentClient(config, sa_token)
     notify_client = Notify(config, sa_token)
-    db_conn: psycopg2.extensions.connection
-    db_cursor: psycopg2.extensions.cursor
+    db_conn: DbConnection
+    db_cursor: DbCursor
     try:
         logger.info("Getting database connection and cursor.")
-        db_conn = psycopg2.connect(dsn=config.APP_DATABASE_URI)
+        if config.CLOUDSQL_INSTANCE_CONNECTION_NAME:  # pragma: no cover
+            db_config = DBConfig(
+                instance_name=config.CLOUDSQL_INSTANCE_CONNECTION_NAME,
+                database=config.APP_DB_NAME,
+                user=config.APP_DB_USER,
+                ip_type=config.DB_IP_TYPE,
+                pool_recycle=60,
+                schema="public",
+            )
+            db_conn = getconn(db_config)
+        else:
+            db_conn = pg8000.connect(
+                user=config.APP_DB_USER,
+                password=config.APP_DB_PASSWORD,
+                host=config.APP_DB_HOST,
+                port=int(config.APP_DB_PORT),
+                database=config.APP_DB_NAME,
+            )
         db_cursor = db_conn.cursor()
 
         status_data = run_status_query(db_conn, db_cursor, config)
@@ -488,7 +501,7 @@ def job(config: Config, sa_token=None):
         notify_client.send_status(status_data)
         job_message: str = f"Run successful: status info {json.dumps(status_data)}."
         track_event(db_conn, db_cursor, STATUS_JOB_ID, STATUS_TRACKING_TYPE, HTTPStatus.OK, job_message)
-    except (psycopg2.Error, Exception) as err:
+    except Exception as err:
         job_message: str = f"Run failed: {str(err)}."
         logger.error(job_message)
         notify_client.send_status_error(str(err))

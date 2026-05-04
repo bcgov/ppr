@@ -1,0 +1,75 @@
+# Copyright 2026 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+apiVersion: deploy.cloud.google.com/v1
+kind: DeliveryPipeline
+metadata:
+ name: ppr-assets-payment-pipeline
+description: Deployment pipeline
+serialPipeline:
+ stages:
+ - targetId: eogruh-dev
+   profiles: [dev]
+   strategy:
+    standard:
+      verify: false
+   deployParameters:
+   - values:
+      deploy-env: "development"
+      deploy-project-id: "eogruh-dev"
+      service-name: "ppr-assets-payment-dev"
+      container-name: "ppr-assets-payment-dev"
+      cloudsql-instances: "eogruh-dev:northamerica-northeast1:ppr-dev-cloudsql"
+      service-account: "sa-job@eogruh-dev.iam.gserviceaccount.com"
+ - targetId: eogruh-test
+   profiles: [test]
+   strategy:
+    standard:
+      verify: false
+   deployParameters:
+   - values:
+      deploy-env: "test"
+      deploy-project-id: "eogruh-test"
+      service-name: "ppr-assets-payment-test"
+      container-name: "ppr-assets-payment-test"
+      app-env: "test"
+      cloudsql-instances: "eogruh-test:northamerica-northeast1:ppr-test-cloudsql"
+      service-account: "sa-job@eogruh-test.iam.gserviceaccount.com"
+ - targetId: eogruh-sandbox
+   profiles: [sandbox]
+   strategy:
+    standard:
+      verify: false
+   deployParameters:
+   - values:
+      deploy-env: "sandbox"
+      deploy-project-id: "eogruh-sandbox"
+      service-name: "ppr-assets-payment-sandbox"
+      container-name: "ppr-assets-payment-sandbox"
+      app-env: "sandbox"
+      cloudsql-instances: "eogruh-sandbox:northamerica-northeast1:ppr-sandbox-pgdb"
+      service-account: "sa-job@eogruh-sandbox.iam.gserviceaccount.com"
+ - targetId: eogruh-prod
+   profiles: [prod]
+   strategy:
+    standard:
+      verify: false
+   deployParameters:
+   - values:
+      deploy-env: "production"
+      deploy-project-id: "eogruh-prod"
+      service-name: "ppr-assets-payment-prod"
+      container-name: "ppr-assets-payment-prod"
+      app-env: "production"
+      cloudsql-instances: "eogruh-prod:northamerica-northeast1:ppr-prod"
+      service-account: "sa-job@eogruh-prod.iam.gserviceaccount.com"
