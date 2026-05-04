@@ -23,7 +23,6 @@ phonenumbers = "8.13.39"
 notifications-python-client = "7.0.0"
 beautifulsoup4 = "4.12.3"
 sqlalchemy-continuum = "^1.4.2"
-pg8000 = "^1.31.2"
 cachecontrol = "^0.14.0"
 structured-logging = { git = "https://github.com/bcgov/sbc-connect-common.git", subdirectory = "python/structured-logging", branch = "main" }
 oauthlib = "^3.2.2"
@@ -44,9 +43,9 @@ datedelta = "^1.4"
 flask-jwt-oidc = "^0.7.0"
 flask-babel = "^4.0.0"
 registry-schemas = {git = "https://github.com/bcgov/registry-schemas.git", rev = "1.8.15"}
+cloud-sql-connector = { git = "https://github.com/bcgov/sbc-connect-common.git", subdirectory = "python/cloud-sql-connector", branch = "main" }
 
 [tool.poetry.group.test.dependencies]
-psycopg2-binary = "^2.9.9"
 pytest = "^8.2.2"
 pytest-cov = "^5.0.0"
 pytest-mock = "^3.14.0"
@@ -143,8 +142,7 @@ minversion = "2.0"
 testpaths = [
    "tests",
 ]
-# addopts = "--verbose --strict -p no:warnings --cov=src --cov-report html:htmlcov --cov-report xml:coverage.xml"
-addopts = "--verbose --strict -p no:warnings"
+addopts = "--verbose --strict -p no:warnings --cov=src/mhr_api"
 python_files = [
    "test*.py"
 ]

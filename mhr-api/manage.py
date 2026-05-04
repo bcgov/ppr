@@ -25,8 +25,13 @@ from mhr_api import models  # pylint: disable=unused-import
 from mhr_api import create_app
 from mhr_api.models import db
 
-APP = create_app()
-CLI = FlaskGroup(APP)  # replaces MANAGER
+
+def _create_app():
+    return create_app(run_mode="migration")
+
+
+APP = _create_app()
+CLI = FlaskGroup(create_app=_create_app)
 
 
 def execute_script(session, file_name):

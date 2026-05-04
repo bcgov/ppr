@@ -69,6 +69,10 @@ class TrustIndenture(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a list of trust indenture objects by registration number."""
         trust_indenture = None
         if registration_id:
+            try:
+                registration_id = int(registration_id)
+            except (TypeError, ValueError):
+                return None
             trust_indenture = (
                 db.session.query(TrustIndenture)
                 .filter(TrustIndenture.registration_id == registration_id)
