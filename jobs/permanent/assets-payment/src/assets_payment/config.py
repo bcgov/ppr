@@ -43,11 +43,11 @@ class Config(BaseConfig):
     ACCOUNT_SVC_CLIENT_ID = os.getenv("ACCOUNT_SVC_CLIENT_ID")
     ACCOUNT_SVC_CLIENT_SECRET = os.getenv("ACCOUNT_SVC_CLIENT_SECRET")
 
-    APP_DB_USER = os.getenv("APP_DATABASE_USERNAME", "")
-    APP_DB_PASSWORD = os.getenv("APP_DATABASE_PASSWORD", "")
-    APP_DB_NAME = os.getenv("APP_DATABASE_NAME", "")
-    APP_DB_HOST = os.getenv("APP_DATABASE_HOST", "")
-    APP_DB_PORT = os.getenv("APP_DATABASE_PORT", "5432")
+    APP_DB_USER = os.getenv("DATABASE_USERNAME", "")
+    APP_DB_PASSWORD = os.getenv("DATABASE_PASSWORD", "")
+    APP_DB_NAME = os.getenv("DATABASE_NAME", "")
+    APP_DB_HOST = os.getenv("DATABASE_HOST", "")
+    APP_DB_PORT = os.getenv("DATABASE_PORT", "5432")
     # POSTGRESQL
 
     CLOUDSQL_INSTANCE_CONNECTION_NAME = os.getenv("CLOUDSQL_INSTANCE_CONNECTION_NAME", "")
