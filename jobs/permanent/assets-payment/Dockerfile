@@ -63,6 +63,7 @@ COPY ./poetry.lock ./pyproject.toml /opt/app-root/
 
 COPY ./src /opt/app-root/src
 COPY ./README.md /opt/app-root
+COPY ./run.sh /opt/app-root
 
 # Project initialization:
 RUN --mount=type=cache,target="$POETRY_CACHE_DIR" \
@@ -72,11 +73,12 @@ RUN --mount=type=cache,target="$POETRY_CACHE_DIR" \
   && poetry run pip install -U pip \
   && poetry install \
     $(if [ -z ${APP_ENV+x} ] | [ "$APP_ENV" = 'production' ]; then echo '--only main'; fi) \
-    --no-interaction --no-ansi
+    --no-interaction --no-ansi \
+  && chmod 755 /opt/app-root/run.sh
 
 USER 1001
 
 # Set Python path
 ENV PYTHONPATH=/opt/app-root/src
 
-CMD [ "python", "-m", "assets_payment" ]
+CMD [ "./run.sh" ]
