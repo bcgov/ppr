@@ -83,6 +83,12 @@ class Notify:
 
     def send_email(self, payload: dict) -> HTTPStatus:
         """Create and send the email payload to the Notify service."""
+        if not self.notify_url:
+            logger.error("Notify URL not configured. Skipping email send.")
+            return HTTPStatus.INTERNAL_SERVER_ERROR
+        if not self.jwt:
+            logger.error("Notify JWT is unavailable. Skipping email send.")
+            return HTTPStatus.UNAUTHORIZED
         headers = {"Authorization": "Bearer " + self.jwt, "Content-Type": "application/json"}
         res = requests.post(url=self.notify_url, headers=headers, json=payload, timeout=30.0)
         logger.info(f"Email sent to {self.notify_url} response status code={res.status_code}")

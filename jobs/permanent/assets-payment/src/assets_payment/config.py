@@ -43,17 +43,24 @@ class Config(BaseConfig):
     ACCOUNT_SVC_CLIENT_ID = os.getenv("ACCOUNT_SVC_CLIENT_ID")
     ACCOUNT_SVC_CLIENT_SECRET = os.getenv("ACCOUNT_SVC_CLIENT_SECRET")
 
-    APP_DB_USER = os.getenv("APP_DATABASE_USERNAME", "")
-    APP_DB_PASSWORD = os.getenv("APP_DATABASE_PASSWORD", "")
-    APP_DB_NAME = os.getenv("APP_DATABASE_NAME", "")
-    APP_DB_HOST = os.getenv("APP_DATABASE_HOST", "")
-    APP_DB_PORT = os.getenv("APP_DATABASE_PORT", "5432")
+    APP_DB_USER = os.getenv("DATABASE_USERNAME", "")
+    APP_DB_PASSWORD = os.getenv("DATABASE_PASSWORD", "")
+    APP_DB_NAME = os.getenv("DATABASE_NAME", "")
+    APP_DB_HOST = os.getenv("DATABASE_HOST", "")
+    APP_DB_PORT = os.getenv("DATABASE_PORT", "5432")
     # POSTGRESQL
-    # POSTGRESQL
-    if APP_DB_UNIX_SOCKET := os.getenv("APP_DATABASE_UNIX_SOCKET", None):
-        APP_DATABASE_URI = f"postgresql://{APP_DB_USER}:{APP_DB_PASSWORD}@/{APP_DB_NAME}?host={APP_DB_UNIX_SOCKET}"
-    else:
+
+    CLOUDSQL_INSTANCE_CONNECTION_NAME = os.getenv("CLOUDSQL_INSTANCE_CONNECTION_NAME", "")
+    DB_IP_TYPE = os.getenv("DATABASE_IP_TYPE", "private").lower()
+    APP_DATABASE_URI = ""
+
+    if CLOUDSQL_INSTANCE_CONNECTION_NAME:
+        SQLALCHEMY_DATABASE_URI = "postgresql+pg8000://"
+    if APP_DB_HOST:
         APP_DATABASE_URI = f"postgresql://{APP_DB_USER}:{APP_DB_PASSWORD}@{APP_DB_HOST}:{APP_DB_PORT}/{APP_DB_NAME}"
+        SQLALCHEMY_DATABASE_URI = (
+            f"postgresql://{APP_DB_USER}:{APP_DB_PASSWORD}@{APP_DB_HOST}:{APP_DB_PORT}/{APP_DB_NAME}"
+        )
 
     # Notify config
     NOTIFY_STATUS_RECIPIENTS = os.getenv("NOTIFY_STATUS_RECIPIENTS", "")
