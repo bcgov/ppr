@@ -462,8 +462,8 @@ def job(config: Config, sa_token=None):
     """Execute the job."""
     pay_client: SBCPaymentClient = SBCPaymentClient(config, sa_token)
     notify_client = Notify(config, sa_token)
-    db_conn: DbConnection
-    db_cursor: DbCursor
+    db_conn: DbConnection | None = None
+    db_cursor: DbCursor | None = None
     try:
         logger.info("Getting database connection and cursor.")
         if config.CLOUDSQL_INSTANCE_CONNECTION_NAME:  # pragma: no cover
@@ -505,13 +505,21 @@ def job(config: Config, sa_token=None):
         job_message: str = f"Run failed: {str(err)}."
         logger.error(job_message)
         notify_client.send_status_error(str(err))
-        track_event(
-            db_conn, db_cursor, STATUS_JOB_ID, STATUS_TRACKING_TYPE, HTTPStatus.INTERNAL_SERVER_ERROR, job_message
-        )
+        if db_conn and db_cursor:
+            track_event(
+                db_conn,
+                db_cursor,
+                STATUS_JOB_ID,
+                STATUS_TRACKING_TYPE,
+                HTTPStatus.INTERNAL_SERVER_ERROR,
+                job_message,
+            )
         sys.exit(1)  # Retry Job Task by exiting the process
     finally:
         # Clean up: Close the database cursor and connection
-        with suppress(Exception):
-            db_cursor.close()
-        with suppress(Exception):
-            db_conn.close()
+        if db_cursor:
+            with suppress(Exception):
+                db_cursor.close()
+        if db_conn:
+            with suppress(Exception):
+                db_conn.close()
