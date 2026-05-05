@@ -27,8 +27,7 @@ serialPipeline:
    - values:
       deploy-env: "development"
       deploy-project-id: "eogruh-dev"
-      service-name: "ppr-assets-payment-dev"
-      container-name: "ppr-assets-payment-dev"
+      job-name: "ppr-assets-payment-dev"
       cloudsql-instances: "eogruh-dev:northamerica-northeast1:ppr-dev-cloudsql"
       service-account: "sa-job@eogruh-dev.iam.gserviceaccount.com"
  - targetId: eogruh-test
@@ -40,8 +39,7 @@ serialPipeline:
    - values:
       deploy-env: "test"
       deploy-project-id: "eogruh-test"
-      service-name: "ppr-assets-payment-test"
-      container-name: "ppr-assets-payment-test"
+      job-name: "ppr-assets-payment-test"
       app-env: "test"
       cloudsql-instances: "eogruh-test:northamerica-northeast1:ppr-test-cloudsql"
       service-account: "sa-job@eogruh-test.iam.gserviceaccount.com"
@@ -54,8 +52,7 @@ serialPipeline:
    - values:
       deploy-env: "sandbox"
       deploy-project-id: "eogruh-sandbox"
-      service-name: "ppr-assets-payment-sandbox"
-      container-name: "ppr-assets-payment-sandbox"
+      job-name: "ppr-assets-payment-sandbox"
       app-env: "sandbox"
       cloudsql-instances: "eogruh-sandbox:northamerica-northeast1:ppr-sandbox-pgdb"
       service-account: "sa-job@eogruh-sandbox.iam.gserviceaccount.com"
@@ -68,8 +65,7 @@ serialPipeline:
    - values:
       deploy-env: "production"
       deploy-project-id: "eogruh-prod"
-      service-name: "ppr-assets-payment-prod"
-      container-name: "ppr-assets-payment-prod"
+      job-name: "ppr-assets-payment-prod"
       app-env: "production"
       cloudsql-instances: "eogruh-prod:northamerica-northeast1:ppr-prod"
       service-account: "sa-job@eogruh-prod.iam.gserviceaccount.com"
