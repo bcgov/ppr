@@ -27,7 +27,7 @@ serialPipeline:
    - values:
       deploy-env: "development"
       deploy-project-id: "eogruh-dev"
-      job-name: "ppr-seecured-party-dev"
+      job-name: "ppr-secured-party-dev"
       run-command: "./run.sh"
       cloudsql-instances: "eogruh-dev:northamerica-northeast1:ppr-dev-cloudsql"
       service-account: "sa-job@eogruh-dev.iam.gserviceaccount.com"
