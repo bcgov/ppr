@@ -68,7 +68,7 @@ COPY --chown=web:web ./poetry.lock ./pyproject.toml /code/
 
 COPY --chown=web:web ./src /code/src
 COPY --chown=web:web ./README.md /code
-COPY ./run.sh /opt/app-root
+COPY ./run.sh /opt/app-root/run.sh
 
 # Project initialization:
 RUN --mount=type=cache,target="$POETRY_CACHE_DIR" \
@@ -84,4 +84,4 @@ USER web
 # Set Python path
 ENV PYTHONPATH=/code/src
 
-CMD [ "./run.sh" ]
+CMD [ "/opt/app-root/run.sh" ]
