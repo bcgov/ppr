@@ -19,14 +19,19 @@ import sys
 import zipfile
 from contextlib import suppress
 from datetime import datetime as _datetime
+from typing import Any
 
-import psycopg2
+from cloud_sql_connector import DBConfig, getconn
+from pg8000 import dbapi as pg8000
 import pytz
 
 from secured_party_notification.config import Config
 from secured_party_notification.services.document_storage.storage_service import GoogleStorageService
 from secured_party_notification.services.notify import Notify
 from secured_party_notification.utils.logging import logger
+
+DbConnection = Any
+DbCursor = Any
 
 CONTENT_TYPE_CSV = "text/csv"
 CONTENT_TYPE_TEXT = "text/plain"
@@ -168,7 +173,7 @@ def get_delivery_count_name():
 
 
 def run_summary_query(
-    db_conn: psycopg2.extensions.connection, db_cursor: psycopg2.extensions.cursor, config: Config
+    db_conn: DbConnection, db_cursor: DbCursor, config: Config
 ) -> dict:
     """Execute the summary information query."""
     if config.RERUN_JOB_ID and config.RERUN_JOB_ID != "":
@@ -195,14 +200,14 @@ def run_summary_query(
             status_data["delivery_count_file_name"] = get_delivery_count_name()
             status_data["delivery_zip_file_name"] = get_delivery_zip_name()
         logger.info(f"Status query results: {str(status_data)}")
-    except (psycopg2.Error, Exception) as err:
+    except Exception as err:
         error_message = f"Error attempting to run summary query: {err}"
         logger.error(error_message)
     return status_data
 
 
 def rerun_summary_query(
-    db_conn: psycopg2.extensions.connection, db_cursor: psycopg2.extensions.cursor, config: Config
+    db_conn: DbConnection, db_cursor: DbCursor, config: Config
 ) -> dict:
     """Execute the summary information query for a batch rerun on the env var RERUN_JOB_ID."""
     status_data: dict = copy.deepcopy(NOTIFY_STATUS_DATA)
@@ -226,14 +231,14 @@ def rerun_summary_query(
             status_data["delivery_count_file_name"] = get_delivery_count_name()
             status_data["delivery_zip_file_name"] = get_delivery_zip_name()
         logger.info(f"Status query results: {str(status_data)}")
-    except (psycopg2.Error, Exception) as err:
+    except Exception as err:
         error_message = f"Error attempting to execute rerun job summary query: {err}"
         logger.error(error_message)
     return status_data
 
 
 def ts_range_summary_query(
-    db_conn: psycopg2.extensions.connection, db_cursor: psycopg2.extensions.cursor, config: Config
+    db_conn: DbConnection, db_cursor: DbCursor, config: Config
 ) -> dict:
     """Execute the summary information query for a batch timestamp range on the start and end ts env vars."""
     status_data: dict = copy.deepcopy(NOTIFY_STATUS_DATA)
@@ -258,7 +263,7 @@ def ts_range_summary_query(
             status_data["delivery_count_file_name"] = get_delivery_count_name()
             status_data["delivery_zip_file_name"] = get_delivery_zip_name()
         logger.info(f"Status query results: {str(status_data)}")
-    except (psycopg2.Error, Exception) as err:
+    except Exception as err:
         error_message = f"Error attempting to execute timestamp range job summary query: {err}"
         logger.error(error_message)
     return status_data
@@ -298,7 +303,7 @@ def generate_csv_file(csv_data: list, status_data: dict) -> dict:
 
 
 def set_job_id(
-    db_conn: psycopg2.extensions.connection, db_cursor: psycopg2.extensions.cursor, config: Config, job_id: int
+    db_conn: DbConnection, db_cursor: DbCursor, config: Config, job_id: int
 ):
     """Update the mail_report table batch job id and status for documents included in the batch run."""
     try:
@@ -314,11 +319,11 @@ def set_job_id(
         db_cursor.execute(sql_statement)
         db_conn.commit()
         logger.info(f"Update mail_reports batch job id completed for job id={job_id}")
-    except (psycopg2.Error, Exception) as err:
+    except Exception as err:
         logger.error(f"Error running update mail_reports statement for job id={job_id}: {err}")
 
 
-def get_mail_report_data(db_cursor: psycopg2.extensions.cursor, config: Config):
+def get_mail_report_data(db_cursor: DbCursor, config: Config):
     """Get notification mail_reports table query results."""
     sql_statement = NOTIFICATION_QUERY.format(interval_hours=config.JOB_INTERVAL_HOURS)
     if config.RERUN_JOB_ID and config.RERUN_JOB_ID != "":
@@ -414,11 +419,28 @@ def job(config: Config):
     Returns:
     """
     notify_client = Notify(config)
-    db_conn: psycopg2.extensions.connection
-    db_cursor: psycopg2.extensions.cursor
+    db_conn: DbConnection | None = None
+    db_cursor: DbCursor | None = None
     try:
         logger.info("Getting database connection and cursor.")
-        db_conn = psycopg2.connect(dsn=config.APP_DATABASE_URI)
+        if config.CLOUDSQL_INSTANCE_CONNECTION_NAME:  # pragma: no cover
+            db_config = DBConfig(
+                instance_name=config.CLOUDSQL_INSTANCE_CONNECTION_NAME,
+                database=config.APP_DB_NAME,
+                user=config.APP_DB_USER,
+                ip_type=config.DB_IP_TYPE,
+                pool_recycle=60,
+                schema="public",
+            )
+            db_conn = getconn(db_config)
+        else:
+            db_conn = pg8000.connect(
+                user=config.APP_DB_USER,
+                password=config.APP_DB_PASSWORD,
+                host=config.APP_DB_HOST,
+                port=int(config.APP_DB_PORT),
+                database=config.APP_DB_NAME,
+            )
         db_cursor = db_conn.cursor()
         status_data = run_summary_query(db_conn, db_cursor, config)
         if status_data.get("total_count") < 1:  # Non-PROD
@@ -436,14 +458,16 @@ def job(config: Config):
         logger.info("Run completed: sending email.")
         notify_client.send_status(status_data)
         job_message: str = f"Run successful: status info {json.dumps(status_data)}."
-    except (psycopg2.Error, Exception) as err:
+    except Exception as err:
         job_message: str = f"Run failed: {str(err)}."
         logger.error(job_message)
         notify_client.send_status_error(str(err))
         sys.exit(1)  # Retry Job Task by exiting the process
     finally:
         # Clean up: Close the database cursor and connection
-        with suppress(Exception):
-            db_cursor.close()
-        with suppress(Exception):
-            db_conn.close()
+        if db_cursor:
+            with suppress(Exception):
+                db_cursor.close()
+        if db_conn:
+            with suppress(Exception):
+                db_conn.close()
