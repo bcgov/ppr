@@ -43,7 +43,7 @@ class Config(BaseConfig):
     if CLOUDSQL_INSTANCE_CONNECTION_NAME:
         SQLALCHEMY_DATABASE_URI = "postgresql+pg8000://"
     if APP_DB_HOST:
-        APP_DATABASE_URI = f"postgresql://{APP_DB_USER}:{APP_DB_PASSWORD}@{APP_DB_HOST}:{APP_DB_PORT}/{APP_DB_NAME}"
+        APP_DATABASE_URI = f"postgresql+pg8000://{APP_DB_USER}:{APP_DB_PASSWORD}@{APP_DB_HOST}:{APP_DB_PORT}/{APP_DB_NAME}"
         SQLALCHEMY_DATABASE_URI = (
-            f"postgresql://{APP_DB_USER}:{APP_DB_PASSWORD}@{APP_DB_HOST}:{APP_DB_PORT}/{APP_DB_NAME}"
+            f"postgresql+pg8000://{APP_DB_USER}:{APP_DB_PASSWORD}@{APP_DB_HOST}:{APP_DB_PORT}/{APP_DB_NAME}"
         )
