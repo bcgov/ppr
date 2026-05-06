@@ -8,7 +8,7 @@ BC Registries Assets Prune/Purge Staff Registrations Service
 
 ## Technology Stack Used
 * Python
-* Postgres -  psycopg2-binary
+* Postgres
 * GCP Artifact Registry
 * GCP Cloud Run Jobs
 * GCP Cloud Scheduler
