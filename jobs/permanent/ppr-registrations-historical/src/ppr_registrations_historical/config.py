@@ -28,15 +28,20 @@ class Config(BaseConfig):
 
     LOG_LEVEL = os.getenv('LOG_LEVEL', 'DEBUG')
 
-    APP_DB_USER = os.getenv('APP_DATABASE_USERNAME', '')
-    APP_DB_PASSWORD = os.getenv('APP_DATABASE_PASSWORD', '')
-    APP_DB_NAME = os.getenv('APP_DATABASE_NAME', '')
-    APP_DB_HOST = os.getenv('APP_DATABASE_HOST', '')
-    APP_DB_PORT = os.getenv('APP_DATABASE_PORT', '5432')
-    START_DATE_OFFSET = os.getenv('START_DATE_OFFSET', '32')
+    APP_DB_USER = os.getenv("DATABASE_USERNAME", "")
+    APP_DB_PASSWORD = os.getenv("DATABASE_PASSWORD", "")
+    APP_DB_NAME = os.getenv("DATABASE_NAME", "")
+    APP_DB_HOST = os.getenv("DATABASE_HOST", "")
+    APP_DB_PORT = os.getenv("DATABASE_PORT", "5432")
     # POSTGRESQL
-        # POSTGRESQL
-    if (APP_DB_UNIX_SOCKET := os.getenv('APP_DATABASE_UNIX_SOCKET', None)):
-        APP_DATABASE_URI = f'postgresql://{APP_DB_USER}:{APP_DB_PASSWORD}@/{APP_DB_NAME}?host={APP_DB_UNIX_SOCKET}'
-    else:
-        APP_DATABASE_URI = f'postgresql://{APP_DB_USER}:{APP_DB_PASSWORD}@{APP_DB_HOST}:{APP_DB_PORT}/{APP_DB_NAME}'
+    CLOUDSQL_INSTANCE_CONNECTION_NAME = os.getenv("CLOUDSQL_INSTANCE_CONNECTION_NAME", "")
+    DB_IP_TYPE = os.getenv("DATABASE_IP_TYPE", "private").lower()
+    APP_DATABASE_URI = ""
+
+    if CLOUDSQL_INSTANCE_CONNECTION_NAME:
+        SQLALCHEMY_DATABASE_URI = "postgresql+pg8000://"
+    if APP_DB_HOST:
+        APP_DATABASE_URI = f"postgresql+pg8000://{APP_DB_USER}:{APP_DB_PASSWORD}@{APP_DB_HOST}:{APP_DB_PORT}/{APP_DB_NAME}"
+        SQLALCHEMY_DATABASE_URI = (
+            f"postgresql+pg8000://{APP_DB_USER}:{APP_DB_PASSWORD}@{APP_DB_HOST}:{APP_DB_PORT}/{APP_DB_NAME}"
+        )

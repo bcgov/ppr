@@ -12,7 +12,7 @@ dynamic = ["dependencies"]
 packages = [{ include = "ppr_registrations_historical", from = "src" }]
 
 [tool.poetry.dependencies]
-python = ">=3.12,<4.0"
+python = "^3.12"
 cachetools = "==5.3.0"
 certifi = "==2022.12.7"
 charset-normalizer = "==3.1.0"
@@ -34,21 +34,72 @@ google-cloud-storage = "*"
 google-crc32c = "*"
 cloud-sql-connector = { git = "https://github.com/bcgov/sbc-connect-common.git", branch = "main", subdirectory = "python/cloud-sql-connector" }
 
-[tool.poetry.group.dev.dependencies]
+[tool.poetry.group.test.dependencies]
 freezegun = "*"
 pytest = "*"
+pytest-cov = "*"
+
+[tool.poetry.group.dev.dependencies]
 autopep8 = "*"
 flake8 = "*"
 flake8-blind-except = "*"
 flake8-debugger = "*"
 flake8-docstrings = "*"
 flake8-isort = "*"
+flake8-pyproject = "*"
 flake8-quotes = "*"
 pep8-naming = "*"
 pydocstyle = "*"
 pylint = "*"
 isort = "*"
-pytest-cov = "*"
+
+[tool.flake8]
+exclude = [".git", "*migrations*"]
+max-line-length = 120
+docstring-min-length = 10
+per-file-ignores = ["*/__init__.py:F401", "*.py:B902"]
+
+[tool.isort]
+line_length = 120
+indent = 4
+multi_line_output = 3
+lines_after_imports = 2
+include_trailing_comma = true
+
+[tool.pylint.main]
+ignore = ["migrations", "test"]
+max-line-length = 120
+notes = ["FIXME", "XXX", "TODO"]
+disable = "C0301,W0511,W0613,R0801,R0902"
+
+[tool.pytest.ini_options]
+minversion = "2.0"
+testpaths = ["tests"]
+addopts = "--verbose --strict -p no:warnings --cov=src --cov-report html:htmlcov --cov-report xml:coverage.xml"
+python_files = ["test*.py"]
+norecursedirs = [".git", ".tox", "venv*", "requirements*", "build"]
+log_cli = true
+log_cli_level = 1
+filterwarnings = ["ignore::UserWarning"]
+markers = ["slow", "serial"]
+
+[tool.coverage.run]
+branch = true
+source = ["src/ppr_registrations_historical"]
+
+[tool.coverage.report]
+exclude_lines = [
+	"pragma: no cover",
+	"from",
+	"import",
+	"def __repr__",
+	"if self.debug:",
+	"if settings.DEBUG",
+	"raise AssertionError",
+	"raise NotImplementedError",
+	"if 0:",
+	"if __name__ == .__main__.:",
+]
 
 [build-system]
 requires = ["poetry-core>=1.9.0"]
