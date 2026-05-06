@@ -27,8 +27,8 @@ serialPipeline:
    - values:
       deploy-env: "development"
       deploy-project-id: "eogruh-dev"
-      job-name: "ppr-reg-historical-dev"
-      run-command: "/code/run.sh"
+      job-name: "ppr-registrations-historical-dev"
+      run-command: "/opt/app-root/run.sh"
       cloudsql-instances: "eogruh-dev:northamerica-northeast1:ppr-dev-cloudsql"
       service-account: "sa-job@eogruh-dev.iam.gserviceaccount.com"
  - targetId: eogruh-test
@@ -40,8 +40,8 @@ serialPipeline:
    - values:
       deploy-env: "test"
       deploy-project-id: "eogruh-test"
-      job-name: "ppr-reg-historical-test"
-      run-command: "/code/run.sh"
+      job-name: "ppr-registrations-historical-test"
+      run-command: "/opt/app-root/run.sh"
       app-env: "test"
       cloudsql-instances: "eogruh-test:northamerica-northeast1:ppr-test-cloudsql"
       service-account: "sa-job@eogruh-test.iam.gserviceaccount.com"
@@ -54,8 +54,8 @@ serialPipeline:
    - values:
       deploy-env: "sandbox"
       deploy-project-id: "eogruh-sandbox"
-      job-name: "ppr-reg-historical-sandbox"
-      run-command: "/code/run.sh"
+      job-name: "ppr-registrations-historical-sandbox"
+      run-command: "/opt/app-root/run.sh"
       app-env: "sandbox"
       cloudsql-instances: "eogruh-sandbox:northamerica-northeast1:ppr-sandbox-pgdb"
       service-account: "sa-job@eogruh-sandbox.iam.gserviceaccount.com"
@@ -68,8 +68,8 @@ serialPipeline:
    - values:
       deploy-env: "production"
       deploy-project-id: "eogruh-prod"
-      job-name: "ppr-reg-historical-prod"
-      run-command: "/code/run.sh"
+      job-name: "ppr-registrations-historical-prod"
+      run-command: "/opt/app-root/run.sh"
       app-env: "production"
       cloudsql-instances: "eogruh-prod:northamerica-northeast1:ppr-prod"
       service-account: "sa-job@eogruh-prod.iam.gserviceaccount.com"
