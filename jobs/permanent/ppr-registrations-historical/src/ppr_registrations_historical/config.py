@@ -27,6 +27,7 @@ class Config(BaseConfig):
     """Production configuration."""
 
     LOG_LEVEL = os.getenv('LOG_LEVEL', 'DEBUG')
+    START_DATE_OFFSET = int(os.getenv("START_DATE_OFFSET", "31"))
 
     APP_DB_USER = os.getenv("DATABASE_USERNAME", "")
     APP_DB_PASSWORD = os.getenv("DATABASE_PASSWORD", "")

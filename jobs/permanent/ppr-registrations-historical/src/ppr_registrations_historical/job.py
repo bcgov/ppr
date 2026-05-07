@@ -79,8 +79,8 @@ DELETE
 """
 INSERT_EVENT: Final = """
 INSERT INTO event_tracking(id, key_id, event_ts, event_tracking_type, status, message)
-  VALUES(nextval('event_tracking_id_seq'), {job_id}, CURRENT_TIMESTAMP  at time zone 'utc', 'REG_HIST_JOB',
-         {job_status}, '{job_message}')
+    VALUES(nextval('event_tracking_id_seq'), %s, CURRENT_TIMESTAMP at time zone 'utc', 'REG_HIST_JOB',
+                 %s, %s)
 """
 
 def track_event(db_conn: DbConnection,
@@ -91,8 +91,7 @@ def track_event(db_conn: DbConnection,
     try:
         if not db_conn or not db_cursor:
             return
-        sql_statement = INSERT_EVENT.format(job_id=EVENT_JOB_ID, job_status=status, job_message=message)
-        db_cursor.execute(sql_statement)
+        db_cursor.execute(INSERT_EVENT, (EVENT_JOB_ID, int(status), message))
         db_conn.commit()
     except Exception as err:
         error_message = f"Error attempting event_tracking insert: {err}"
