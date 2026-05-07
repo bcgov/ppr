@@ -3,7 +3,7 @@ from contextlib import suppress
 from http import HTTPStatus
 from typing import Any, Final
 
-from cloud_sql_connector import DBConfig, getconn
+from cloud_sql_connector import DBConfig, close_connector, getconn
 from pg8000 import dbapi as pg8000
 
 from .services.logging import logging
@@ -102,10 +102,12 @@ def job(config):
 
     db_conn: DbConnection | None = None
     db_cursor: DbCursor | None = None
+    use_cloudsql = False
     job_message: str = '1. Update account discharged registrations.'
     try:
         logging.info('Getting database connection and cursor.')
         if config.CLOUDSQL_INSTANCE_CONNECTION_NAME:  # pragma: no cover
+            use_cloudsql = True
             db_config = DBConfig(
                 instance_name=config.CLOUDSQL_INSTANCE_CONNECTION_NAME,
                 database=config.APP_DB_NAME,
@@ -166,3 +168,6 @@ def job(config):
         if db_conn:
             with suppress(Exception):
                 db_conn.close()
+        if use_cloudsql:
+            with suppress(Exception):
+                close_connector()
