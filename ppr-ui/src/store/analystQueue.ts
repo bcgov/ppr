@@ -8,7 +8,7 @@ import type {
 import { queueTableColumns, ReviewStatusTypes } from "@/composables"
 import { getQueuedTransfer, getReviews } from "@/utils/mhr-api-helper"
 import { computed, ref } from 'vue'
-
+import { useStore } from '@/store/store'
 
 export const useAnalystQueueStore = defineStore('mhr/queue', () => {
   // queueTable
@@ -132,6 +132,18 @@ const showClearFilterButton = computed(() => {
   })
 })
 
+const isUserAssignee = computed(() => {
+  const assetsStore = useStore()
+  const userFirstName = assetsStore.getUserFirstName
+  const userLastName = assetsStore.getUserLastName
+  const userName = `${userFirstName} ${userLastName}`
+  return userName === queueTransfer.value?.assigneeName
+})
+
+const isDecisionAllowed = computed(() => {
+  return isUserAssignee.value && isInReview.value
+})
+
 // Allow assigning/unassigning while NEW or IN_REVIEW.
 const isAssignable = computed(() => {
   return [ReviewStatusTypes.NEW, ReviewStatusTypes.IN_REVIEW].includes(queueTransferStatus.value)
@@ -141,7 +153,6 @@ const isAssignable = computed(() => {
 const isInReview = computed(() => {
   return queueTransferStatus.value === ReviewStatusTypes.IN_REVIEW
 })
-
 
 const assignees = computed(() => {
   const uniqueAssignees = new Set()
@@ -206,6 +217,8 @@ const assignees = computed(() => {
     showClearFilterButton,
     isAssignable,
     isInReview,
+    isUserAssignee,
+    isDecisionAllowed,
     queueTransfer,
     reviewId,
     reviewDecision,
