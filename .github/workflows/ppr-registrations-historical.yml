@@ -22,9 +22,10 @@ on:
 
 jobs:
   ppr-registrations-historical-cd:
-    uses: bcgov/bcregistry-sre/.github/workflows/backend-job-cd.yaml@main
+    uses: bcgov/bcregistry-sre/.github/workflows/backend-job-cd.yaml@tag-bug
     with:
       target: ${{ inputs.target }}
+      cd_runner_version: "1.0.8"
       app_name: "ppr-reg-historical"
       working_directory: "./jobs/permanent/ppr-registrations-historical"
     secrets:

@@ -22,10 +22,11 @@ on:
 
 jobs:
   ppr-assets-registrations-staff-cd:
-    uses: bcgov/bcregistry-sre/.github/workflows/backend-job-cd.yaml@main
+    uses: bcgov/bcregistry-sre/.github/workflows/backend-job-cd.yaml@tag-bug
     with:
       target: ${{ inputs.target }}
       app_name: "ppr-assets-reg-staff"
+      cd_runner_version: "1.0.8"
       working_directory: "./jobs/permanent/assets-registrations-staff"
     secrets:
       WORKLOAD_IDENTIFY_POOLS_PROVIDER: ${{ secrets.WORKLOAD_IDENTIFY_POOLS_PROVIDER }}
