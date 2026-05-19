@@ -22,10 +22,11 @@ on:
 
 jobs:
   ppr-api-cd:
-    uses: bcgov/bcregistry-sre/.github/workflows/backend-cd.yaml@main
+    uses: bcgov/bcregistry-sre/.github/workflows/backend-cd.yaml@tag-bug
     with:
       target: ${{ inputs.target }}
       app_name: "ppr-api"
+      cd_runner_version: "1.0.8"
       working_directory: "./ppr-api"
     secrets:
       WORKLOAD_IDENTIFY_POOLS_PROVIDER: ${{ secrets.WORKLOAD_IDENTIFY_POOLS_PROVIDER }}
