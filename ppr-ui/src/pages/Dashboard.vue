@@ -1,7 +1,7 @@
 <template>
   <v-container
     id="dashboard"
-    class="py-12 ma-0 px-0"
+    class="py-12 my-0 px-0"
   >
     <!-- Page Overlay -->
     <v-overlay
@@ -21,7 +21,7 @@
     />
     <div
       v-if="appReady"
-      class="container pa-0"
+      class="pa-0"
     >
       <!-- Payment method messaging -->
       <CautionBox
