@@ -22,7 +22,7 @@ on:
 
 jobs:
   mhr-api-cd:
-    uses: bcgov/bcregistry-sre/.github/workflows/backend-cd.yaml@mmain
+    uses: bcgov/bcregistry-sre/.github/workflows/backend-cd.yaml@main
     with:
       target: ${{ inputs.target }}
       app_name: "mhr-api"
