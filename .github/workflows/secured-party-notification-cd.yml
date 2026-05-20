@@ -22,7 +22,7 @@ on:
 
 jobs:
   ppr-secured-party-cd:
-    uses: bcgov/bcregistry-sre/.github/workflows/backend-job-cd.yaml@tag-bug
+    uses: bcgov/bcregistry-sre/.github/workflows/backend-job-cd.yaml@main
     with:
       target: ${{ inputs.target }}
       cd_runner_version: "1.0.8"
