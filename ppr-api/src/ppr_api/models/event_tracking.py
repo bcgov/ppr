@@ -94,9 +94,16 @@ class EventTracking(db.Model):  # pylint: disable=too-many-instance-attributes
     def find_by_key_id(cls, key_id: int):
         """Return a list of event tracking objects by key id."""
         event_tracking = None
-        if key_id:
+        try:
+            key_id_int = int(key_id) if key_id is not None else None
+        except (TypeError, ValueError):
+            return None
+        if key_id_int:
             event_tracking = (
-                db.session.query(EventTracking).filter(EventTracking.key_id == key_id).order_by(EventTracking.id).all()
+                db.session.query(EventTracking)
+                .filter(EventTracking.key_id == key_id_int)
+                .order_by(EventTracking.id)
+                .all()
             )
 
         return event_tracking
@@ -105,10 +112,14 @@ class EventTracking(db.Model):  # pylint: disable=too-many-instance-attributes
     def find_by_key_id_type(cls, key_id: int, event_tracking_type: str, extra_key: str = None):
         """Return a list of event tracking objects by key id and event tracking type."""
         event_tracking = None
-        if key_id and event_tracking_type:
+        try:
+            key_id_int = int(key_id) if key_id is not None else None
+        except (TypeError, ValueError):
+            return None
+        if key_id_int and event_tracking_type:
             event_tracking = (
                 db.session.query(EventTracking)
-                .filter(EventTracking.key_id == key_id, EventTracking.event_tracking_type == event_tracking_type)
+                .filter(EventTracking.key_id == key_id_int, EventTracking.event_tracking_type == event_tracking_type)
                 .order_by(EventTracking.id)
                 .all()
             )

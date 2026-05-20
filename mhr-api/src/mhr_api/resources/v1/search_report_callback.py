@@ -122,9 +122,8 @@ def post_search_report_callback(  # pylint: disable=too-many-branches,too-many-l
         # Track success event.
         EventTracking.create(key_id, EventTracking.EventTrackingTypes.SEARCH_REPORT, int(HTTPStatus.OK))
 
-        # return response, HTTPStatus.OK
-        # Replace with above when report implemented.
-        return None, HTTPStatus.OK
+        # Return an empty JSON body with HTTP 200 so Flask accepts the response.
+        return {}, HTTPStatus.OK
     except ReportException as report_err:
         return callback_error(
             resource_utils.CallbackExceptionCodes.REPORT_ERR,

@@ -85,10 +85,14 @@ class VerificationReport(db.Model):
     def find_by_registration_id(cls, registration_id: int = None):
         """Return the verification report that matches the registration ID."""
         verification_report = None
-        if registration_id:
+        try:
+            reg_id_int = int(registration_id) if registration_id is not None else None
+        except (TypeError, ValueError):
+            return None
+        if reg_id_int:
             verification_report = (
                 db.session.query(VerificationReport)
-                .filter(VerificationReport.registration_id == registration_id)
+                .filter(VerificationReport.registration_id == reg_id_int)
                 .one_or_none()
             )
 
