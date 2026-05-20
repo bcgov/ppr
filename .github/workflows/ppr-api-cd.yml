@@ -22,7 +22,7 @@ on:
 
 jobs:
   ppr-api-cd:
-    uses: bcgov/bcregistry-sre/.github/workflows/backend-cd.yaml@tag-bug
+    uses: bcgov/bcregistry-sre/.github/workflows/backend-cd.yaml@main
     with:
       target: ${{ inputs.target }}
       app_name: "ppr-api"
