@@ -116,9 +116,7 @@ def registration_callback_error(code: str, registration_id: int, status_code, me
     # Track event here if id is numeric.
     try:
         key_id_int = int(registration_id)
-        EventTracking.create(
-            key_id_int, EventTracking.EventTrackingTypes.MHR_REGISTRATION_REPORT, status_code, message
-        )
+        EventTracking.create(key_id_int, EventTracking.EventTrackingTypes.MHR_REGISTRATION_REPORT, status_code, message)
     except (TypeError, ValueError):
         logger.warning(f"EventTracking not created: invalid id={registration_id}")
     if status_code != HTTPStatus.BAD_REQUEST and code not in (
@@ -182,7 +180,9 @@ def get_registration_callback_report(
         report_info.doc_storage_url = doc_name
         report_info.save()
         # Track success event.
-        EventTracking.create(registration_id, EventTracking.EventTrackingTypes.MHR_REGISTRATION_REPORT, int(HTTPStatus.OK))
+        EventTracking.create(
+            registration_id, EventTracking.EventTrackingTypes.MHR_REGISTRATION_REPORT, int(HTTPStatus.OK)
+        )
         if report_info.report_data.get("reviewId"):
             send_review_notification(report_info.report_data, response)
         MhrRegistration.update_summary_snapshot_by_reg_id(registration_id)
