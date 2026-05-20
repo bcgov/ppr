@@ -810,7 +810,7 @@ def post_verification_callback():
         )
 
 
-@bp.route("/registration-report-callback/<string:registration_id>", methods=["POST", "OPTIONS"])
+@bp.route("/registration-report-callback/<int:registration_id>", methods=["POST", "OPTIONS"])
 @cross_origin(origin="*")
 def post_reg_report_callback(registration_id: int):
     """Generate, store report, record request status and possibly retry."""

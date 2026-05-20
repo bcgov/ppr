@@ -57,13 +57,24 @@ def post_search_report_callback(  # pylint: disable=too-many-branches,too-many-l
         if search_id is None:
             return resource_utils.path_param_error_response("search ID")
 
+        # normalize the id for DB operations: path params are strings
+        try:
+            key_id = int(search_id)
+        except (TypeError, ValueError):
+            return callback_error(
+                resource_utils.CallbackExceptionCodes.INVALID_ID,
+                search_id,
+                HTTPStatus.BAD_REQUEST,
+                "Invalid search id",
+            )
+
         # Authenticate with request api key
         if not resource_utils.valid_api_key(request):
             return resource_utils.unauthorized_error_response("MHR search report callback")
 
         # If exceeded max retries we're done.
         event_count: int = 0
-        events = EventTracking.find_by_key_id_type(search_id, EventTracking.EventTrackingTypes.SEARCH_REPORT)
+        events = EventTracking.find_by_key_id_type(key_id, EventTracking.EventTrackingTypes.SEARCH_REPORT)
         if events:
             event_count = len(events)
         if event_count > current_app.config.get("EVENT_MAX_RETRIES"):
@@ -74,7 +85,7 @@ def post_search_report_callback(  # pylint: disable=too-many-branches,too-many-l
                 "Max retries reached.",
             )
 
-        search_detail = SearchResult.find_by_search_id(search_id, False)
+        search_detail = SearchResult.find_by_search_id(key_id, False)
         if not search_detail:
             return callback_error(resource_utils.CallbackExceptionCodes.UNKNOWN_ID, search_id, HTTPStatus.NOT_FOUND)
 
@@ -109,7 +120,7 @@ def post_search_report_callback(  # pylint: disable=too-many-branches,too-many-l
         search_detail.save()
 
         # Track success event.
-        EventTracking.create(search_id, EventTracking.EventTrackingTypes.SEARCH_REPORT, int(HTTPStatus.OK))
+        EventTracking.create(key_id, EventTracking.EventTrackingTypes.SEARCH_REPORT, int(HTTPStatus.OK))
 
         # return response, HTTPStatus.OK
         # Replace with above when report implemented.
@@ -149,8 +160,12 @@ def callback_error(code: str, search_id: str, status_code, message: str = None):
     if message:
         error += " " + message
     logger.error(error)
-    # Track event here.
-    EventTracking.create(search_id, EventTracking.EventTrackingTypes.SEARCH_REPORT, status_code, message)
+    # Track event here if id is numeric.
+    try:
+        key_id_int = int(search_id)
+        EventTracking.create(key_id_int, EventTracking.EventTrackingTypes.SEARCH_REPORT, status_code, message)
+    except (TypeError, ValueError):
+        logger.warning(f"EventTracking not created: invalid id={search_id}")
     if status_code != HTTPStatus.BAD_REQUEST and code not in (
         resource_utils.CallbackExceptionCodes.MAX_RETRIES,
         resource_utils.CallbackExceptionCodes.UNKNOWN_ID,
@@ -171,12 +186,17 @@ def enqueue_search_report(search_id: str):
         logger.info(f"Enqueue search report successful for id={search_id}.")
     except Exception as err:  # noqa: B902; do not alter app processing
         logger.error(f"Enqueue search report failed for id={search_id}: " + str(err))
-        EventTracking.create(
-            search_id,
-            EventTracking.EventTrackingTypes.SEARCH_REPORT,
-            int(HTTPStatus.INTERNAL_SERVER_ERROR),
-            "Enqueue search report event failed: " + str(err),
-        )
+        # Track event here if id is numeric.
+        try:
+            key_id_int = int(search_id)
+            EventTracking.create(
+                key_id_int,
+                EventTracking.EventTrackingTypes.SEARCH_REPORT,
+                int(HTTPStatus.INTERNAL_SERVER_ERROR),
+                "Enqueue search report event failed: " + str(err),
+            )
+        except (TypeError, ValueError):
+            logger.warning(f"EventTracking not created for enqueue failure: invalid id={search_id}")
 
 
 def get_search_report(search_id: str):

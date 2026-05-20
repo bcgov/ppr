@@ -55,15 +55,24 @@ def post_registration_report_callback(registration_id: str):  # pylint: disable=
         if registration_id is None:
             return resource_utils.path_param_error_response("registration ID")
 
+        # normalize the id for DB operations: path params are strings
+        try:
+            key_id = int(registration_id)
+        except (TypeError, ValueError):
+            return registration_callback_error(
+                resource_utils.CallbackExceptionCodes.INVALID_ID,
+                registration_id,
+                HTTPStatus.BAD_REQUEST,
+                "Invalid registration id",
+            )
+
         # Authenticate with request api key
         if not resource_utils.valid_api_key(request):
             return resource_utils.unauthorized_error_response("MHR registration report callback")
 
         # If exceeded max retries we're done.
         event_count: int = 0
-        events = EventTracking.find_by_key_id_type(
-            registration_id, EventTracking.EventTrackingTypes.MHR_REGISTRATION_REPORT
-        )
+        events = EventTracking.find_by_key_id_type(key_id, EventTracking.EventTrackingTypes.MHR_REGISTRATION_REPORT)
         if events:
             event_count = len(events)
         if event_count > current_app.config.get("EVENT_MAX_RETRIES"):
@@ -74,12 +83,12 @@ def post_registration_report_callback(registration_id: str):  # pylint: disable=
                 "Max retries reached.",
             )
         # Verify the registration ID and request:
-        registration: MhrRegistration = MhrRegistration.find_by_id(registration_id)
+        registration: MhrRegistration = MhrRegistration.find_by_id(key_id)
         if not registration:
             return registration_callback_error(
                 resource_utils.CallbackExceptionCodes.UNKNOWN_ID, registration_id, HTTPStatus.NOT_FOUND
             )
-        report_info: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(registration_id)
+        report_info: MhrRegistrationReport = MhrRegistrationReport.find_by_registration_id(key_id)
         if not report_info:
             return registration_callback_error(
                 resource_utils.CallbackExceptionCodes.SETUP_ERR,
@@ -104,10 +113,14 @@ def registration_callback_error(code: str, registration_id: int, status_code, me
     error: str = CALLBACK_MESSAGES[code].format(key_id=registration_id)
     if message:
         error += " " + message
-    # Track event here.
-    EventTracking.create(
-        registration_id, EventTracking.EventTrackingTypes.MHR_REGISTRATION_REPORT, status_code, message
-    )
+    # Track event here if id is numeric.
+    try:
+        key_id_int = int(registration_id)
+        EventTracking.create(
+            key_id_int, EventTracking.EventTrackingTypes.MHR_REGISTRATION_REPORT, status_code, message
+        )
+    except (TypeError, ValueError):
+        logger.warning(f"EventTracking not created: invalid id={registration_id}")
     if status_code != HTTPStatus.BAD_REQUEST and code not in (
         resource_utils.CallbackExceptionCodes.MAX_RETRIES,
         resource_utils.CallbackExceptionCodes.UNKNOWN_ID,
@@ -169,9 +182,7 @@ def get_registration_callback_report(
         report_info.doc_storage_url = doc_name
         report_info.save()
         # Track success event.
-        EventTracking.create(
-            registration_id, EventTracking.EventTrackingTypes.MHR_REGISTRATION_REPORT, int(HTTPStatus.OK)
-        )
+        EventTracking.create(registration_id, EventTracking.EventTrackingTypes.MHR_REGISTRATION_REPORT, int(HTTPStatus.OK))
         if report_info.report_data.get("reviewId"):
             send_review_notification(report_info.report_data, response)
         MhrRegistration.update_summary_snapshot_by_reg_id(registration_id)
