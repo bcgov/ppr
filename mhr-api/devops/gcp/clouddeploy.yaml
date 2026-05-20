@@ -32,6 +32,7 @@ serialPipeline:
       container-name: "mhr-api-dev"
       cloudsql-instances: "eogruh-dev:northamerica-northeast1:ppr-dev-cloudsql"
       service-account: "sa-api@eogruh-dev.iam.gserviceaccount.com"
+      container-concurrency: "8"
  - targetId: eogruh-test
    profiles: [test]
    strategy:
@@ -46,6 +47,7 @@ serialPipeline:
       app-env: "test"
       cloudsql-instances: "eogruh-test:northamerica-northeast1:ppr-test-cloudsql"
       service-account: "sa-api@eogruh-test.iam.gserviceaccount.com"
+      container-concurrency: "8"
  - targetId: eogruh-sandbox
    profiles: [sandbox]
    strategy:
@@ -60,6 +62,7 @@ serialPipeline:
       app-env: "sandbox"
       cloudsql-instances: "eogruh-sandbox:northamerica-northeast1:ppr-sandbox-pgdb"
       service-account: "sa-api@eogruh-sandbox.iam.gserviceaccount.com"
+      container-concurrency: "8"
  - targetId: eogruh-prod
    profiles: [prod]
    strategy:
@@ -74,5 +77,5 @@ serialPipeline:
       app-env: "production"
       cloudsql-instances: "eogruh-prod:northamerica-northeast1:ppr-prod"
       service-account: "sa-api@eogruh-prod.iam.gserviceaccount.com"
-      max-scale: "10"
-      container-concurrency: "20"
+      max-scale: "20"
+      container-concurrency: "8"

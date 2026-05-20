@@ -257,6 +257,8 @@ class MhrDraft(db.Model):
             query_text = MhrDraft.build_account_query_filter(query_text, params)
         if params.has_sort():
             order_clause: str = QUERY_ACCOUNT_ORDER_BY.get(params.sort_criteria)
+            if not order_clause:
+                order_clause = QUERY_ACCOUNT_DRAFTS_DEFAULT_ORDER
             if params.sort_direction and params.sort_direction == reg_utils.SORT_DESCENDING:
                 order_clause += SORT_DESCENDING
             elif params.sort_direction and params.sort_direction == reg_utils.SORT_ASCENDING:
