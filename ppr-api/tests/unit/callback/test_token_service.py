@@ -12,17 +12,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Google Storage token tests."""
+from flask import current_app
+
 from ppr_api.callback.auth.token_service import GoogleStorageTokenService
+from ppr_api.utils.logging import logger
 
 
 def test_get_token(session, client, jwt):
     """Assert that config to get a google storage token works as expected."""
     token = GoogleStorageTokenService.get_token()
-    # print(token)
-    assert token
+    if current_app.config.get("GOOGLE_DEFAULT_SA"):
+        logger.debug(token)
+        assert token
+    else:
+        assert not token
 
 
 def test_get_credentials(session, client, jwt):
     """Assert that the configuration to get a google storage token works as expected (no exceptions)."""
     credentials = GoogleStorageTokenService.get_credentials()
-    assert credentials
+    if current_app.config.get("GOOGLE_DEFAULT_SA"):
+        assert credentials
+        assert credentials.token
+        assert credentials.service_account_email
+    else:
+        assert not credentials
+
+
+def test_get_cs_signed_credentials(session, client, jwt):
+    """Assert that the configuration to get a google storage token works as expected (no exceptions)."""
+    if current_app.config.get("GOOGLE_DEFAULT_SA"):
+        credentials = GoogleStorageTokenService.get_cs_signed_credentials()
+        assert credentials
+        assert credentials.token
+        assert credentials.service_account_email

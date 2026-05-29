@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Google Storage token tests."""
-from ppr_api.callback.document_storage.storage_service import DocumentTypes, GoogleStorageService
 
 from flask import current_app
+
+from ppr_api.callback.document_storage.storage_service import DocumentTypes, GoogleStorageService
+from ppr_api.utils.logging import logger
 
 
 TEST_DOC_NAME = 'financing-statements_100348B.pdf'
@@ -52,7 +54,7 @@ def test_cs_save_document(session):
         data_file.close()
 
     response = GoogleStorageService.save_document(TEST_SAVE_DOC_NAME, raw_data)
-    print(response)
+    logger.debug(response)
     assert response
 
 
@@ -102,7 +104,7 @@ def test_cs_save_verification_document(session):
 
     response = GoogleStorageService.save_document(TEST_VERIFICATION_SAVE_DOC_NAME, raw_data,
                                                   DocumentTypes.VERIFICATION_MAIL)
-    print(response)
+    logger.debug(response)
     assert response
 
 
@@ -129,10 +131,23 @@ def test_cs_save_registration_document(session):
 
     response = GoogleStorageService.save_document(TEST_REGISTRATION_SAVE_DOC_NAME, raw_data,
                                                   DocumentTypes.REGISTRATION)
-    print(response)
+    logger.debug(response)
     assert response
 
 
+def test_cs_get_search_document_link(session):
+    """Assert that getting a document link from google cloud storage works as expected."""
+    if is_ci_testing():
+        return
+    download_link = GoogleStorageService.get_document_link("2025/12/23/search-results-report-4132437.pdf",
+                                                           DocumentTypes.SEARCH_RESULTS,
+                                                           7)
+    logger.debug(download_link)
+    assert download_link
+
+
 def is_ci_testing() -> bool:
-    """Check unit test environment: exclude most reports for CI testing."""
+    """Check unit test environment: exclude pub/sub for CI testing."""
+    if not current_app.config.get("GOOGLE_DEFAULT_SA"):
+        return True
     return  current_app.config.get("DEPLOYMENT_ENV", "testing") == "testing"
