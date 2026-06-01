@@ -153,7 +153,7 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
     ):
         """Call the Cloud Storage API."""
         credentials = GoogleStorageTokenService.get_credentials()
-        storage_client = storage.Client(credentials=credentials)
+        storage_client = storage.Client(credentials=credentials) if credentials else storage.Client()
         bucket = storage_client.bucket(cls.__get_bucket_id(doc_type))
         blob = bucket.blob(name)
         if method == HTTP_POST:
@@ -171,7 +171,10 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
     @classmethod
     def __call_cs_api_link(cls, name: str, data=None, doc_type: str = None, available_days: int = 1):
         """Call the Cloud Storage API, returning a time-limited download link."""
-        credentials = GoogleStorageTokenService.get_credentials()
+        credentials = GoogleStorageTokenService.get_cs_signed_credentials()
+        if not credentials:
+            logger.warning(f"No credentials to create signed storage link for {name}")
+            return ""
         storage_client = storage.Client(credentials=credentials)
         bucket = storage_client.bucket(cls.__get_bucket_id(doc_type))
         blob = bucket.blob(name)
@@ -179,6 +182,10 @@ class GoogleStorageService(StorageService):  # pylint: disable=too-few-public-me
             media_type: str = CONTENT_TYPE_PDF
             blob.upload_from_string(data=data, content_type=media_type)
         url = blob.generate_signed_url(
-            version="v4", expiration=datetime.timedelta(days=available_days, hours=0, minutes=0), method="GET"
+            version="v4",
+            expiration=datetime.timedelta(days=available_days, hours=0, minutes=0),
+            method="GET",
+            service_account_email=credentials.service_account_email,
+            access_token=credentials.token,
         )
         return url

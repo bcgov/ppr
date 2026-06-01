@@ -33,9 +33,8 @@ TEST_PAYLOAD_REGISTRATION = {
 
 def test_publish_search_report(session):
     """Assert that enqueuing/publishing a search report event works as expected."""
-    payload = TEST_PAYLOAD
-    test_env = current_app.config.get("DEPLOYMENT_ENV", "testing")
-    if test_env != "testing":
+    if not is_ci_testing():
+        payload = TEST_PAYLOAD
         apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
         if apikey:
             payload['apikey'] = apikey
@@ -44,9 +43,8 @@ def test_publish_search_report(session):
 
 def test_publish_api_notification(session):
     """Assert that enqueuing/publishing an api notification event works as expected."""
-    payload = TEST_PAYLOAD
-    test_env = current_app.config.get("DEPLOYMENT_ENV", "testing")
-    if test_env != "testing":
+    if not is_ci_testing():
+        payload = TEST_PAYLOAD
         apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
         if apikey:
             payload['apikey'] = apikey
@@ -55,9 +53,8 @@ def test_publish_api_notification(session):
 
 def test_publish_verification_mail(session):
     """Assert that enqueuing/publishing an api verification statement mail event works as expected."""
-    payload = TEST_PAYLOAD_VERIFICATION
-    test_env = current_app.config.get("DEPLOYMENT_ENV", "testing")
-    if test_env != "testing":
+    if not is_ci_testing():
+        payload = TEST_PAYLOAD_VERIFICATION
         apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
         if apikey:
             payload['apikey'] = apikey
@@ -66,10 +63,16 @@ def test_publish_verification_mail(session):
 
 def test_publish_registration_report(session):
     """Assert that enqueuing/publishing a registration report event works as expected."""
-    payload = TEST_PAYLOAD_REGISTRATION
-    test_env = current_app.config.get("DEPLOYMENT_ENV", "testing")
-    if test_env != "testing":
+    if not is_ci_testing():
+        payload = TEST_PAYLOAD_REGISTRATION
         apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
         if apikey:
             payload['apikey'] = apikey
         GoogleQueueService().publish_registration_report(payload)
+
+
+def is_ci_testing() -> bool:
+    """Check unit test environment: exclude pub/sub for CI testing."""
+    if not current_app.config.get("GOOGLE_DEFAULT_SA"):
+        return True
+    return  current_app.config.get("DEPLOYMENT_ENV", "testing") == "testing"
