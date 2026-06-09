@@ -30,8 +30,10 @@ serialPipeline:
       deploy-project-id: "eogruh-dev"
       service-name: "ppr-api-dev"
       container-name: "ppr-api-dev"
+      container-concurrency: "7"
       cloudsql-instances: "eogruh-dev:northamerica-northeast1:ppr-dev-cloudsql"
       service-account: "sa-api@eogruh-dev.iam.gserviceaccount.com"
+      timeout-seconds: "1800"
  - targetId: eogruh-test
    profiles: [test]
    strategy:
@@ -44,8 +46,10 @@ serialPipeline:
       service-name: "ppr-api-test"
       container-name: "ppr-api-test"
       app-env: "test"
+      container-concurrency: "7"
       cloudsql-instances: "eogruh-test:northamerica-northeast1:ppr-test-cloudsql"
       service-account: "sa-api@eogruh-test.iam.gserviceaccount.com"
+      timeout-seconds: "1800"
  - targetId: eogruh-sandbox
    profiles: [sandbox]
    strategy:
@@ -60,8 +64,9 @@ serialPipeline:
       app-env: "sandbox"
       cloudsql-instances: "eogruh-sandbox:northamerica-northeast1:ppr-sandbox-pgdb"
       service-account: "sa-api@eogruh-sandbox.iam.gserviceaccount.com"
+      timeout-seconds: "1800"
       max-scale: "50"
-      container-concurrency: "20"
+      container-concurrency: "7"
       container-port: "8080"
       resources-cpu: 4000m
       resources-memory: 8Gi
@@ -79,8 +84,9 @@ serialPipeline:
       app-env: "production"
       cloudsql-instances: "eogruh-prod:northamerica-northeast1:ppr-prod"
       service-account: "sa-api@eogruh-prod.iam.gserviceaccount.com"
-      max-scale: "50"
-      container-concurrency: "20"
+      max-scale: "100"
+      container-concurrency: "7"
+      timeout-seconds: "1800"
       container-port: "8080"
       resources-cpu: 4000m
       resources-memory: 8Gi

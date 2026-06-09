@@ -32,11 +32,12 @@ ENV APP_ENV=${APP_ENV} \
   PIP_DEFAULT_TIMEOUT=100 \
   PIP_ROOT_USER_ACTION=ignore \
   # poetry:
-  POETRY_VERSION=1.8.3 \
+  POETRY_VERSION=2.1.3 \
   POETRY_NO_INTERACTION=1 \
   POETRY_VIRTUALENVS_CREATE=false \
   POETRY_CACHE_DIR='/var/cache/pypoetry' \
-  POETRY_HOME='/usr/local'
+  POETRY_HOME='/usr/local' \
+  POETRY_INSTALLER_PARALLEL=false
 
 SHELL ["/bin/bash", "-eo", "pipefail", "-c"]
 
@@ -67,6 +68,7 @@ COPY --chown=web:web ./poetry.lock ./pyproject.toml /code/
 
 COPY --chown=web:web ./src /code/src
 COPY --chown=web:web ./README.md /code
+COPY ./run.sh /opt/app-root/run.sh
 
 # Project initialization:
 RUN --mount=type=cache,target="$POETRY_CACHE_DIR" \
@@ -74,11 +76,12 @@ RUN --mount=type=cache,target="$POETRY_CACHE_DIR" \
   && poetry version \
   # Install deps:
   && poetry run pip install -U pip \
-  && poetry install --only main --no-interaction --no-ansi
+  && poetry install --only main --no-interaction --no-ansi \
+  && chmod 755 /opt/app-root/run.sh
 
 USER web
 
 # Set Python path
 ENV PYTHONPATH=/code/src
 
-CMD [ "python", "-m", "secured_party_notification" ]
+CMD [ "/opt/app-root/run.sh" ]

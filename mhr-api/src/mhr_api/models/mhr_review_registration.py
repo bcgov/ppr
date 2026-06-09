@@ -166,7 +166,10 @@ class MhrReviewRegistration(db.Model):
         reg = None
         if reg_id:
             try:
+                reg_id = int(reg_id)
                 reg = db.session.query(MhrReviewRegistration).filter(MhrReviewRegistration.id == reg_id).one_or_none()
+            except (TypeError, ValueError):
+                return None
             except Exception as db_exception:  # noqa: B902; return nicer error
                 logger.error(f"MhrReviewRegistration.find_by_id exception: {db_exception}")
                 raise DatabaseException(db_exception) from db_exception

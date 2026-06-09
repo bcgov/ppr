@@ -5,9 +5,6 @@ venv
 .env*
 .eggs
 Makefile
-manage.py
-migrations
-pre-hook-update-db.sh
 requirements
 test_data
 tests

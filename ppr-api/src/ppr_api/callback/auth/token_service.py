@@ -46,9 +46,9 @@ class GoogleStorageTokenService(TokenService):  # pylint: disable=too-few-public
     service_account_info = None
     credentials = None
     # Use service account env var if available.
-    if gcp_auth_key:
-        sa_bytes = bytes(gcp_auth_key, "utf-8")
-        service_account_info = json.loads(base64.b64decode(sa_bytes.decode("utf-8")))
+    # if gcp_auth_key:
+    #    sa_bytes = bytes(gcp_auth_key, "utf-8")
+    #    service_account_info = json.loads(base64.b64decode(sa_bytes.decode("utf-8")))
     # Otherwise leave as none and use the service account attached to the Cloud service.
 
     @staticmethod
@@ -59,10 +59,18 @@ class GoogleStorageTokenService(TokenService):  # pylint: disable=too-few-public
         if GoogleStorageTokenService.gcp_auth_key:
             sa_bytes = bytes(GoogleStorageTokenService.gcp_auth_key, "utf-8")
             GoogleStorageTokenService.service_account_info = json.loads(base64.b64decode(sa_bytes.decode("utf-8")))
+            GoogleStorageTokenService.credentials = service_account.Credentials.from_service_account_info(
+                GoogleStorageTokenService.service_account_info, scopes=GoogleStorageTokenService.gcp_sa_scopes
+            )
+        else:
+            logger.info("auth_service.init_app no SA info.")
 
     @classmethod
     def get_token(cls):
         """Generate an OAuth access token with cloud storage access."""
+        if not cls.gcp_auth_key or not cls.service_account_info:
+            return None
+
         if cls.credentials is None:
             cls.credentials = service_account.Credentials.from_service_account_info(
                 cls.service_account_info, scopes=cls.gcp_sa_scopes
@@ -75,11 +83,14 @@ class GoogleStorageTokenService(TokenService):  # pylint: disable=too-few-public
     @classmethod
     def get_credentials(cls):
         """Generate GCP auth credentials to pass to a GCP client."""
+        if not cls.gcp_auth_key or not cls.service_account_info:
+            return None
+
         if cls.credentials is None:
             cls.credentials = service_account.Credentials.from_service_account_info(
                 cls.service_account_info, scopes=cls.gcp_sa_scopes
             )
-        logger.info("Call successful: obtained credentials.")
+        logger.debug("Call successful: obtained credentials.")
         return cls.credentials
 
     @classmethod
@@ -94,3 +105,16 @@ class GoogleStorageTokenService(TokenService):  # pylint: disable=too-few-public
         token = google.oauth2.id_token.fetch_id_token(auth_req, audience)
         logger.debug("Call successful: obtained token.")
         return token
+
+    @classmethod
+    def get_cs_signed_credentials(cls):
+        """Extra steps for ADC cloud storage signed url - requires cert to sign."""
+        if cls.gcp_auth_key and cls.service_account_info:
+            return cls.get_credentials()
+
+        # Load default credentials
+        credentials, project = google.auth.default()  # pylint: disable=unused-variable; gcp api response
+        # Refresh credentials to ensure an access token is available
+        auth_request = google.auth.transport.requests.Request()
+        credentials.refresh(auth_request)
+        return credentials

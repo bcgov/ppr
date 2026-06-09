@@ -342,8 +342,12 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
     def find_by_id(cls, registration_id: int):
         """Return the registration matching the id."""
         registration = None
-        if registration_id:
-            registration = db.session.query(Registration).filter(Registration.id == registration_id).one_or_none()
+        try:
+            reg_id_int = int(registration_id) if registration_id is not None else None
+        except (TypeError, ValueError):
+            return None
+        if reg_id_int:
+            registration = db.session.query(Registration).filter(Registration.id == reg_id_int).one_or_none()
         return registration
 
     @classmethod

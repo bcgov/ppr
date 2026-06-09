@@ -31,11 +31,12 @@ ENV APP_ENV=${APP_ENV} \
   PIP_DEFAULT_TIMEOUT=100 \
   PIP_ROOT_USER_ACTION=ignore \
   # poetry:
-  POETRY_VERSION=1.8.3 \
+  POETRY_VERSION=2.1.3 \
   POETRY_NO_INTERACTION=1 \
   POETRY_VIRTUALENVS_CREATE=false \
   POETRY_CACHE_DIR='/var/cache/pypoetry' \
-  POETRY_HOME='/usr/local'
+  POETRY_HOME='/usr/local' \
+  POETRY_INSTALLER_PARALLEL=false
 
 SHELL ["/bin/bash", "-eo", "pipefail", "-c"]
 
@@ -62,6 +63,7 @@ COPY ./poetry.lock ./pyproject.toml /opt/app-root/
 
 COPY ./src /opt/app-root/src
 COPY ./README.md /opt/app-root
+COPY ./run.sh /opt/app-root
 
 # Project initialization:
 RUN --mount=type=cache,target="$POETRY_CACHE_DIR" \
@@ -71,11 +73,12 @@ RUN --mount=type=cache,target="$POETRY_CACHE_DIR" \
   && poetry run pip install -U pip \
   && poetry install \
     $(if [ -z ${APP_ENV+x} ] | [ "$APP_ENV" = 'production' ]; then echo '--only main'; fi) \
-    --no-interaction --no-ansi
+    --no-interaction --no-ansi \
+  && chmod 755 /opt/app-root/run.sh
 
 USER 1001
 
 # Set Python path
 ENV PYTHONPATH=/opt/app-root/src
 
-CMD [ "python", "-m", "assets_payment" ]
+CMD [ "./run.sh" ]

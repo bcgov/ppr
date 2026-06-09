@@ -32,11 +32,12 @@ ENV APP_ENV=${APP_ENV} \
   PIP_DEFAULT_TIMEOUT=100 \
   PIP_ROOT_USER_ACTION=ignore \
   # poetry:
-  POETRY_VERSION=1.8.3 \
+  POETRY_VERSION=2.1.3 \
   POETRY_NO_INTERACTION=1 \
   POETRY_VIRTUALENVS_CREATE=false \
   POETRY_CACHE_DIR='/var/cache/pypoetry' \
-  POETRY_HOME='/usr/local'
+  POETRY_HOME='/usr/local' \
+  POETRY_INSTALLER_PARALLEL=false
 
 SHELL ["/bin/bash", "-eo", "pipefail", "-c"]
 
@@ -66,6 +67,7 @@ RUN groupadd -g "${GID}" -r web \
 COPY --chown=web:web ./poetry.lock ./pyproject.toml /code/
 
 COPY --chown=web:web ./src /code/src
+COPY ./run.sh /code
 COPY --chown=web:web ./README.md /code
 
 # Project initialization:
@@ -76,11 +78,12 @@ RUN --mount=type=cache,target="$POETRY_CACHE_DIR" \
   && poetry run pip install -U pip \
   && poetry install \
     $(if [ -z ${APP_ENV+x} ] | [ "$APP_ENV" = 'production' ]; then echo '--only main'; fi) \
-    --no-interaction --no-ansi
+    --no-interaction --no-ansi \
+  && chmod 755 /code/run.sh
 
 USER web
 
 # Set Python path
 ENV PYTHONPATH=/code/src
 
-CMD [ "python", "-m", "assets_registrations_staff" ]
+CMD [ "/code/run.sh" ]

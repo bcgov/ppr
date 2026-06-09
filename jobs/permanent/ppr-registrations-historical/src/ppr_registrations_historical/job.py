@@ -1,11 +1,16 @@
 import sys
 from contextlib import suppress
 from http import HTTPStatus
-from typing import Final
+from typing import Any, Final
 
-import psycopg2
+from cloud_sql_connector import DBConfig, close_connector, getconn
+from pg8000 import dbapi as pg8000
 
 from .services.logging import logging
+
+
+DbConnection = Any
+DbCursor = Any
 
 
 EVENT_JOB_ID = 777777001
@@ -74,34 +79,52 @@ DELETE
 """
 INSERT_EVENT: Final = """
 INSERT INTO event_tracking(id, key_id, event_ts, event_tracking_type, status, message)
-  VALUES(nextval('event_tracking_id_seq'), {job_id}, CURRENT_TIMESTAMP  at time zone 'utc', 'REG_HIST_JOB',
-         {job_status}, '{job_message}')
+    VALUES(nextval('event_tracking_id_seq'), %s, CURRENT_TIMESTAMP at time zone 'utc', 'REG_HIST_JOB',
+                 %s, %s)
 """
 
-def track_event(db_conn: psycopg2.extensions.connection,
-                db_cursor: psycopg2.extensions.cursor,
+def track_event(db_conn: DbConnection,
+                db_cursor: DbCursor,
                 status: int,
                 message: str):
     """Capture the job run in the event tracking table."""
     try:
         if not db_conn or not db_cursor:
             return
-        sql_statement = INSERT_EVENT.format(job_id=EVENT_JOB_ID, job_status=status, job_message=message)
-        db_cursor.execute(sql_statement)
+        db_cursor.execute(INSERT_EVENT, (EVENT_JOB_ID, int(status), message))
         db_conn.commit()
-    except (psycopg2.Error, Exception) as err:
+    except Exception as err:
         error_message = f"Error attempting event_tracking insert: {err}"
         logging.error(error_message)
 
 # Start job
 def job(config):
 
-    db_conn: psycopg2.extensions.connection
-    db_cursor: psycopg2.extensions.cursor
+    db_conn: DbConnection | None = None
+    db_cursor: DbCursor | None = None
+    use_cloudsql = False
     job_message: str = '1. Update account discharged registrations.'
     try:
         logging.info('Getting database connection and cursor.')
-        db_conn = psycopg2.connect(dsn=config.APP_DATABASE_URI)
+        if config.CLOUDSQL_INSTANCE_CONNECTION_NAME:  # pragma: no cover
+            use_cloudsql = True
+            db_config = DBConfig(
+                instance_name=config.CLOUDSQL_INSTANCE_CONNECTION_NAME,
+                database=config.APP_DB_NAME,
+                user=config.APP_DB_USER,
+                ip_type=config.DB_IP_TYPE,
+                pool_recycle=60,
+                schema='public',
+            )
+            db_conn = getconn(db_config)
+        else:
+            db_conn = pg8000.connect(
+                user=config.APP_DB_USER,
+                password=config.APP_DB_PASSWORD,
+                host=config.APP_DB_HOST,
+                port=int(config.APP_DB_PORT),
+                database=config.APP_DB_NAME,
+            )
         db_cursor = db_conn.cursor()
 
         # Update account ids for registrations discharged more than 30 days.
@@ -133,13 +156,18 @@ def job(config):
 
         logging.info('Run completed without error.')
         track_event(db_conn, db_cursor, HTTPStatus.OK, job_message)
-    except (psycopg2.Error, Exception) as err:
+    except Exception as err:
         track_event(db_conn, db_cursor, HTTPStatus.INTERNAL_SERVER_ERROR, job_message + '\n' + str(err))
-        logging.error(f'Job run failed: {err}', err)
+        logging.error(f'Job run failed: {err}')
         sys.exit(1)  # Retry Job Task by exiting the process
     finally:
         # Clean up: Close the database cursor and connection
-        with suppress(Exception):
-            db_cursor.close()
-        with suppress(Exception):
-            db_conn.close()
+        if db_cursor:
+            with suppress(Exception):
+                db_cursor.close()
+        if db_conn:
+            with suppress(Exception):
+                db_conn.close()
+        if use_cloudsql:
+            with suppress(Exception):
+                close_connector()

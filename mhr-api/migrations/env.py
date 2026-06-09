@@ -1,6 +1,8 @@
 import logging
+import os
 from logging.config import fileConfig
 
+import sqlalchemy as sa
 from alembic import context
 from alembic_utils.replaceable_entity import register_entities
 from flask import current_app
@@ -139,8 +141,8 @@ def run_migrations_offline():
 
     """
     url = config.get_main_option("sqlalchemy.url")
-    context.configure(url=url, target_metadata=get_metadata(), literal_binds=True)
-
+    context.configure(url=url, target_metadata=get_metadata(), literal_binds=True,
+                        version_table="alembic_version_mhr")
     with context.begin_transaction():
         context.run_migrations()
 
@@ -166,10 +168,16 @@ def run_migrations_online():
     connectable = get_engine()
 
     with connectable.connect() as connection:
+        owner_role = os.getenv("DATABASE_OWNER_ROLE")
+        if owner_role:
+            safe_role = owner_role.replace('"', '""')  # Escape any quotes for SQL safety
+            connection.execute(sa.text(f'SET ROLE "{safe_role}"'))
+            connection.commit()
         context.configure(
             connection=connection,
             target_metadata=get_metadata(),
             process_revision_directives=process_revision_directives,
+            version_table="alembic_version_mhr",
             **current_app.extensions["migrate"].configure_args,
         )
 

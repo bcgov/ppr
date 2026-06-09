@@ -14,12 +14,16 @@
 """This module executes all the job steps."""
 import sys
 from contextlib import suppress
-from typing import Final
+from typing import Any, Final
 
-import psycopg2
+from cloud_sql_connector import DBConfig, getconn
+from pg8000 import dbapi as pg8000
 
 from assets_registrations_staff.config import Config
 from assets_registrations_staff.utils.logging import logger
+
+DbConnection = Any
+DbCursor = Any
 
 COUNT_QUERY: Final = """
 SELECT (select count(mer.id)
@@ -78,7 +82,7 @@ INSERT INTO mhr_extra_registrations(id, account_id, mhr_number, removed_ind)
 """
 
 
-def delete_mhr_other(db_conn: psycopg2.extensions.connection, db_cursor: psycopg2.extensions.cursor):
+def delete_mhr_other(db_conn: DbConnection, db_cursor: DbCursor):
     """Remove stale registrations created by non-staff from the mhr_other_registrations table."""
     try:
         if not db_conn or not db_cursor:
@@ -87,13 +91,13 @@ def delete_mhr_other(db_conn: psycopg2.extensions.connection, db_cursor: psycopg
         db_cursor.execute(sql_statement)
         db_conn.commit()
         logger.info("Delete stale other account registrations successful.")
-    except (psycopg2.Error, Exception) as err:
+    except Exception as err:
         logger.error(f"Delete stale other account registrations failed: {err}.")
 
 
 def remove_mhr_registration(
-    db_conn: psycopg2.extensions.connection,
-    db_cursor: psycopg2.extensions.cursor,
+    db_conn: DbConnection,
+    db_cursor: DbCursor,
     mhr_num: str,
 ):
     """Create a record for a staff created new MH registration to be removed from the staff table as stale."""
@@ -103,13 +107,13 @@ def remove_mhr_registration(
         sql_statement = INSERT_EXTRA_REG.format(mhr_number=mhr_num)
         db_cursor.execute(sql_statement)
         db_conn.commit()
-    except (psycopg2.Error, Exception) as err:
+    except Exception as err:
         error_message = f"Error attempting mhr_extra_registrations insert MHR#={mhr_num}: {err}"
         logger.error(error_message)
 
 
 def remove_mhr_staff_reg(
-    db_conn: psycopg2.extensions.connection, db_cursor: psycopg2.extensions.cursor, count_data: dict
+    db_conn: DbConnection, db_cursor: DbCursor, count_data: dict
 ):
     """Revert MHR drafts in a payment pending state to the regular draft state."""
     try:
@@ -123,12 +127,12 @@ def remove_mhr_staff_reg(
         for mhr_num in mhr_numbers:
             remove_mhr_registration(db_conn, db_cursor, mhr_num)
         logger.info(f"Remove staff MHR registrations completed for MHR numbers {staff_mhr_nums}")
-    except (psycopg2.Error, Exception) as err:
+    except Exception as err:
         error_message = f"Remove staff MHR registrations failed: {err}"
         logger.error(error_message)
 
 
-def run_count_query(db_conn: psycopg2.extensions.connection, db_cursor: psycopg2.extensions.cursor) -> dict:
+def run_count_query(db_conn: DbConnection, db_cursor: DbCursor) -> dict:
     """Execute the count staff registrations query."""
     count_data: dict = {}
     try:
@@ -140,7 +144,7 @@ def run_count_query(db_conn: psycopg2.extensions.connection, db_cursor: psycopg2
         count_data["staff_reg_count"] = int(row[1])
         count_data["staff_reg_nums"] = str(row[2]) if row[2] else ""
         logger.info(f"Count query results: {str(count_data)}")
-    except (psycopg2.Error, Exception) as err:
+    except Exception as err:
         error_message = f"Error attempting to run status query: {err}"
         logger.error(error_message)
     return count_data
@@ -148,11 +152,28 @@ def run_count_query(db_conn: psycopg2.extensions.connection, db_cursor: psycopg2
 
 def job(config: Config):
     """Execute the job."""
-    db_conn: psycopg2.extensions.connection
-    db_cursor: psycopg2.extensions.cursor
+    db_conn: DbConnection | None = None
+    db_cursor: DbCursor | None = None
     try:
         logger.info("Getting database connection and cursor.")
-        db_conn = psycopg2.connect(dsn=config.APP_DATABASE_URI)
+        if config.CLOUDSQL_INSTANCE_CONNECTION_NAME:  # pragma: no cover
+            db_config = DBConfig(
+                instance_name=config.CLOUDSQL_INSTANCE_CONNECTION_NAME,
+                database=config.APP_DB_NAME,
+                user=config.APP_DB_USER,
+                ip_type=config.DB_IP_TYPE,
+                pool_recycle=60,
+                schema="public",
+            )
+            db_conn = getconn(db_config)
+        else:
+            db_conn = pg8000.connect(
+                user=config.APP_DB_USER,
+                password=config.APP_DB_PASSWORD,
+                host=config.APP_DB_HOST,
+                port=int(config.APP_DB_PORT),
+                database=config.APP_DB_NAME,
+            )
         db_cursor = db_conn.cursor()
         count_data = run_count_query(db_conn, db_cursor)
         if not count_data.get("other_reg_count") or count_data.get("other_reg_count") < 1:
@@ -161,13 +182,15 @@ def job(config: Config):
             delete_mhr_other(db_conn, db_cursor)
         remove_mhr_staff_reg(db_conn, db_cursor, count_data)
         logger.info("Run completed.")
-    except (psycopg2.Error, Exception) as err:
+    except Exception as err:
         job_message: str = f"Run failed: {str(err)}."
         logger.error(job_message)
         sys.exit(1)  # Retry Job Task by exiting the process
     finally:
         # Clean up: Close the database cursor and connection
-        with suppress(Exception):
-            db_cursor.close()
-        with suppress(Exception):
-            db_conn.close()
+        if db_cursor:
+            with suppress(Exception):
+                db_cursor.close()
+        if db_conn:
+            with suppress(Exception):
+                db_conn.close()

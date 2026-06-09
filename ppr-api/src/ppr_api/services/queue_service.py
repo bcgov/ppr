@@ -36,7 +36,9 @@ class GoogleQueueService:
     def init_app(app):
         """Set up the service"""
         credentials = GoogleStorageTokenService.get_credentials()
-        GoogleQueueService.publisher = pubsub_v1.PublisherClient(credentials=credentials)
+        GoogleQueueService.publisher = (
+            pubsub_v1.PublisherClient(credentials=credentials) if credentials else pubsub_v1.PublisherClient()
+        )
         project_id = str(app.config.get("GCP_PS_PROJECT_ID"))
         search_report_topic = str(app.config.get("GCP_PS_SEARCH_REPORT_TOPIC"))
         notification_topic = str(app.config.get("GCP_PS_NOTIFICATION_TOPIC"))

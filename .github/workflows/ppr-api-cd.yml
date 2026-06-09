@@ -19,6 +19,13 @@ on:
         - test
         - sandbox
         - prod
+      redeploy:
+        description: "Redeploy Application"
+        required: true
+        type: choice
+        options:
+          - "false"
+          - "true"
 
 jobs:
   ppr-api-cd:
@@ -26,7 +33,9 @@ jobs:
     with:
       target: ${{ inputs.target }}
       app_name: "ppr-api"
+      cd_runner_version: "1.0.8"
       working_directory: "./ppr-api"
+      redeploy: ${{ inputs.redeploy }}
     secrets:
       WORKLOAD_IDENTIFY_POOLS_PROVIDER: ${{ secrets.WORKLOAD_IDENTIFY_POOLS_PROVIDER }}
       GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }}

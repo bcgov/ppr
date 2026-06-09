@@ -32,11 +32,12 @@ ENV APP_ENV=${APP_ENV} \
   PIP_DEFAULT_TIMEOUT=100 \
   PIP_ROOT_USER_ACTION=ignore \
   # poetry:
-  POETRY_VERSION=1.8.3 \
+  POETRY_VERSION=2.3.2 \
   POETRY_NO_INTERACTION=1 \
   POETRY_VIRTUALENVS_CREATE=false \
   POETRY_CACHE_DIR='/var/cache/pypoetry' \
-  POETRY_HOME='/usr/local'
+  POETRY_HOME='/usr/local' \
+  POETRY_INSTALLER_PARALLEL=false
 
 SHELL ["/bin/bash", "-eo", "pipefail", "-c"]
 
@@ -84,6 +85,7 @@ USER web
 # The following stage is only for production:
 FROM development_build AS production_build
 COPY --chown=web:web . /code
+RUN chmod +x /code/update_db.sh
 
 # ENV PYTHONPATH=/opt/app-root/src
 

@@ -280,14 +280,20 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         error_msg = ""
         if search_id and not limit_by_date:
             try:
+                search_id = int(search_id)
                 search_detail = db.session.query(SearchResult).filter(SearchResult.search_id == search_id).one_or_none()
+            except (TypeError, ValueError):
+                return None
             except Exception as db_exception:  # noqa: B902; return nicer error
                 logger.error("DB find_by_search_id exception: " + str(db_exception))
                 raise DatabaseException(db_exception) from db_exception
         elif search_id and limit_by_date:
             min_allowed_date = model_utils.today_ts_offset(GET_HISTORY_DAYS_LIMIT, False)
             try:
+                search_id = int(search_id)
                 search_detail = db.session.query(SearchResult).filter(SearchResult.search_id == search_id).one_or_none()
+            except (TypeError, ValueError):
+                return None
             except Exception as db_exception:  # noqa: B902; return nicer error
                 logger.error("DB find_by_search_id exception: " + str(db_exception))
                 raise DatabaseException(db_exception) from db_exception
