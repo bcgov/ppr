@@ -8,7 +8,7 @@ readme = "README.md"
 packages = [{include = "ppr_api", from = "src"}]
 
 [tool.poetry.dependencies]
-python = ">=3.12,<3.13"
+python = ">=3.12,<3.14"
 flask = "^3.0.3"
 flask-sqlalchemy = "^3.1.1"
 Flask-Cors = "^4.0.1"
@@ -26,6 +26,7 @@ sqlalchemy-continuum = "^1.4.2"
 pg8000 = "^1.31.2"
 cachecontrol = "^0.14.0"
 structured-logging = { git = "https://github.com/bcgov/sbc-connect-common.git", subdirectory = "python/structured-logging", branch = "main" }
+cloud-sql-connector = { git = "https://github.com/bcgov/sbc-connect-common.git", subdirectory = "python/cloud-sql-connector", branch = "main" }
 oauthlib = "^3.2.2"
 Jinja2 = "^3.1.2"
 google-api-core = "^2.11.0"
