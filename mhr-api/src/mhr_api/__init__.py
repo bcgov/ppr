@@ -18,6 +18,7 @@ This module is the API for the BC Registries Manufactured Home Registry system.
 
 import os
 
+from cloud_sql_connector import setup_pg8000_close_event_listener
 from flask import Flask, redirect  # noqa: I001
 from flask_migrate import Migrate, upgrade
 from registry_schemas import __version__ as registry_schemas_version
@@ -60,6 +61,10 @@ def create_app(service_environment=APP_RUNNING_ENVIRONMENT, run_mode=None, **kwa
 
     db.init_app(app)
     Migrate(app, db)
+
+    with app.app_context():
+        setup_pg8000_close_event_listener(db.engine)
+
     if app.config.get("DEPLOYMENT_ENV", "") == "testing":  # CI only run upgrade for unit testing.
         logger.info("Running db upgrade.")
         with app.app_context():
