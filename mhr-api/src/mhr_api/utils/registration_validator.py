@@ -444,12 +444,10 @@ def validate_permit_location_address(json_data: dict, current_location: dict) ->
     addr_2 = current_location.get("address")
     # logger.debug(addr_1)
     # logger.debug(addr_2)
-    if addr_2.get("street"):
-        addr_2["street"] = str(addr_2.get("street")).upper().strip()
     if addr_2.get("city"):
         addr_2["city"] = str(addr_2.get("city")).upper().strip()
     if (
-        addr_1.get("street", "") != addr_2.get("street", "")
+        not validator_utils.validate_manufacturer_street(addr_1.get("street", ""), addr_2.get("street", ""))
         or addr_1.get("city", "") != addr_2.get("city", "")
         or addr_1.get("region", "") != addr_2.get("region", "")
         or addr_1.get("country", "") != addr_2.get("country", "")

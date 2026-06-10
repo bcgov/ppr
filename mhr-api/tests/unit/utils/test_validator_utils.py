@@ -47,6 +47,35 @@ TEST_DESCRIPTION_DATA2 = [
     ('Invalid year missing', None, 'CHAMPION', 'DELUXE 5000', 0, False, validator_utils.DESCRIPTION_YEAR_REQUIRED),
     ('Invalid no make or model', 2020, None, None, 0, True, validator_utils.DESCRIPTION_MAKE_MODEL_REQUIRED)
 ]
+# testdata pattern is ({identical}, {street1}, {street2})
+TEST_MANUFACTURER_STREET_DATA = [
+    (True, "", ""),
+    (True, "1234 TEST ROAD", "1234 TEST ROAD"),
+    (True, "1234 TEST RD", "1234 TEST RD"),
+    (True, "1234 TEST RD", "1234 TEST RD."),
+    (True, "1234 TEST RD", "1234 TEST ROAD"),
+    (True, "1234 TEST RD.", "1234 TEST ROAD"),
+    (True, "1234 TEST", "1234 TEST ROAD"),
+    (True, "1234 TEST", "1234 TEST RD"),
+    (False, "1234 TEST RDS", "1234 TEST RD"),
+    (True, "1234 TEST ST", "1234 TEST ST."),
+    (True, "1234 TEST ST", "1234 TEST STREET"),
+    (True, "1234 TEST ST.", "1234 TEST STREET"),
+    (True, "1234 TEST", "1234 TEST STREET"),
+    (True, "1234 TEST", "1234 TEST ST"),
+    (False, "1234 TEST STR", "1234 TEST STREET"),
+    (True, "1234 TEST RD SW", "1234 TEST ROAD SOUTHWEST"),
+    (True, "1234 TEST ST N", "1234 TEST NORTH STREET"),
+    (False, "1234 TEST ST EN", "1234 TEST NORTH STREET"),
+    (False, "1234 TEST RD SWE", "1234 TEST ROAD SOUTHWEST"),
+]
+
+
+@pytest.mark.parametrize('identical,street_1,street_2', TEST_MANUFACTURER_STREET_DATA)
+def test_validate_manufacturer_street(session, identical, street_1, street_2):
+    """Assert that manufacturer location address street validation works as expected."""
+    result = validator_utils.validate_manufacturer_street(street_1, street_2)
+    assert result == identical
 
 
 @pytest.mark.parametrize('desc,rebuilt,other,csa_num,eng_date,staff,message_content', TEST_DESCRIPTION_DATA)

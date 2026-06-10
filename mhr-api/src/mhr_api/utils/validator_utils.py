@@ -120,6 +120,102 @@ PPR_RESTRICTED_REG_TYPES = {
     MhrRegistrationTypes.TRANS: PPR_REG_TYPE_TRANSFER,
     MhrRegistrationTypes.PERMIT: PPR_REG_TYPE_PERMIT,
 }
+MANUFACTURER_STREET_ABBREVIATIONS = [
+    "RD",
+    "ROAD",
+    "ST",
+    "STREET",
+    "AVE",
+    "AVENUE",
+    "DR",
+    "DRIVE",
+    "BLVD",
+    "BOULEVARD",
+    "HWY",
+    "HIGHWAY",
+    "LN",
+    "LANE",
+    "CRT",
+    "COURT",
+    "PL",
+    "PLACE",
+    "SQ",
+    "SQUARE",
+    "CIR",
+    "CIRCLE",
+    "CRES",
+    "CRESCENT",
+    "PKWY",
+    "PARKWAY",
+    "TER",
+    "TERRACE",
+    "TRL",
+    "TRAIL",
+    "N",
+    "NORTH",
+    "NE",
+    "NORTHEAST",
+    "NW",
+    "NORTHWEST",
+    "E",
+    "EAST",
+    "S",
+    "SOUTH",
+    "SE",
+    "SOUTHEAST",
+    "SW",
+    "SOUTHWEST",
+    "W",
+    "WEST",
+]
+MANUFACTURER_STREET_ABBREVIATIONS_MAPPING = {
+    "RD": "ROAD",
+    "ROAD": "RD",
+    "ST": "STREET",
+    "STREET": "ST",
+    "AVE": "AVENUE",
+    "AVENUE": "AVE",
+    "DR": "DRIVE",
+    "DRIVE": "DR",
+    "BLVD": "BOULEVARD",
+    "BOULEVARD": "BLVD",
+    "HWY": "HIGHWAY",
+    "HIGHWAY": "HWY",
+    "LN": "LANE",
+    "LANE": "LN",
+    "CRT": "COURT",
+    "COURT": "CRT",
+    "PL": "PLACE",
+    "PLACE": "PL",
+    "SQ": "SQUARE",
+    "SQUARE": "SQ",
+    "CIR": "CIRCLE",
+    "CIRCLE": "CIR",
+    "CRES": "CRESCENT",
+    "CRESCENT": "CRES",
+    "PKWY": "PARKWAY",
+    "PARKWAY": "PKWY",
+    "TER": "TERRACE",
+    "TERRACE": "TER",
+    "TRL": "TRAIL",
+    "TRAIL": "TRL",
+    "N": "NORTH",
+    "NORTH": "N",
+    "NE": "NORTHEAST",
+    "NORTHEAST": "NE",
+    "NW": "NORTHWEST",
+    "NORTHWEST": "NW",
+    "E": "EAST",
+    "EAST": "E",
+    "S": "SOUTH",
+    "SOUTH": "S",
+    "SE": "SOUTHEAST",
+    "SOUTHEAST": "SE",
+    "SW": "SOUTHWEST",
+    "SOUTHWEST": "SW",
+    "W": "WEST",
+    "WEST": "W",
+}
 
 
 def validate_doc_id(json_data, check_exists: bool = True):
@@ -714,3 +810,47 @@ def validate_cancel_permit(registration: MhrRegistration) -> str:
     if not has_active_permit(registration):
         error_msg += CANCEL_PERMIT_INVALID
     return error_msg
+
+
+def validate_manufacturer_street(street_1: str, street_2: str) -> bool:
+    """
+    Manufacturer/dealer current home location address must match QS agreement address, allowing for some
+    common discrepancies from abreviations.
+    """
+    if street_1 == street_2:
+        return True
+    test_1: str = street_1.upper().strip().replace(".", "")
+    test_2: str = street_2.upper().strip().replace(".", "")
+    test_1 = test_1.replace(",", "")
+    test_2 = test_2.replace(",", "")
+    suffix_1: str = test_1.split(" ")[-1]
+    suffix_2: str = test_2.split(" ")[-1]
+    for suffix in MANUFACTURER_STREET_ABBREVIATIONS:
+        if suffix == suffix_1:
+            test_1 = " ".join(test_1.split(" ")[:-1])
+            if MANUFACTURER_STREET_ABBREVIATIONS_MAPPING[suffix] == suffix_2:
+                test_2 = " ".join(test_2.split(" ")[:-1])
+                break
+        if suffix == suffix_2:
+            test_2 = " ".join(test_2.split(" ")[:-1])
+            if MANUFACTURER_STREET_ABBREVIATIONS_MAPPING[suffix] == suffix_1:
+                test_1 = " ".join(test_1.split(" ")[:-1])
+                break
+    if test_1 == test_2:
+        return True
+    # Allow form and direction abbreviation comibations in any order, so check twice.
+    suffix_1 = test_1.split(" ")[-1]
+    suffix_2 = test_2.split(" ")[-1]
+    for suffix in MANUFACTURER_STREET_ABBREVIATIONS:
+        if suffix == suffix_1:
+            test_1 = " ".join(test_1.split(" ")[:-1])
+            if MANUFACTURER_STREET_ABBREVIATIONS_MAPPING[suffix] == suffix_2:
+                test_2 = " ".join(test_2.split(" ")[:-1])
+                break
+        if suffix == suffix_2:
+            test_2 = " ".join(test_2.split(" ")[:-1])
+            if MANUFACTURER_STREET_ABBREVIATIONS_MAPPING[suffix] == suffix_1:
+                test_1 = " ".join(test_1.split(" ")[:-1])
+                break
+    logger.debug(f"test1={test_1} test_2={test_2}")
+    return test_1 == test_2
