@@ -8,6 +8,14 @@ import { nextTick } from 'vue'
 import flushPromises from 'flush-promises'
 import { useUserAccess } from "@/composables"
 
+vi.mock('@/utils/mhr-api-helper', async (importOriginal) => {
+  const mod = await importOriginal<any>()
+  return {
+    ...mod,
+    getQsServiceAgreements: vi.fn().mockResolvedValue(new Blob(['test'], { type: 'application/pdf' }))
+  }
+})
+
 setActivePinia(createPinia())
 const store = useStore()
 
@@ -15,7 +23,6 @@ const subProducts: MhrSubTypes[] = [MhrSubTypes.LAWYERS_NOTARIES, MhrSubTypes.MA
 for (const subProduct of subProducts) {
   describe(`${subProduct}: QsInformation`, () => {
     let wrapper
-    window.URL.createObjectURL = vi.fn();
     const { setQsInformationModel } = useUserAccess()
 
     beforeAll(async () => {
