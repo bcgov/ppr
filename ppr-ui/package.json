@@ -108,6 +108,13 @@
     "vue-test-utils-helpers": "git+https://github.com/bcgov/vue-test-utils-helpers.git"
   },
   "pnpm": {
-    "overrides": {}
+    "overrides": {},
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "esbuild",
+      "sharp",
+      "unrs-resolver",
+      "vue-demi"
+    ]
   }
 }
