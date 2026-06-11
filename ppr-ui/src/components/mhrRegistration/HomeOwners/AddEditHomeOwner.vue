@@ -76,7 +76,7 @@
                   v-model="owner.individualName.middle"
                   variant="filled"
                   color="primary"
-                  label="Middle Name (Optional)"
+                  label="Middle Name"
                   data-test-id="middle-name"
                   :rules="maxLength(50)"
                   :disabled="disableNameFields && isCurrentOwner(owner)"
