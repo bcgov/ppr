@@ -15,7 +15,8 @@
 import json
 
 from flask import current_app
-# import pytest
+
+import pytest
 
 from mhr_api.reports.v2.report import Report
 from mhr_api.reports.v2 import report_utils
@@ -23,6 +24,24 @@ from mhr_api.reports.v2.report_utils import ReportTypes
 
 
 SEARCH_RESULT_MHR_DATAFILE = 'tests/unit/reports/data/search-detail-mhr-example.json'
+# test data pattern is ({reg_ts}, {version})
+TEST_REG_VERSION_DATA = [
+    ('default', 'current'),
+    ('2026-04-28T20:11:53+00:00', 'current'),
+    ('2025-11-19T20:11:53+00:00', '6'),
+    ('2025-04-18T20:11:53+00:00', '5'),
+    ('2022-06-01T20:11:53+00:00', '4'),
+    ('2012-07-13T20:11:53+00:00', '3'),
+    ('2012-06-01T20:11:53+00:00', '2'),
+    ('2012-05-31T20:11:53+00:00', '1'),
+]
+
+
+@pytest.mark.parametrize('reg_ts,version', TEST_REG_VERSION_DATA)
+def test_reg_sig_version(session, reg_ts, version):
+    """Assert that deriving a registrar's signature from a regisration timestamp works as expected."""
+    test_version = report_utils.get_reg_signature_version(reg_ts)
+    assert test_version == version
 
 
 def test_get_header_data(session):

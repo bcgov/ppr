@@ -174,8 +174,32 @@
       <div class="section-data italic mt-8 mb-3">
         <span class="bold">Issued</span> on my behalf on {{createDate}}
       </div>
-      [[registrarSignatureBlack.html]]
-          <div class="section-data bold">KATHLEEN ASSAF</div>
+      {% if regSigVersion is not defined or regSigVersion == 'current' or regSigVersion == '7' %}
+        [[registrarSignatureBlack.html]]
+        <div class="section-data bold">KATHLEEN ASSAF</div>
+      {% elif regSigVersion is defined and regSigVersion == '6' %}
+        [[registrarSignatureBlack6.html]]
+        <div class="section-data bold">KERRY TAYLOR</div>
+      {% elif regSigVersion is defined and regSigVersion == '5' %}
+        [[registrarSignatureBlack5.html]]
+        <div class="section-data bold">S. O'CALLAGHAN</div>
+      {% elif regSigVersion is defined and regSigVersion == '4' %}
+        [[registrarSignatureBlack4.html]]
+        <div class="section-data bold">T.K. SPARKS</div>
+      {% elif regSigVersion is defined and regSigVersion == '3' %}
+        [[registrarSignatureBlack3.html]]
+        <div class="section-data bold">CAROL PREST</div>
+      {% elif regSigVersion is defined and regSigVersion == '2' %}
+        [[registrarSignatureBlack2.html]]
+        <div class="section-data bold">ANGELO COCCO</div>
+      {% elif regSigVersion is defined and regSigVersion == '1' %}
+        [[registrarSignatureBlack1.html]]
+        <div class="section-data bold">RON TOWNSHEND</div>
+      {% else %}
+        [[registrarSignatureBlack.html]]
+        <div class="section-data bold">KATHLEEN ASSAF</div>
+      {% endif %}
+
       <div class="section-data">Registrar</div>
       <div class="section-data italic mt-5">Manufactured Home Registry</div>
       <div class="section-data">Province of British Columbia</div>
