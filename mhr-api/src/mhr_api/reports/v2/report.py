@@ -394,6 +394,12 @@ class Report:  # pylint: disable=too-few-public-methods
             "macros",
             "registrarSignature",
             "registrarSignatureBlack",
+            "registrarSignatureBlack6",
+            "registrarSignatureBlack5",
+            "registrarSignatureBlack4",
+            "registrarSignatureBlack3",
+            "registrarSignatureBlack2",
+            "registrarSignatureBlack1",
             "registration/details",
             "registration/givingNoticeParty",
             "registration/location",
@@ -848,6 +854,7 @@ class Report:  # pylint: disable=too-few-public-methods
             reg = self._report_data
             if self._report_key == ReportTypes.MHR_EXEMPTION:
                 reg["createDate"] = Report._to_report_datetime(reg["createDateTime"], False)
+                reg["regSigVersion"] = report_utils.get_reg_signature_version(reg["createDateTime"])
             reg["createDateTime"] = Report._to_report_datetime(reg["createDateTime"])
             if reg.get("declaredValue"):
                 declared_value = str(reg["declaredValue"])
@@ -954,7 +961,6 @@ class Report:  # pylint: disable=too-few-public-methods
             ReportTypes.MHR_NOTE,
             ReportTypes.MHR_TRANSPORT_PERMIT,
             ReportTypes.MHR_REGISTRATION_COVER,
-            ReportTypes.MHR_TOD_REJECTION,
         ):
             reg_num = self._report_data.get("mhrNumber", "")
             self._report_data["footer_content"] = f"Manufactured Home Registration #{reg_num}"

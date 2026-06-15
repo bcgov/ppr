@@ -49,6 +49,16 @@ REPORT_META_DATA = {
 }
 REPORT_FILES = {"index.html": "", "header.html": "", "footer.html": ""}
 REG_PAGE_PREFIX = "Manufactured Home Registration Number: "
+# Descending chronological order: current is always first.
+REG_SIG_VERSIONS = [
+    {"version": "current", "start": 20260428, "end": -1},
+    {"version": "6", "start": 20251119, "end": 20260427},
+    {"version": "5", "start": 20250418, "end": 20251118},
+    {"version": "4", "start": 20220601, "end": 20250417},
+    {"version": "3", "start": 20120713, "end": 20220531},
+    {"version": "2", "start": 20120601, "end": 20120712},
+    {"version": "1", "start": 19700101, "end": 20120531},
+]
 
 
 class ReportTypes(BaseEnum):
@@ -613,3 +623,20 @@ def format_phone_number(phone: str) -> str:
     if len(phone) == 7:
         return phone[0:3] + "-" + phone[3:]
     return phone
+
+
+def get_reg_signature_version(registration_ts: str) -> str:
+    """Default is the current version, get the registrar's signature based on the registration date."""
+    reg_version: str = REG_SIG_VERSIONS[0].get("version")
+    if not registration_ts or len(registration_ts) < 10:
+        return reg_version
+    reg_date: int = int(registration_ts[0:10].replace("-", ""))
+    if reg_date >= REG_SIG_VERSIONS[0].get("start"):
+        logger.info(f"reg_ts={registration_ts} reg_date={reg_date} version={reg_version}")
+        return reg_version
+    for version in REG_SIG_VERSIONS:
+        if reg_date >= version.get("start") and reg_date <= version.get("end"):
+            reg_version = version.get("version")
+            break
+    logger.debug(f"reg_ts={registration_ts} reg_date={reg_date} version={reg_version}")
+    return reg_version
