@@ -33,6 +33,8 @@ TEST_SERVICE_AGREEMENT_DATAFILE = 'tests/unit/services/test_qs_terms_of_use.pdf'
 
 def test_cs_save_search_document(session):
     """Assert that saving a search bucket document to google cloud storage works as expected."""
+    if is_ci_testing():
+        return
     raw_data = None
     with open(TEST_DATAFILE, 'rb') as data_file:
         raw_data = data_file.read()
@@ -44,6 +46,8 @@ def test_cs_save_search_document(session):
 
 def test_cs_save_registration_document(session):
     """Assert that saving a registration verification statement to google cloud storage works as expected."""
+    if is_ci_testing():
+        return
     raw_data = None
     with open(TEST_REGISTRATION_DATAFILE, 'rb') as data_file:
         raw_data = data_file.read()
@@ -57,6 +61,8 @@ def test_cs_save_registration_document(session):
 
 def test_cs_get_search_document(session):
     """Assert that getting a search bucket document from google cloud storage works as expected."""
+    if is_ci_testing():
+        return
     raw_data = GoogleStorageService.get_document(TEST_SAVE_DOC_NAME, DocumentTypes.SEARCH_RESULTS)
     assert raw_data
     assert len(raw_data) > 0
@@ -67,6 +73,8 @@ def test_cs_get_search_document(session):
 
 def test_cs_get_registration_document(session):
     """Assert that getting a registration verification statement from google cloud storage works as expected."""
+    if is_ci_testing():
+        return
     raw_data = GoogleStorageService.get_document(TEST_REGISTRATION_SAVE_DOC_NAME, DocumentTypes.REGISTRATION)
     assert raw_data
     assert len(raw_data) > 0
@@ -77,6 +85,8 @@ def test_cs_get_registration_document(session):
 
 def test_cs_get_registration_document_link(session):
     """Assert that getting a document link from google cloud storage works as expected."""
+    if is_ci_testing():
+        return
     download_link = GoogleStorageService.get_document_link(TEST_REGISTRATION_SAVE_DOC_NAME,
                                                            DocumentTypes.REGISTRATION,
                                                            2)
@@ -85,11 +95,16 @@ def test_cs_get_registration_document_link(session):
 
 def test_cs_delete_search_document(session):
     """Assert that deleting a search bucket document from google cloud storage works as expected."""
+    if is_ci_testing():
+        return
     response = GoogleStorageService.delete_document(TEST_SAVE_DOC_NAME2, DocumentTypes.SEARCH_RESULTS)
+    assert not response
 
 
 def test_save_batch_registration_document(session):
     """Assert that saving a batch registration pdf to google cloud storage works as expected."""
+    if is_ci_testing():
+        return
     bucket: str = current_app.config.get('GCP_CS_BUCKET_ID_BATCH')
     current_app.logger.debug(f'Testing saving to bucket={bucket}')
     raw_data = None
@@ -104,6 +119,8 @@ def test_save_batch_registration_document(session):
 
 def test_cs_get_batch_registration_document(session):
     """Assert that getting a batch registration pdf from google cloud storage works as expected.""" 
+    if is_ci_testing():
+        return
     raw_data = GoogleStorageService.get_document(TEST_BATCH_REGISTRATION_SAVE_DOC_NAME,
                                                  DocumentTypes.BATCH_REGISTRATION)
     assert raw_data
@@ -115,6 +132,8 @@ def test_cs_get_batch_registration_document(session):
 
 def test_cs_get_service_agreement_document(session):
     """Assert that getting a qualified supplier service agreement pdf from google cloud storage works as expected."""
+    if is_ci_testing():
+        return
     raw_data = GoogleStorageService.get_document(TEST_SERVICE_AGREEMENT_SAVE_DOC_NAME,
                                                  DocumentTypes.SERVICE_AGREEMENT)
     assert raw_data
@@ -122,3 +141,10 @@ def test_cs_get_service_agreement_document(session):
     with open(TEST_SERVICE_AGREEMENT_DATAFILE, "wb") as pdf_file:
         pdf_file.write(raw_data)
         pdf_file.close()
+
+
+def is_ci_testing() -> bool:
+    """Check unit test environment: exclude pub/sub for CI testing."""
+    if not current_app.config.get("GOOGLE_DEFAULT_SA"):
+        return True
+    return  current_app.config.get("DEPLOYMENT_ENV", "testing") == "testing"

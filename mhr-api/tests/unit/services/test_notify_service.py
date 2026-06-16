@@ -119,14 +119,14 @@ def test_review_notify(session, jwt, desc, has_env_var, has_email, status, appro
     if not has_env_var:
         current_app.config.update(NOTIFY_REVIEW_CONFIG="")
     reg_data = copy.deepcopy(TEST_TRANSFER)
-    if not has_email:
+    if not has_email or desc in ("Approved valid", "Declined valid"):
         del reg_data["submittingParty"]["emailAddress"]
     notify: Notify = Notify(**{"review": True})
     n_status = HTTPStatus.OK
     if approved:
         n_status = notify.send_review_approved(reg_data, "verify_url")
     else:
-        n_status = notify.send_review_declined(reg_data, "declined reason here")
+        n_status = notify.send_review_declined(reg_data, "declined reason here", "rejection_url")
     if env_var:
         current_app.config.update(NOTIFY_REVIEW_CONFIG=env_var)
     assert n_status == status

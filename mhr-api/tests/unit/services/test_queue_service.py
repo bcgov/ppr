@@ -46,19 +46,19 @@ TEST_PAY_NOTIFICATION = {
 def test_publish_search_report(session):
     """Assert that enqueuing/publishing a search report event works as expected (no exception thrown)."""
     payload = TEST_PAYLOAD
-    apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
-    if apikey:
+    if not is_ci_testing() and current_app.config.get("SUBSCRIPTION_API_KEY"):
+        apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
         payload['apikey'] = apikey
-    GoogleQueueService().publish_search_report(payload)
+        GoogleQueueService().publish_search_report(payload)
 
 
 def test_publish_registration_report(session):
     """Assert that enqueuing/publishing a registration report event works as expected (no exception thrown)."""
     payload = TEST_PAYLOAD_REGISTRATION
-    apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
-    if apikey:
+    if not is_ci_testing() and current_app.config.get("SUBSCRIPTION_API_KEY"):
+        apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
         payload['apikey'] = apikey
-    GoogleQueueService().publish_registration_report(payload)
+        GoogleQueueService().publish_registration_report(payload)
 
 
 def test_publish_document_rec(session):
@@ -78,4 +78,6 @@ def test_publish_pay_completion(session):
 
 def is_ci_testing() -> bool:
     """Check unit test environment: exclude pub/sub for CI testing."""
+    if not current_app.config.get("GOOGLE_DEFAULT_SA"):
+        return True
     return  current_app.config.get("DEPLOYMENT_ENV", "testing") == "testing"
