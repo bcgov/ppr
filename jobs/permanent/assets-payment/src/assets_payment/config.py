@@ -37,6 +37,8 @@ class Config(BaseConfig):
     AUTH_SVC_URL = f"{AUTH_API_URL + AUTH_API_VERSION}"
     PAYMENT_SVC_URL = f"{PAY_API_URL + PAY_API_VERSION}"
     NOTIFY_SVC_URL = f"{NOTIFY_API_URL + NOTIFY_API_VERSION}"
+    if not NOTIFY_SVC_URL.endswith("/notify"):
+        NOTIFY_SVC_URL += "/notify"
 
     JWT_OIDC_TOKEN_URL = os.getenv("JWT_OIDC_TOKEN_URL")
     # service accounts
