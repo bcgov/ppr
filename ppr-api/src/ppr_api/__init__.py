@@ -47,8 +47,9 @@ def create_app(service_environment=APP_RUNNING_ENVIRONMENT, run_mode=None, **kwa
 
     errorhandlers.init_app(app)
 
-    if app.config.get("CLOUDSQL_INSTANCE_CONNECTION_NAME") \
-      and not app.config.get("CLOUDSQL_IAP_SIDECAR"):  # pragma: no cover
+    if app.config.get("CLOUDSQL_INSTANCE_CONNECTION_NAME") and not app.config.get(
+        "CLOUDSQL_IAP_SIDECAR"
+    ):  # pragma: no cover
         from cloud_sql_connector import DBConfig
 
         db_config = DBConfig(
