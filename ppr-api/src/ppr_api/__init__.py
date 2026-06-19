@@ -63,6 +63,7 @@ def create_app(service_environment=APP_RUNNING_ENVIRONMENT, run_mode=None, **kwa
         app.config["SQLALCHEMY_ENGINE_OPTIONS"] = db_config.get_engine_options()
 
     db.init_app(app)
+    logger.info(f'Using DB connection: {app.config["SQLALCHEMY_DATABASE_URI"]}')
     Migrate(app, db)
 
     with app.app_context():
