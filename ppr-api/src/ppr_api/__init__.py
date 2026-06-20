@@ -48,7 +48,7 @@ def create_app(service_environment=APP_RUNNING_ENVIRONMENT, run_mode=None, **kwa
     errorhandlers.init_app(app)
 
     if app.config.get("CLOUDSQL_INSTANCE_CONNECTION_NAME")  \
-      and not app.config.get("CLOUDSQL_IAP_SIDECAR").lower() == "true":  # pragma: no cover
+      and not app.config.get("IAP_SIDECAR"):  # pragma: no cover
         from cloud_sql_connector import DBConfig
 
         db_config = DBConfig(
@@ -62,7 +62,7 @@ def create_app(service_environment=APP_RUNNING_ENVIRONMENT, run_mode=None, **kwa
         app.config["SQLALCHEMY_ENGINE_OPTIONS"] = db_config.get_engine_options()
 
     db.init_app(app)
-    logger.info(f'Using Sidecar:{app.config["CLOUDSQL_IAP_SIDECAR"]} DB connection: {app.config["SQLALCHEMY_DATABASE_URI"]}')
+    logger.info(f'Using Sidecar:{app.config["IAP_SIDECAR"]} DB connection: {app.config["SQLALCHEMY_DATABASE_URI"]}')
     Migrate(app, db)
 
     with app.app_context():

@@ -103,10 +103,10 @@ class Config:  # pylint: disable=too-few-public-methods
     DB_HOST = os.getenv("DATABASE_HOST", "")
     DB_PORT = os.getenv("DATABASE_PORT", "5432")  # POSTGRESQL
     CLOUDSQL_INSTANCE_CONNECTION_NAME = os.getenv("CLOUDSQL_INSTANCE_CONNECTION_NAME", "")
-    CLOUDSQL_IAP_SIDECAR = str(os.getenv("CLOUDSQL_IAP_SIDECAR", "False"))
+    IAP_SIDECAR = os.getenv("IAP_SIDECAR", "")
     DB_IP_TYPE = os.getenv("DATABASE_IP_TYPE", "private").lower()
 
-    if CLOUDSQL_IAP_SIDECAR.lower() == "true":
+    if IAP_SIDECAR:
         SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{DB_USER}@127.0.0.1:{DB_PORT}/{DB_NAME}"
     elif CLOUDSQL_INSTANCE_CONNECTION_NAME:
         SQLALCHEMY_DATABASE_URI = "postgresql+pg8000://"
