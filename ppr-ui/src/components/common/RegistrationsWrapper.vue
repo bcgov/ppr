@@ -502,7 +502,8 @@ export default defineComponent({
           addedReg: regNum,
           addedRegParent: parentRegNum,
           addedRegSummary: addReg,
-          prevDraft: ''
+          prevDraft: '',
+          isScrollTo: true
         }
         setRegTableNewItem(newRegItem)
         await fetchMhRegistrations(getRegTableMhSortOptions.value)
