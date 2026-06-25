@@ -1,0 +1,28 @@
+name: "[TEST] pnpm v11 upgrade"
+
+on:
+  push:
+    branches: ["test/pnpm-v11-upgrade"]
+  workflow_dispatch:
+
+  pull_request:
+    branches: [main]
+    types: [assigned, synchronize]
+    paths:
+      - "ppr-ui/**"
+
+
+defaults:
+  run:
+    shell: bash
+    working-directory: ./ppr-ui
+
+jobs:
+  ppr-ui-ci:
+    uses: bcgov/bcregistry-sre/.github/workflows/frontend-ci.yaml@feat/upgrade-pnpm-v11
+    with:
+      pnpm_version: 'latest-11'
+      app_name: "ppr-ui"
+      working_directory: "./ppr-ui"
+      codecov_flag: "pprui"
+      node_version: 24
