@@ -112,6 +112,8 @@ class Config:  # pylint: disable=too-few-public-methods
         SQLALCHEMY_DATABASE_URI = "postgresql+pg8000://"
     elif DB_HOST:
         SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    
+    print(f"Tracking:SQLALCHEMY_DATABASE_URI: {SQLALCHEMY_DATABASE_URI}, CLOUD_SQL_PROXY_SIDECAR:{CLOUD_SQL_PROXY_SIDECAR}", file=sys.stderr)
 
     # Connection pool settings
     DB_MIN_POOL_SIZE = os.getenv("DATABASE_MIN_POOL_SIZE", "2")
