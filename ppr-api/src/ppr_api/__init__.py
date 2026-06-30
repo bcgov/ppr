@@ -17,6 +17,7 @@ This module is the API for the BC Registries Personal Property Registry system.
 """
 
 import os
+import sys
 
 from cloud_sql_connector import setup_pg8000_close_event_listener
 from flask import Flask, redirect  # noqa: I001
@@ -62,7 +63,7 @@ def create_app(service_environment=APP_RUNNING_ENVIRONMENT, run_mode=None, **kwa
     app.config["SQLALCHEMY_ENGINE_OPTIONS"] = db_config.get_engine_options()
 
     db.init_app(app)
-    logger.info(f'Using Sidecar:{app.config["CLOUD_SQL_PROXY_SIDECAR"]} DB connection: {app.config["SQLALCHEMY_DATABASE_URI"]}')
+    print(f'INIT: Using Sidecar:{app.config["CLOUD_SQL_PROXY_SIDECAR"]} DB connection: {app.config["SQLALCHEMY_DATABASE_URI"]}', file=sys.stderr)
     Migrate(app, db)
 
     with app.app_context():
