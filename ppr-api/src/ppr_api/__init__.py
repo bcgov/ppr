@@ -61,7 +61,7 @@ def create_app(service_environment=APP_RUNNING_ENVIRONMENT, run_mode=None, **kwa
             pool_recycle=60,
             schema="public",
         )
-    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = db_config.get_engine_options()
+        app.config["SQLALCHEMY_ENGINE_OPTIONS"] = db_config.get_engine_options()
 
     db.init_app(app)
     print(f'INIT: Using Sidecar:{app.config["CLOUD_SQL_PROXY_SIDECAR"]} DB connection: {app.config["SQLALCHEMY_DATABASE_URI"]}', file=sys.stderr)
