@@ -45,6 +45,7 @@ def create_app(service_environment=APP_RUNNING_ENVIRONMENT, run_mode=None, **kwa
     app = Flask(__name__)
     app.config.from_object(config[service_environment])
     app.url_map.strict_slashes = False
+    print(f'CreateApp: Using Sidecar:{app.config["CLOUD_SQL_PROXY_SIDECAR"]} DB connection: {app.config["SQLALCHEMY_DATABASE_URI"]}', file=sys.stderr)
 
     errorhandlers.init_app(app)
 
