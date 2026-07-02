@@ -213,14 +213,8 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         search_value = self.request_json["criteria"]["debtorName"]["business"]
         rows = None
         try:
-            query: str = search_utils.BUSINESS_NAME_QUERY
-            # pg8000 trigram word similarity operator workaround
-            if current_app.config.get("CLOUDSQL_INSTANCE_CONNECTION_NAME") and not current_app.config.get(
-                "CLOUD_SQL_PROXY_SIDECAR"
-            ):
-                query = query.replace(" <% ", " <%% ")
             result = db.session.execute(
-                text(query),
+                text(search_utils.BUSINESS_NAME_QUERY),
                 {
                     "query_bus_name": search_value.strip().upper(),
                     "query_bus_quotient": current_app.config.get("SIMILARITY_QUOTIENT_BUSINESS_NAME"),
