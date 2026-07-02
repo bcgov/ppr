@@ -45,7 +45,10 @@ def create_app(service_environment=APP_RUNNING_ENVIRONMENT, run_mode=None, **kwa
     app = Flask(__name__)
     app.config.from_object(config[service_environment])
     app.url_map.strict_slashes = False
-    print(f'CreateApp: Using Sidecar:{app.config["CLOUD_SQL_PROXY_SIDECAR"]} DB connection: {app.config["SQLALCHEMY_DATABASE_URI"]}', file=sys.stderr)
+    print(
+        f'CreateApp: Using Sidecar:{app.config["CLOUD_SQL_PROXY_SIDECAR"]} DB connection: {app.config["SQLALCHEMY_DATABASE_URI"]}',  # noqa: E501
+        file=sys.stderr,
+    )
 
     errorhandlers.init_app(app)
 
@@ -64,7 +67,10 @@ def create_app(service_environment=APP_RUNNING_ENVIRONMENT, run_mode=None, **kwa
         app.config["SQLALCHEMY_ENGINE_OPTIONS"] = db_config.get_engine_options()
 
     db.init_app(app)
-    print(f'INIT: Using Sidecar:{app.config["CLOUD_SQL_PROXY_SIDECAR"]} DB connection: {app.config["SQLALCHEMY_DATABASE_URI"]}', file=sys.stderr)
+    print(
+        f'INIT: Using Sidecar:{app.config["CLOUD_SQL_PROXY_SIDECAR"]} DB connection: {app.config["SQLALCHEMY_DATABASE_URI"]}',  # noqa: E501
+        file=sys.stderr,
+    )
     Migrate(app, db)
 
     with app.app_context():
