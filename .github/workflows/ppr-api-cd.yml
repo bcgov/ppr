@@ -33,7 +33,7 @@ jobs:
     with:
       target: ${{ inputs.target }}
       app_name: "ppr-api"
-      cd_runner_version: "1.0.8"
+      cd_runner_version: "1.2.1"
       working_directory: "./ppr-api"
       redeploy: ${{ inputs.redeploy }}
     secrets:
