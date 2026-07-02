@@ -105,15 +105,21 @@ class Config:  # pylint: disable=too-few-public-methods
     CLOUDSQL_INSTANCE_CONNECTION_NAME = os.getenv("CLOUDSQL_INSTANCE_CONNECTION_NAME", "")
     CLOUD_SQL_PROXY_SIDECAR = bool(os.getenv("CLOUD_SQL_PROXY_SIDECAR", None) == "yes")
     DB_IP_TYPE = os.getenv("DATABASE_IP_TYPE", "private").lower()
-    
+
     if CLOUD_SQL_PROXY_SIDECAR:
         SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{DB_USER}@127.0.0.1:{DB_PORT}/{DB_NAME}"
+        print(
+            f"Tracking:SQLALCHEMY_DATABASE_URI: {SQLALCHEMY_DATABASE_URI}, CLOUD_SQL_PROXY_SIDECAR:{CLOUD_SQL_PROXY_SIDECAR}",  # noqa: E501
+            file=sys.stderr,
+        )
     elif CLOUDSQL_INSTANCE_CONNECTION_NAME:
         SQLALCHEMY_DATABASE_URI = "postgresql+pg8000://"
+        print(
+            f"Tracking:SQLALCHEMY_DATABASE_URI: {SQLALCHEMY_DATABASE_URI}, CLOUD_SQL_PROXY_SIDECAR:{CLOUD_SQL_PROXY_SIDECAR}",  # noqa: E501
+            file=sys.stderr,
+        )
     elif DB_HOST:
         SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-    
-    print(f"Tracking:SQLALCHEMY_DATABASE_URI: {SQLALCHEMY_DATABASE_URI}, CLOUD_SQL_PROXY_SIDECAR:{CLOUD_SQL_PROXY_SIDECAR}", file=sys.stderr)
 
     # Connection pool settings
     DB_MIN_POOL_SIZE = os.getenv("DATABASE_MIN_POOL_SIZE", "2")
@@ -241,7 +247,7 @@ class UnitTestingConfig(Config):  # pylint: disable=too-few-public-methods
     DB_HOST = os.getenv("DATABASE_TEST_HOST", "")
     DB_PORT = os.getenv("DATABASE_TEST_PORT", "5432")
     # SQLALCHEMY_DATABASE_URI = f"postgresql+pg8000://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-    SQLALCHEMY_DATABASE_URI = f"postgresql+pg8000://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
     # JWT OIDC settings
     # JWT_OIDC_TEST_MODE will set jwt_manager to use

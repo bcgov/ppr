@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ppr-api"
-version = "1.3.17"
+version = "1.3.18"
 description = ""
 authors = ["dlovett <doug@daxiom.com>"]
 license = "BSD 3"
@@ -106,7 +106,7 @@ atomic = true
 profile = "black"
 line_length = 120
 skip_gitignore = true
-skip_glob = ["migrations", "devops", "tests", "src/database/*"]
+skip_glob = ["migrations", "devops", "tests", "src/database/*", "src/ppr_api/config.py"]
 
 [tool.pylint.main]
 fail-under = 10
