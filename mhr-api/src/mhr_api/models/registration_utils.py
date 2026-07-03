@@ -499,7 +499,7 @@ def include_caution_note(notes, document_id: str) -> bool:
             break
         if latest_caution and note.get("documentType", "") not in ("CAUC", "CAUE", "CAU "):
             return False
-    return latest_caution and not model_utils.date_elapsed(latest_caution.get("expiryDate"))
+    return latest_caution and not model_utils.date_elapsed(latest_caution.get("expiryDateTime"))
 
 
 def get_batch_manufacturer_reg_report_data(start_ts: str = None, end_ts: str = None) -> dict:
