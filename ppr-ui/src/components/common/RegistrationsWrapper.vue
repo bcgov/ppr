@@ -505,7 +505,6 @@ export default defineComponent({
           prevDraft: ''
         }
         setRegTableNewItem(newRegItem)
-        await fetchMhRegistrations(getRegTableMhSortOptions.value)
       }
       localState.loading = false
     }
