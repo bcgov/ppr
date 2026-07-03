@@ -148,7 +148,8 @@ export default defineComponent({
       }
 
       // redirect if store doesn't contain all needed data (happens on page reload, etc.)
-      if (!getRegistrationType.value || getRegistrationFlowType.value !== RegistrationFlowType.NEW) {
+      if (!getRegistrationType.value?.registrationTypeAPI ||
+        getRegistrationFlowType.value !== RegistrationFlowType.NEW) {
         goToDash()
         return
       }
