@@ -635,7 +635,8 @@ def get_reg_signature_version(registration_ts: str) -> str:
         logger.info(f"reg_ts={registration_ts} reg_date={reg_date} version={reg_version}")
         return reg_version
     for version in REG_SIG_VERSIONS:
-        if reg_date >= version.get("start") and reg_date <= version.get("end"):
+        # if reg_date >= version.get("start") and reg_date <= version.get("end"):
+        if version.get("start") <= reg_date <= version.get("end"):
             reg_version = version.get("version")
             break
     logger.debug(f"reg_ts={registration_ts} reg_date={reg_date} version={reg_version}")

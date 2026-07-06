@@ -71,6 +71,14 @@ OWNER_IND7 = {'individualName': {'first': 'FIRST','middle': 'M.','last': 'DIFF'}
 OWNER_ORG1 = {'organizationName': 'ORG NAME'}
 OWNER_ORG2 = {'organizationName': 'Org Name'}
 OWNER_ORG3 = {'organizationName': 'ORG NAME DIFF'}
+SEARCH_CAUTION_NOTES = [
+    {
+        "documentId": "12343434",
+        "documentType": "CAUC",
+        "status": "ACTIVE",
+        "expiryDateTime": "2024-04-28T06:59:59+00:00"
+    }
+]
 # testdata pattern is ({same}, {owner1}, {owner2})
 TEST_DATA_OWNER_NAME = [
     ('1', True, OWNER_IND1, OWNER_IND1),
@@ -205,6 +213,36 @@ TEST_DATA_ID_GENERATION = [
     (STAFF_ROLE, False, '1'),
     (STAFF_ROLE, True, '7'),
 ]
+# testdata pattern is ({has_note}, {doc_type}, {expiry_ts})
+TEST_DATA_SEARCH_NOTES_CAUTION = [
+    (True, "CAU", None),
+    (True, "CAUC", None),
+    (True, "CAUE", None),
+    (True, "CAU", "2099-04-28T06:59:59+00:00"),
+    (True, "CAUC", "2099-04-28T06:59:59+00:00"),
+    (True, "CAUE", "2099-04-28T06:59:59+00:00"),
+    (False, "CAU", "2026-04-28T06:59:59+00:00"),
+    (False, "CAUC", "2026-04-28T06:59:59+00:00"),
+    (False, "CAUE", "2026-04-28T06:59:59+00:00"),
+]
+
+
+@pytest.mark.parametrize('has_note,doc_type,expiry_ts', TEST_DATA_SEARCH_NOTES_CAUTION)
+def test_search_notes_caution(session, has_note, doc_type, expiry_ts):
+    """Assert that owner name test is_identical_owner_name works as expected."""
+    search_notes = copy.deepcopy(SEARCH_CAUTION_NOTES)
+    note = search_notes[0]
+    note["documentType"] = doc_type
+    if expiry_ts:
+        note["expiryDateTime"] = expiry_ts
+    else:
+        del note["expiryDateTime"]
+    result = reg_json_utils.update_notes_search_json(search_notes, True)
+    if has_note:
+        assert result
+        assert len(result) == 1
+    else:
+        assert not result
 
 
 @pytest.mark.parametrize('desc,same,owner1,owner2', TEST_DATA_OWNER_NAME)
