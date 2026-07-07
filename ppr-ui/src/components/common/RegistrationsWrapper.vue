@@ -613,6 +613,7 @@ export default defineComponent({
       if (stateModel.registration.draft.error) {
         emitError(stateModel.registration.draft.error)
       } else {
+        setRegistrationType(stateModel.registration.registrationType)
         setLengthTrust(stateModel.registration.lengthTrust)
         setAddCollateral(stateModel.registration.collateral)
         setAddSecuredPartiesAndDebtors(stateModel.registration.parties)
