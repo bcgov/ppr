@@ -141,7 +141,8 @@ TEST_AMEND_DATA = [
 # testdata pattern is ({description}, {mhr_num}, {roles}, {status}, {account}, {ownland})
 TEST_EXTEND_DATA = [
     ('Valid staff', '000931', STAFF_ROLES, HTTPStatus.CREATED, 'PS12345', True),
-    ('Valid non-staff ', '000931', QUALIFIED_USER_ROLES, HTTPStatus.CREATED, 'PS12345', False)
+    ('Valid non-staff ', '000931', QUALIFIED_USER_ROLES, HTTPStatus.CREATED, 'PS12345', False),
+    ('Valid non-BC request location', '000931', STAFF_ROLES, HTTPStatus.CREATED, 'PS12345', True),
 ]
 
 
@@ -272,6 +273,8 @@ def test_extend(session, client, jwt, desc, mhr_num, roles, status, account, own
     json_data['mhrNumber'] = mhr_num
     json_data['newLocation'] = LOCATION_OTHER
     json_data['extension'] = True
+    if desc == "Valid non-BC request location":
+        json_data["newLocation"]["address"]["region"] = "AB"
     if account:
         headers = create_header_account(jwt, roles, 'UT-TEST', account)
     else:
@@ -307,6 +310,7 @@ def test_extend(session, client, jwt, desc, mhr_num, roles, status, account, own
         registration.current_view = True
         reg_json = registration.new_registration_json
         assert 'ownLand' in reg_json
+        assert reg_json.get("status") == "ACTIVE"
 
 
 def get_valid_tax_cert_dt() -> str:

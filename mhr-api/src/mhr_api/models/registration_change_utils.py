@@ -18,7 +18,13 @@
 from mhr_api.models import MhrLocation
 from mhr_api.models import utils as model_utils
 from mhr_api.models.db import db
-from mhr_api.models.type_tables import MhrDocumentTypes, MhrNoteStatusTypes, MhrRegistrationStatusTypes, MhrStatusTypes
+from mhr_api.models.type_tables import (
+    MhrDocumentTypes,
+    MhrNoteStatusTypes,
+    MhrRegistrationStatusTypes,
+    MhrRegistrationTypes,
+    MhrStatusTypes,
+)
 from mhr_api.utils.logging import logger
 
 
@@ -94,8 +100,10 @@ def save_permit(registration, json_data, new_reg_id):
         logger.info("Amend Transport Permit new location in BC, updating EXEMPT status to ACTIVE.")
     elif (
         json_data
+        and not json_data.get("extension")  # Skip for extensions: location does not change.
         and json_data["newLocation"]["address"]["region"] != model_utils.PROVINCE_BC
         and json_data.get("documentType", "") != MhrDocumentTypes.CANCEL_PERMIT
+        and json_data.get("registrationType", "") != MhrRegistrationTypes.PERMIT_EXTENSION
     ):
         registration.status_type = MhrRegistrationStatusTypes.EXEMPT
         logger.info("Transport Permit new location out of province, updating status to EXEMPT.")
