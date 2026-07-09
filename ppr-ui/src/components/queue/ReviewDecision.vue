@@ -4,10 +4,35 @@ import { enumToLabel } from '@/utils/format-helper'
 import { ReviewDecisionTypes, ReviewStatusTypes } from '@/composables';
 import { storeToRefs } from 'pinia';
 import { useAnalystQueueStore } from '@/store/analystQueue';
+import { useStore } from '@/store/store'
 
-const { reviewDecision, validationErrors, isInReview } = storeToRefs(useAnalystQueueStore())
+const { reviewDecision, validationErrors, isInReview, queueTransfer, reviewId } = storeToRefs(useAnalystQueueStore())
+const appStore = useStore() as any
+
+const resetValidationErrors = () => {
+  validationErrors.value.declineReasonType = ''
+  validationErrors.value.general = ''
+}
 
 const isDeclined = computed(() => reviewDecision.value.statusType === ReviewStatusTypes.DECLINED)
+
+const currentUserDisplayName = computed(() => {
+  return `${appStore.getUserFirstName} ${appStore.getUserLastName}`.trim()
+})
+
+const isCurrentUserAssignee = computed(() => {
+  const assignee = queueTransfer.value?.assigneeName?.trim().toLowerCase()
+  if (!assignee) return false
+
+  const username = appStore.getUserUsername?.trim().toLowerCase()
+  const displayName = currentUserDisplayName.value?.toLowerCase()
+
+  return assignee === username || (!!displayName && assignee === displayName)
+})
+
+const isDecisionEnabled = computed(() => {
+  return isInReview.value && isCurrentUserAssignee.value
+})
 
 // Options for the decline reason select dropdown
 const declineReasonItems = computed(() => {
@@ -21,12 +46,31 @@ const declineReasonItems = computed(() => {
 // Update the review decision status type when a button is clicked
 const updateReviewDecision = (statusType: ReviewStatusTypes) => {
   if (!isInReview.value) return
+
+  if (!isCurrentUserAssignee.value) {
+    validationErrors.value.general = 'Please assign this filing to yourself to approve or decline.'
+    return
+  }
+
   reviewDecision.value = { ...reviewDecision.value, statusType }
 }
 
 // Clear the decline-reason error as soon as a reason is selected.
 watch(() => reviewDecision.value?.declinedReasonType, (val) => {
   if (val) validationErrors.value.declineReasonType = ''
+})
+
+// Clear stale errors when switching to a different transfer review.
+watch(() => reviewId.value, () => {
+  resetValidationErrors()
+}, { immediate: true })
+
+// If decision becomes available (eg. assigned to self), clear lingering general error.
+watch(() => isDecisionEnabled.value, (enabled, wasEnabled) => {
+  if (enabled && !wasEnabled) {
+    resetValidationErrors()
+    reviewDecision.value = {}
+  }
 })
 
 // Clear the general error once a decision is picked.
