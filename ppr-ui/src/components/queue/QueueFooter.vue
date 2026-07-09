@@ -4,7 +4,15 @@ import { useAnalystQueueStore } from '@/store/analystQueue';
 import { updateQueuedTransfer } from '@/utils/mhr-api-helper'
 import type { QueueReviewUpdatePayloadIF } from '@/composables/analystQueue/interfaces'
 
-const { queueTransfer, reviewId, isAssignable, isInReview, reviewDecision, validationErrors } = storeToRefs(useAnalystQueueStore())
+const {
+  queueTransfer,
+  reviewId,
+  isAssignable,
+  isInReview,
+  reviewDecision,
+  validationErrors
+} = storeToRefs(useAnalystQueueStore())
+
 const { validateReviewDecision } = useAnalystQueueStore()
 
 const isAssigned = computed(() => {

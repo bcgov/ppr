@@ -332,8 +332,8 @@ export function setupAmendmentStatementDraft (stateModel:StateModelIF): DraftIF 
 /** Save or update a draft of the current amendment. */
 export async function saveAmendmentStatementDraft (stateModel:StateModelIF): Promise<DraftIF> {
   const draft:DraftIF = setupAmendmentStatementDraft(stateModel)
-  let draftResponse:DraftIF = null
-  let apiCall:string = ''
+  let draftResponse:DraftIF
+  let apiCall:string
   if (draft.amendmentStatement.documentId !== undefined && draft.amendmentStatement.documentId !== '') {
     apiCall = 'update'
     draftResponse = await updateDraft(draft)
@@ -433,8 +433,8 @@ export async function saveFinancingStatementDraft (stateModel:StateModelIF): Pro
   statement.clientReferenceId = stateModel.folioOrReferenceNumber
   // Now save the draft.
   draft.financingStatement = statement
-  let draftResponse:DraftIF = null
-  let apiCall:string = ''
+  let draftResponse:DraftIF
+  let apiCall:string
   if (draft.amendmentStatement !== undefined) {
     delete draft.amendmentStatement
   }

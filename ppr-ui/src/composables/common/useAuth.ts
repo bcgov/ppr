@@ -43,7 +43,7 @@ export const useAuth = () => {
 
   /** Gets product subscription authorizations and stores it. */
   const loadAccountProductSubscriptions = async (): Promise<void> => {
-    let rpprSubscription = {} as AccountProductSubscriptionIF
+    let rpprSubscription: AccountProductSubscriptionIF
     if (isRoleStaff.value) {
       rpprSubscription = {
         [AccountProductCodes.RPPR]: {

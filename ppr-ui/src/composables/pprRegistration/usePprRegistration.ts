@@ -110,7 +110,7 @@ export const usePprRegistration = () => {
       setCourtOrderInformation(courtOrder)
     }
 
-    let lengthTrust = null
+    let lengthTrust: LengthTrustIF
 
     if (flowType === RegistrationFlowType.RENEWAL) {
       const isRepairsLien = registrationType.registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN &&

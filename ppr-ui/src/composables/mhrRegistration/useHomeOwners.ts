@@ -234,7 +234,7 @@ export function useHomeOwners (isMhrTransfer: boolean = false, isMhrCorrection: 
     // Make additional Group available in dropdown when adding a new home owner
     // or when there are more than one owner in the group
 
-    let numOfAdditionalGroupsInDropdown = 0
+    let numOfAdditionalGroupsInDropdown: number
 
     const homeOwnerGroups = getTransferOrRegistrationHomeOwnerGroups() as MhrRegistrationHomeOwnerGroupIF[]
     const removedOwners = homeOwnerGroups.filter(group => group.action === ActionTypes.REMOVED)

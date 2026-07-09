@@ -591,7 +591,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       // if deleted Exec, Admin or Trustee, then docs are not required and are valid
       if (owner.action === ActionTypes.REMOVED && EATOwnerTypes.includes(owner.partyType)) return true
 
-      let hasValidSupportingDoc = false
+      let hasValidSupportingDoc: boolean
 
       if (owner.supportingDocument === SupportingDocumentsOptions.DEATH_CERT ||
         owner.supportingDocument === SupportingDocumentsOptions.AFFIDAVIT) {
@@ -680,7 +680,7 @@ export const useTransferOwners = (enableAllActions: boolean = false) => {
       }
 
       // prefill Description field Execs, Admin, Trustees have description as Additional Name
-      let desc = ''
+      let desc: string
       if ([HomeOwnerPartyTypes.OWNER_IND, HomeOwnerPartyTypes.OWNER_BUS].includes(deletedOwner.partyType)) {
         // if reg or business owner is deleted, prefill the additional name (suffix) with the name of the deleted owner
         const { first, middle, last } = deletedOwner.individualName || {}
