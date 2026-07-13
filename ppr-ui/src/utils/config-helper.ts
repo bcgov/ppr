@@ -3,6 +3,10 @@
  * @returns A promise to get & set session storage keys with appropriate values.
  */
 export async function fetchConfig (): Promise<any> {
+  if (typeof window === 'undefined' || typeof sessionStorage === 'undefined') {
+    return
+  }
+
   const config = useRuntimeConfig().public
 
   // get config from environment

@@ -40,7 +40,8 @@ export default defineNuxtConfig({
       ],
       script: [
         {
-          src: 'https://ws1.postescanada-canadapost.ca/js/addresscomplete-2.30.js?key=tr28-mh11-ud79-br91&app=14466&culture=en',
+          src: 'https://ws1.postescanada-canadapost.ca/js/addresscomplete-2.30.js?' +
+            'key=tr28-mh11-ud79-br91&app=14466&culture=en',
           type: 'text/javascript'
         }
       ]

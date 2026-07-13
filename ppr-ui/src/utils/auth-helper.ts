@@ -44,7 +44,7 @@ function parseToken (token: string): any {
     }).join(''))
     return JSON.parse(base64)
   } catch (err) {
-    throw new Error('Error parsing Keycloak token - ' + err)
+    throw new Error('Error parsing Keycloak token - ' + err, { cause: err })
   }
 }
 
