@@ -5,6 +5,12 @@ import { useAnalystQueueStore } from '@/store/analystQueue'
 import ReviewDecision from '../../src/components/queue/ReviewDecision.vue'
 import { ReviewStatusTypes } from '@/composables'
 import { createComponent, setupMockStaffUser } from './utils'
+import { vi } from 'vitest'
+import { getKeycloakName } from '@/utils/auth-helper'
+
+vi.mock('@/utils/auth-helper', () => ({
+  getKeycloakName: vi.fn()
+}))
 
 const ASSIGN_ERROR = 'Please assign this filing to yourself to approve or decline.'
 
@@ -25,6 +31,7 @@ describe('ReviewDecision', () => {
       firstname: 'Test',
       lastname: 'User',
     } as any)
+    vi.mocked(getKeycloakName).mockReturnValue('Test User')
     setupMockStaffUser(store)
 
     analystQueueStore.queueTransfer = {
@@ -49,7 +56,7 @@ describe('ReviewDecision', () => {
     expect(wrapper.text()).toContain(ASSIGN_ERROR)
   })
 
-  it('resets the review decision when the assignee changes to the current user (FirstName LastName)', async () => {
+  it('resets the review decision when the assignee changes to the current user token name', async () => {
     analystQueueStore.reviewDecision = {
       statusType: ReviewStatusTypes.DECLINED,
       declinedReasonType: 'NON_COMPLIANCE'
@@ -58,24 +65,6 @@ describe('ReviewDecision', () => {
     analystQueueStore.validationErrors.declineReasonType = 'Please select a reason for declining'
 
     analystQueueStore.queueTransfer.assigneeName = 'Test User'
-    await nextTick()
-
-    expect(analystQueueStore.validationErrors.general).toBe('')
-    expect(analystQueueStore.validationErrors.declineReasonType).toBe('')
-    expect(analystQueueStore.reviewDecision.statusType).toBeUndefined()
-    expect(analystQueueStore.reviewDecision.declinedReasonType).toBeUndefined()
-    expect(wrapper.exists()).toBe(true)
-  })
-
-  it('resets the review decision when the assignee changes to the current user (LastName, FirstName)', async () => {
-    analystQueueStore.reviewDecision = {
-      statusType: ReviewStatusTypes.DECLINED,
-      declinedReasonType: 'NON_COMPLIANCE'
-    } as any
-    analystQueueStore.validationErrors.general = ASSIGN_ERROR
-    analystQueueStore.validationErrors.declineReasonType = 'Please select a reason for declining'
-
-    analystQueueStore.queueTransfer.assigneeName = 'User, Test'
     await nextTick()
 
     expect(analystQueueStore.validationErrors.general).toBe('')

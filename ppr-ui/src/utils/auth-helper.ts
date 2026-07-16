@@ -58,6 +58,12 @@ export function getKeycloakRoles (): Array<string> {
   throw new Error('Error getting Keycloak roles')
 }
 
+/** Gets display name from Keycloak JWT name claim. */
+export function getKeycloakName (): string {
+  const jwt = getJWT()
+  return jwt?.name || ''
+}
+
 export async function getStaffRegisteringParty (isBcOnline: boolean): Promise<PartyIF> {
   let partyCode = sessionStorage.getItem('PPR_STAFF_PARTY_CODE')
   if (isBcOnline) {

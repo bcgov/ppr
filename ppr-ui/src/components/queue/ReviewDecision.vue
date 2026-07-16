@@ -5,6 +5,7 @@ import { ReviewDecisionTypes, ReviewStatusTypes } from '@/composables';
 import { storeToRefs } from 'pinia';
 import { useAnalystQueueStore } from '@/store/analystQueue';
 import { useStore } from '@/store/store'
+import { getKeycloakName } from '@/utils/auth-helper'
 
 const { reviewDecision, validationErrors, isInReview, queueTransfer, reviewId } = storeToRefs(useAnalystQueueStore())
 const appStore = useStore() as any
@@ -16,28 +17,12 @@ const resetValidationErrors = () => {
 
 const isDeclined = computed(() => reviewDecision.value.statusType === ReviewStatusTypes.DECLINED)
 
-const normalizeName = (name?: string) => {
-  return (name || '')
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, ' ')
-}
-
-const normalizeAssigneeName = (name?: string) => {
-  if (!name || !name.includes(',')) return normalizeName(name)
-
-  const [lastName, firstName] = name.split(',')
-  return normalizeName(`${firstName} ${lastName}`)
-}
-
 const isCurrentUserAssignee = computed(() => {
-  const assignee = normalizeAssigneeName(queueTransfer.value?.assigneeName)
+  const assignee = queueTransfer.value?.assigneeName
   if (!assignee) return false
 
-  const currentUserDisplayName = `${appStore.getUserFirstName} ${appStore.getUserLastName}`
-  const displayName = normalizeName(currentUserDisplayName)
-
-  return assignee === displayName
+  const tokenName = getKeycloakName()
+  return assignee === tokenName
 })
 
 const isDecisionEnabled = computed(() => {
