@@ -6,6 +6,8 @@ import ReviewDecision from '../../src/components/queue/ReviewDecision.vue'
 import { ReviewStatusTypes } from '@/composables'
 import { createComponent, setupMockStaffUser } from './utils'
 
+const ASSIGN_ERROR = 'Please assign this filing to yourself to approve or decline.'
+
 describe('ReviewDecision', () => {
   let pinia
   let store
@@ -22,7 +24,6 @@ describe('ReviewDecision', () => {
     await store.setUserInfo({
       firstname: 'Test',
       lastname: 'User',
-      username: 'user'
     } as any)
     setupMockStaffUser(store)
 
@@ -44,21 +45,19 @@ describe('ReviewDecision', () => {
     await approveButton!.trigger('click')
     await nextTick()
 
-    expect(analystQueueStore.validationErrors.general).toBe(
-      'Please assign this filing to yourself to approve or decline.'
-    )
-    expect(wrapper.text()).toContain('Please assign this filing to yourself to approve or decline.')
+    expect(analystQueueStore.validationErrors.general).toBe(ASSIGN_ERROR)
+    expect(wrapper.text()).toContain(ASSIGN_ERROR)
   })
 
-  it('resets the review decision when the assignee changes to the current user', async () => {
+  it('resets the review decision when the assignee changes to the current user (FirstName LastName)', async () => {
     analystQueueStore.reviewDecision = {
       statusType: ReviewStatusTypes.DECLINED,
       declinedReasonType: 'NON_COMPLIANCE'
     } as any
-    analystQueueStore.validationErrors.general = 'Please assign this filing to yourself to approve or decline.'
+    analystQueueStore.validationErrors.general = ASSIGN_ERROR
     analystQueueStore.validationErrors.declineReasonType = 'Please select a reason for declining'
 
-    analystQueueStore.queueTransfer.assigneeName = 'user'
+    analystQueueStore.queueTransfer.assigneeName = 'Test User'
     await nextTick()
 
     expect(analystQueueStore.validationErrors.general).toBe('')
@@ -67,4 +66,23 @@ describe('ReviewDecision', () => {
     expect(analystQueueStore.reviewDecision.declinedReasonType).toBeUndefined()
     expect(wrapper.exists()).toBe(true)
   })
+
+  it('resets the review decision when the assignee changes to the current user (LastName, FirstName)', async () => {
+    analystQueueStore.reviewDecision = {
+      statusType: ReviewStatusTypes.DECLINED,
+      declinedReasonType: 'NON_COMPLIANCE'
+    } as any
+    analystQueueStore.validationErrors.general = ASSIGN_ERROR
+    analystQueueStore.validationErrors.declineReasonType = 'Please select a reason for declining'
+
+    analystQueueStore.queueTransfer.assigneeName = 'User, Test'
+    await nextTick()
+
+    expect(analystQueueStore.validationErrors.general).toBe('')
+    expect(analystQueueStore.validationErrors.declineReasonType).toBe('')
+    expect(analystQueueStore.reviewDecision.statusType).toBeUndefined()
+    expect(analystQueueStore.reviewDecision.declinedReasonType).toBeUndefined()
+    expect(wrapper.exists()).toBe(true)
+  })
+
 })

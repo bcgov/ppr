@@ -16,18 +16,28 @@ const resetValidationErrors = () => {
 
 const isDeclined = computed(() => reviewDecision.value.statusType === ReviewStatusTypes.DECLINED)
 
-const currentUserDisplayName = computed(() => {
-  return `${appStore.getUserFirstName} ${appStore.getUserLastName}`.trim()
-})
+const normalizeName = (name?: string) => {
+  return (name || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+}
+
+const normalizeAssigneeName = (name?: string) => {
+  if (!name || !name.includes(',')) return normalizeName(name)
+
+  const [lastName, firstName] = name.split(',')
+  return normalizeName(`${firstName} ${lastName}`)
+}
 
 const isCurrentUserAssignee = computed(() => {
-  const assignee = queueTransfer.value?.assigneeName?.trim().toLowerCase()
+  const assignee = normalizeAssigneeName(queueTransfer.value?.assigneeName)
   if (!assignee) return false
 
-  const username = appStore.getUserUsername?.trim().toLowerCase()
-  const displayName = currentUserDisplayName.value?.toLowerCase()
+  const currentUserDisplayName = `${appStore.getUserFirstName} ${appStore.getUserLastName}`
+  const displayName = normalizeName(currentUserDisplayName)
 
-  return assignee === username || (!!displayName && assignee === displayName)
+  return assignee === displayName
 })
 
 const isDecisionEnabled = computed(() => {
