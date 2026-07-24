@@ -26,6 +26,7 @@ from mhr_api.models.type_tables import MhrDocumentTypes, MhrRegistrationTypes, M
 from mhr_api.reports import ppr_report_utils
 from mhr_api.reports.v2 import report_utils
 from mhr_api.reports.v2.report_utils import ReportTypes
+from mhr_api.services.authz import STAFF_ROLE
 from mhr_api.services.gcp_auth.auth_service import GoogleAuthService
 from mhr_api.utils.logging import logger
 
@@ -926,8 +927,9 @@ class Report:  # pylint: disable=too-few-public-methods
         self._report_data["meta_account_id"] = self._account_id
         if self._account_name:
             self._report_data["meta_account_name"] = self._account_name
+        elif self._account_id != STAFF_ROLE:
+            self._report_data["meta_account_name"] = report_utils.get_qs_account_name(self._account_id)
 
-        # Get source ???
         # Appears in the Description section of the PDF Document Properties as Title.
         self._report_data["meta_title"] = ReportMeta.reports[self._report_key]["metaTitle"].upper()
         self._report_data["meta_subtitle"] = ReportMeta.reports[self._report_key]["metaSubtitle"]

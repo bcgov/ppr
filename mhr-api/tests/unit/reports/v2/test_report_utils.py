@@ -35,13 +35,24 @@ TEST_REG_VERSION_DATA = [
     ('2012-06-01T20:11:53+00:00', '2'),
     ('2012-05-31T20:11:53+00:00', '1'),
 ]
-
+# test data pattern is ({account_id}, {account_name})
+TEST_QS_ACCOUNT_NAME_DATA = [
+    ("PS12345", "TEST NOTARY PUBLIC"),
+    ("JUNK", ""),
+]
 
 @pytest.mark.parametrize('reg_ts,version', TEST_REG_VERSION_DATA)
 def test_reg_sig_version(session, reg_ts, version):
     """Assert that deriving a registrar's signature from a regisration timestamp works as expected."""
     test_version = report_utils.get_reg_signature_version(reg_ts)
     assert test_version == version
+
+
+@pytest.mark.parametrize('account_id,account_name', TEST_QS_ACCOUNT_NAME_DATA)
+def test_qs_account_name(session, account_id, account_name):
+    """Assert that obtaining a verification report account name from a regisration account id works as expected."""
+    test_name = report_utils.get_qs_account_name(account_id)
+    assert test_name == account_name
 
 
 def test_get_header_data(session):
