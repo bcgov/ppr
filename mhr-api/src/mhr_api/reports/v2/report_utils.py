@@ -18,6 +18,7 @@ import PyPDF2
 from flask import current_app
 from jinja2 import Template
 
+from mhr_api.models import MhrManufacturer, MhrQualifiedSupplier
 from mhr_api.models.type_tables import MhrDocumentTypes
 from mhr_api.utils.base import BaseEnum
 from mhr_api.utils.logging import logger
@@ -641,3 +642,12 @@ def get_reg_signature_version(registration_ts: str) -> str:
             break
     logger.debug(f"reg_ts={registration_ts} reg_date={reg_date} version={reg_version}")
     return reg_version
+
+
+def get_qs_account_name(account_id: str) -> str:
+    """Get the qualified supplier account name from the registration account id."""
+    supplier: MhrQualifiedSupplier = MhrQualifiedSupplier.find_by_account_id(account_id)
+    if supplier:
+        return supplier.business_name
+    manufacturer: MhrManufacturer = MhrManufacturer.find_by_account_id(account_id)
+    return manufacturer.manufacturer_name if manufacturer else ""

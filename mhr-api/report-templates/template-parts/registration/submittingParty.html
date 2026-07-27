@@ -58,6 +58,8 @@
         <span class="section-data pl-1">
             {% if meta_account_id == 'ppr_staff' %}
                 BC REGISTRIES STAFF
+            {% elif meta_account_name is defined and meta_account_name != '' %} 
+                {{ meta_account_name }}
             {% elif affirmByName is defined and affirmByName != '' %} 
                 {{ affirmByName }}
             {% else %}
