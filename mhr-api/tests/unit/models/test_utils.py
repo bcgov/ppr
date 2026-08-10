@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Test Suite to ensure the model utility functions are working as expected."""
-from datetime import timedelta as _timedelta
+from datedelta import datedelta
 
 import pytest
 
@@ -78,7 +78,14 @@ TEST_DATA_TS_NO_TZ = [
     ('2024-09-01T21:00:00-07:00', '2024-09-02T04:00:00+00:00'),
     ('2024-12-01T21:00:00-08:00', '2024-12-02T05:00:00+00:00')
 ]
-
+# testdata pattern is ({days_offset}, {expected_days})
+TEST_DATA_EXPIRY_DAYS = [
+    (0, 30),
+    (-20, 10),
+    (-29, 1),
+    (-30, 1),
+    (-31, -1),
+]
 
 @pytest.mark.parametrize('name, key_value', TEST_DATA_ORG_KEY)
 def test_search_key_org(name, key_value):
@@ -115,13 +122,13 @@ def test_tax_cert_date(session, valid, registration_ts, tax_cert_ts):
         assert not is_valid
 
 
-def test_permit_expiry_days(session):
+@pytest.mark.parametrize('days_offset,expected_days', TEST_DATA_EXPIRY_DAYS)
+def test_permit_expiry_days(session, days_offset, expected_days):
     """Assert that setting and computing expiry days works as expected."""
     expiry_ts = model_utils.compute_permit_expiry()
-    current_app.logger.debug(model_utils.format_ts(model_utils.now_ts()))
-    current_app.logger.debug(model_utils.format_ts(expiry_ts))
+    expiry_ts = expiry_ts + datedelta(days=days_offset)
     expiry_days = model_utils.expiry_ts_days(expiry_ts)
-    assert expiry_days == 30
+    assert expiry_days == expected_days
 
 
 @pytest.mark.parametrize('registration_ts,expected_ts', TEST_DATA_TS_NO_TZ)

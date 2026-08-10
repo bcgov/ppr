@@ -375,7 +375,8 @@ def expiry_ts_days(expiry_ts: _datetime) -> int:
     today_ts = today_local()
     expiry = expiry_ts.astimezone(LOCAL_TZ)
     date_diff = expiry.date() - today_ts.date()
-    return date_diff.days
+    # Expiry is at the end of the day local time, so if the expiry is today there is 1 day remaining.
+    return date_diff.days if date_diff.days != 0 else 1
 
 
 def expiry_dt_from_years(life_years: int, iso_date: str = None):
