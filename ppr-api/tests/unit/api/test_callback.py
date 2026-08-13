@@ -82,6 +82,50 @@ TEST_PAY_CALLBACK_DATA = [
     ('Invalid status', HTTPStatus.BAD_REQUEST, FINANCING_STATEMENT, None,  None, model_utils.REG_CLASS_PPSA, "20000100"),
     ('Invalid used', HTTPStatus.OK, FINANCING_STATEMENT, None,  None, model_utils.REG_CLASS_PPSA, "20000100"),
 ]
+# testdata pattern is ({desc}, {status}, {registration_id}, {has_key}, {has_config_key}, {is_param}, {bad_key})
+TEST_CALLBACK_KEY_DATA = [
+    ('Invalid reg id header key', HTTPStatus.NOT_FOUND, 300000005, True, True, False, None),
+    ('Invalid reg id param key', HTTPStatus.NOT_FOUND, 300000005, True, True, True, None),
+    ('Unauthorized no key', HTTPStatus.UNAUTHORIZED, 300000005, False, True, True, None),
+    ('Unauthorized invalid key header', HTTPStatus.UNAUTHORIZED, 300000005, True, True, False, "JUNK"),
+    ('Unauthorized invalid key param', HTTPStatus.UNAUTHORIZED, 300000005, True, True, True, "JUNK"),
+    ('Unauthorized no config key', HTTPStatus.UNAUTHORIZED, 300000005, True, False, True, None),
+]
+
+
+@pytest.mark.parametrize('desc,status,registration_id,has_key,has_config_key,is_param,bad_key', TEST_CALLBACK_KEY_DATA)
+def test_callback_key(session, client, jwt, desc, status, registration_id, has_key, has_config_key, is_param, bad_key):
+    """Assert that a callback request returns the expected status with different key scenarios."""
+    # setup
+    config_key = current_app.config.get("SUBSCRIPTION_API_KEY", "")
+    json_data = {
+        'registrationId': registration_id,
+        'partyId': 200000013
+    }
+
+    if not has_config_key and config_key:
+        current_app.config.update(SUBSCRIPTION_API_KEY="")
+    elif not config_key and has_config_key:
+        current_app.config.update(SUBSCRIPTION_API_KEY="afassdfdssds12342s")
+        config_key = current_app.config.get('SUBSCRIPTION_API_KEY')
+    test_key = bad_key if bad_key else config_key
+    url: str = "/api/v1/callbacks/mail-report"
+    headers = None
+    if test_key and has_key:
+        if is_param:
+            url += f"?x-apikey={test_key}"
+        else:
+            headers = {
+                'x-apikey': test_key
+            }
+
+    # test
+    rv = client.post(url, json=json_data, headers=headers, content_type='application/json')
+
+    if not has_config_key and config_key:
+        current_app.config.update(SUBSCRIPTION_API_KEY=config_key)
+    # check
+    assert rv.status_code == status
 
 
 @pytest.mark.parametrize('desc,status,reg_id,party_id', TEST_MAIL_CALLBACK_DATA)

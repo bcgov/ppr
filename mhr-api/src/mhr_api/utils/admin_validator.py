@@ -27,7 +27,6 @@ VALIDATOR_ERROR = "Error performing admin registration extra validation. "
 DOC_ID_REQUIRED = "Document ID is required for staff registrations. "
 DOC_ID_EXISTS = "Document ID must be unique: provided value already exists. "
 DOC_ID_INVALID_CHECKSUM = "Document ID is invalid: checksum failed. "
-REMARKS_REQUIRED = "Remarks are required with the registration document type. "
 REMARKS_NOT_ALLOWED = "Remarks are not allowed with the registration document type. "
 NOTICE_REQUIRED = "A giving notice party must be specified with the registration document type. "
 NOTICE_NAME_REQUIRED = "The name of the person or business giving notice is missing and must be provided. "
@@ -80,8 +79,7 @@ def validate_admin_reg(registration: MhrRegistration, json_data, staff: bool = T
             error_msg += validate_location(registration, json_data, False)
             error_msg += validate_description(registration, json_data)
             error_msg += validate_owners(registration, json_data)
-            if json_data.get("note") and not json_data["note"].get("remarks"):
-                error_msg += REMARKS_REQUIRED
+            error_msg += validator_utils.validate_note_remarks(json_data, True)
     except Exception as validation_exception:  # noqa: B902; eat all errors
         logger.error("validate_admin exception: " + str(validation_exception))
         error_msg += VALIDATOR_ERROR

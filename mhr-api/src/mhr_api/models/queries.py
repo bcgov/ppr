@@ -297,38 +297,38 @@ REG_ORDER_BY_EXPIRY_DAYS = " ORDER BY arv.mhr_number"
 REG_ORDER_BY_DOCUMENT_ID = " ORDER BY arv.summary_snapshot ->> 'document_id'"
 REG_ORDER_BY_MANUFACTURER_NAME = " ORDER BY arv.summary_snapshot ->> 'manufacturer_name'"
 REG_ORDER_BY_CIVIC_ADDRESS = " ORDER BY arv.summary_snapshot ->> 'civic_address'"
-REG_FILTER_REG_TYPE = " AND arv.summary_snapshot ->> 'document_type' = '?'"
+REG_FILTER_REG_TYPE = " AND arv.summary_snapshot ->> 'document_type' = :query_reg_type"
 REG_FILTER_REG_TYPE_COLLAPSE = """
  AND arv.mhr_number IN (SELECT DISTINCT r2.mhr_number
                           FROM mhr_registrations r2, mhr_documents d2
                          WHERE r2.id = d2.registration_id
                            AND r2.mhr_number = arv.mhr_number
-                           AND d2.document_type = '?')
+                           AND d2.document_type = :query_reg_type)
 """
-REG_FILTER_MHR = " AND arv.mhr_number = '?'"
-REG_FILTER_STATUS = " AND arv.status_type = '?'"
+REG_FILTER_MHR = " AND arv.mhr_number = :query_mhr_num"
+REG_FILTER_STATUS = " AND arv.status_type = :query_status_type"
 REG_FILTER_STATUS_COLLAPSE = """
  AND arv.mhr_number IN (SELECT DISTINCT r2.mhr_number
                           FROM mhr_registrations r2
                          WHERE arv.mhr_number = r2.mhr_number
                            AND r2.registration_type IN ('MHREG', 'MHREG_CONVERSION')
-                           AND r2.status_type = '?')
+                           AND r2.status_type = :query_status_type)
 """
-REG_FILTER_SUBMITTING_NAME = " AND position('?' in arv.summary_snapshot ->> 'submitting_name') > 0"
+REG_FILTER_SUBMITTING_NAME = " AND position(:query_sub_name in arv.summary_snapshot ->> 'submitting_name') > 0"
 REG_FILTER_SUBMITTING_NAME_COLLAPSE = """
  AND arv.mhr_number IN (SELECT DISTINCT arv2.mhr_number
                           FROM mhr_registrations arv2
                          WHERE arv.mhr_number = arv2.mhr_number
-                           AND position('?' in arv2.summary_snapshot ->> 'submitting_name') > 0)
+                           AND position(:query_sub_name in arv2.summary_snapshot ->> 'submitting_name') > 0)
 """
-REG_FILTER_CLIENT_REF = " AND position('?' in UPPER(arv.client_reference_id)) > 0"
+REG_FILTER_CLIENT_REF = " AND position(:query_client_ref in UPPER(arv.client_reference_id)) > 0"
 REG_FILTER_CLIENT_REF_COLLAPSE = """
  AND arv.mhr_number IN (SELECT DISTINCT r2.mhr_number
                           FROM mhr_registrations r2
                          WHERE arv.mhr_number = r2.mhr_number
-                           AND position('?' in UPPER(r2.client_reference_id)) > 0)
+                           AND position(:query_client_ref in UPPER(r2.client_reference_id)) > 0)
 """
-REG_FILTER_USERNAME = " AND position('?' in arv.summary_snapshot ->> 'registering_name') > 0"
+REG_FILTER_USERNAME = " AND position(:query_username in arv.summary_snapshot ->> 'registering_name') > 0"
 REG_FILTER_USERNAME_COLLAPSE = """
  AND arv.mhr_number IN (SELECT r2.mhr_number
                         FROM mhr_registrations r2, users u
@@ -337,7 +337,7 @@ REG_FILTER_USERNAME_COLLAPSE = """
                          AND r2.user_id != ''
                          AND r2.user_id = u.username
                          AND u.firstname IS NOT NULL AND u.lastname IS NOT NULL
-                         AND position('?' in TRIM(UPPER(u.firstname || ' ' || u.lastname))) > 0)
+                         AND position(:query_username in TRIM(UPPER(u.firstname || ' ' || u.lastname))) > 0)
 """
 REG_FILTER_DATE = " AND arv.registration_ts BETWEEN :query_start AND :query_end"
 REG_FILTER_DATE_COLLAPSE = """
@@ -346,20 +346,20 @@ REG_FILTER_DATE_COLLAPSE = """
                          WHERE arv.mhr_number = r2.mhr_number
                            AND r2.registration_ts BETWEEN :query_start AND :query_end)
 """
-REG_FILTER_DOCUMENT_ID = " AND position('?' in arv.summary_snapshot ->> 'document_id') > 0"
+REG_FILTER_DOCUMENT_ID = " AND position(:query_doc_id in arv.summary_snapshot ->> 'document_id') > 0"
 REG_FILTER_DOCUMENT_ID_COLLAPSE = """
  AND arv.mhr_number IN (SELECT DISTINCT r2.mhr_number
                           FROM mhr_registrations r2, mhr_documents d2
                          WHERE arv.mhr_number = r2.mhr_number
                            AND r2.id = d2.registration_id
-                           AND position('?' in d2.document_id) > 0)
+                           AND position(:query_doc_id in d2.document_id) > 0)
 """
-REG_FILTER_MANUFACTURER_NAME = " AND position('?' in arv.summary_snapshot ->> 'manufacturer_name') > 0"
+REG_FILTER_MANUFACTURER_NAME = " AND position(:query_man_name in arv.summary_snapshot ->> 'manufacturer_name') > 0"
 REG_FILTER_MANUFACTURER_NAME_COLLAPSE = """
  AND arv.mhr_number IN (SELECT DISTINCT arv2.mhr_number
                           FROM mhr_registrations arv2
                          WHERE arv.mhr_number = arv2.mhr_number
-                           AND position('?' in arv2.summary_snapshot ->> 'manufacturer_name') > 0)
+                           AND position(:query_man_name in arv2.summary_snapshot ->> 'manufacturer_name') > 0)
 """
 ACCOUNT_SORT_DESCENDING = " DESC"
 ACCOUNT_SORT_ASCENDING = " ASC"

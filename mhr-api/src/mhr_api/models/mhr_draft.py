@@ -120,12 +120,12 @@ SELECT COUNT(r.id)
  WHERE r.mhr_number = :query_value1
    AND r.registration_ts > :query_value2
 """
-FILTER_MHR_NUMBER = " AND mhr_number = '?'"
-FILTER_REG_TYPE = " AND registration_type_desc = '?'"
-FILTER_SUBMITTING_NAME = " AND position('?' in submitting_party) > 0"
-FILTER_CLIENT_REF = " AND position('?' in TRIM(UPPER(clientReferenceId))) > 0"
-FILTER_USERNAME = " AND position('?' in TRIM(UPPER(registering_name))) > 0"
-FILTER_MANUFACTURER = " AND position('?' in TRIM(UPPER(manufacturer_name))) > 0"
+FILTER_MHR_NUMBER = " AND mhr_number = :query_mhr_num"
+FILTER_REG_TYPE = " AND registration_type_desc = :query_reg_type"
+FILTER_SUBMITTING_NAME = " AND position(:query_sub_name in submitting_party) > 0"
+FILTER_CLIENT_REF = " AND position(:query_client_ref in TRIM(UPPER(clientReferenceId))) > 0"
+FILTER_USERNAME = " AND position(:query_username in TRIM(UPPER(registering_name))) > 0"
+FILTER_MANUFACTURER = " AND position(:query_man_name in TRIM(UPPER(manufacturer_name))) > 0"
 FILTER_DATE = " AND create_ts BETWEEN :query_start AND :query_end"
 
 ORDER_BY_DATE = " ORDER BY create_ts"
@@ -222,18 +222,9 @@ class MhrDraft(db.Model):
             query = text(MhrDraft.build_account_query(params))
             results = None
             max_results_size = int(current_app.config.get("ACCOUNT_DRAFTS_MAX_RESULTS", 1000))
-            if params.has_filter() and params.filter_reg_start_date and params.filter_reg_end_date:
-                start_ts = model_utils.ts_from_iso_format(params.filter_reg_start_date)
-                end_ts = model_utils.ts_from_iso_format(params.filter_reg_end_date)
-                results = db.session.execute(
-                    query,
-                    {
-                        "query_account": params.account_id,
-                        "query_start": start_ts,
-                        "query_end": end_ts,
-                        "max_results_size": max_results_size,
-                    },
-                )
+            if params.has_filter():
+                bind_params: dict = MhrDraft.build_account_query_params(params, max_results_size)
+                results = db.session.execute(query, bind_params)
             else:
                 results = db.session.execute(
                     query, {"query_account": params.account_id, "max_results_size": max_results_size}
@@ -257,8 +248,6 @@ class MhrDraft(db.Model):
             query_text = MhrDraft.build_account_query_filter(query_text, params)
         if params.has_sort():
             order_clause: str = QUERY_ACCOUNT_ORDER_BY.get(params.sort_criteria)
-            if not order_clause:
-                order_clause = QUERY_ACCOUNT_DRAFTS_DEFAULT_ORDER
             if params.sort_direction and params.sort_direction == reg_utils.SORT_DESCENDING:
                 order_clause += SORT_DESCENDING
             elif params.sort_direction and params.sort_direction == reg_utils.SORT_ASCENDING:
@@ -304,11 +293,29 @@ class MhrDraft(db.Model):
             filter_type = q_filter[0]
             filter_value = q_filter[1]
             if filter_type and filter_value:
-                filter_clause: str = QUERY_ACCOUNT_FILTER_BY.get(filter_type)
-                if filter_clause and filter_type != reg_utils.START_TS_PARAM:  # timestamp range added elsewhere
-                    filter_clause = filter_clause.replace("?", filter_value)
-                query_text += filter_clause
+                query_text += QUERY_ACCOUNT_FILTER_BY.get(filter_type)
         return query_text
+
+    @staticmethod
+    def build_account_query_params(params: reg_utils.AccountRegistrationParams, max_results_size: int) -> dict:
+        """Build the account draft summary query list of parameter values."""
+        bind_params = {"query_account": params.account_id, "max_results_size": max_results_size}
+        if params.filter_reg_start_date and params.filter_reg_end_date:
+            bind_params["query_start"] = model_utils.search_ts(params.filter_reg_start_date, True)
+            bind_params["query_end"] = model_utils.search_ts(params.filter_reg_end_date, False)
+        if params.filter_mhr_number:
+            bind_params["query_mhr_num"] = params.filter_mhr_number
+        if params.filter_registration_type:
+            bind_params["query_reg_type"] = params.filter_registration_type
+        if params.filter_client_reference_id:
+            bind_params["query_client_ref"] = params.filter_client_reference_id
+        if params.filter_submitting_name:
+            bind_params["query_sub_name"] = params.filter_submitting_name
+        if params.filter_username:
+            bind_params["query_username"] = params.filter_username
+        if params.filter_manufacturer:
+            bind_params["query_man_name"] = params.filter_manufacturer
+        return bind_params
 
     @staticmethod
     def __build_account_draft_result(row) -> dict:

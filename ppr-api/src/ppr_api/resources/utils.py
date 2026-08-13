@@ -147,7 +147,10 @@ def is_pdf(req):
 
 def get_apikey(req):
     """Get gateway api key from request headers."""
-    return req.headers.get("x-apikey")
+    key = req.headers.get("x-apikey")
+    if not key:
+        key = request.args.get("x-apikey")
+    return key
 
 
 def account_required_response():
@@ -744,7 +747,7 @@ def valid_api_key(req) -> bool:
         return False
     apikey = current_app.config.get("SUBSCRIPTION_API_KEY")
     if not apikey:
-        return True
+        return False
     return key == apikey
 
 

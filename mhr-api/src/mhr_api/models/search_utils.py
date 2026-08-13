@@ -53,7 +53,7 @@ SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_
          sr.score, sc.pay_invoice_id
 FROM search_requests sc, search_results sr
 WHERE sc.id = sr.search_id
-  AND sc.account_id = '?'
+  AND sc.account_id = :query_value1
   AND sc.search_ts > ((now() at time zone 'utc') - interval '{str(GET_HISTORY_DAYS_LIMIT)} days')
   AND sc.search_type IN ('MI', 'MO', 'MS', 'MM')
 ORDER BY sc.search_ts DESC
@@ -71,7 +71,7 @@ SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_
          sr.score, sc.pay_invoice_id
 FROM search_requests sc, search_results sr
 WHERE sc.id = sr.search_id
-  AND sc.account_id = '?'
+  AND sc.account_id = :query_value1
   AND sc.search_type IN ('MI', 'MO', 'MS', 'MM')
 ORDER BY sc.search_ts DESC
 FETCH FIRST {str(ACCOUNT_SEARCH_HISTORY_MAX_SIZE)} ROWS ONLY
@@ -88,7 +88,7 @@ SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_
          sr.score, sc.pay_invoice_id
 FROM search_requests sc, search_results sr
 WHERE sc.id = sr.search_id
-  AND sc.account_id = '?'
+  AND sc.account_id = :query_value1
   AND sc.search_type IN ('MI', 'MO', 'MS', 'MM')
   AND sc.search_ts > ((now() at time zone 'utc') - interval '{str(GET_HISTORY_DAYS_LIMIT)} days')
 ORDER BY sc.search_ts DESC
@@ -106,7 +106,7 @@ SELECT sc.id, sc.search_ts, sc.api_criteria, sc.total_results_size, sc.returned_
          sr.score, sc.pay_invoice_id
 FROM search_requests sc, search_results sr
 WHERE sc.id = sr.search_id
-  AND sc.account_id = '?'
+  AND sc.account_id = :query_value1
   AND sc.search_type IN ('MI', 'MO', 'MS', 'MM')
 ORDER BY sc.search_ts DESC
 FETCH FIRST {str(ACCOUNT_SEARCH_HISTORY_MAX_SIZE)} ROWS ONLY

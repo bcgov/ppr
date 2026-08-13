@@ -458,8 +458,8 @@ TEST_LOCATION_DATA = [
 TEST_NOTE_REMARKS_DATA = [
     ('Valid PUBA with note', True, '000900', NOTE_VALID, 'PUBA', None),
     ('Valid REGC with note', True, '000900', NOTE_VALID, 'REGC_STAFF', None),
-    ('Invalid PUBA no remarks', False, '000900', NOTE_INVALID, 'PUBA', validator.REMARKS_REQUIRED),
-    ('Invalid REGC no remarks', False, '000900', NOTE_INVALID, 'REGC_CLIENT', validator.REMARKS_REQUIRED)
+    ('Invalid PUBA no remarks', False, '000900', NOTE_INVALID, 'PUBA', validator_utils.REMARKS_REQUIRED),
+    ('Invalid REGC no remarks', False, '000900', NOTE_INVALID, 'REGC_CLIENT', validator_utils.REMARKS_REQUIRED)
 ]
 # test data pattern is ({description}, {valid}, {mhr_num}, {account}, {staff}, {message_content})
 TEST_CANCEL_PERMIT_DATA = [

@@ -16,6 +16,7 @@
 Refactored from registration_validator.
 """
 import copy
+import re
 
 from mhr_api.models import MhrDraft, MhrRegistration, registration_json_utils
 from mhr_api.models import registration_utils as reg_utils
@@ -110,6 +111,8 @@ STATUS_CONFIRMATION_REQUIRED = "Land status confirmation is required for this re
 CANCEL_PERMIT_INVALID = (
     "Cancel Transport Permit is not allowed because there is no active, non-expired transport permit. "
 )
+REMARKS_REQUIRED = "Remarks are required with the registration document type. "
+REMARKS_INVALID_JS = "Unit Note remarks invalid: javascript not allowed. "
 PPR_REG_TYPE_ALL = " SA_TAX TA_TAX TM_TAX "
 PPR_REG_TYPE_GOV = " SA_GOV TA_GOV TM_GOV "
 PPR_REG_TYPE_EXEMPTION = PPR_REG_TYPE_ALL + PPR_REG_TYPE_GOV + " FR LT ML MN SG "
@@ -216,6 +219,10 @@ MANUFACTURER_STREET_ABBREVIATIONS_MAPPING = {
     "W": "WEST",
     "WEST": "W",
 }
+# Regex patterns looking for common JS definitions when validating note remarks.
+JS_PATTERN1 = re.compile(r"\b(var|let|const)\s+\w+\s*=|function\s*\w*\s*\(|console\.")
+JS_PATTERN2 = re.compile(r"<script([^'\"]|\"(\\.|[^\"\\])*\"|'(\\.|[^'\\])*')*?<\/script>")
+JS_PATTERN3 = re.compile(r"alert\s*\(\s*['\"`]?.*['\"`]?\s*\)")
 
 
 def validate_doc_id(json_data, check_exists: bool = True):
@@ -854,3 +861,16 @@ def validate_manufacturer_street(street_1: str, street_2: str) -> bool:
                 break
     logger.debug(f"test1={test_1} test_2={test_2}")
     return test_1 == test_2
+
+
+def validate_note_remarks(json_data: dict, required: bool = False) -> str:
+    """Validate note remarks if present contains no javascript."""
+    error_msg = ""
+    if not json_data.get("note"):
+        return error_msg
+    remarks: str = str(json_data["note"].get("remarks", "")).strip().lower()
+    if required and remarks == "":
+        error_msg += REMARKS_REQUIRED
+    if remarks != "" and (JS_PATTERN1.search(remarks) or JS_PATTERN2.search(remarks) or JS_PATTERN3.search(remarks)):
+        error_msg += REMARKS_INVALID_JS
+    return error_msg

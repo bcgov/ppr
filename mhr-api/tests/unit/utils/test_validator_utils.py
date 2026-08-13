@@ -24,6 +24,12 @@ from mhr_api.utils import validator_utils
 
 
 INVALID_TEXT_CHARSET = 'TEST \U0001d5c4\U0001d5c6/\U0001d5c1 INVALID'
+NOTE_REMARKS = {
+  'note': {
+    'documentType': 'CAU',
+    'documentId': '62133670',
+  }
+}
 
 
 # testdata pattern is ({description}, {rebuilt}, {other}, {csa_num}, {eng_date}, {staff}, {message content})
@@ -69,6 +75,31 @@ TEST_MANUFACTURER_STREET_DATA = [
     (False, "1234 TEST ST EN", "1234 TEST NORTH STREET"),
     (False, "1234 TEST RD SWE", "1234 TEST ROAD SOUTHWEST"),
 ]
+# testdata pattern is ({valid}, {required}, {value}, {message content})
+TEST_NOTE_REMARKS_DATA = [
+    (True, True, "Let this note with the words function and alert and console be valid.", None),
+    (False, True, "", validator_utils.REMARKS_REQUIRED),
+    (False, True, None, validator_utils.REMARKS_REQUIRED),
+    (True, False, None, None),
+    (True, False, "", None),
+    (False, False, "Invalid var x = function() { return true; };", validator_utils.REMARKS_INVALID_JS),
+    (False, False, "Invalid let x = function() { return true; };", validator_utils.REMARKS_INVALID_JS),
+    (False, False, "Invalid <script>invalid();</script>", validator_utils.REMARKS_INVALID_JS),
+    (False, False, "Invalid <img src=x onerror=alert(document.cookie)>", validator_utils.REMARKS_INVALID_JS),
+]
+
+
+@pytest.mark.parametrize('valid,required,value,message', TEST_NOTE_REMARKS_DATA)
+def test_note_remarks(session, valid, required, value, message):
+    """Assert that unit note remarks validation works as expected."""
+    json_data = copy.deepcopy(NOTE_REMARKS)
+    if value:
+        json_data["note"]["remarks"] = value
+    msg: str = validator_utils.validate_note_remarks(json_data, required)
+    if valid:
+        assert msg == ""
+    elif message:
+        assert msg.find(message) > -1
 
 
 @pytest.mark.parametrize('identical,street_1,street_2', TEST_MANUFACTURER_STREET_DATA)

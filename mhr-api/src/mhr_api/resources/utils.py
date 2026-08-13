@@ -304,7 +304,7 @@ def valid_api_key(req) -> bool:
         return False
     apikey = current_app.config.get("SUBSCRIPTION_API_KEY")
     if not apikey:
-        return True
+        return False
     return key == apikey
 
 

@@ -17,6 +17,7 @@ Validation includes rules captured in the PPR Registration Types spreadsheet:
 https://docs.google.com/spreadsheets/d/18eTumnf5H6TG2qWXwXJ_iAA-Gc7iNMpnm0ly7ctceTI/edit#gid=0
 """
 # pylint: disable=superfluous-parens
+import re
 
 from ppr_api.models import ClientCode, VehicleCollateral
 from ppr_api.models import utils as model_utils
@@ -55,6 +56,12 @@ SE_RP_INVALID_CODE = "The client party code for Registering Party in SE registra
 SE_SP_INVALID_CODE = "The client party code for Secured Party in SE registration type is invalid. "
 RL_NOT_ALLOWED = "The RL lien type is not permitted; use CL Commercial Lien type instead. "
 CL_NOT_ALLOWED = "The Commercial Lien CL type is not allowed: use the RL Repairer's Lien type instead. "
+GC_INVALID_JS = "The General Collateral text is invalid: javascript not allowed. "
+
+# Regex patterns looking for common JS definitions when validating amdendment descriptions and general collateral text.
+JS_PATTERN1 = re.compile(r"\b(var|let|const)\s+\w+\s*=|function\s*\w*\s*\(|console\.")
+JS_PATTERN2 = re.compile(r"<script([^'\"]|\"(\\.|[^\"\\])*\"|'(\\.|[^'\\])*')*?<\/script>")
+JS_PATTERN3 = re.compile(r"alert\s*\(\s*['\"`]?.*['\"`]?\s*\)")
 
 GC_NOT_ALLOWED_LIST = [
     MiscellaneousTypes.MH_NOTICE.value,
@@ -171,15 +178,18 @@ def validate_life(json_data, reg_type: str, reg_class: str):
 def validate_general_collateral(json_data, reg_type: str, reg_class: str):
     """Validate generalCollateral by registration type."""
     error_msg = ""
-    if reg_type in GC_NOT_ALLOWED_LIST and "generalCollateral" in json_data and json_data["generalCollateral"]:
+    if reg_type in GC_NOT_ALLOWED_LIST and json_data.get("generalCollateral"):
         error_msg = GC_NOT_ALLOWED
     elif (reg_class == model_utils.REG_CLASS_CROWN or reg_type in GC_ONLY_LIST) and (
-        "generalCollateral" not in json_data
-        or not json_data["generalCollateral"]
-        or str(json_data["generalCollateral"][0]).strip() == ""
+        not json_data.get("generalCollateral")
+        or not json_data["generalCollateral"][0].get("description")
+        or str(json_data["generalCollateral"][0].get("description")).strip() == ""
     ):
         error_msg = GC_REQUIRED
 
+    if error_msg == "":
+        for gc in json_data.get("generalCollateral", []):
+            error_msg += validate_text_js(gc.get("description", ""), GC_INVALID_JS)
     return error_msg
 
 
@@ -255,3 +265,13 @@ def get_registration_class(reg_type: str):
         return ""
     except KeyError:
         return ""
+
+
+def validate_text_js(text: str, validation_msg: str) -> str:
+    """Validate text if present contains no javascript."""
+    text2: str = text.strip().lower() if text else ""
+    if text2 == "":
+        return ""
+    if JS_PATTERN1.search(text2) or JS_PATTERN2.search(text2) or JS_PATTERN3.search(text2):
+        return validation_msg
+    return ""

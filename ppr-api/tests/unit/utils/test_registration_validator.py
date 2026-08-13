@@ -414,6 +414,33 @@ TEST_PAY_LOCKED_DATA = [
     ('TEST0017', AMENDMENT_VALID, False, True, validator.STATE_INVALID_PAY_LOCKED),
     ('TEST0001', DISCHARGE_STATEMENT, False, True, validator.STATE_INVALID_PAY_LOCKED),
 ]
+# testdata pattern is ({valid}, {value}, {message content})
+TEST_JS_TEXT_DATA = [
+    (True, "Let this note with the words function and alert and console be valid.", None),
+    (False, "Invalid var x = function() { return true; };", validator.GC_INVALID_JS),
+    (False, "Invalid let x = function() { return true; };", validator.GC_INVALID_JS),
+    (False, "Invalid <script>invalid();</script>", validator.GC_INVALID_JS),
+    (False, "Invalid <img src=x onerror=alert(document.cookie)>", validator.GC_INVALID_JS),
+]
+
+
+@pytest.mark.parametrize('valid,value,message_content', TEST_JS_TEXT_DATA)
+def test_validate_am_text(session, valid, value, message_content):
+    """Assert that an amendment general collateral text javascript validation works as expected."""
+    # setup
+    json_data = copy.deepcopy(AMENDMENT_VALID)
+    del json_data["deleteVehicleCollateral"]
+    del json_data["addVehicleCollateral"]
+    json_data["addGeneralCollateral"][0]["description"] = value
+    json_data["description"] = value
+    statement = FinancingStatement.find_by_registration_number('TEST0001', 'PS12345', False)
+    error_msg = validator.validate_registration(json_data, statement)
+    if valid:
+        assert error_msg == ""
+    elif message_content:
+        assert error_msg != ""
+        assert error_msg.find(message_content) != -1
+        assert error_msg.find(validator.AM_DESCRIPTION_INVALID_JS) != -1
 
 
 @pytest.mark.parametrize('desc,valid,act_offset,message_content', TEST_AMEND_RL_DATA)

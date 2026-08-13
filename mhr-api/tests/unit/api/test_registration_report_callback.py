@@ -22,28 +22,42 @@ import pytest
 from flask import current_app
 
 
-# testdata pattern is ({desc}, {status}, {registration_id})
-# Add more when report available.
+# testdata pattern is ({desc}, {status}, {registration_id}, {has_key}, {has_config_key}, {is_param}, {bad_key})
 TEST_CALLBACK_DATA = [
-    ('Invalid id', HTTPStatus.NOT_FOUND, 300000005),
-    ('Unauthorized', HTTPStatus.UNAUTHORIZED, 300000005)
+    ('Invalid reg id header key', HTTPStatus.NOT_FOUND, 300000005, True, True, False, None),
+    ('Invalid reg id param key', HTTPStatus.NOT_FOUND, 300000005, True, True, True, None),
+    ('Unauthorized no key', HTTPStatus.UNAUTHORIZED, 300000005, False, True, True, None),
+    ('Unauthorized invalid key header', HTTPStatus.UNAUTHORIZED, 300000005, True, True, False, "JUNK"),
+    ('Unauthorized invalid key param', HTTPStatus.UNAUTHORIZED, 300000005, True, True, True, "JUNK"),
+    ('Unauthorized no config key', HTTPStatus.UNAUTHORIZED, 300000005, True, False, True, None),
 ]
 
 
-@pytest.mark.parametrize('desc,status,registration_id', TEST_CALLBACK_DATA)
-def test_registration_report_callback(session, client, jwt, desc, status, registration_id):
+@pytest.mark.parametrize('desc,status,registration_id,has_key,has_config_key,is_param,bad_key', TEST_CALLBACK_DATA)
+def test_registration_report_callback(session, client, jwt, desc, status, registration_id, has_key, has_config_key, is_param, bad_key):
     """Assert that a callback request returns the expected status."""
-    # test
-    if not current_app.config.get('SUBSCRIPTION_API_KEY'):
-        return
+    # setup
+    config_key = current_app.config.get("SUBSCRIPTION_API_KEY", "")
+    if not has_config_key and config_key:
+        current_app.config.update(SUBSCRIPTION_API_KEY="")
+    elif not config_key and has_config_key:
+        current_app.config.update(SUBSCRIPTION_API_KEY="afassdfdssds12342s")
+        config_key = current_app.config.get('SUBSCRIPTION_API_KEY')
+    test_key = bad_key if bad_key else config_key
+    url: str = f"/api/v1/registration-report-callback/{registration_id}"
     headers = None
-    if status != HTTPStatus.UNAUTHORIZED:
-        apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
-        if apikey:
+    if test_key and has_key:
+        if is_param:
+            url += f"?x-apikey={test_key}"
+        else:
             headers = {
-                'x-apikey': apikey
+                'x-apikey': test_key
             }
-    rv = client.post('/api/v1/registration-report-callback/' + str(registration_id),
-                     headers=headers)
+
+    # test
+    rv = client.post(url, headers=headers)
+
+    if not has_config_key and config_key:
+        current_app.config.update(SUBSCRIPTION_API_KEY=config_key)
     # check
     assert rv.status_code == status

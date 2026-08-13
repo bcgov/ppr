@@ -15,7 +15,7 @@
 from http import HTTPStatus
 from typing import List
 
-from flask import current_app
+from flask import current_app, g
 from flask_jwt_oidc import JwtManager
 from requests import Session, exceptions
 from requests.adapters import HTTPAdapter
@@ -52,7 +52,8 @@ SEARCH_USER_GROUP = "mhr_search_user"
 def authorized(identifier: str, jwt: JwtManager) -> bool:  # pylint: disable=too-many-return-statements
     """Verify the user is authorized to submit the request by inspecting the web token.
 
-    The gateway has already verified the JWT with the OIDC service.
+    The gateway has already verified the JWT with the OIDC service: adding an additonal check
+    on the issuer is sufficient.
     """
     if not jwt:
         return False
@@ -64,41 +65,29 @@ def authorized(identifier: str, jwt: JwtManager) -> bool:  # pylint: disable=too
     if not jwt.validate_roles([PPR_ROLE]):
         return False
 
-    # Account ID (idenfifier) is required if not staff.
+    # Token already validated by the gateway: verify the issuer here.
+    token = g.jwt_oidc_token_info
+    if not token:
+        return False
+    if token.get("iss", "") != current_app.config.get("JWT_OIDC_ISSUER", ""):
+        return False
+
+    # Account ID (idenfifier) is required.
     if identifier and identifier.strip() != "":
-        return True
+        return jwt.has_one_of_roles(
+            [
+                STAFF_ROLE,
+                SYSTEM_ROLE,
+                PPR_ROLE,
+                GOV_ACCOUNT_ROLE,
+                BASIC_USER,
+                PRO_DATA_USER,
+            ]
+        )
 
     # Remove when all staff changes made.
     if jwt.validate_roles([STAFF_ROLE]):
         return True
-
-    #        template_url = current_app.config.get('AUTH_SVC_URL')
-    #        auth_url = template_url.format(**vars())
-
-    #        token = jwt.get_token_auth_header()
-    #        headers = {'Authorization': 'Bearer ' + token}
-    #        try:
-    #            http = Session()
-    #            retries = Retry(total=5,
-    #                            backoff_factor=0.1,
-    #                            status_forcelist=[500, 502, 503, 504])
-    #            http.mount('http://', HTTPAdapter(max_retries=retries))
-    #            rv = http.get(url=auth_url, headers=headers)
-
-    #           if rv.status_code != HTTPStatus.OK \
-    #                    or not rv.json().get('roles'):
-    #                return False
-
-    #            if all(elem.lower() in rv.json().get('roles') for elem in action):
-    #                return True
-
-    #        except (exceptions.ConnectionError,  # pylint: disable=broad-except
-    #                exceptions.Timeout,
-    #                ValueError,
-    #                Exception) as err:
-    #            logger.error(f'template_url {template_url}, svc:{auth_url}')
-    #            logger.error(f'Authorization connection failure for {identifier}, using svc:{auth_url}', err)
-    #            return False
 
     return False
 

@@ -14,12 +14,14 @@
 """Data for the JWT tokens."""
 from typing import List
 
+from flask import current_app
 
 STAFF_ROLE = 'staff'
 
 
 def helper_create_jwt(jwt_manager, roles: List[str] = [], username: str = 'test-user'):
     """Create a jwt bearer token with the correct keys, roles and username."""
+    current_app.config.update(JWT_OIDC_ISSUER="https://example.localdomain/auth/realms/example")
     token_header = {
         'alg': 'RS256',
         'typ': 'JWT',

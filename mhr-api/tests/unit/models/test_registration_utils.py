@@ -413,22 +413,13 @@ def test_account_reg_filter(session, account_id, collapse, filter_name, filter_v
     params: AccountRegistrationParams = AccountRegistrationParams(account_id=account_id,
                                                                   collapse=collapse,
                                                                   sbc_staff=False)
-    filter_clause: str = expected_clause
-    if filter_name == reg_utils.REG_TS_PARAM:
-        params.filter_registration_date = filter_value
-        filter_clause = filter_clause.replace('?', filter_value[0:10])
-    elif filter_name == reg_utils.STATUS_PARAM:
+    if filter_name == reg_utils.STATUS_PARAM:
         params.filter_status_type = filter_value
-        filter_clause = filter_clause.replace('?', filter_value)
     elif filter_name == reg_utils.REG_TYPE_PARAM:
         params.filter_registration_type = filter_value
-        filter_clause = filter_clause.replace('?', 'REG_103')
     elif filter_name == reg_utils.MHR_NUMBER_PARAM:
         params.filter_mhr_number = filter_value
-        filter_clause = filter_clause.replace('?', filter_value)
-    else:
-        filter_clause = filter_clause.replace('?', filter_value)
-    if filter_name == reg_utils.CLIENT_REF_PARAM:
+    elif filter_name == reg_utils.CLIENT_REF_PARAM:
         params.filter_client_reference_id = filter_value
     elif filter_name == reg_utils.SUBMITTING_NAME_PARAM:
         params.filter_submitting_name = filter_value
@@ -441,11 +432,55 @@ def test_account_reg_filter(session, account_id, collapse, filter_name, filter_v
 
     base_query: str = queries.QUERY_ACCOUNT_DEFAULT
     filter_query: str = reg_utils.build_account_query_filter(base_query, params)
-    # current_app.logger.info(filter_clause)
-    # current_app.logger.info(filter_query)
-    assert filter_query.find(filter_clause) > 0
+    # current_app.logger.info(expected_clause)
+    assert filter_query.find(expected_clause) > 0
     if account_id != STAFF_ROLE:
         assert filter_query.find("AND mr.registration_ts > now() - interval '14 days'") < 1
+
+
+@pytest.mark.parametrize('account_id,collapse,filter_name,filter_value,mhr_numbers,expected_clause',
+                         TEST_QUERY_FILTER_DATA)
+def test_account_reg_filter_params(session, account_id, collapse, filter_name, filter_value, mhr_numbers, expected_clause):
+    """Assert that account registration query filter bind params are as expected."""
+    params: AccountRegistrationParams = AccountRegistrationParams(account_id=account_id,
+                                                                  collapse=collapse,
+                                                                  sbc_staff=False)
+    if filter_name == reg_utils.STATUS_PARAM:
+        params.filter_status_type = filter_value
+    elif filter_name == reg_utils.REG_TYPE_PARAM:
+        params.filter_registration_type = filter_value
+    elif filter_name == reg_utils.MHR_NUMBER_PARAM:
+        params.filter_mhr_number = filter_value
+    elif filter_name == reg_utils.CLIENT_REF_PARAM:
+        params.filter_client_reference_id = filter_value
+    elif filter_name == reg_utils.SUBMITTING_NAME_PARAM:
+        params.filter_submitting_name = filter_value
+    elif filter_name == reg_utils.USER_NAME_PARAM:
+        params.filter_username = filter_value
+    elif filter_name == reg_utils.DOCUMENT_ID_PARAM:
+        params.filter_document_id = filter_value
+    elif filter_name == reg_utils.MANUFACTURER_NAME_PARAM:
+        params.filter_manufacturer = filter_value
+    bind_params: dict = reg_utils.build_account_query_params(params)
+    if filter_name == reg_utils.STATUS_PARAM:
+        assert bind_params.get("query_status_type") == filter_value
+    elif filter_name == reg_utils.REG_TYPE_PARAM:
+        if filter_value == "TRANSPORT PERMIT":
+            assert bind_params.get("query_reg_type") == "REG_103"
+        else:
+            assert bind_params.get("query_reg_type") == filter_value
+    elif filter_name == reg_utils.MHR_NUMBER_PARAM:
+        assert bind_params.get("query_mhr_num") == filter_value
+    elif filter_name == reg_utils.CLIENT_REF_PARAM:
+        assert bind_params.get("query_client_ref") == filter_value
+    elif filter_name == reg_utils.SUBMITTING_NAME_PARAM:
+        assert bind_params.get("query_sub_name") == filter_value
+    elif filter_name == reg_utils.USER_NAME_PARAM:
+        assert bind_params.get("query_username") == filter_value
+    elif filter_name == reg_utils.DOCUMENT_ID_PARAM:
+        assert bind_params.get("query_doc_id") == filter_value
+    elif filter_name == reg_utils.MANUFACTURER_NAME_PARAM:
+        assert bind_params.get("query_man_name") == filter_value
 
 
 @pytest.mark.parametrize('filter_name,filter_value', TEST_QUERY_STAFF_DATA)
@@ -488,14 +523,26 @@ def test_account_reg_filter_date(session, account_id, collapse, start_value, end
     params: AccountRegistrationParams = AccountRegistrationParams(account_id=account_id,
                                                                 collapse=collapse,
                                                                 sbc_staff=False)
-    filter_clause: str = expected_clause
     params.filter_reg_start_date = start_value
     params.filter_reg_end_date = model_utils.format_ts(model_utils.now_ts())  # end_value
     base_query: str = queries.QUERY_ACCOUNT_DEFAULT
     filter_query: str = reg_utils.build_account_query_filter(base_query, params)
-    # current_app.logger.debug(filter_clause)
-    # current_app.logger.debug(filter_query)
-    assert filter_query.find(filter_clause) > 0
+    # current_app.logger.debug(expected_clause)
+    assert filter_query.find(expected_clause) > 0
+
+
+@pytest.mark.parametrize('account_id,collapse,start_value,end_value,mhr_numbers,expected_clause',
+                         TEST_QUERY_FILTER_DATA_DATE)
+def test_account_reg_filter_date_params(session, account_id, collapse, start_value, end_value, mhr_numbers, expected_clause):
+    """Assert that account registration query filter date bind params are as expected."""
+    params: AccountRegistrationParams = AccountRegistrationParams(account_id=account_id,
+                                                                collapse=collapse,
+                                                                sbc_staff=False)
+    params.filter_reg_start_date = start_value
+    params.filter_reg_end_date = model_utils.format_ts(model_utils.now_ts())  # end_value
+    bind_params: dict = reg_utils.build_account_query_params(params)
+    assert bind_params.get("query_start")
+    assert bind_params.get("query_end")
 
 
 @pytest.mark.parametrize('account_id,collapse,start_value,end_value,second_filter_name,second_filter_value,mhr_numbers,expected_date_clause,expected_second_clause',
