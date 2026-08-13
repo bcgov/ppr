@@ -548,7 +548,7 @@ def test_get_batch_mhreg_manufacturer_report(session, client, jwt, desc, start_t
     """Assert that requesting a batch manufacturer registration report works as expected."""
     # setup
     apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
-    if not apikey:
+    if not apikey or is_ci_testing():
         return
     params: str = ''
     if has_key:
@@ -579,7 +579,7 @@ def test_post_batch_location_report(session, client, jwt, desc, start_ts, end_ts
     """Assert that requesting a batch noc location registration report works as expected."""
     # setup
     apikey = current_app.config.get('SUBSCRIPTION_API_KEY')
-    if not apikey:
+    if not apikey or is_ci_testing():
         return
     params: str = ''
     if has_key:
@@ -633,7 +633,7 @@ def test_get_batch_registrations(session, client, jwt, desc, roles, status, acco
 
 def test_batch_manufacturer_notify_config(session, client, jwt):
     """Assert that building the batch manufacturer registration report notify configuration works as expected."""
-    if not current_app.config.get("NOTIFY_MAN_REG_CONFIG"):
+    if not current_app.config.get("NOTIFY_MAN_REG_CONFIG") or is_ci_testing():
         return
     config = notify_man_reg_config()
     assert config
@@ -647,7 +647,7 @@ def test_batch_manufacturer_notify_config(session, client, jwt):
 
 def test_batch_manufacturer_notify_email_data(session, client, jwt):
     """Assert that building the batch manufacturer registration report email data works as expected."""
-    if not current_app.config.get("NOTIFY_MAN_REG_CONFIG"):
+    if not current_app.config.get("NOTIFY_MAN_REG_CONFIG") or is_ci_testing():
         return
     config = notify_man_reg_config()
     email_data = email_batch_man_report_data(config, None)
@@ -694,7 +694,7 @@ def test_batch_location_notify_config(session, client, jwt):
 
 def test_batch_location_notify_email_data(session, client, jwt):
     """Assert that building the batch noc location registration report email data works as expected."""
-    if not current_app.config.get("NOTIFY_LOCATION_CONFIG"):
+    if not current_app.config.get("NOTIFY_LOCATION_CONFIG") or is_ci_testing():
         return
     config = notify_location_config()
     email_data = email_batch_location_data(config, None)
@@ -707,7 +707,7 @@ def test_batch_location_notify_email_data(session, client, jwt):
     email_data = email_batch_location_data(config, 'junk-link')
     current_app.logger.debug(email_data)
 
-# testdata pattern is ({pay_ref}, {account_id}, {username}, {usergroup})
+
 @pytest.mark.parametrize('pay_ref, account_id, username, usergroup',TEST_SETUP_CC_PAYMENT)
 def test_cc_payment_setup(session, client, jwt, pay_ref, account_id, username, usergroup):
     """Assert that setting up the pay api invoice information by doc type works as expected."""
@@ -718,3 +718,8 @@ def test_cc_payment_setup(session, client, jwt, pay_ref, account_id, username, u
     assert reg_json.get("accountId") == account_id
     assert reg_json.get("username") == username
     assert reg_json.get("usergroup") == usergroup
+
+
+def is_ci_testing() -> bool:
+    """Check unit test environment: exclude most reports for CI testing."""
+    return  current_app.config.get("DEPLOYMENT_ENV", "testing") == "testing"

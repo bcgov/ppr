@@ -253,6 +253,10 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return the search query matching the id."""
         search = None
         if search_id:
+            try:
+                search_id = int(search_id)
+            except (TypeError, ValueError):
+                return None
             search = db.session.query(SearchRequest).filter(SearchRequest.id == search_id).one_or_none()
         return search
 
