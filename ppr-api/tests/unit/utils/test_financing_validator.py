@@ -347,6 +347,33 @@ TEST_MISC_DATA = [
     (DESC_EXCLUDES_LY, False, 'SE', validator.LY_NOT_ALLOWED),
     (DESC_EXCLUDES_LY, False, 'WL', validator.LY_NOT_ALLOWED)
 ]
+# testdata pattern is ({valid}, {value}, {message content})
+TEST_GC_TEXT_DATA = [
+    (True, "Let this note with the words function and alert and console be valid.", None),
+    (True, None, None),
+    (True, "", None),
+    (False, "Invalid var x = function() { return true; };", validator.GC_INVALID_JS),
+    (False, "Invalid let x = function() { return true; };", validator.GC_INVALID_JS),
+    (False, "Invalid <script>invalid();</script>", validator.GC_INVALID_JS),
+    (False, "Invalid <img src=x onerror=alert(document.cookie)>", validator.GC_INVALID_JS),
+]
+
+
+@pytest.mark.parametrize('valid,value,message_content', TEST_GC_TEXT_DATA)
+def test_validate_gc_text(session, valid, value, message_content):
+    """Assert that financing statement general collateral text javascript validation works as expected."""
+    # setup
+    json_data = copy.deepcopy(FINANCING)
+    if value is None:
+        del json_data["generalCollateral"][0]["description"]
+    else:
+        json_data["generalCollateral"][0]["description"] = value
+    error_msg = validator.validate(json_data, 'PS12345')
+    if valid:
+        assert error_msg == ""
+    elif message_content:
+        assert error_msg != ""
+        assert error_msg.find(message_content) != -1
 
 
 @pytest.mark.parametrize('desc,valid,account_id,registering,secured,notices,message_content', TEST_SE_DATA)

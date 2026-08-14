@@ -15,7 +15,7 @@
 from http import HTTPStatus
 from typing import List
 
-from flask import current_app
+from flask import current_app, g
 from flask_jwt_oidc import JwtManager
 from requests import Session, exceptions
 from requests.adapters import HTTPAdapter
@@ -42,6 +42,7 @@ REQUEST_EXEMPTION_RES = "mhr_exemption_res"
 REQUEST_EXEMPTION_NON_RES = "mhr_exemption_non_res"
 TRANSFER_SALE_BENEFICIARY = "mhr_transfer_sale"
 TRANSFER_DEATH_JT = "mhr_transfer_death"
+PAYMENT = "mhr_payment"  # Search only users.
 # MH groups from role combinations
 QUALIFIED_USER_GROUP = "mhr_qualified_user"
 MANUFACTURER_GROUP = "mhr_manufacturer"
@@ -53,7 +54,8 @@ SBC_STAFF_ACCOUNT = "SBC_STAFF"
 def authorized(identifier: str, jwt: JwtManager) -> bool:
     """Verify the user is authorized to submit the request by inspecting the web token.
 
-    The gateway has already verified the JWT with the OIDC service.
+    The gateway has already verified the JWT with the OIDC service: adding an additonal check
+    on the issuer is sufficient.
     """
     if not jwt:
         return False
@@ -61,45 +63,34 @@ def authorized(identifier: str, jwt: JwtManager) -> bool:
     # Could call the auth api here to check the token roles (/api/v1/orgs/{account_id}/authorizations),
     # but JWTManager.validate_roles does the same thing.
 
-    # All users including staff must have the PPR role.
+    # All users including staff must have the MHR role.
     if not jwt.validate_roles([MHR_ROLE]):
         return False
 
-    # Account ID (idenfifier) is required if not staff.
+    # Token already validated by the gateway: verify the issuer here.
+    token = g.jwt_oidc_token_info
+    if not token:
+        return False
+    if token.get("iss", "") != current_app.config.get("JWT_OIDC_ISSUER", ""):
+        return False
+
+    # Account ID (identifier) is required.
     if identifier and identifier.strip() != "":
-        return True
-
-    # Remove when all staff changes made.
-    if jwt.validate_roles([STAFF_ROLE]):
-        return True
-
-    #        template_url = current_app.config.get('AUTH_SVC_URL')
-    #        auth_url = template_url.format(**vars())
-
-    #        token = jwt.get_token_auth_header()
-    #        headers = {'Authorization': 'Bearer ' + token}
-    #        try:
-    #            http = Session()
-    #            retries = Retry(total=5,
-    #                            backoff_factor=0.1,
-    #                            status_forcelist=[500, 502, 503, 504])
-    #            http.mount('http://', HTTPAdapter(max_retries=retries))
-    #            rv = http.get(url=auth_url, headers=headers)
-
-    #           if rv.status_code != HTTPStatus.OK \
-    #                    or not rv.json().get('roles'):
-    #                return False
-
-    #            if all(elem.lower() in rv.json().get('roles') for elem in action):
-    #                return True
-
-    #        except (exceptions.ConnectionError,  # pylint: disable=broad-except
-    #                exceptions.Timeout,
-    #                ValueError,
-    #                Exception) as err:
-    #            logger.error(f'template_url {template_url}, svc:{auth_url}')
-    #            logger.error(f'Authorization connection failure for {identifier}, using svc:{auth_url}', err)
-    #            return False
+        return jwt.has_one_of_roles(
+            [
+                STAFF_ROLE,
+                SYSTEM_ROLE,
+                BCOL_HELP_ROLE,
+                GOV_ACCOUNT_ROLE,
+                PAYMENT,
+                REGISTER_MH,
+                REQUEST_TRANSPORT_PERMIT,
+                REQUEST_EXEMPTION_RES,
+                REQUEST_EXEMPTION_NON_RES,
+                TRANSFER_SALE_BENEFICIARY,
+                TRANSFER_DEATH_JT,
+            ]
+        )
 
     return False
 

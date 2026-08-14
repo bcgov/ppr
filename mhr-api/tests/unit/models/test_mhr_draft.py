@@ -385,8 +385,6 @@ def test_account_filter(session, filter1, value1, filter2, value2, clause1, clau
     filter_clause2: str = None
     if filter1 == reg_utils.START_TS_PARAM:
         params.filter_reg_start_date = value1
-    else:
-        filter_clause = filter_clause.replace('?', value1)      
     if filter1 == reg_utils.REG_TYPE_PARAM:
         params.filter_registration_type = value1
     elif filter1 == reg_utils.MHR_NUMBER_PARAM:
@@ -424,3 +422,58 @@ def test_account_filter(session, filter1, value1, filter2, value2, clause1, clau
     assert filter_query.find(filter_clause) > 0
     if filter_clause2:
       assert filter_query.find(filter_clause2) > 0
+
+
+@pytest.mark.parametrize('filter1,value1,filter2,value2,clause1,clause2', TEST_QUERY_FILTER_DATA)
+def test_account_filter_params(session, filter1, value1, filter2, value2, clause1, clause2):
+    """Assert that the account drafts query filter bind parameters work as expected."""
+    params: AccountRegistrationParams = AccountRegistrationParams(account_id="PS12345",
+                                                                  sbc_staff=False)
+    max_results: int = 100
+    if filter1 == reg_utils.START_TS_PARAM:
+        params.filter_reg_start_date = value1
+    if filter1 == reg_utils.REG_TYPE_PARAM:
+        params.filter_registration_type = value1
+    elif filter1 == reg_utils.MHR_NUMBER_PARAM:
+        params.filter_mhr_number = value1
+    elif filter1 == reg_utils.CLIENT_REF_PARAM:
+        params.filter_client_reference_id = value1
+    elif filter1 == reg_utils.SUBMITTING_NAME_PARAM:
+        params.filter_submitting_name = value1
+    elif filter1 == reg_utils.USER_NAME_PARAM:
+        params.filter_username = value1
+    elif filter1 == reg_utils.MANUFACTURER_NAME_PARAM:
+        params.filter_manufacturer = value1
+    if filter2 and value2:
+      if filter2 == reg_utils.END_TS_PARAM:
+          params.filter_reg_end_date = value2
+      if filter2 == reg_utils.REG_TYPE_PARAM:
+          params.filter_registration_type = value2
+      elif filter2 == reg_utils.MHR_NUMBER_PARAM:
+          params.filter_mhr_number = value2
+      elif filter2 == reg_utils.CLIENT_REF_PARAM:
+          params.filter_client_reference_id = value2
+      elif filter2 == reg_utils.SUBMITTING_NAME_PARAM:
+          params.filter_submitting_name = value2
+      elif filter2 == reg_utils.USER_NAME_PARAM:
+          params.filter_username = value2
+      elif filter2 == reg_utils.MANUFACTURER_NAME_PARAM:
+          params.filter_manufacturer = value2
+
+    bind_params: dict = MhrDraft.build_account_query_params(params, max_results)
+    assert bind_params.get("query_account") == "PS12345"
+    assert bind_params.get("max_results_size") == max_results
+    if params.filter_status_type:
+        assert bind_params.get("query_status_type") == params.filter_status_type
+    if params.filter_registration_type:
+        assert bind_params.get("query_reg_type") == params.filter_registration_type
+    if params.filter_mhr_number:
+        assert bind_params.get("query_mhr_num") == params.filter_mhr_number
+    if params.filter_client_reference_id:
+        assert bind_params.get("query_client_ref") == params.filter_client_reference_id
+    if params.filter_submitting_name:
+        assert bind_params.get("query_sub_name") == params.filter_submitting_name
+    if params.filter_username:
+        assert bind_params.get("query_username") == params.filter_username
+    if params.filter_manufacturer:
+        assert bind_params.get("query_man_name") == params.filter_manufacturer

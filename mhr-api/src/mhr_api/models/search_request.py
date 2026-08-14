@@ -267,16 +267,16 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         """Return a search history summary list of searches executed by an account."""
         history_list = []
         if account_id:
-            query = search_utils.ACCOUNT_SEARCH_HISTORY_DATE_QUERY.replace("?", account_id)
+            query = search_utils.ACCOUNT_SEARCH_HISTORY_DATE_QUERY
             if from_ui:
-                query = search_utils.ACCOUNT_SEARCH_HISTORY_DATE_QUERY_NEW.replace("?", account_id)
+                query = search_utils.ACCOUNT_SEARCH_HISTORY_DATE_QUERY_NEW
             if search_utils.GET_HISTORY_DAYS_LIMIT <= 0:
-                query = search_utils.ACCOUNT_SEARCH_HISTORY_QUERY.replace("?", account_id)
+                query = search_utils.ACCOUNT_SEARCH_HISTORY_QUERY
                 if from_ui:
-                    query = search_utils.ACCOUNT_SEARCH_HISTORY_QUERY_NEW.replace("?", account_id)
+                    query = search_utils.ACCOUNT_SEARCH_HISTORY_QUERY_NEW
             rows = None
             try:
-                result = db.session.execute(text(query))
+                result = db.session.execute(text(query), {"query_value1": account_id.strip()})
                 rows = result.fetchall()
             except Exception as db_exception:  # noqa: B902; return nicer error
                 logger.error("DB find_all_by_account_id exception: " + str(db_exception))

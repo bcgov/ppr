@@ -65,6 +65,7 @@ def validate_note(registration: MhrRegistration, json_data, staff: bool = False,
         error_msg += validate_expiry_ts(registration, json_data, doc_type)
         if doc_type and doc_type == MhrDocumentTypes.NCAN:
             error_msg += validate_ncan(registration, json_data)
+        error_msg += validator_utils.validate_note_remarks(json_data, False)
     except Exception as validation_exception:  # noqa: B902; eat all errors
         logger.error("validate_note exception: " + str(validation_exception))
         error_msg += VALIDATOR_ERROR

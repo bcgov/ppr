@@ -910,13 +910,9 @@ def find_all_by_account_id(params: AccountRegistrationParams):
     try:
         query = text(build_account_query(params))
         # logger.info(query)
-        if params.has_filter() and params.filter_reg_start_date and params.filter_reg_end_date:
-            start_ts = model_utils.search_ts(params.filter_reg_start_date, True)
-            end_ts = model_utils.search_ts(params.filter_reg_end_date, False)
-            # logger.info(f'start_ts={start_ts} end_ts={end_ts}')
-            result = db.session.execute(
-                query, {"query_value1": params.account_id, "query_start": start_ts, "query_end": end_ts}
-            )
+        if params.has_filter():
+            bind_params = build_account_query_params(params)
+            result = db.session.execute(query, bind_params)
         else:
             result = db.session.execute(query, {"query_value1": params.account_id})
         rows = result.fetchall()
@@ -1124,30 +1120,28 @@ def build_account_query(params: AccountRegistrationParams) -> str:
     return query_text
 
 
-def get_multiple_filters(params: AccountRegistrationParams) -> dict:
+def get_multiple_filters(params: AccountRegistrationParams):
     """Build the list of all applied filters as a key/value dictionary."""
     filters = []
     if params.filter_mhr_number:
-        filters.append(("mhrNumber", params.filter_mhr_number))
+        filters.append((MHR_NUMBER_PARAM, params.filter_mhr_number))
     if params.filter_registration_type:
-        filters.append(("registrationType", params.filter_registration_type))
+        filters.append((REG_TYPE_PARAM, params.filter_registration_type))
     if params.filter_reg_start_date:
-        filters.append(("startDateTime", params.filter_reg_start_date))
+        filters.append((START_TS_PARAM, params.filter_reg_start_date))
     if params.filter_status_type:
-        filters.append(("statusType", params.filter_status_type))
+        filters.append((STATUS_PARAM, params.filter_status_type))
     if params.filter_client_reference_id:
-        filters.append(("clientReferenceId", params.filter_client_reference_id))
+        filters.append((CLIENT_REF_PARAM, params.filter_client_reference_id))
     if params.filter_submitting_name:
-        filters.append(("submittingName", params.filter_submitting_name))
+        filters.append((SUBMITTING_NAME_PARAM, params.filter_submitting_name))
     if params.filter_username:
-        filters.append(("username", params.filter_username))
+        filters.append((USER_NAME_PARAM, params.filter_username))
     if params.filter_document_id:
-        filters.append(("documentId", params.filter_document_id))
+        filters.append((DOCUMENT_ID_PARAM, params.filter_document_id))
     if params.filter_manufacturer:
-        filters.append(("manufacturerName", params.filter_manufacturer))
-    if filters:
-        return filters
-    return None
+        filters.append((MANUFACTURER_NAME_PARAM, params.filter_manufacturer))
+    return filters
 
 
 def build_account_query_filter(query_text: str, params: AccountRegistrationParams) -> str:
@@ -1164,26 +1158,38 @@ def build_account_query_filter(query_text: str, params: AccountRegistrationParam
             if not params.collapse:
                 filter_clause = QUERY_ACCOUNT_FILTER_BY.get(filter_type)
             if filter_clause:
-                if filter_type == REG_TYPE_PARAM:
-                    filter_clause = __get_reg_type_filter(filter_value, params.collapse)
-                elif filter_type == STATUS_PARAM and filter_value == MhrRegistrationStatusTypes.DRAFT:
-                    filter_clause = filter_clause.replace("?", MhrRegistrationStatusTypes.ACTIVE)
-                elif filter_type != START_TS_PARAM:
-                    filter_clause = filter_clause.replace("?", filter_value)
                 query_text += filter_clause
     return query_text
 
 
-def __get_reg_type_filter(filter_value: str, collapse: bool) -> dict:
-    """Get the document type from the filter value."""
-    doc_types = MhrDocumentType.find_all()
-    doc_type: str = "missing"
-    for doc_rec in doc_types:
-        if filter_value in (doc_rec.document_type_desc, doc_rec.document_type):
-            doc_type = doc_rec.document_type
-            break
-    if doc_type == "missing":
-        return ""
-    if collapse:
-        return REG_FILTER_REG_TYPE_COLLAPSE.replace("?", doc_type)
-    return REG_FILTER_REG_TYPE.replace("?", doc_type)
+def build_account_query_params(params: AccountRegistrationParams) -> dict:
+    """Build the account registration summary query list of parameter values."""
+    bind_params = {"query_value1": params.account_id}
+    if params.filter_reg_start_date and params.filter_reg_end_date:
+        bind_params["query_start"] = model_utils.search_ts(params.filter_reg_start_date, True)
+        bind_params["query_end"] = model_utils.search_ts(params.filter_reg_end_date, False)
+    if params.filter_mhr_number:
+        bind_params["query_mhr_num"] = params.filter_mhr_number
+    if params.filter_registration_type:
+        doc_types = MhrDocumentType.find_all()
+        doc_type: str = ""
+        for doc_rec in doc_types:
+            if params.filter_registration_type in (doc_rec.document_type_desc, doc_rec.document_type):
+                doc_type = doc_rec.document_type
+                break
+        bind_params["query_reg_type"] = doc_type if doc_type != "" else params.filter_registration_type
+    if params.filter_status_type and params.filter_status_type == MhrRegistrationStatusTypes.DRAFT:
+        bind_params["query_status_type"] = MhrRegistrationStatusTypes.ACTIVE
+    elif params.filter_status_type:
+        bind_params["query_status_type"] = params.filter_status_type
+    if params.filter_client_reference_id:
+        bind_params["query_client_ref"] = params.filter_client_reference_id
+    if params.filter_submitting_name:
+        bind_params["query_sub_name"] = params.filter_submitting_name
+    if params.filter_username:
+        bind_params["query_username"] = params.filter_username
+    if params.filter_document_id:
+        bind_params["query_doc_id"] = params.filter_document_id
+    if params.filter_manufacturer:
+        bind_params["query_man_name"] = params.filter_manufacturer
+    return bind_params
