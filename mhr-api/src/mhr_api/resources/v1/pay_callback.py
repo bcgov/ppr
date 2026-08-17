@@ -115,11 +115,12 @@ def post_payment_callback(invoice_id: str):  # pylint: disable=too-many-return-s
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception, None, "POST pay callback event")
     except Exception as default_err:  # noqa: B902; return nicer default error
+        logger.error(f"post callback error {default_err}")
         return pay_callback_error(
             resource_utils.CallbackExceptionCodes.DEFAULT,
             invoice_id,
             HTTPStatus.INTERNAL_SERVER_ERROR,
-            str(default_err),
+            "post callback error",
         )
 
 
@@ -381,9 +382,10 @@ def complete_registration(
         cc_payment_utils.track_event("10", draft.user_id, HTTPStatus.OK, msg)
         return update_draft(draft)
     except Exception as default_err:  # noqa: B902; return nicer default error
+        logger.error(f"complete_registration error {default_err}")
         return pay_callback_error(
             resource_utils.CallbackExceptionCodes.DEFAULT,
             invoice_id,
             HTTPStatus.INTERNAL_SERVER_ERROR,
-            str(default_err),
+            "complete registration error",
         )

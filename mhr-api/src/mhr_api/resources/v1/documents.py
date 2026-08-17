@@ -13,6 +13,7 @@
 # limitations under the License.
 """API endpoints for requests to maintain MH documents."""
 
+from html import escape
 from http import HTTPStatus
 
 from flask import Blueprint, jsonify, request
@@ -69,7 +70,7 @@ def get_verify_ids(document_id: str):
         if not authorized(account_id, jwt):
             return resource_utils.unauthorized_error_response(account_id)
         # Verify the doc id, start with a valid response.
-        response_json = {"documentId": document_id, "exists": False, "valid": True}
+        response_json = {"documentId": escape(document_id), "exists": False, "valid": True}
         error_msg = registration_validator.validate_doc_id(response_json)
         if error_msg and error_msg.find(registration_validator.DOC_ID_EXISTS) != -1:
             response_json["exists"] = True

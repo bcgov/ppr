@@ -148,13 +148,13 @@ def db_exception_response(exception, account_id: str, context: str):
     """Build a database error response."""
     message = DATABASE.format(code=ResourceErrorCodes.DATABASE_ERR.value, context=context, account_id=account_id)
     logger.error(message)
-    return jsonify({"message": message, "detail": str(exception)}), HTTPStatus.INTERNAL_SERVER_ERROR
+    return jsonify({"message": message, "detail": "Internal database error."}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 
 def business_exception_response(exception):
     """Build business exception error response."""
     logger.error(str(exception))
-    return jsonify({"message": exception.error}), exception.status_code
+    return jsonify({"message": exception.error, "detail": "Interal business error."}), exception.status_code
 
 
 def pay_exception_response(exception: SBCPaymentException, account_id: str = None):
@@ -170,14 +170,14 @@ def pay_exception_response(exception: SBCPaymentException, account_id: str = Non
         )
 
     logger.error(str(exception))
-    return jsonify({"message": message, "detail": str(exception)}), HTTPStatus.PAYMENT_REQUIRED
+    return jsonify({"message": message, "detail": "Internal payment service error."}), HTTPStatus.PAYMENT_REQUIRED
 
 
 def default_exception_response(exception):
     """Build default 500 exception error response."""
     logger.error(str(exception))
     message = DEFAULT.format(code=ResourceErrorCodes.DEFAULT_ERR.value)
-    return jsonify({"message": message, "detail": str(exception)}), HTTPStatus.INTERNAL_SERVER_ERROR
+    return jsonify({"message": message, "detail": "Internal service error."}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 
 def service_exception_response(message):

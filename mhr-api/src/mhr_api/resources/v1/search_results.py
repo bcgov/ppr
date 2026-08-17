@@ -396,16 +396,12 @@ def enqueue_search_report(search_id: str):
         logger.info(f"Enqueue search report successful for id={search_id}.")
     except Exception as err:  # noqa: B902; do not alter app processing
         logger.error(f"Enqueue search report failed for id={search_id}: " + str(err))
-        try:
-            key_id_int = int(search_id)
-            EventTracking.create(
-                key_id_int,
-                EventTracking.EventTrackingTypes.SEARCH_REPORT,
-                int(HTTPStatus.INTERNAL_SERVER_ERROR),
-                "Enqueue search report event failed: " + str(err),
-            )
-        except (TypeError, ValueError):
-            logger.warning(f"EventTracking not created for enqueue failure: invalid id={search_id}")
+        EventTracking.create(
+            search_id,
+            EventTracking.EventTrackingTypes.SEARCH_REPORT,
+            int(HTTPStatus.INTERNAL_SERVER_ERROR),
+            "Enqueue search report event failed: " + str(err),
+        )
 
 
 def generate_search_report(search_detail: SearchResult, search_id: str):
@@ -435,26 +431,16 @@ def generate_search_report(search_detail: SearchResult, search_id: str):
     search_detail.save()
 
     # Track success event.
-    try:
-        key_id_int = int(search_id)
-        EventTracking.create(key_id_int, EventTracking.EventTrackingTypes.SEARCH_REPORT, int(HTTPStatus.OK))
-    except (TypeError, ValueError):
-        logger.warning(f"EventTracking not created: invalid id={search_id}")
+    EventTracking.create(search_id, EventTracking.EventTrackingTypes.SEARCH_REPORT, int(HTTPStatus.OK))
     return raw_data, status_code, {"Content-Type": "application/pdf"}
 
 
 def report_error(code: str, search_id: str, status_code, message: str = None):
     """Return to the event listener callback error response based on the code."""
     error = CALLBACK_MESSAGES[code].format(search_id=search_id)
-    if message:
-        error += " " + message
-    logger.error(error)
+    logger.error(f"{error} {message}")
     # Track event here.
-    try:
-        key_id_int = int(search_id)
-        EventTracking.create(key_id_int, EventTracking.EventTrackingTypes.SEARCH_REPORT, status_code, message)
-    except (TypeError, ValueError):
-        logger.warning(f"EventTracking not created: invalid id={search_id}")
+    EventTracking.create(search_id, EventTracking.EventTrackingTypes.SEARCH_REPORT, status_code, message)
     return resource_utils.error_response(status_code, error)
 
 
