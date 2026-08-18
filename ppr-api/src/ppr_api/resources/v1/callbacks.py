@@ -86,9 +86,8 @@ def post_mail_report():  # pylint: disable=too-many-return-statements
             db_exception, None, "POST callback mail verification report DB error."
         )
     except Exception as default_err:  # noqa: B902; return nicer default error
-        return mail_callback_error(
-            mail_report, HTTPStatus.INTERNAL_SERVER_ERROR, "Callback default error: " + str(default_err)
-        )
+        logger.error(f"Mail callback error: {default_err}")
+        return mail_callback_error(mail_report, HTTPStatus.INTERNAL_SERVER_ERROR, "Mail callback error.")
 
 
 @bp.route("/mail-report", methods=["GET", "OPTIONS"])
@@ -176,7 +175,8 @@ def post_payment_callback(invoice_id: str):  # pylint: disable=too-many-return-s
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception, None, "POST pay callback event")
     except Exception as default_err:  # noqa: B902; return nicer default error
-        return pay_callback_error("00", invoice_id, HTTPStatus.INTERNAL_SERVER_ERROR, str(default_err))
+        logger.error(f"Post payment callback error: {default_err}")
+        return pay_callback_error("00", invoice_id, HTTPStatus.INTERNAL_SERVER_ERROR, "Post payment callback error.")
 
 
 def get_search_id(invoice_id: str):
@@ -200,7 +200,7 @@ def pay_callback_search(search_id: int, invoice_id: str):
     """Handle a payment complete notification for a search request."""
     search_result: SearchResult = SearchResult.find_by_search_id(search_id)
     if not search_result:
-        return pay_callback_error("13", invoice_id, HTTPStatus.NOT_FOUND)
+        return pay_callback_error("13", invoice_id, HTTPStatus.NOT_FOUND, "")
     if not search_result.is_payment_pending():
         return pay_callback_error("14", invoice_id, HTTPStatus.BAD_REQUEST, f"Search id={search_id}")
     logger.info(f"Request valid for invoice id={invoice_id} search id={search_id}, marking search as completed.")
@@ -256,7 +256,10 @@ def complete_registration(draft: Draft, statement: FinancingStatement, request_j
         cc_payment_utils.track_event("10", draft.user_id, HTTPStatus.OK, msg)
         return update_draft(draft)
     except Exception as default_err:  # noqa: B902; return nicer default error
-        return pay_callback_error("00", invoice_id, HTTPStatus.INTERNAL_SERVER_ERROR, str(default_err))
+        logger.error(f"Complete registration error: {default_err}")
+        return pay_callback_error(
+            "00", invoice_id, HTTPStatus.INTERNAL_SERVER_ERROR, "Pay callback complete registration error."
+        )
 
 
 def update_registration_status(base_reg: Registration):
@@ -325,22 +328,25 @@ def generate_mail_callback_report(mail_report: MailReport):  # pylint: disable=t
         mail_report.save()
         return {}, HTTPStatus.OK, {"Content-Type": "application/json"}
     except ReportException as report_err:
+        logger.error(f"POST callback mail verification report error: {report_err}")
         return mail_callback_error(
-            mail_report, HTTPStatus.INTERNAL_SERVER_ERROR, "Callback report generation error: " + str(report_err)
+            mail_report, HTTPStatus.INTERNAL_SERVER_ERROR, "POST callback mail verification report error."
         )
     except ReportDataException as report_data_err:
-        return mail_callback_error(
-            mail_report, HTTPStatus.INTERNAL_SERVER_ERROR, "Callback report data error: " + str(report_data_err)
-        )
+        logger.error(f"POST callback mail verification report data error: {report_data_err}")
+        return mail_callback_error(mail_report, HTTPStatus.INTERNAL_SERVER_ERROR, "Callback report data error.")
     except StorageException as storage_err:
+        logger.error(f"POST callback mail verification report storage error: {storage_err}")
         return mail_callback_error(
-            mail_report, HTTPStatus.INTERNAL_SERVER_ERROR, "Callback report cloud storage error: " + str(storage_err)
+            mail_report, HTTPStatus.INTERNAL_SERVER_ERROR, "POST callback mail verification report storage error."
         )
     except DatabaseException as db_exception:
+        logger.error(f"POST callback mail verification report DB error: {db_exception}")
         return resource_utils.db_exception_response(
             db_exception, None, "POST callback mail verification report DB error."
         )
     except Exception as default_err:  # noqa: B902; return nicer default error
+        logger.error(f"POST callback mail verification report default error: {default_err}")
         return mail_callback_error(
-            mail_report, HTTPStatus.INTERNAL_SERVER_ERROR, "Callback default error: " + str(default_err)
+            mail_report, HTTPStatus.INTERNAL_SERVER_ERROR, "POST callback mail verification report default error."
         )

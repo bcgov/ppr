@@ -38,7 +38,7 @@ from ppr_api.utils.logging import logger
 SEARCH_HISTORICAL_ID_QUERY = """
 select MAX(id)
   from registrations
- where registration_ts <= (TO_TIMESTAMP('?', 'YYYY-MM-DD HH24:MI:SSTZHH') at time zone 'utc')
+ where registration_ts <= (TO_TIMESTAMP(:query_value, 'YYYY-MM-DD HH24:MI:SSTZHH') at time zone 'utc')
    and id < 200000000
 """
 # Serial number search base where clause
@@ -209,9 +209,8 @@ HISTORICAL_REF_ID: str = "HISTORICAL SEARCH"
 
 def get_search_historical_id(search_timestamp: str) -> int:
     """Execute a search to get the total match count for the search criteria. Only call if limit reached."""
-    query_text = SEARCH_HISTORICAL_ID_QUERY.replace("?", search_timestamp.replace("T", " "))
-    query = text(query_text)
-    result = db.session.execute(query)
+    query = text(SEARCH_HISTORICAL_ID_QUERY)
+    result = db.session.execute(query, {"query_value": search_timestamp.replace("T", " ")})
     historical_reg_id: int = 0
     if result:
         row = result.first()

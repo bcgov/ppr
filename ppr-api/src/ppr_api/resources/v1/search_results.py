@@ -140,7 +140,7 @@ def post_search_results(search_id: str):  # pylint: disable=too-many-branches,to
 @bp.route("/<string:search_id>", methods=["GET", "OPTIONS"])
 @cross_origin(origin="*")
 @jwt.requires_auth
-def get_search_results(search_id: str):  # pylint: disable=too-many-branches,too-many-locals
+def get_search_results(search_id: str):  # pylint: disable=too-many-branches,too-many-locals,too-many-statements
     """Get search detail information for a previous search."""
     try:
         if search_id is None:
@@ -360,11 +360,13 @@ def post_notifications(search_id: str):  # pylint: disable=too-many-branches, to
             search_id_int = int(search_id)
         except (ValueError, TypeError):
             return notification_error(
-                resource_utils.CallbackExceptionCodes.INVALID_ID, search_id, HTTPStatus.BAD_REQUEST
+                resource_utils.CallbackExceptionCodes.INVALID_ID, search_id, HTTPStatus.BAD_REQUEST, ""
             )
         search_detail = SearchResult.find_by_search_id(search_id_int, False)
         if not search_detail:
-            return notification_error(resource_utils.CallbackExceptionCodes.UNKNOWN_ID, search_id, HTTPStatus.NOT_FOUND)
+            return notification_error(
+                resource_utils.CallbackExceptionCodes.UNKNOWN_ID, search_id, HTTPStatus.NOT_FOUND, ""
+            )
 
         # Check if search result is async: always have callback_url.
         callback_url = search_detail.callback_url
@@ -431,11 +433,13 @@ def results_pdf_response(
 def callback_error(code: str, search_id: str, status_code, message: str = None):
     """Return to the event listener callback error response based on the code."""
     error = CALLBACK_MESSAGES[code].format(search_id=search_id)
-    if message:
-        error += " " + message
-    logger.error(error)
+    logger.error(f"{error}: message={message}")
     # Track event here.
-    EventTracking.create(search_id, EventTracking.EventTrackingTypes.SEARCH_REPORT, status_code, message)
+    try:
+        key_id_int = int(search_id)
+        EventTracking.create(key_id_int, EventTracking.EventTrackingTypes.SEARCH_REPORT, status_code, message)
+    except (TypeError, ValueError):
+        logger.error(f"Callback error search id {search_id} not valid integer, skipping event tracking.")
     if status_code != HTTPStatus.BAD_REQUEST and code not in (
         resource_utils.CallbackExceptionCodes.MAX_RETRIES.value,
         resource_utils.CallbackExceptionCodes.UNKNOWN_ID.value,
@@ -448,11 +452,13 @@ def callback_error(code: str, search_id: str, status_code, message: str = None):
 def notification_error(code: str, search_id: str, status_code, message: str = None):
     """Return to the event listener a notification error response based on the status code."""
     error = CALLBACK_MESSAGES[code].format(search_id=search_id)
-    if message:
-        error += " " + message
-    logger.error(error)
+    logger.error(f"{error} message={message}")
     # Track event here.
-    EventTracking.create(search_id, EventTracking.EventTrackingTypes.API_NOTIFICATION, status_code, message)
+    try:
+        key_id_int = int(search_id)
+        EventTracking.create(key_id_int, EventTracking.EventTrackingTypes.API_NOTIFICATION, status_code, message)
+    except (TypeError, ValueError):
+        logger.error(f"Callback notification search id {search_id} not valid integer, skipping event tracking.")
     if status_code != HTTPStatus.BAD_REQUEST and code not in (
         resource_utils.CallbackExceptionCodes.MAX_RETRIES.value,
         resource_utils.CallbackExceptionCodes.UNKNOWN_ID.value,
@@ -528,9 +534,9 @@ def enqueue_notification(search_id: str):
         GoogleQueueService().publish_notification(payload)
         logger.info(f"Enqueue notification successful for id={search_id}.")
     except Exception as err:  # noqa: B902; do not alter app processing
-        logger.error(f"Enqueue notification failed for id={search_id}: " + str(err))
+        logger.error(f"Enqueue notification failed for id={search_id}: {err}")
         EventTracking.create(
-            search_id,
+            int(search_id),
             EventTracking.EventTrackingTypes.API_NOTIFICATION,
             int(HTTPStatus.INTERNAL_SERVER_ERROR),
             "Enqueue api notification event failed: " + str(err),

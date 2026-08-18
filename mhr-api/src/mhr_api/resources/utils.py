@@ -147,7 +147,7 @@ def validation_error_response(errors, cause, additional_msg: str = None):
 def db_exception_response(exception, account_id: str, context: str):
     """Build a database error response."""
     message = DATABASE.format(code=ResourceErrorCodes.DATABASE_ERR.value, context=context, account_id=account_id)
-    logger.error(message)
+    logger.error(f"{message} {exception}")
     return jsonify({"message": message, "detail": "Internal database error."}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 
