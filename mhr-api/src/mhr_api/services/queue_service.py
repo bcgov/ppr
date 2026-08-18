@@ -75,6 +75,9 @@ class GoogleQueueService:
     def publish(self, topic_name, payload_json):
         """Publish the payload to the specified topic."""
         payload = json.dumps(payload_json).encode("utf-8")
-        logger.info("Publishing topic=" + topic_name + ", payload=" + json.dumps(payload_json))
+        key = payload_json.get("apikey", "")
+        payload_json["apikey"] = ""
+        logger.info(f"Publishing topic={topic_name}, payload=" + json.dumps(payload_json))
+        payload_json["apikey"] = key
         future = GoogleQueueService.publisher.publish(topic_name, payload)
         future.result()
