@@ -165,6 +165,7 @@ TEST_QUERY_FILTER_DATA = [
     ('PS12345', False, reg_utils.REG_TYPE_PARAM, 'TRANSPORT PERMIT', "'000926'", queries.REG_FILTER_REG_TYPE),
     ('PS12345', False, reg_utils.REG_TYPE_PARAM, 'REG_103', "'000926'", queries.REG_FILTER_REG_TYPE),
     ('PS12345', True, reg_utils.STATUS_PARAM, 'EXEMPT', "'000912'", queries.REG_FILTER_STATUS_COLLAPSE),
+    ('PS12345', True, reg_utils.STATUS_PARAM, 'DRAFT', "'000912'", queries.REG_FILTER_STATUS_DRAFT),
     ('PS12345', False, reg_utils.STATUS_PARAM, 'EXEMPT', "'000912'", queries.REG_FILTER_STATUS),
     ('PS12345', False, reg_utils.DOCUMENT_ID_PARAM, 'UT000004', "'000903'", queries.REG_FILTER_DOCUMENT_ID),
     ('PS12345', True, reg_utils.DOCUMENT_ID_PARAM, 'UT000004', "'000903'", queries.REG_FILTER_DOCUMENT_ID_COLLAPSE),
@@ -463,7 +464,10 @@ def test_account_reg_filter_params(session, account_id, collapse, filter_name, f
         params.filter_manufacturer = filter_value
     bind_params: dict = reg_utils.build_account_query_params(params)
     if filter_name == reg_utils.STATUS_PARAM:
-        assert bind_params.get("query_status_type") == filter_value
+        if filter_value != "DRAFT":
+            assert bind_params.get("query_status_type") == filter_value
+        else:
+            assert "query_status_type" not in bind_params
     elif filter_name == reg_utils.REG_TYPE_PARAM:
         if filter_value == "TRANSPORT PERMIT":
             assert bind_params.get("query_reg_type") == "REG_103"

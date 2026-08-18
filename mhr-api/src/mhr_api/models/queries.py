@@ -314,6 +314,14 @@ REG_FILTER_STATUS_COLLAPSE = """
                            AND r2.registration_type IN ('MHREG', 'MHREG_CONVERSION')
                            AND r2.status_type = :query_status_type)
 """
+REG_FILTER_STATUS_DRAFT = """
+ AND arv.mhr_number IN (SELECT DISTINCT d.mhr_number
+                          FROM mhr_drafts d
+                         WHERE arv.mhr_number = d.mhr_number
+                           AND d.account_id = :query_value1
+                           AND LEFT(d.draft_number, 1) NOT IN ('P', 'R')
+                           AND NOT EXISTS (SELECT r2.id FROM mhr_registrations r2 WHERE r2.draft_id = d.id))
+"""
 REG_FILTER_SUBMITTING_NAME = " AND position(:query_sub_name in arv.summary_snapshot ->> 'submitting_name') > 0"
 REG_FILTER_SUBMITTING_NAME_COLLAPSE = """
  AND arv.mhr_number IN (SELECT DISTINCT arv2.mhr_number
