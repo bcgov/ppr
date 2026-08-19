@@ -29,13 +29,6 @@ from ppr_api.utils.logging import logger
 
 from .db import db
 
-ACCOUNT_QUERY = """
-SELECT d.create_ts, d.registration_type_cl, d.registration_type, d.document_number, d.registration_number
-  FROM drafts d
- WHERE d.account_id = '?'
-   AND NOT EXISTS (SELECT r.draft_id FROM registrations r WHERE r.draft_id = d.id)
-"""
-
 PARAM_TO_ORDER_BY = {
     "registrationNumber": "document_number",
     "registrationType": "registration_type",

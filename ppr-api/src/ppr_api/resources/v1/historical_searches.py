@@ -93,9 +93,8 @@ def post_historical_searches():  # pylint: disable=too-many-locals,too-many-retu
         update_response_data(results_data, rep_url)
         return jsonify(results_data), HTTPStatus.CREATED, {"Content-Type": "application/json"}
     except StorageException as storage_err:
-        return resource_utils.error_response(
-            HTTPStatus.INTERNAL_SERVER_ERROR, "Unable to save report to doc storage: " + str(storage_err)
-        )
+        logger.error(f"POST historical search storage error: {storage_err}")
+        return resource_utils.error_response(HTTPStatus.INTERNAL_SERVER_ERROR, "POST historical search storage error.")
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception, "HIST_SEARCH", "POST historical search")
     except BusinessException as exception:

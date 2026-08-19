@@ -267,7 +267,7 @@ QUERY_ACCOUNT_REG_NAME_CLAUSE_NEW = """
 QUERY_ACCOUNT_STATUS_CLAUSE = " AND arv.state = :status_type"
 QUERY_ACCOUNT_REG_TYPE_CLAUSE = " AND arv.registration_type = :registration_type"
 QUERY_ACCOUNT_REG_DATE_CLAUSE = """
- AND arv.registration_ts BETWEEN TO_TIMESTAMP(start_ts) AND TO_TIMESTAMP(end_ts)
+ AND arv.registration_ts BETWEEN TO_TIMESTAMP(:start_ts) AND TO_TIMESTAMP(:end_ts)
  """
 QUERY_ACCOUNT_CHANGE_REG_CLASS_CLAUSE = " AND arv2.registration_type_cl IN ('CROWNLIEN', 'MISCLIEN', 'PPSALIEN')"
 QUERY_ACCOUNT_CHANGE_REG_NUM_CLAUSE = " AND arv2.registration_number LIKE :reg_num || '%'"
@@ -276,7 +276,7 @@ QUERY_ACCOUNT_CHANGE_REG_NAME_CLAUSE = " AND arv2.registering_name LIKE '%' || :
 QUERY_ACCOUNT_CHANGE_STATUS_CLAUSE = " AND arv2.state = :status_type"
 QUERY_ACCOUNT_CHANGE_REG_TYPE_CLAUSE = " AND arv2.registration_type = :registration_type"
 QUERY_ACCOUNT_CHANGE_REG_DATE_CLAUSE = """
- AND arv2.registration_ts BETWEEN TO_TIMESTAMP(start_ts) AND TO_TIMESTAMP(end_ts)
+ AND arv2.registration_ts BETWEEN TO_TIMESTAMP(:start_ts) AND TO_TIMESTAMP(:end_ts)
  """
 QUERY_UPDATE_ACCOUNT_ID_REMOVE = """
 UPDATE registrations
@@ -496,10 +496,6 @@ def build_account_reg_base_query(params: AccountRegistrationParams) -> str:
 def build_reg_date_clause(params: AccountRegistrationParams, base_query: bool) -> str:
     """Build the account registration base query date range clause from the provided parameters."""
     clause: str = QUERY_ACCOUNT_REG_DATE_CLAUSE if base_query else QUERY_ACCOUNT_CHANGE_REG_DATE_CLAUSE
-    start_ts: str = str(model_utils.ts_from_iso_format(params.start_date_time).timestamp())
-    end_ts: str = str(model_utils.ts_from_iso_format(params.end_date_time).timestamp())
-    clause = clause.replace("start_ts", start_ts)
-    clause = clause.replace("end_ts", end_ts)
     return clause
 
 
@@ -582,6 +578,10 @@ def build_account_query_params(params: AccountRegistrationParams, api_filter: bo
         query_params["registering_name"] = params.registering_name
     if params.status_type:
         query_params["status_type"] = params.status_type
+    if params.start_date_time and params.end_date_time:
+        query_params["start_ts"] = str(model_utils.ts_from_iso_format(params.start_date_time).timestamp())
+        query_params["end_ts"] = str(model_utils.ts_from_iso_format(params.end_date_time).timestamp())
+
     return query_params
 
 

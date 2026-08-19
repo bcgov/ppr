@@ -275,8 +275,7 @@ def get_verification_report_data(registration_id: int, json_data, account_id: st
 def callback_error(code: str, registration_id: int, status_code, party_id: int, message: str = None):
     """Return the event listener callback error response based on the code."""
     error: str = CALLBACK_MESSAGES[code].format(key_id=registration_id)
-    if message:
-        error += " " + message
+    logger.error(f"Callback error status={status_code}: {error} message: {message}")
     # Track event here.
     EventTracking.create(registration_id, EventTracking.EventTrackingTypes.SURFACE_MAIL, status_code, message)
     if status_code != HTTPStatus.BAD_REQUEST and code not in (
@@ -292,9 +291,7 @@ def callback_error(code: str, registration_id: int, status_code, party_id: int, 
 def registration_callback_error(code: str, registration_id: int, status_code, message: str = None):
     """Return the registration report event listener callback error response based on the code."""
     error: str = CALLBACK_MESSAGES[code].format(key_id=registration_id)
-    if message:
-        error += " " + message
-    logger.info(f"Registration callback error status={status_code}: {error}")
+    logger.error(f"Registration callback error status={status_code}: {error} message: {message}")
     # Track event here.
     EventTracking.create(registration_id, EventTracking.EventTrackingTypes.REGISTRATION_REPORT, status_code, message)
     if status_code != HTTPStatus.BAD_REQUEST and code not in (
@@ -447,10 +444,13 @@ def get_registration_report(  # pylint: disable=too-many-return-statements,too-m
         verification_report.save()
         return raw_data, response_status, headers
     except ReportException as report_err:
-        return resource_utils.service_exception_response("Report API error: " + str(report_err))
+        logger.error(f"Report API error: {report_err}")
+        return resource_utils.service_exception_response("Report API error")
     except ReportDataException as report_data_err:
-        return resource_utils.service_exception_response("Report API data error: " + str(report_data_err))
+        logger.error(f"Report API data error: {report_data_err}")
+        return resource_utils.service_exception_response("Report API data error.")
     except StorageException as storage_err:
-        return resource_utils.service_exception_response("Report storage API error: " + str(storage_err))
+        logger.error(f"Report storage API error: {storage_err}")
+        return resource_utils.service_exception_response("Report storage API error.")
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception, None, "Generate registration report state.")

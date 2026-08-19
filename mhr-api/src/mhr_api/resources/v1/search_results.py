@@ -446,9 +446,7 @@ def generate_search_report(search_detail: SearchResult, search_id: str):
 def report_error(code: str, search_id: str, status_code, message: str = None):
     """Return to the event listener callback error response based on the code."""
     error = CALLBACK_MESSAGES[code].format(search_id=search_id)
-    if message:
-        error += " " + message
-    logger.error(error)
+    logger.error(f"{error} {message}")
     # Track event here.
     try:
         key_id_int = int(search_id)

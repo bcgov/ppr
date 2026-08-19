@@ -52,6 +52,7 @@ from mhr_api.models.queries import (
     REG_FILTER_REG_TYPE_COLLAPSE,
     REG_FILTER_STATUS,
     REG_FILTER_STATUS_COLLAPSE,
+    REG_FILTER_STATUS_DRAFT,
     REG_FILTER_SUBMITTING_NAME,
     REG_FILTER_SUBMITTING_NAME_COLLAPSE,
     REG_FILTER_USERNAME,
@@ -1121,7 +1122,7 @@ def build_account_query(params: AccountRegistrationParams) -> str:
 
 
 def get_multiple_filters(params: AccountRegistrationParams):
-    """Build the list of all applied filters as a key/value dictionary."""
+    """Build the list of all applied filters as a key/value list."""
     filters = []
     if params.filter_mhr_number:
         filters.append((MHR_NUMBER_PARAM, params.filter_mhr_number))
@@ -1153,8 +1154,11 @@ def build_account_query_filter(query_text: str, params: AccountRegistrationParam
         filter_type = query_filter[0]
         filter_value = query_filter[1]
         if filter_type and filter_value:
-            # Filter may exclude parent MH registrations, so use a different query to include base registrations.
-            filter_clause = QUERY_ACCOUNT_FILTER_BY_COLLAPSE.get(filter_type)
+            if filter_type == STATUS_PARAM and params.filter_status_type == MhrRegistrationStatusTypes.DRAFT.value:
+                filter_clause = REG_FILTER_STATUS_DRAFT
+            else:
+                # Filter may exclude parent MH registrations, so use a different query to include base registrations.
+                filter_clause = QUERY_ACCOUNT_FILTER_BY_COLLAPSE.get(filter_type)
             if not params.collapse:
                 filter_clause = QUERY_ACCOUNT_FILTER_BY.get(filter_type)
             if filter_clause:
@@ -1178,9 +1182,7 @@ def build_account_query_params(params: AccountRegistrationParams) -> dict:
                 doc_type = doc_rec.document_type
                 break
         bind_params["query_reg_type"] = doc_type if doc_type != "" else params.filter_registration_type
-    if params.filter_status_type and params.filter_status_type == MhrRegistrationStatusTypes.DRAFT:
-        bind_params["query_status_type"] = MhrRegistrationStatusTypes.ACTIVE
-    elif params.filter_status_type:
+    if params.filter_status_type and params.filter_status_type != MhrRegistrationStatusTypes.DRAFT.value:
         bind_params["query_status_type"] = params.filter_status_type
     if params.filter_client_reference_id:
         bind_params["query_client_ref"] = params.filter_client_reference_id

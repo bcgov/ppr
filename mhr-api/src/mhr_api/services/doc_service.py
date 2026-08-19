@@ -31,7 +31,7 @@ def doc_id_lookup(document_id: str, auth_header: str = None) -> dict:
     apikey: str = current_app.config.get("DOC_SERVICE_KEY")
     account_id = current_app.config.get("DOC_SERVICE_ACCOUNT_ID")
     if not service_url or not apikey or not account_id:
-        logger.info(f"Missing required service config var url={service_url} apikey={apikey} acount={account_id}")
+        logger.info(f"Missing required service config var url={service_url} apikey=? account={account_id}")
         return response
     api_url: str = service_url + SEARCH_DOC_ID + document_id
     try:
@@ -61,7 +61,7 @@ def doc_id_lookup_staff(document_id: str, account_id: str, auth_header: str = No
     service_url: str = current_app.config.get("DOC_SERVICE_URL")
     apikey: str = current_app.config.get("DOC_SERVICE_KEY")
     if not service_url or not apikey:
-        logger.info(f"Missing required service config var url={service_url} apikey={apikey}")
+        logger.info(f"Missing required service config var url={service_url} apikey=?")
         return response
     api_url: str = service_url + SEARCH_DOC_ID + document_id
     try:

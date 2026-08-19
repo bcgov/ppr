@@ -28,11 +28,11 @@ VERSION_CURRENT = "current"
 VERSION_LATEST = "latest"
 UPDATE_USER_PROFILE = """
 UPDATE user_profiles
-   SET service_agreements = '{agreement}'
+   SET service_agreements = :query_agreement
  WHERE id = (SELECT id
                FROM users
-              WHERE account_id = '{account_id}'
-                AND username = '{username}')
+              WHERE account_id = :query_account_id
+                AND username = :query_username)
 """
 SELECT_USER_PROFILE = """
 SELECT up.service_agreements
@@ -118,11 +118,10 @@ class MhrServiceAgreement(db.Model):
         agreement_json: dict = copy.deepcopy(json_data)
         agreement_json["acceptAgreementRequired"] = False
         agreement = json.dumps(agreement_json)
-        query_s = UPDATE_USER_PROFILE
-        query_s = query_s.format(agreement=agreement, account_id=account_id, username=username)
-        # logger.debug(f'Executing update query {query_s}')
-        query = text(query_s)
-        result = db.session.execute(query)
+        query = text(UPDATE_USER_PROFILE)
+        result = db.session.execute(
+            query, {"query_agreement": agreement, "query_account_id": account_id, "query_username": username}
+        )
         update_count = result.rowcount
         db.session.commit()
         if result:

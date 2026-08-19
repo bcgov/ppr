@@ -32,7 +32,7 @@ select r.id, r.account_id, r.registration_ts, rr.id, rr.report_data, rr.batch_st
    and r.account_id = m.account_id
    and r.registration_type = 'MHREG'
    and r.registration_ts between (now() - interval '1 days') and now()
-  order by r.account_id, r.mhr_number
+  order by r.mhr_number
  """
 QUERY_BATCH_MANUFACTURER_MHREG = """
 select r.id, r.account_id, r.registration_ts, rr.id, rr.report_data, rr.batch_storage_url
@@ -42,7 +42,7 @@ select r.id, r.account_id, r.registration_ts, rr.id, rr.report_data, rr.batch_st
    and r.registration_type = 'MHREG'
    and r.registration_ts between to_timestamp(:query_val1, 'YYYY-MM-DD HH24:MI:SS')
                              and to_timestamp(:query_val2, 'YYYY-MM-DD HH24:MI:SS')
-  order by r.account_id, r.mhr_number
+  order by r.mhr_number
 """
 UPDATE_BATCH_REG_REPORT = """
 update mhr_registration_reports
@@ -313,6 +313,14 @@ REG_FILTER_STATUS_COLLAPSE = """
                          WHERE arv.mhr_number = r2.mhr_number
                            AND r2.registration_type IN ('MHREG', 'MHREG_CONVERSION')
                            AND r2.status_type = :query_status_type)
+"""
+REG_FILTER_STATUS_DRAFT = """
+ AND arv.mhr_number IN (SELECT DISTINCT d.mhr_number
+                          FROM mhr_drafts d
+                         WHERE arv.mhr_number = d.mhr_number
+                           AND d.account_id = :query_value1
+                           AND LEFT(d.draft_number, 1) NOT IN ('P', 'R')
+                           AND NOT EXISTS (SELECT r2.id FROM mhr_registrations r2 WHERE r2.draft_id = d.id))
 """
 REG_FILTER_SUBMITTING_NAME = " AND position(:query_sub_name in arv.summary_snapshot ->> 'submitting_name') > 0"
 REG_FILTER_SUBMITTING_NAME_COLLAPSE = """

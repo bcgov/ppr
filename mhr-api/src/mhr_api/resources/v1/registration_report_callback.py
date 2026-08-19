@@ -111,8 +111,7 @@ def post_registration_report_callback(registration_id: str):  # pylint: disable=
 def registration_callback_error(code: str, registration_id: int, status_code, message: str = None):
     """Return the registration report event listener callback error response based on the code."""
     error: str = CALLBACK_MESSAGES[code].format(key_id=registration_id)
-    if message:
-        error += " " + message
+    logger.error(f"{error}: {message}")
     # Track event here if id is numeric.
     try:
         key_id_int = int(registration_id)

@@ -156,9 +156,7 @@ def post_search_report_callback(  # pylint: disable=too-many-branches,too-many-l
 def callback_error(code: str, search_id: str, status_code, message: str = None):
     """Return to the event listener callback error response based on the code."""
     error = CALLBACK_MESSAGES[code].format(search_id=search_id)
-    if message:
-        error += " " + message
-    logger.error(error)
+    logger.error(f"{error} {message}")
     # Track event here if id is numeric.
     try:
         key_id_int = int(search_id)
