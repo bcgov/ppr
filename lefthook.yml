@@ -1,0 +1,27 @@
+# Lefthook Git hooks configuration
+# https://github.com/evilmartians/lefthook
+#
+# This repo hosts several independently-deployed services in sibling
+# subfolders (ppr-ui, ppr-api, mhr-api). Each lint command is scoped to
+# its own subfolder via `root:` so a commit touching only one service
+# doesn't trigger checks for the others. secret-scan runs unscoped,
+# across the whole staged changeset.
+
+pre-commit:
+  parallel: true
+  commands:
+    secret-scan:
+      tags: security
+      run: node scripts/run-gitleaks.mjs
+    ppr-ui-lint:
+      root: "ppr-ui/"
+      glob: "*.{js,ts,jsx,tsx,vue}"
+      run: pnpm exec eslint {staged_files}
+    ppr-api-lint:
+      root: "ppr-api/"
+      glob: "*.py"
+      run: poetry run flake8 {staged_files}
+    mhr-api-lint:
+      root: "mhr-api/"
+      glob: "*.py"
+      run: poetry run flake8 {staged_files}
