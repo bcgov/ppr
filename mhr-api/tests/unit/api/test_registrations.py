@@ -264,6 +264,11 @@ TEST_GET_HISTORY = [
 TEST_SETUP_CC_PAYMENT= [
     (CC_PAYREF, "1234", "username", "ppr_staff")
 ]
+# testdata pattern is ({desc}, {roles}, {status}, {account_id}, {staff_reg_id})
+TEST_GET_ACCOUNT_RECEIPT_DATA = [
+    ('Non staff account', [MHR_ROLE], HTTPStatus.OK, "PS12345", 0),
+    ('Staff account', [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, "ppr_staff", 200000006),
+]
 
 
 @pytest.mark.parametrize('desc,roles,status,has_account,results_size', TEST_GET_ACCOUNT_DATA)
@@ -295,9 +300,37 @@ def test_get_account_registrations(session, client, jwt, desc, roles, status, ha
             assert registration['clientReferenceId'] is not None
             assert registration['ownerNames'] is not None
             assert registration['path'] is not None
+            assert "payRegistrationId" not in registration
+            assert not registration.get("receiptPath")
             if registration['registrationDescription'] == 'REGISTER NEW UNIT':
                 assert 'lienRegistrationType' in registration
             assert registration.get("consumedDraftNumber")
+
+
+@pytest.mark.parametrize('desc,roles,status,account_id,staff_reg_id', TEST_GET_ACCOUNT_RECEIPT_DATA)
+def test_get_account_registrations_receipt(session, client, jwt, desc, roles, status, account_id, staff_reg_id):
+    """Assert that a get account registrations summary list response with staff receipts works as expected."""
+   # setup
+    headers = create_header_account(jwt, roles, 'test-user', account_id)
+    if STAFF_ROLE in roles and staff_reg_id > 0:
+        reg: MhrRegistration = MhrRegistration.find_by_id(staff_reg_id)
+        reg.account_id = "ppr_staff"
+        reg.pay_invoice_id = staff_reg_id
+        reg.save()
+    # test
+    rv = client.get('/api/v1/registrations', headers=headers)
+
+    # check
+    assert rv.status_code == status
+    if rv.status_code == HTTPStatus.OK:
+        assert rv.json
+        for registration in rv.json:
+            if STAFF_ROLE in roles and staff_reg_id > 0:
+                assert "payRegistrationId" in registration
+                assert registration.get("receiptPath")
+            else:
+                assert not registration.get("receiptPath")
+                assert "payRegistrationId" not in registration
 
 
 @pytest.mark.parametrize('desc,has_submitting,roles,status,has_account,mhr_num', TEST_CREATE_DATA)

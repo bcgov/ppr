@@ -75,6 +75,7 @@ TO_DRS_DOC_TYPE = {
     "TRANS_WRIT_SEIZURE": "TRAN",
     "REGC_STAFF": "REGC",
     "REGC_CLIENT": "REGC",
+    "COU": "CRTO",
 }
 CALLBACK_MESSAGES = {
     resource_utils.CallbackExceptionCodes.UNKNOWN_ID.value: "01: no registration data found for id={key_id}.",

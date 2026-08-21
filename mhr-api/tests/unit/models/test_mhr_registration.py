@@ -304,11 +304,11 @@ DELETE_OG_EXRE = [
 FROZEN_LIST = [
     {'mhrNumber': '000915', 'documentType': 'REST'}
 ]
-# testdata pattern is ({account_id}, {mhr_num}, {exists}, {reg_description}, {in_list})
+# testdata pattern is ({account_id}, {mhr_num}, {exists}, {reg_description}, {in_list}, {staff_reg})
 TEST_SUMMARY_REG_DATA = [
-    ('PS12345', 'TESTXX', False, None, False),
-    ('PS12345', '000900', True, REG_DESCRIPTION, True),
-    ('PS99999', '000900', True, REG_DESCRIPTION, False)
+    ('PS12345', 'TESTXX', False, None, False, False),
+    ('PS12345', '000900', True, REG_DESCRIPTION, True, False),
+    ('ppr_staff', '000900', True, REG_DESCRIPTION, False, False)
 ]
 # testdata pattern is ({account_id}, {doc_reg_num}, {mhr_number}, {result_count}, {reg_desc}, {in_list})
 TEST_SUMMARY_DOC_REG_DATA = [
@@ -319,10 +319,11 @@ TEST_SUMMARY_DOC_REG_DATA = [
     ('ppr_staff', '90499043', '000930', 2, REG_DESCRIPTION, False),
     ('ppr_staff', '90499042', '000929', 1, REG_DESCRIPTION, False)
 ]
-# testdata pattern is ({account_id}, {has_results})
+# testdata pattern is ({account_id}, {has_results}, {staff_reg})
 TEST_ACCOUNT_REG_DATA = [
-    ('PS12345', True),
-    ('999999', False)
+    ('PS12345', True, False),
+    ('999999', False, False),
+    ('ppr_staff', False, False)
 ]
 # testdata pattern is ({account_id}, {staff}, {frozen_list})
 TEST_ACCOUNT_REG_DATA_FROZEN = [
@@ -476,10 +477,11 @@ TEST_DATA_SUMMRY_REG_ID = [
 ]
 
 
-@pytest.mark.parametrize('account_id,mhr_num,exists,reg_desc,in_list', TEST_SUMMARY_REG_DATA)
-def test_find_summary_by_mhr_number(session, account_id, mhr_num, exists, reg_desc, in_list):
+@pytest.mark.parametrize('account_id,mhr_num,exists,reg_desc,in_list,staff_reg', TEST_SUMMARY_REG_DATA)
+def test_find_summary_by_mhr_number(session, account_id, mhr_num, exists, reg_desc, in_list, staff_reg):
     """Assert that finding summary MHR registration information works as expected."""
-    registration = MhrRegistration.find_summary_by_mhr_number(account_id, mhr_num)
+    staff: bool = account_id == "ppr_staff"
+    registration = MhrRegistration.find_summary_by_mhr_number(account_id, mhr_num, staff)
     if exists:
         current_app.logger.info(registration)
         assert registration['mhrNumber'] == mhr_num
@@ -497,6 +499,12 @@ def test_find_summary_by_mhr_number(session, account_id, mhr_num, exists, reg_de
         assert registration['inUserList'] == in_list
         assert registration.get('locationType')
         assert 'legacy' in registration
+        if staff and staff_reg:
+            assert registration.get('receiptPath')
+            assert 'payRegistrationId' in registration
+        else:
+            assert not registration.get('receiptPath')
+            assert 'payRegistrationId' not in registration
     else:
         assert not registration
 
@@ -504,7 +512,8 @@ def test_find_summary_by_mhr_number(session, account_id, mhr_num, exists, reg_de
 @pytest.mark.parametrize('account_id,doc_reg_num,mhr_num,result_count,reg_desc,in_list', TEST_SUMMARY_DOC_REG_DATA)
 def test_find_summary_by_doc_reg_number(session, account_id, doc_reg_num, mhr_num, result_count, reg_desc, in_list):
     """Assert that finding summary MHR registration information by a document registration number works as expected."""
-    registration = MhrRegistration.find_summary_by_doc_reg_number(account_id, doc_reg_num)
+    staff: bool = account_id == "ppr_staff"
+    registration = MhrRegistration.find_summary_by_doc_reg_number(account_id, doc_reg_num, staff)
     if result_count > 0:
         # current_app.logger.info(registration)
         assert registration['mhrNumber'] == mhr_num
@@ -522,6 +531,12 @@ def test_find_summary_by_doc_reg_number(session, account_id, doc_reg_num, mhr_nu
         assert registration['inUserList'] == in_list
         assert registration.get('locationType')
         assert 'legacy' in registration
+        if staff and in_list:
+            assert registration.get('receiptPath')
+            assert 'payRegistrationId' in registration
+        else:
+            assert not registration.get('receiptPath')
+            assert 'payRegistrationId' not in registration
         if result_count == 1:
             assert not registration.get('changes')
         else:
@@ -536,12 +551,13 @@ def test_find_summary_by_doc_reg_number(session, account_id, doc_reg_num, mhr_nu
         assert not registration
 
 
-@pytest.mark.parametrize('account_id, has_results', TEST_ACCOUNT_REG_DATA)
-def test_find_account_registrations(session, account_id, has_results):
+@pytest.mark.parametrize('account_id, has_results, staff_reg', TEST_ACCOUNT_REG_DATA)
+def test_find_account_registrations(session, account_id, has_results, staff_reg):
     """Assert that finding account summary MHR registration information works as expected."""
+    staff: bool = account_id == "ppr_staff"
     params: AccountRegistrationParams = AccountRegistrationParams(account_id=account_id,
                                                                   collapse=True,
-                                                                  sbc_staff=False)
+                                                                  sbc_staff=staff)
     reg_list = MhrRegistration.find_all_by_account_id(params)
     if has_results:
         for registration in reg_list:
@@ -559,6 +575,12 @@ def test_find_account_registrations(session, account_id, has_results):
             assert registration['documentId'] is not None
             assert not registration.get('inUserList')
             assert 'legacy' in registration
+            if staff and staff_reg:
+                assert registration.get('receiptPath')
+                assert 'payRegistrationId' in registration
+            else:
+                assert not registration.get('receiptPath')
+                assert 'payRegistrationId' not in registration
             if registration['registrationDescription'] == REG_DESCRIPTION:
                 assert 'lienRegistrationType' in registration
             assert registration.get('locationType')

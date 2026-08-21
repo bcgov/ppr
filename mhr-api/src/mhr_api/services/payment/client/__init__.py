@@ -87,6 +87,7 @@ VALID_RESPONSE_STATUS = [StatusCodes.PAID.value, StatusCodes.APPROVED.value, Sta
 VALID_RESPONSE_STATUS_CC = StatusCodes.CREATED
 INVALID_STATUS_JSON = {"status_code": HTTPStatus.PAYMENT_REQUIRED}
 INVALID_STATUS_MSG = "Payment request failed: payment method {pay_method} returned invalid status {invoice_status}."
+API_TIMEOUT = 30.0
 
 
 class ApiClientException(Exception):
@@ -196,9 +197,11 @@ class BaseClient:
             # logger.debug(method.value + ' url=' + url)
             if data:
                 # logger.debug(json.dumps(data))
-                response = requests.request(method.value, url, params=None, json=data, headers=headers, timeout=30.0)
+                response = requests.request(
+                    method.value, url, params=None, json=data, headers=headers, timeout=API_TIMEOUT
+                )
             else:
-                response = requests.request(method.value, url, params=None, headers=headers, timeout=30.0)
+                response = requests.request(method.value, url, params=None, headers=headers, timeout=API_TIMEOUT)
 
             if response is not None:
                 if self.account_id:
@@ -226,6 +229,37 @@ class BaseClient:
             return response_json
         except ApiRequestError as err:
             logger.error("call_api error: " + err.message)
+            raise err
+
+    def call_api_report(self, method, relative_path: str, data=None):
+        """Call the Pay API."""
+        try:
+            headers = {
+                "Authorization": "Bearer " + self.jwt,
+                "Content-Type": "application/json",
+                "Accept": "application/pdf",
+                "Account-Id": self.account_id,
+            }
+            if self.api_key:
+                headers["x-apikey"] = self.api_key
+            url = self.api_url + relative_path
+            logger.info(f"Submitting call_api_report {url} request Account-Id={self.account_id}")
+            if data:
+                response = requests.request(
+                    method.value, url, params=None, json=data, headers=headers, timeout=API_TIMEOUT
+                )
+            else:
+                response = requests.request(method.value, url, params=None, headers=headers, timeout=API_TIMEOUT)
+
+            if response is None:
+                logger.error("call_api_report no response, returning None.")
+                raise SBCPaymentException(f"Pay API request {url} no response.", {})
+            logger.info(f"{relative_path} response status={response.status_code}")
+            if not response.ok:
+                raise ApiRequestError(response, f"{response.status_code}: {response.text}")
+            return response.content
+        except ApiRequestError as err:
+            logger.error(f"call_api_report error: {err.message}")
             raise err
 
 
@@ -489,6 +523,14 @@ class SBCPaymentClient(BaseClient):
         invoice_data = self.call_api(HttpVerbs.POST, PATH_PAYMENT, data, include_account=True)
         return SBCPaymentClient.build_pay_reference(invoice_data, self.api_url, self.account_id)
 
+    def get_payment_receipt_report(self, invoice_id, registration_ts: str):
+        """Request a payment receipt report by invoice ID. The registration_date appears in the report."""
+        # Payment status does not matter with immediate refunds: always use the refund endpoint.
+        logger.info(f"Calling pay api to retrieve a receipt report invoice={invoice_id}.")
+        request_path = PATH_RECEIPT.format(invoice_id=invoice_id)
+        payload = {"filingDateTime": registration_ts}
+        return self.call_api_report(HttpVerbs.POST, request_path, data=payload)
+
     def cancel_payment(self, invoice_id):
         """Immediately cancel or refund the transaction payment as a state rollback."""
         # Payment status does not matter with immediate refunds: always use the refund endpoint.
@@ -519,7 +561,7 @@ class SBCPaymentClient(BaseClient):
             headers = {"Accept": "application/json", "Content-Type": "application/x-www-form-urlencoded"}
             data = f"grant_type=client_credentials&scope=openid&client_id={client_id}&client_secret={client_secret}"
             response = requests.request(
-                HttpVerbs.POST, oidc_token_url, data=data, params=None, headers=headers, timeout=30.0
+                HttpVerbs.POST, oidc_token_url, data=data, params=None, headers=headers, timeout=API_TIMEOUT
             )
 
             if not response or not response.ok:
