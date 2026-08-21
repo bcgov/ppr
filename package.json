@@ -8,5 +8,10 @@
   },
   "devDependencies": {
     "lefthook": "^1.11.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "lefthook"
+    ]
   }
 }
