@@ -240,11 +240,10 @@ TEST_PAYMENT_RECEIPT = [
 def test_payment_receipt_report(session, client, jwt, desc, invoice_id, registration_ts, error):
     """Assert that a pay-api payment receipt report request works as expected."""
     # setup
-    pay_url = current_app.config.get("PAYMENT_SVC_URL")
-    if not error:
-        current_app.config.update(PAYMENT_SVC_URL=MOCK_URL_NO_KEY)
     token = helper_create_jwt(jwt, [MHR_ROLE])
     payment = Payment(jwt=token, account_id='PS12345')
+    payment.api_url = MOCK_URL_NO_KEY if not error else MOCK_URL
+
     # payment.api_url = MOCK_URL_NO_KEY if not error else MOCK_URL
 
     # test
@@ -253,8 +252,6 @@ def test_payment_receipt_report(session, client, jwt, desc, invoice_id, registra
             pay_data = payment.get_payment_receipt_report(invoice_id, registration_ts)
     else:
         pay_data = payment.get_payment_receipt_report(invoice_id, registration_ts)
-    if not error:
-        current_app.config.update(PAYMENT_SVC_URL=pay_url)
 
     # check
     if error:
