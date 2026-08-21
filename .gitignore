@@ -1,6 +1,5 @@
 # Git hooks tooling
 node_modules/
-.gitleaks-bin/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

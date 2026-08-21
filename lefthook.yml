@@ -12,7 +12,7 @@ pre-commit:
   commands:
     secret-scan:
       tags: security
-      run: node scripts/run-gitleaks.mjs
+      run: npx gitleaks-secret-scanner
     ppr-ui-lint:
       root: "ppr-ui/"
       glob: "*.{js,ts,jsx,tsx,vue}"
