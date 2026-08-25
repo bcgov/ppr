@@ -120,6 +120,8 @@ TEST_GET_DATA = [
     ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, 200000005, False),
     ('Invalid request too old', [MHR_ROLE], HTTPStatus.BAD_REQUEST, True, 200000006, False),
     ('Valid request', [MHR_ROLE], HTTPStatus.OK, True, 200000005, False),
+    ('Invalid account Id', [MHR_ROLE], HTTPStatus.BAD_REQUEST, True, 200000005, False),
+    ('Invalid account Id staff', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, True, 200000005, False),
     ('Invalid no search selection', [MHR_ROLE], HTTPStatus.BAD_REQUEST, True, 200000001, False),
     ('Invalid search Id', [MHR_ROLE], HTTPStatus.NOT_FOUND, True, 300000006, False),
     ('Invalid request staff no account', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, False, 200000005, False)
@@ -241,7 +243,10 @@ def test_get_search_detail(session, client, jwt, desc, roles, status, has_accoun
     if is_report:
         headers = create_header_account_report(jwt, roles)
     elif has_account:
-        headers = create_header_account(jwt, roles)
+        if str(desc).startswith("Invalid account Id"):
+            headers = create_header_account(jwt, roles, 'test-user', "1234")
+        else:
+            headers = create_header_account(jwt, roles)
     else:
         headers = create_header(jwt, roles)
     # test

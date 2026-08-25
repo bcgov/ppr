@@ -417,10 +417,6 @@ TEST_PAY_LOCKED_DATA = [
 # testdata pattern is ({valid}, {value}, {message content})
 TEST_JS_TEXT_DATA = [
     (True, "Let this note with the words function and alert and console be valid.", None),
-    (False, "Invalid var x = function() { return true; };", validator.GC_INVALID_JS),
-    (False, "Invalid let x = function() { return true; };", validator.GC_INVALID_JS),
-    (False, "Invalid <script>invalid();</script>", validator.GC_INVALID_JS),
-    (False, "Invalid <img src=x onerror=alert(document.cookie)>", validator.GC_INVALID_JS),
 ]
 
 

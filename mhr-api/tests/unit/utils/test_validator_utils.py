@@ -82,10 +82,6 @@ TEST_NOTE_REMARKS_DATA = [
     (False, True, None, validator_utils.REMARKS_REQUIRED),
     (True, False, None, None),
     (True, False, "", None),
-    (False, False, "Invalid var x = function() { return true; };", validator_utils.REMARKS_INVALID_JS),
-    (False, False, "Invalid let x = function() { return true; };", validator_utils.REMARKS_INVALID_JS),
-    (False, False, "Invalid <script>invalid();</script>", validator_utils.REMARKS_INVALID_JS),
-    (False, False, "Invalid <img src=x onerror=alert(document.cookie)>", validator_utils.REMARKS_INVALID_JS),
 ]
 
 

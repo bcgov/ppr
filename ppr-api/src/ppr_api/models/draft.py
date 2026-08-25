@@ -305,10 +305,8 @@ class Draft(db.Model):  # pylint: disable=too-many-instance-attributes
         if not params.sort_criteria:
             return order_by
         if param_order_by := PARAM_TO_ORDER_BY.get(params.sort_criteria, None):
-            sort_order = "DESC"
-            if params.sort_direction and params.sort_direction in ("asc", "ascending", "desc", "descending"):
-                sort_order = params.sort_direction
-            order_by = " ORDER BY " + param_order_by + " " + sort_order
+            sort_order = "ASC" if params.sort_direction and params.sort_direction in ("asc", "ascending") else "DESC"
+            order_by = f" ORDER BY {param_order_by} {sort_order}"
         return order_by
 
     @staticmethod

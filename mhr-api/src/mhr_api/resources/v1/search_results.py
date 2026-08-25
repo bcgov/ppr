@@ -197,6 +197,9 @@ def get_search_results(search_id: str):  # pylint: disable=too-many-branches
         search_detail: SearchResult = SearchResult.find_by_search_id(search_id, True)
         if not search_detail:
             return resource_utils.not_found_error_response("searchId", search_id)
+        search_request: SearchRequest = search_detail.search
+        if search_request.account_id != account_id:
+            return resource_utils.bad_request_response(f"The requested search does not belong to account {account_id}.")
 
         # If no search selection (step 2) return an error. Could be results
         # with no exact matches and no results selected - nil, which is valid.

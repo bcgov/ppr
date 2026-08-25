@@ -95,8 +95,10 @@ def get_agreement_versions(version: str):  # pylint: disable=too-many-return-sta
             db_exception, account_id, f"GET service agreement version={version}"
         )
     except StorageException as storage_err:
-        msg: str = "Error getting service agreement pdf from storage: " + str(storage_err)
-        return resource_utils.error_response(HTTPStatus.INTERNAL_SERVER_ERROR, msg)
+        logger.error(f"Error getting service agreement pdf from storage: {storage_err}")
+        return resource_utils.error_response(
+            HTTPStatus.INTERNAL_SERVER_ERROR, "Error getting service agreement pdf from storage."
+        )
     except BusinessException as exception:
         return resource_utils.business_exception_response(exception)
     except Exception as default_exception:  # noqa: B902; return nicer default error
