@@ -7086,6 +7086,14 @@ components:
           type: string
           description: 'If the status is FROZEN, frozenDocumentType is conditionally included in the response as the document type of the registration that put the home in a frozen or locked state. The set of document types includes AFFE, TAXN, REST, NCON, REG_103 (expired). AFFE blocks registration for all users; the remaining document types block registrations for non-staff users. One of the defined document types.'
           example: AFFE
+        payRegistrationId:
+          type: integer
+          description: 'Conditionally included only when the user is BC Registries staff and the registration was submitted by a BC Registries staff account. The MHR identifier to retrieve the registration payment receipt report from the Pay API.'
+          example: 387363
+        receiptPath:
+          type: string
+          description: 'Conditionally included only when the user is BC Registries staff and the registration was submitted by a BC Registries staff account. The MHR API relative path to retrieve the registration payment receipt report from the Pay API.'
+          example: '/mhr/api/v1/documents/receipts/487356'
       required:
         - mhrNumber
         - statusType

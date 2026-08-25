@@ -50,6 +50,86 @@ TEST_CANCEL_DRAFT = [
     ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, FINANCING_STATEMENT, None, "SA", "20000100", 'PT500002'),
     ('Invalid Draft Number', [PPR_ROLE], HTTPStatus.NOT_FOUND, FINANCING_STATEMENT, None, "SA", "20000100", 'PT500002'),
 ]
+# testdata pattern is ({description}, {roles}, {status}, {account}, {draft_num})
+TEST_GET_DRAFT = [
+    ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, None, 'D-T-FS01'),
+    ('Invalid account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, '12345', 'D-T-FS01'),
+    ('Invalid account staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, '12345', 'D-T-FS01'),
+    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345', 'D-T-FS01'),
+    ('Valid Request', [PPR_ROLE], HTTPStatus.OK, 'PS12345', 'D-T-FS01'),
+    ('Invalid Draft Number', [PPR_ROLE], HTTPStatus.NOT_FOUND, 'PS12345', 'XXXXXX'),
+    ('Invalid request Staff no account', [PPR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None, 'D-T-FS01')
+]
+# testdata pattern is ({description}, {roles}, {status}, {account}, {draft_num}, {payload})
+TEST_UPDATE_DRAFT = [
+    ('Missing account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, None, 'D-T-FS01', SAMPLE_JSON_FINANCING),
+    ('Invalid account', [PPR_ROLE], HTTPStatus.BAD_REQUEST, '12345', 'D-T-FS01', SAMPLE_JSON_FINANCING),
+    ('Invalid account staff', [PPR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, '12345', 'D-T-FS01', SAMPLE_JSON_FINANCING),
+    ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345', 'D-T-FS01', SAMPLE_JSON_FINANCING),
+    ('Valid SA', [PPR_ROLE], HTTPStatus.OK, 'PS12345', 'D-T-FS01', SAMPLE_JSON_FINANCING),
+    ('Valid AM', [PPR_ROLE], HTTPStatus.OK, 'PS12345', 'D-T-AM01', SAMPLE_JSON_AMENDMENT),
+    ('Invalid SA type', [PPR_ROLE], HTTPStatus.NOT_FOUND, 'PS12345', 'D0034001', SAMPLE_JSON_FINANCING),
+    ('Invalid Draft Number', [PPR_ROLE], HTTPStatus.NOT_FOUND, 'PS12345', 'XXXXXX', SAMPLE_JSON_FINANCING),
+    ('Invalid request Staff no account', [PPR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None, 'D-T-FS01', SAMPLE_JSON_FINANCING)
+]
+
+
+@pytest.mark.parametrize('desc,roles,status,account_id,draft_num', TEST_GET_DRAFT)
+def test_get_draft(session, client, jwt, desc, roles, status, account_id, draft_num):
+    """Assert that a get account draft by draft number works as expected."""
+    # setup
+    headers = None
+    if account_id:
+        headers = create_header_account(jwt, roles, 'test-user', account_id)
+    else:
+        headers = create_header(jwt, roles)
+
+    # test
+    response = client.get('/api/v1/drafts/' + draft_num,
+                          headers=headers)
+    # check
+    assert response.status_code == status
+
+
+@pytest.mark.parametrize('desc,roles,status,account_id,draft_num,payload', TEST_UPDATE_DRAFT)
+def test_update_draft(session, client, jwt, desc, roles, status, account_id, draft_num, payload):
+    """Assert that an update account draft by draft number works as expected."""
+    # setup
+    json_data = copy.deepcopy(payload)
+    headers = None
+    if account_id:
+        headers = create_header_account(jwt, roles, 'test-user', account_id)
+    else:
+        headers = create_header(jwt, roles)
+    if desc == "Invalid SA type":
+        json_data['financingStatement']['type'] = 'XA'
+    # test
+    response = client.put('/api/v1/drafts/' + draft_num,
+                          json=json_data,
+                          headers=headers,
+                          content_type='application/json')
+    # check
+    assert response.status_code == status
+
+
+@pytest.mark.parametrize('desc,roles,status,account_id,draft_num', TEST_GET_DRAFT)
+def test_delete_draft(session, client, jwt, desc, roles, status, account_id, draft_num):
+    """Assert that a delete account draft by draft number works as expected."""
+    # setup
+    headers = None
+    if account_id:
+        headers = create_header_account(jwt, roles, 'test-user', account_id)
+    else:
+        headers = create_header(jwt, roles)
+
+    # test
+    response = client.delete('/api/v1/drafts/' + draft_num,
+                             headers=headers)
+    # check
+    if status != HTTPStatus.OK and desc != "Invalid account staff":
+        assert response.status_code == status
+    else:
+        assert response.status_code == HTTPStatus.NO_CONTENT
 
 
 def test_draft_create_invalid_type(session, client, jwt):
@@ -144,106 +224,6 @@ def test_draft_get_list_200(session, client, jwt):
     assert rv.status_code == HTTPStatus.OK
 
 
-def test_draft_valid_get_statement_200(session, client, jwt):
-    """Assert that a valid get draft by document ID returns a 200 status."""
-    # setup
-
-    # test
-    rv = client.get('/api/v1/drafts/D-T-FS01',
-                    headers=create_header_account(jwt, [PPR_ROLE]))
-    # check
-    assert rv.status_code == HTTPStatus.OK
-
-
-def test_draft_invalid_get_statement_404(session, client, jwt):
-    """Assert that a get draft by invalid document ID returns a 404 status."""
-    # setup
-
-    # test
-    rv = client.get('/api/v1/drafts/D0012345',
-                    headers=create_header_account(jwt, [PPR_ROLE]))
-    # check
-    assert rv.status_code == HTTPStatus.NOT_FOUND
-
-
-def test_draft_update_invalid_type_404(session, client, jwt):
-    """Assert that an update draft financing statement request with an invalid type returns a 404."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON_FINANCING)
-    json_data['financingStatement']['type'] = 'XA'
-
-    # test
-    rv = client.put('/api/v1/drafts/D0034001',
-                    json=json_data,
-                    headers=create_header_account(jwt, [PPR_ROLE]),
-                    content_type='application/json')
-    # check
-    assert rv.status_code == HTTPStatus.NOT_FOUND
-
-
-def test_draft_update_valid_financing_200(session, client, jwt):
-    """Assert that a valid draft financing statement update request returns a 200 status."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON_FINANCING)
-
-    # test
-    rv = client.put('/api/v1/drafts/D-T-FS01',
-                    json=json_data,
-                    headers=create_header_account(jwt, [PPR_ROLE]),
-                    content_type='application/json')
-    # check
-    assert rv.status_code == HTTPStatus.OK
-
-
-def test_draft_update_valid_amendment_200(session, client, jwt):
-    """Assert that a valid draft amendment statement update request returns a 200 status."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON_AMENDMENT)
-
-    # test
-    rv = client.put('/api/v1/drafts/D-T-AM01',
-                    json=json_data,
-                    headers=create_header_account(jwt, [PPR_ROLE]),
-                    content_type='application/json')
-    # check
-    assert rv.status_code == HTTPStatus.OK
-
-
-def test_draft_update_valid_change_200(session, client, jwt):
-    """Assert that a valid draft change statement update request returns a 200 status."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON_CHANGE)
-
-    # test
-    rv = client.put('/api/v1/drafts/D-T-CH01',
-                    json=json_data,
-                    headers=create_header_account(jwt, [PPR_ROLE]),
-                    content_type='application/json')
-    # check
-    assert rv.status_code == HTTPStatus.OK
-
-# def test_draft_delete_204(session, client, jwt):
-#    """Assert that a valid delete draft request returns a 204 status."""
-    # setup
-
-    # test
-#    rv = client.delete(f'/api/v1/drafts/TEST-FSD1',
-#                       headers=create_header_account(jwt, [PPR_ROLE]))
-    # check
-#    assert rv.status_code == HTTPStatus.NO_CONTENT
-
-
-def test_draft_delete_404(session, client, jwt):
-    """Assert that an invalid delete draft document ID returns a 404 status."""
-    # setup
-
-    # test
-    rv = client.delete('/api/v1/drafts/X12345X',
-                       headers=create_header_account(jwt, [PPR_ROLE]))
-    # check
-    assert rv.status_code == HTTPStatus.NOT_FOUND
-
-
 def test_draft_create_nonstaff_missing_account_400(session, client, jwt):
     """Assert that a non-staff draft request with no account ID returns a 400 status."""
     # setup
@@ -314,81 +294,6 @@ def test_draft_list_nonstaff_unauthorized_401(session, client, jwt):
 
     # test
     rv = client.get('/api/v1/drafts',
-                    headers=create_header_account(jwt, [COLIN_ROLE]))
-    # check
-    assert rv.status_code == HTTPStatus.UNAUTHORIZED
-
-
-def test_draft_update_nonstaff_missing_account_400(session, client, jwt):
-    """Assert that a non-staff update draft request with no account ID returns a 400 status."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON_FINANCING)
-
-    # test
-    rv = client.put('/api/v1/drafts/TEST-FSD1',
-                    json=json_data,
-                    headers=create_header(jwt, [COLIN_ROLE]),
-                    content_type='application/json')
-    # check
-    assert rv.status_code == HTTPStatus.BAD_REQUEST
-
-
-def test_draft_update_staff_missing_account_400(session, client, jwt):
-    """Assert that a staff update draft request with no account ID returns a 400 status."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON_FINANCING)
-
-    # test
-    rv = client.put('/api/v1/drafts/TEST-FSD1',
-                    json=json_data,
-                    headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]),
-                    content_type='application/json')
-    # check
-    assert rv.status_code == HTTPStatus.BAD_REQUEST
-
-
-def test_draft_update_nonstaff_unauthorized_401(session, client, jwt):
-    """Assert that a non-ppr role update draft request with an account ID returns a 404 status."""
-    # setup
-    json_data = copy.deepcopy(SAMPLE_JSON_FINANCING)
-
-    # test
-    rv = client.put('/api/v1/drafts/TEST-FSD1',
-                    json=json_data,
-                    headers=create_header_account(jwt, [COLIN_ROLE]),
-                    content_type='application/json')
-    # check
-    assert rv.status_code == HTTPStatus.UNAUTHORIZED
-
-
-def test_draft_get_nonstaff_missing_account_400(session, client, jwt):
-    """Assert that a non-staff draft get request with no account ID returns a 400 status."""
-    # setup
-
-    # test
-    rv = client.get('/api/v1/drafts/TEST-FSD1',
-                    headers=create_header(jwt, [COLIN_ROLE]))
-    # check
-    assert rv.status_code == HTTPStatus.BAD_REQUEST
-
-
-def test_draft_get_staff_missing_account_400(session, client, jwt):
-    """Assert that a staff draft get request with no account ID returns a 201 status."""
-    # setup
-
-    # test
-    rv = client.get('/api/v1/drafts/D-T-FS01',
-                    headers=create_header(jwt, [PPR_ROLE, STAFF_ROLE]))
-    # check
-    assert rv.status_code == HTTPStatus.BAD_REQUEST
-
-
-def test_draft_get_nonstaff_unauthorized_401(session, client, jwt):
-    """Assert that a non-ppr role draft get request with an account ID returns a 404 status."""
-    # setup
-
-    # test
-    rv = client.get('/api/v1/drafts/TEST-FSD1',
                     headers=create_header_account(jwt, [COLIN_ROLE]))
     # check
     assert rv.status_code == HTTPStatus.UNAUTHORIZED

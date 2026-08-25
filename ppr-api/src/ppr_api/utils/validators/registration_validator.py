@@ -20,7 +20,6 @@ from ppr_api.models import ClientCode, FinancingStatement, Registration, Vehicle
 from ppr_api.models import registration_utils as reg_utils
 from ppr_api.models import utils as model_utils
 from ppr_api.models.registration import MiscellaneousTypes
-from ppr_api.utils.validators.financing_validator import GC_INVALID_JS, validate_text_js
 
 # from ppr_api.utils.logging import logger
 
@@ -47,7 +46,6 @@ SE_DELETE_INVALID = "At least one Securities Act Notice is required. "
 SE_DELETE_MISSING_ID = "A notice ID is required to delete a Securities Act Notice. "
 SE_DELETE_INVALID_ID = "The delete ID provided for the Securities Act Notice is invalid ({}). "
 STATE_INVALID_PAY_LOCKED = "New registration is blocked because a previous one has an unresolved credit card payment. "
-AM_DESCRIPTION_INVALID_JS = "Admendment description text invalid: javascript not allowed. "
 
 
 def validate_registration(json_data: dict, account_id: str, financing_statement=None) -> str:
@@ -60,8 +58,6 @@ def validate_registration(json_data: dict, account_id: str, financing_statement=
     error_msg += validate_collateral(json_data, financing_statement)
     error_msg += validate_securities_act_access(account_id, financing_statement)
     error_msg += validate_securities_act_notices(financing_statement, json_data)
-    if json_data.get("description"):
-        error_msg += validate_text_js(json_data.get("description"), AM_DESCRIPTION_INVALID_JS)
     return error_msg
 
 
@@ -98,10 +94,6 @@ def validate_collateral(json_data, financing_statement=None) -> str:
         for collateral in json_data["addVehicleCollateral"]:
             if "type" in collateral and collateral["type"] == VehicleCollateral.SerialTypes.AIRPLANE.value:
                 error_msg += VC_AP_NOT_ALLOWED
-
-    if json_data.get("addGeneralCollateral"):
-        for gc in json_data.get("addGeneralCollateral"):
-            error_msg += validate_text_js(gc.get("description", ""), GC_INVALID_JS)
     return error_msg
 
 

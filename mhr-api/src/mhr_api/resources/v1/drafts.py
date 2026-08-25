@@ -115,7 +115,9 @@ def get_drafts(draft_number: str):  # pylint: disable=too-many-return-statements
             return resource_utils.unauthorized_error_response(account_id)
 
         # Try to fetch draft by draft number
-        draft = MhrDraft.find_by_draft_number(draft_number, False)
+        draft: MhrDraft = MhrDraft.find_by_draft_number(draft_number, False)
+        if draft and draft.account_id != account_id:
+            return resource_utils.bad_request_response(f"The requested draft does not belong to account {account_id}.")
         return draft.json, HTTPStatus.OK
     except DatabaseException as db_exception:
         return resource_utils.db_exception_response(db_exception, account_id, "GET draft id=" + draft_number)
@@ -145,11 +147,16 @@ def put_drafts(draft_number: str):  # pylint: disable=too-many-return-statements
             error_msg: str = f"Draft number {draft_number} is in a pending state: update not allowed."
             logger.error(error_msg)
             return resource_utils.bad_request_response(error_msg)
+
+        draft: MhrDraft = MhrDraft.find_by_draft_number(draft_number, False)
+        if draft and draft.account_id != account_id:
+            return resource_utils.bad_request_response(f"The requested draft does not belong to account {account_id}.")
+
         request_json = request.get_json(silent=True)
         # Save draft statement update: BusinessException raised if failure.
-        draft = MhrDraft.update(request_json, draft_number)
-        draft.save()
-        return draft.json, HTTPStatus.OK
+        update_draft = MhrDraft.update(request_json, draft_number)
+        update_draft.save()
+        return update_draft.json, HTTPStatus.OK
     except BusinessException as exception:
         return resource_utils.business_exception_response(exception)
     except DatabaseException as db_exception:  # noqa: B902; return nicer default error
@@ -175,6 +182,9 @@ def delete_drafts(draft_number: str):  # pylint: disable=too-many-return-stateme
         if not authorized(account_id, jwt):
             return resource_utils.unauthorized_error_response(account_id)
         draft: MhrDraft = MhrDraft.find_by_draft_number(draft_number, False)
+        staff: bool = is_staff(jwt)
+        if not staff and draft and draft.account_id != account_id:
+            return resource_utils.bad_request_response(f"The requested draft does not belong to account {account_id}.")
         # Try to delete draft by draft number.
         MhrDraft.delete(draft_number)
         draft_number: str = draft.draft_number
@@ -184,7 +194,6 @@ def delete_drafts(draft_number: str):  # pylint: disable=too-many-return-stateme
             and draft.registration_type != MhrRegistrationTypes.MHREG.value
             and draft.mhr_number
         ):
-            staff: bool = is_staff(jwt)
             invoice_id: str = draft.user_id
             orig_status: str = draft.draft.get("status")
             mhr_reg: MhrRegistration = MhrRegistration.find_all_by_mhr_number(draft.mhr_number, draft.account_id, staff)

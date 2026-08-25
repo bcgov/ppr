@@ -132,7 +132,9 @@ def get_drafts(document_id: str):  # pylint: disable=too-many-return-statements
             return resource_utils.unauthorized_error_response(account_id)
 
         # Try to fetch draft statement by document ID
-        draft = Draft.find_by_document_number(document_id, False)
+        draft: Draft = Draft.find_by_document_number(document_id, False)
+        if draft and draft.account_id != account_id:
+            return resource_utils.bad_request_response(f"The requested draft does not belong to account {account_id}.")
         return draft.json, HTTPStatus.OK
 
     except DatabaseException as db_exception:
@@ -163,20 +165,20 @@ def put_drafts(document_id: str):  # pylint: disable=too-many-return-statements
 
         request_json = request.get_json(silent=True)
         # Disable schema validation: draft may be partial/incomplele.
-        # valid_format, errors = schema_utils.validate(request_json, 'draft', 'ppr')
-        # if not valid_format:
-        #   return validation_error_response(errors, VAL_ERROR)
+        draft: Draft = Draft.find_by_document_number(document_id, False)
+        if draft and draft.account_id != account_id:
+            return resource_utils.bad_request_response(f"The requested draft does not belong to account {account_id}.")
 
         # Save draft statement update: BusinessException raised if failure.
         try:
             draft = Draft.update(request_json, document_id)
             draft.save()
             return draft.json, HTTPStatus.OK
-        except BusinessException as exception:
-            return resource_utils.business_exception_response(exception)
         except Exception as db_exception:  # noqa: B902; return nicer default error
             return resource_utils.db_exception_response(db_exception, account_id, "PUT draft id=" + document_id)
 
+    except BusinessException as exception:
+        return resource_utils.business_exception_response(exception)
     except Exception as default_exception:  # noqa: B902; return nicer default error
         return resource_utils.default_exception_response(default_exception)
 
@@ -202,11 +204,14 @@ def delete_drafts(document_id: str):  # pylint: disable=too-many-return-statemen
         # Try to delete draft statement by document ID
         try:
             draft: Draft = Draft.find_by_document_number(document_id, False)
+            staff: bool = is_staff(jwt)
+            if not staff and draft and draft.account_id != account_id:
+                return resource_utils.bad_request_response(f"The draft does not belong to account {account_id}.")
+
             Draft.delete(document_id)
             doc_number: str = draft.document_number
             logger.info(f"Draft doc number {doc_number} deleted.")
             if doc_number.startswith(DRAFT_PAY_PENDING_PREFIX):
-                staff: bool = is_staff(jwt)
                 invoice_id: str = draft.user_id
                 reg_num: str = draft.registration_number
                 if not model_utils.is_financing(draft.registration_type_cl) and reg_num:

@@ -21,12 +21,15 @@ from http import HTTPStatus
 import pytest
 from flask import current_app
 
+from mhr_api.models import MhrRegistration
 from mhr_api.services.authz import MHR_ROLE, STAFF_ROLE, COLIN_ROLE, REQUEST_EXEMPTION_RES, \
                                    TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY, REQUEST_TRANSPORT_PERMIT, \
                                    REGISTER_MH
 from tests.unit.services.utils import create_header, create_header_account
 
 
+MOCK_PAY_URL = "https://test.api.connect.gov.bc.ca/mockTarget/pay/api/v1/"
+PAY_RECEIPT_URL = "/api/v1/documents/receipts/{reg_id}"
 MANUFACTURER_ROLES = [MHR_ROLE, TRANSFER_SALE_BENEFICIARY, REQUEST_TRANSPORT_PERMIT, REGISTER_MH]
 QUALIFIED_USER = [MHR_ROLE, REQUEST_EXEMPTION_RES, TRANSFER_DEATH_JT, TRANSFER_SALE_BENEFICIARY]
 # testdata pattern is ({desc}, {roles}, {status}, {has_account}, {doc_id}, {exists}, {valid})
@@ -57,6 +60,15 @@ TEST_DATA_QS_DOC_ID_DATA = [
     ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True, None),
     ('Valid request QS lawyyer/notary', QUALIFIED_USER, HTTPStatus.OK, True, '1'),
     ('Valid request QS manufacturer', MANUFACTURER_ROLES, HTTPStatus.OK, True, '8'),
+]
+# testdata pattern is ({desc}, {roles}, {status}, {account_id}, {staff_reg_id})
+TEST_DATA_GET_RECEIPT = [
+    ("Missing account", [MHR_ROLE], HTTPStatus.BAD_REQUEST, None, 200000006),
+    ("Missing account staff", [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, None, 200000006),
+    ("Not staff", [MHR_ROLE], HTTPStatus.UNAUTHORIZED, "PS12345", 200000006),
+    ("Invalid Role", [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, "PS12345", 200000006),
+    ("Not found", [MHR_ROLE, STAFF_ROLE], HTTPStatus.NOT_FOUND, "ppr_staff", 10000000),
+    ("Valid staff", [MHR_ROLE, STAFF_ROLE], HTTPStatus.OK, "ppr_staff", 200000006),
 ]
 
 
@@ -124,3 +136,28 @@ def test_get_qs_doc_id(session, client, jwt, desc, roles, status, has_account, s
         response = rv.json
         assert response
         assert str(response.get("documentId")).startswith(start_digit)
+
+
+@pytest.mark.parametrize('desc,roles,status,account_id,staff_reg_id', TEST_DATA_GET_RECEIPT)
+def test_get_receipt_report(session, client, jwt, desc, roles, status, account_id, staff_reg_id):
+    """Assert that a get account registrations summary list response with staff receipts works as expected."""
+   # setup
+    current_app.config.update(PAYMENT_SVC_URL=MOCK_PAY_URL)
+    if account_id is not None:
+        headers = create_header_account(jwt, roles, 'test-user', account_id)
+        if account_id == "ppr_staff":
+            headers["Staff-Account-Id"] = "1234"
+    else:
+        headers = create_header(jwt, roles)
+
+    if STAFF_ROLE in roles and staff_reg_id > 0 and status == HTTPStatus.OK:
+        reg: MhrRegistration = MhrRegistration.find_by_id(staff_reg_id)
+        reg.account_id = "ppr_staff"
+        reg.pay_invoice_id = staff_reg_id
+        reg.save()
+    url = PAY_RECEIPT_URL.format(reg_id=staff_reg_id)
+    # test
+    rv = client.get(url, headers=headers)
+
+    # check
+    assert rv.status_code == status

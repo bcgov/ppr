@@ -207,7 +207,8 @@ SELECT arv.mhr_number,
                   WHERE arv.draft_id = d.id)
             ELSE NULL END draft_number,
       summary_snapshot ->> 'manufacturer_name' AS manufacturer_name,
-      summary_snapshot ->> 'civic_address' AS civic_address
+      summary_snapshot ->> 'civic_address' AS civic_address,
+      arv.id
 FROM mhr_registrations arv
 """
 

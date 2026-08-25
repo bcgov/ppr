@@ -21,6 +21,7 @@ from flask_cors import cross_origin
 
 from mhr_api.exceptions import BusinessException, DatabaseException
 from mhr_api.models import MhrRegistration
+from mhr_api.models import utils as model_utils
 from mhr_api.models.registration_utils import get_qs_document_id
 from mhr_api.models.type_tables import MhrRegistrationTypes
 from mhr_api.reports.v2.report_utils import ReportTypes
@@ -28,6 +29,7 @@ from mhr_api.resources import registration_utils as reg_utils
 from mhr_api.resources import utils as resource_utils
 from mhr_api.services.authz import authorized, get_group, is_all_staff_account, is_staff
 from mhr_api.services.doc_service import doc_id_lookup
+from mhr_api.services.payment.payment import Payment
 from mhr_api.utils import validator_utils as registration_validator
 from mhr_api.utils.auth import jwt
 from mhr_api.utils.logging import logger
@@ -131,6 +133,49 @@ def get_documents(document_id: str):  # pylint: disable=too-many-return-statemen
         return resource_utils.default_exception_response(default_exception)
 
 
+@bp.route("/receipts/<string:pay_registration_id>", methods=["GET", "OPTIONS"])
+@cross_origin(origin="*")
+@jwt.requires_auth
+def get_pay_receipts(pay_registration_id: str):
+    """Staff only get registration receipt by MHR registration ID."""
+    try:
+        logger.info(f"get_pay_receipt pay_registration_id={pay_registration_id}")
+        if pay_registration_id is None:
+            return resource_utils.path_param_error_response("Pay Registration ID")
+        # Quick check: must be staff or provide an account ID.
+        account_id = resource_utils.get_staff_account_id(request)
+        if account_id is None:
+            account_id = resource_utils.get_account_id(request)
+        if account_id is None:
+            return resource_utils.account_required_response()
+        staff: bool = is_staff(jwt)
+        # Verify request JWT and staff
+        if not staff or not authorized(account_id, jwt):
+            logger.error(f"get_pay_receipt account ID {account_id} not staff: unauthorized.")
+            return resource_utils.unauthorized_error_response(account_id)
+
+        # Try to fetch MH registration by registration id.
+        registration: MhrRegistration = MhrRegistration.find_by_id(int(pay_registration_id))
+        if registration is None:
+            return resource_utils.not_found_error_response("pay receipt registration", pay_registration_id)
+        registration_ts: str = to_report_datetime(registration.registration_ts)
+        payment = Payment(jwt=jwt.get_token_auth_header(), account_id=account_id)
+        return (
+            payment.get_payment_receipt_report(registration.pay_invoice_id, registration_ts),
+            HTTPStatus.OK,
+            {"Content-Type": "application/pdf"},
+        )
+    except BusinessException as exception:
+        return resource_utils.business_exception_response(exception)
+    except DatabaseException as db_exception:
+        return resource_utils.db_exception_response(
+            db_exception, account_id, f"GET receipt reg id={pay_registration_id}"
+        )
+    except Exception as default_exception:  # noqa: B902; return nicer default error
+        logger.error(f"GET payment receipt report failed, reg id={pay_registration_id}")
+        return resource_utils.default_exception_response(default_exception)
+
+
 @bp.route("/qs-document-ids", methods=["GET", "OPTIONS"])
 @cross_origin(origin="*")
 @jwt.requires_auth
@@ -180,3 +225,14 @@ def doc_service_lookup(response_json: dict):
     except Exception as err:  # noqa: B902; return nicer default error
         logger.warning(f"doc_service_lookup failed: {err}")
     return response_json, HTTPStatus.OK
+
+
+def to_report_datetime(reg_ts, include_time: bool = True) -> str:
+    """Convert registration timestamp to report format."""
+    local_ts = model_utils.to_local_timestamp(reg_ts)
+    if include_time:
+        timestamp = local_ts.strftime("%B %-d, %Y at %-I:%M:%S %p Pacific time")
+        if timestamp.find(" AM ") > 0:
+            return timestamp.replace(" AM ", " am ")
+        return timestamp.replace(" PM ", " pm ")
+    return local_ts.strftime("%B %-d, %Y")

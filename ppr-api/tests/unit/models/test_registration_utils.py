@@ -73,12 +73,12 @@ TEST_QUERY_ORDER_DATA = [
     (None, None, ' ORDER BY registration_ts DESC'),
     ('invalid', None, ' ORDER BY registration_ts DESC'),
     ('registrationNumber', None, ' ORDER BY registration_number DESC'),
-    ('registrationNumber', 'asc', ' ORDER BY registration_number asc'),
-    ('registrationType', 'ascending', ' ORDER BY registration_type ascending'),
-    ('registeringName', 'descending', ' ORDER BY registering_name descending'),
-    ('clientReferenceId', 'asc', ' ORDER BY client_reference_id asc'),
-    ('startDateTime', 'ascending', ' ORDER BY registration_ts ascending'),
-    ('endDateTime', 'desc', ' ORDER BY registration_ts desc')
+    ('registrationNumber', 'asc', ' ORDER BY registration_number ASC'),
+    ('registrationType', 'ascending', ' ORDER BY registration_type ASC'),
+    ('registeringName', 'descending', ' ORDER BY registering_name DESC'),
+    ('clientReferenceId', 'asc', ' ORDER BY client_reference_id ASC'),
+    ('startDateTime', 'ascending', ' ORDER BY registration_ts ASC'),
+    ('endDateTime', 'desc', ' ORDER BY registration_ts DESC')
 ]
 
 # testdata pattern is ({reg_num}, {reg_type}, {client_ref}, {registering_name}, {status}, {start_ts}, {end_ts})

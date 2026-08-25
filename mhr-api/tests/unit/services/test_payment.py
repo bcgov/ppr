@@ -229,6 +229,35 @@ TEST_PAYMENT_DATA_CLIENT = [
     (TransactionTypes.TRANSFER, '108234', 'UT-00001', 'PS12345', False, True),
     (TransactionTypes.TRANSFER, '108234', 'UT-00001', 'PS12345', True, True),
 ]
+# testdata pattern is ({desc}, {invoice_id}, {registration_ts}, {error})
+TEST_PAYMENT_RECEIPT = [
+    ('Valid', 6717881, 'July 22, 2025 at 3:33:58 pm Pacific time', False),
+    ('Unauthorized', 6717881, '', True),
+]
+
+
+@pytest.mark.parametrize('desc,invoice_id,registration_ts,error', TEST_PAYMENT_RECEIPT)
+def test_payment_receipt_report(session, client, jwt, desc, invoice_id, registration_ts, error):
+    """Assert that a pay-api payment receipt report request works as expected."""
+    # setup
+    token = helper_create_jwt(jwt, [MHR_ROLE])
+    payment = Payment(jwt=token, account_id='PS12345')
+    payment.api_url = MOCK_URL_NO_KEY if not error else MOCK_URL
+
+    # payment.api_url = MOCK_URL_NO_KEY if not error else MOCK_URL
+
+    # test
+    if error:
+        with pytest.raises(SBCPaymentException) as request_err:
+            pay_data = payment.get_payment_receipt_report(invoice_id, registration_ts)
+    else:
+        pay_data = payment.get_payment_receipt_report(invoice_id, registration_ts)
+
+    # check
+    if error:
+        assert request_err
+    else:
+        assert pay_data
 
 
 @pytest.mark.parametrize('selection,routing_slip,bcol_number,dat_number,waive_fees,priority,certified',

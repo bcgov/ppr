@@ -66,12 +66,12 @@ def post_transfers(mhr_number: str):  # pylint: disable=too-many-return-statemen
             and not authorized_role(jwt, TRANSFER_SALE_BENEFICIARY)
             and group != DEALERSHIP_GROUP
         ):
-            logger.error("User not staff ({group}) or missing required role: " + TRANSFER_SALE_BENEFICIARY)
+            logger.error("User not staff ({group}) or missing required transfer sale role.")
             return resource_utils.unauthorized_error_response(account_id)
         if model_reg_utils.is_transfer_due_to_death(request_json.get("registrationType")) and not authorized_role(
             jwt, TRANSFER_DEATH_JT
         ):
-            logger.error("User not staff or missing required role: " + TRANSFER_DEATH_JT)
+            logger.error("User not staff or missing required  transfer death role.")
             return resource_utils.unauthorized_error_response(account_id)
 
         # Not found or not allowed to access throw exceptions.

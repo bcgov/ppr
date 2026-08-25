@@ -167,3 +167,18 @@ class Payment:
             raise sbc_err
         except Exception as err:  # noqa: B902; wrapping exception
             raise SBCPaymentException(err) from err
+
+    def get_payment_receipt_report(self, invoice_id, registration_ts: str):
+        """
+        Submit a request to get the payment receipt report by the invoice ID.
+
+        invoice_id: Registration payment invoice ID.
+        registration_date: A formatted registration date and time used in the receipt report.
+        """
+        try:
+            api_instance = SBCPaymentClient(self.jwt, self.account_id, self.api_key)
+            if self.api_url:
+                api_instance.api_url = self.api_url
+            return api_instance.get_payment_receipt_report(invoice_id, registration_ts)
+        except Exception as err:  # noqa: B902; wrapping exception
+            raise SBCPaymentException(err) from err

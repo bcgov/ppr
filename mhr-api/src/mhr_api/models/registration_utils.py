@@ -14,6 +14,7 @@
 # pylint: disable=too-few-public-methods,too-many-lines
 
 """This module holds methods to support registration model updates - mostly account registration summary."""
+from flask import current_app
 from sqlalchemy.sql import text
 
 from mhr_api.exceptions import DatabaseException
@@ -122,6 +123,7 @@ DOC_ID_STAFF_CLAUSE = ",  get_mhr_doc_staff_id() AS doc_id"
 BATCH_DOC_NAME_MANUFACTURER_MHREG = "batch-manufacturer-mhreg-report-{time}.pdf"
 REGISTRATION_PATH = "/mhr/api/v1/registrations/"
 DOCUMENT_PATH = "/mhr/api/v1/documents/"
+RECEIPT_PATH = "/mhr/api/v1/documents/receipts/"
 CAUTION_CANCELLED_DAYS: int = -9999
 CAUTION_INDEFINITE_DAYS: int = 9999
 DEFAULT_REG_TYPE_FILTER = "'MHREG'"
@@ -983,7 +985,19 @@ def __build_summary(row, account_id: str, staff: bool, add_in_user_list: bool = 
     ):
         expiry = row[12]
         summary["expireDays"] = model_utils.expiry_ts_days(expiry)
+    summary = __add_receipt_path(summary, row, staff, (account_id == reg_account_id))
     summary = __set_frozen_status(summary, row, staff)
+    return summary
+
+
+def __add_receipt_path(summary: dict, row: dict, staff: bool, user_reg: bool) -> dict:
+    """If staff user and registration was created by staff then add a receipt path."""
+    if not staff or not user_reg:
+        return summary
+    pay_reg_id: int = int(row[29]) if row[29] else 0
+    summary["payRegistrationId"] = pay_reg_id
+    if pay_reg_id > 0:
+        summary["receiptPath"] = RECEIPT_PATH + str(pay_reg_id)
     return summary
 
 
@@ -1069,9 +1083,13 @@ def __get_previous_owner_names(changes: dict, default: str, doc_id: str) -> str:
 def __collapse_results(results):
     """Organized reults as parent-children mh registration-change registrations."""
     registrations = []
+    pay_url: str = current_app.config.get("PAYMENT_SVC_URL", "")
+    # Gateway DEV/TEST share same instance: DEV has a distinct root path /mhr-dev. Conditionally update the paths.
+    is_dev = pay_url.find("/pay-api-dev") > -1 or pay_url.find("/pay-dev/") > -1
+
     for result in results:
         if result["registrationType"] in (MhrRegistrationTypes.MHREG, MhrRegistrationTypes.MHREG_CONVERSION):
-            registrations.append(result)
+            registrations.append(__update_reg_paths(result, is_dev))
     for reg in registrations:
         has_caution: bool = False
         # owner_names = reg.get('ownerNames')
@@ -1087,11 +1105,21 @@ def __collapse_results(results):
                     and str(result["registrationDescription"]).find("CAUTION") >= 0
                 ):
                     has_caution = True
-                changes.append(result)
+                changes.append(__update_reg_paths(result, is_dev))
         if changes:
             reg["changes"] = changes
         reg["hasCaution"] = has_caution
     return registrations
+
+
+def __update_reg_paths(result: dict, is_dev: bool) -> dict:
+    """Update registration relative paths if environment is DEV."""
+    if is_dev:
+        if result.get("path", "") != "":
+            result["path"] = str(result.get("path")).replace("/mhr/", "/mhr-dev/")
+        if result.get("receiptPath", "") != "":
+            result["receiptPath"] = str(result.get("receiptPath")).replace("/mhr/", "/mhr-dev/")
+    return result
 
 
 def build_account_query(params: AccountRegistrationParams) -> str:

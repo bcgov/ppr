@@ -122,6 +122,8 @@ TEST_CREATE_DATA = [
 # testdata pattern is ({description}, {roles}, {status}, {account}, {draft_num})
 TEST_GET_DRAFT = [
     ('Missing account', [MHR_ROLE], HTTPStatus.BAD_REQUEST, None, 'T500002'),
+    ('Invalid account', [MHR_ROLE], HTTPStatus.BAD_REQUEST, '12345', 'T500002'),
+    ('Invalid account staff', [MHR_ROLE, STAFF_ROLE], HTTPStatus.BAD_REQUEST, '12345', 'T500002'),
     ('Invalid role', [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, 'PS12345', 'T500002'),
     ('Valid Request', [MHR_ROLE], HTTPStatus.OK, 'PS12345', 'T500002'),
     ('Invalid Draft Number', [MHR_ROLE], HTTPStatus.NOT_FOUND, 'PS12345', 'XXXXXX'),
@@ -256,7 +258,7 @@ def test_delete_draft(session, client, jwt, desc, roles, status, account_id, dra
     response = client.delete('/api/v1/drafts/' + draft_num,
                              headers=headers)
     # check
-    if status != HTTPStatus.OK:
+    if status != HTTPStatus.OK and desc != "Invalid account staff":
         assert response.status_code == status
     else:
         assert response.status_code == HTTPStatus.NO_CONTENT

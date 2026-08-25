@@ -36,12 +36,12 @@ TEST_QUERY_ORDER_DATA = [
     (None, None, ' ORDER BY create_ts DESC'),
     ('invalid', None, ' ORDER BY create_ts DESC'),
     ('registrationNumber', None, ' ORDER BY document_number DESC'),
-    ('registrationNumber', 'asc', ' ORDER BY document_number asc'),
-    ('registrationType', 'ascending', ' ORDER BY registration_type ascending'),
-    ('registeringName', 'descending', ' ORDER BY registering_name descending'),
-    ('clientReferenceId', 'asc', ' ORDER BY client_reference_id asc'),
-    ('startDateTime', 'ascending', ' ORDER BY create_ts ascending'),
-    ('endDateTime', 'desc', ' ORDER BY create_ts desc')
+    ('registrationNumber', 'asc', ' ORDER BY document_number ASC'),
+    ('registrationType', 'ascending', ' ORDER BY registration_type ASC'),
+    ('registeringName', 'descending', ' ORDER BY registering_name DESC'),
+    ('clientReferenceId', 'asc', ' ORDER BY client_reference_id ASC'),
+    ('startDateTime', 'ascending', ' ORDER BY create_ts ASC'),
+    ('endDateTime', 'desc', ' ORDER BY create_ts DESC')
 ]
 
 # testdata pattern is ({doc_num}, {reg_type}, {client_ref}, {registering_name}, {start_ts}, {end_ts})
