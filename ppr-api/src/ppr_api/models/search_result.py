@@ -33,7 +33,7 @@ from .search_utils import GET_HISTORY_DAYS_LIMIT
 UI_CALLBACK_URL = "PPR_UI"
 SCORE_LARGE_REPORT: int = 999
 LARGE_REPORT_REG_COUNT: int = 400
-LARGE_REPORT_JSON_SIZE: int = 1024000
+LARGE_REPORT_JSON_SIZE: int = 800000
 SCORE_PAY_PENDING: int = 1000
 
 
@@ -121,15 +121,18 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
         self.search_response = detail_response
         if account_name:
             self.account_name = account_name
+        results_length = len(json.dumps(new_results))
         if callback_url:
             size_threshold = current_app.config.get("SEARCH_PDF_ASYNC_THRESHOLD")
             if detail_response.get("totalResultsSize") >= size_threshold:
                 self.callback_url = callback_url
-                if detail_response.get("totalResultsSize") >= LARGE_REPORT_REG_COUNT:
+                if (
+                    detail_response.get("totalResultsSize") >= LARGE_REPORT_REG_COUNT
+                    or results_length >= LARGE_REPORT_JSON_SIZE
+                ):
                     self.score = SCORE_LARGE_REPORT
                     logger.info("Setting score to mark report generation for large search container.")
             else:
-                results_length = len(json.dumps(new_results))
                 logger.debug(f"Search id={self.search_id} data size={results_length}.")
                 if results_length > current_app.config.get("MAX_SIZE_SEARCH_RT"):
                     # Small results size but large report data: allow callback
@@ -139,11 +142,13 @@ class SearchResult(db.Model):  # pylint: disable=too-many-instance-attributes
                         self.score = SCORE_LARGE_REPORT
                         logger.info("Setting score to mark report generation for large search container.")
         else:
-            results_length = len(json.dumps(new_results))
             logger.debug(f"Search id= {self.search_id} results size={results_length}.")
             if results_length > current_app.config.get("MAX_SIZE_SEARCH_RT"):
                 logger.info(f"Search id={self.search_id} size exceeds RT max, setting up async report.")
                 self.callback_url = current_app.config.get("UI_SEARCH_CALLBACK_URL")
+                if results_length >= LARGE_REPORT_JSON_SIZE:
+                    self.score = SCORE_LARGE_REPORT
+                    logger.info("Setting score to mark report generation for large search container.")
         self.save()
 
     def build_details(self):
