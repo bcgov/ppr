@@ -1,0 +1,17 @@
+{
+  "name": "ppr-git-hooks",
+  "private": true,
+  "type": "module",
+  "description": "Root-level package for Git hooks tooling only - ppr-ui, ppr-api and mhr-api each have their own package/dependency management.",
+  "scripts": {
+    "prepare": "lefthook install"
+  },
+  "devDependencies": {
+    "lefthook": "^1.11.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "lefthook"
+    ]
+  }
+}
