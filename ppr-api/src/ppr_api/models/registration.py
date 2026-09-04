@@ -52,6 +52,7 @@ class CrownChargeTypes(BaseEnum):
     CORP_TAX = RegistrationTypes.CC.value
     CARBON_TAX = RegistrationTypes.CT.value
     CONSUMPTION_TAX = RegistrationTypes.DP.value
+    EMPLOYEE_TAX = RegistrationTypes.EH.value
     EXCISE_TAX = RegistrationTypes.ET.value
     FOREST_TAX = RegistrationTypes.FO.value
     MOTOR_FUEL_TAX = RegistrationTypes.FT.value
@@ -67,6 +68,7 @@ class CrownChargeTypes(BaseEnum):
     PROV_SALES_TAX = RegistrationTypes.PS.value
     PROPERTY_TRANSFER_TAX = RegistrationTypes.PT.value
     RURAL_TAX = RegistrationTypes.RA.value
+    RESIDENTIAL_TAX = RegistrationTypes.RP.value
     SCHOOL_ACT = RegistrationTypes.SC.value
     SOCIAL_TAX = RegistrationTypes.SS.value
     TAX_LIEN = RegistrationTypes.TL.value
@@ -342,12 +344,8 @@ class Registration(db.Model):  # pylint: disable=too-many-instance-attributes, t
     def find_by_id(cls, registration_id: int):
         """Return the registration matching the id."""
         registration = None
-        try:
-            reg_id_int = int(registration_id) if registration_id is not None else None
-        except (TypeError, ValueError):
-            return None
-        if reg_id_int:
-            registration = db.session.query(Registration).filter(Registration.id == reg_id_int).one_or_none()
+        if registration_id:
+            registration = db.session.query(Registration).filter(Registration.id == registration_id).one_or_none()
         return registration
 
     @classmethod

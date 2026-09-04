@@ -37,6 +37,7 @@ from .db import db
 REPORT_STATUS_PENDING = "PENDING"
 CHARACTER_SET_UNSUPPORTED = "The search name {} charcter set is not supported.\n"
 PAY_PENDING: int = 1000
+FRENCH_TRANS_TABLE = str.maketrans("àâäéèêëîïôöùûüçÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ", "aaaeeeeiioouuucAAAEEEEIIOOUUUC")
 
 
 class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
@@ -434,6 +435,8 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
                 ind_name: str = str(search_json["criteria"]["debtorName"].get("first")).strip()
                 if search_json["criteria"]["debtorName"].get("middle"):
                     ind_name += " " + str(search_json["criteria"]["debtorName"].get("middle")).strip()
+                elif search_json["criteria"]["debtorName"].get("second"):
+                    ind_name += " " + str(search_json["criteria"]["debtorName"].get("second")).strip()
                 ind_name += " " + str(search_json["criteria"]["debtorName"].get("last")).strip()
                 new_search.search_value = ind_name.upper()
         return new_search
@@ -481,22 +484,26 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
 
     @staticmethod
     def validate_debtor_name(json_data):
-        """Verify search debtor name is valid."""
+        """Verify search debtor name is valid. Replace French characters prior to validating."""
         error_msg = ""
         if "criteria" in json_data and "debtorName" in json_data["criteria"]:
             debtor_json = json_data["criteria"]["debtorName"]
-            name = debtor_json.get("business", None)
-            if name and not valid_charset(name):
-                error_msg += CHARACTER_SET_UNSUPPORTED.format(name)
-            name = debtor_json.get("first", None)
-            if name and not valid_charset(name):
-                error_msg += CHARACTER_SET_UNSUPPORTED.format(name)
-            name = debtor_json.get("middle", None)
-            if name and not valid_charset(name):
-                error_msg += CHARACTER_SET_UNSUPPORTED.format(name)
-            name = debtor_json.get("last", None)
-            if name and not valid_charset(name):
-                error_msg += CHARACTER_SET_UNSUPPORTED.format(name)
+            if name := debtor_json.get("business", None):
+                debtor_json["business"] = replace_french_characters(name)
+                if not valid_charset(debtor_json["business"]):
+                    error_msg += CHARACTER_SET_UNSUPPORTED.format(name)
+            if name := debtor_json.get("first", None):
+                debtor_json["first"] = replace_french_characters(name)
+                if not valid_charset(debtor_json["first"]):
+                    error_msg += CHARACTER_SET_UNSUPPORTED.format(name)
+            if name := debtor_json.get("second", debtor_json.get("middle", None)):
+                debtor_json["second"] = replace_french_characters(name)
+                if not valid_charset(debtor_json["second"]):
+                    error_msg += CHARACTER_SET_UNSUPPORTED.format(name)
+            if name := debtor_json.get("last", None):
+                debtor_json["last"] = replace_french_characters(name)
+                if not valid_charset(debtor_json["last"]):
+                    error_msg += CHARACTER_SET_UNSUPPORTED.format(name)
         return error_msg
 
 
@@ -546,3 +553,13 @@ def build_search_history_json(row, from_ui: bool) -> dict:
         else:
             search["reportAvailable"] = False
     return search
+
+
+@staticmethod
+def replace_french_characters(name: str) -> str:
+    """
+    Search criteria debtor names replace French characters with ascii equivalent before generating a search key.
+    """
+    if not name or name == "":
+        return name
+    return name.translate(FRENCH_TRANS_TABLE)
