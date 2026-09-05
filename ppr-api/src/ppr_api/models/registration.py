@@ -52,6 +52,7 @@ class CrownChargeTypes(BaseEnum):
     CORP_TAX = RegistrationTypes.CC.value
     CARBON_TAX = RegistrationTypes.CT.value
     CONSUMPTION_TAX = RegistrationTypes.DP.value
+    EMPLOYEE_TAX = RegistrationTypes.EH.value
     EXCISE_TAX = RegistrationTypes.ET.value
     FOREST_TAX = RegistrationTypes.FO.value
     MOTOR_FUEL_TAX = RegistrationTypes.FT.value
@@ -67,6 +68,7 @@ class CrownChargeTypes(BaseEnum):
     PROV_SALES_TAX = RegistrationTypes.PS.value
     PROPERTY_TRANSFER_TAX = RegistrationTypes.PT.value
     RURAL_TAX = RegistrationTypes.RA.value
+    RESIDENTIAL_TAX = RegistrationTypes.RP.value
     SCHOOL_ACT = RegistrationTypes.SC.value
     SOCIAL_TAX = RegistrationTypes.SS.value
     TAX_LIEN = RegistrationTypes.TL.value

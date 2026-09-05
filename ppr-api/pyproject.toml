@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ppr-api"
-version = "1.4.1"
+version = "1.4.2"
 description = ""
 authors = ["dlovett <doug@daxiom.com>"]
 license = "BSD 3"
@@ -44,7 +44,7 @@ alembic-utils = "^0.8.3"
 datedelta = "^1.4"
 flask-jwt-oidc = "^0.7.0"
 flask-babel = "^4.0.0"
-registry-schemas = {git = "https://github.com/bcgov/registry-schemas.git", rev = "1.8.14"}
+registry-schemas = {git = "https://github.com/bcgov/registry-schemas.git", rev = "1.8.16"}
 psycopg2-binary = "^2.9.12"
 
 

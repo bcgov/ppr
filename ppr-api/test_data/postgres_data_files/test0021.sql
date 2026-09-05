@@ -2,13 +2,13 @@
 -- No match on registering, secured party names, so test account GETs are unauthorized.
 INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
                   registration_number, update_ts, draft)
-  VALUES(200000035, 'D-T-0019RE', 'PS00001', timestamp with time zone '2021-09-03 15:00:00-07' at time zone 'utc', 
+  VALUES(200000035, 'D-T-0019RE', 'PS00001', timestamp with time zone '2025-09-03 15:00:00-07' at time zone 'utc', 
          'RENEWAL', 'RE', 'TEST0019', null, '{}');
 INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)
     VALUES(200000032, 200000013, 'TEST0019RE', 'TEST0019', 'RE', 'RENEWAL', 
-           timestamp with time zone '2021-09-03 15:00:00-07' at time zone 'utc', 200000035, 5,
+           timestamp with time zone '2025-09-03 15:00:00-07' at time zone 'utc', 200000035, 5,
            null, null, 'PS00001', 'TEST-RE-0019', null, null)
 ;
 -- simulate bad legacy address
@@ -46,16 +46,16 @@ INSERT INTO parties(id, party_type, registration_id, financing_id, registration_
 -- Financing statement secured party should match user account name
 INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
                   registration_number, update_ts, draft)
-  VALUES(200000037, 'D-T-0021', 'PS00001', timestamp with time zone '2021-09-03 12:00:00-07' at time zone 'utc', 
+  VALUES(200000037, 'D-T-0021', 'PS00001', timestamp with time zone '2026-09-03 12:00:00-07' at time zone 'utc', 
          'PPSALIEN', 'SA', 'TEST0021', null, '{}');
 INSERT INTO financing_statements(id, state_type, expire_date, life, discharged, renewed)
-  VALUES(200000016, 'ACT', timestamp with time zone '2026-09-03 23:59:59-07' at time zone 'utc', 5, 'N' , null)
+  VALUES(200000016, 'ACT', timestamp with time zone '2031-09-03 23:59:59-07' at time zone 'utc', 5, 'N' , null)
 ;
 INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)
     VALUES(200000034, 200000016, 'TEST0021', null, 'SA', 'PPSALIEN', 
-           timestamp with time zone '2021-09-03 12:00:00-07' at time zone 'utc', 200000037, 5,
+           timestamp with time zone '2026-09-03 12:00:00-07' at time zone 'utc', 200000037, 5,
            null, null, 'PS00001', 'TEST-SA-0021', null, null)
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
@@ -81,13 +81,13 @@ INSERT INTO general_collateral(id, registration_id, financing_id, registration_i
 -- Add an amendment with matching reg party name.
 INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
                   registration_number, update_ts, draft)
-  VALUES(200000038, 'D-T-0021AM', 'PS00001', timestamp with time zone '2021-09-03 14:00:00-07' at time zone 'utc', 
+  VALUES(200000038, 'D-T-0021AM', 'PS00001', timestamp with time zone '2026-09-03 14:00:00-07' at time zone 'utc', 
          'PPSALIEN', 'SA', 'TEST0021', null, '{}');
 INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)
     VALUES(200000035, 200000016, 'TEST0021AM', 'TEST0021', 'AM', 'AMENDMENT',
-           timestamp with time zone '2021-09-03 14:00:00-07' at time zone 'utc', 200000038, null,
+           timestamp with time zone '2026-09-03 14:00:00-07' at time zone 'utc', 200000038, null,
            null, null, 'PS00001', 'TEST-AM1-0021', null, null)
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
@@ -105,13 +105,13 @@ INSERT INTO parties(id, party_type, registration_id, financing_id, registration_
 
 INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
                   registration_number, update_ts, draft)
-  VALUES(200000039, 'D-T-0021RE', 'PS00001', timestamp with time zone '2021-09-03 15:00:00-07' at time zone 'utc', 
+  VALUES(200000039, 'D-T-0021RE', 'PS00001', timestamp with time zone '2026-09-03 15:00:00-07' at time zone 'utc', 
          'RENEWAL', 'RE', 'TEST0021', null, '{}');
 INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)
     VALUES(200000036, 200000016, 'TEST0021RE', 'TEST0021', 'RE', 'RENEWAL', 
-           timestamp with time zone '2021-09-03 15:00:00-07' at time zone 'utc', 200000039, 5,
+           timestamp with time zone '2026-09-03 15:00:00-07' at time zone 'utc', 200000039, 5,
            null, null, 'PS00001', 'TEST-RE-0021', null, null)
 ;
 INSERT INTO parties(id, party_type, registration_id, financing_id, registration_id_end, branch_id, first_name,

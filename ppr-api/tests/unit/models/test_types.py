@@ -31,6 +31,8 @@ TEST_REG_TYPES = [
     (RegistrationTypes.AM.value, True),
     (RegistrationTypes.SA.value, True),
     (RegistrationTypes.CL.value, True),
+    (RegistrationTypes.EH.value, True),
+    (RegistrationTypes.RP.value, True),
 ]
 # testdata pattern is ({client_code_type}, {exists})
 TEST_CLIENT_CODE_TYPES = [

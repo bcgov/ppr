@@ -2820,6 +2820,12 @@ def upgrade():
         },
         {
             'registration_type_cl': 'CROWNLIEN',
+            'registration_type': 'EH',
+            'registration_act': 'MISCELLANEOUS REGISTRATIONS ACT',
+            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO EMPLOYEE HEALTH TAX ACT'
+        },
+        {
+            'registration_type_cl': 'CROWNLIEN',
             'registration_type': 'ET',
             'registration_act': 'MISCELLANEOUS REGISTRATIONS ACT',
             'registration_desc': 'CROWN CHARGE FILED PURSUANT TO EXCISE TAX ACT'
@@ -2907,6 +2913,12 @@ def upgrade():
             'registration_type': 'RA',
             'registration_act': 'MISCELLANEOUS REGISTRATIONS ACT',
             'registration_desc': 'CROWN CHARGE FILED PURSUANT TO TAXATION (RURAL AREA) ACT'
+        },
+        {
+            'registration_type_cl': 'CROWNLIEN',
+            'registration_type': 'RP',
+            'registration_act': 'MISCELLANEOUS REGISTRATIONS ACT',
+            'registration_desc': 'CROWN CHARGE FILED PURSUANT TO RESIDENTIAL PROPERTY PROFIT TAX ACT'
         },
         {
             'registration_type_cl': 'CROWNLIEN',

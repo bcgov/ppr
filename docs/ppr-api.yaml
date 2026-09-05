@@ -6183,6 +6183,8 @@ components:
         - A1
         - A2
         - A3
+        - EH
+        - RP
       description: |
         <p>The registration type has 3 uses:</p>
         <ol>
@@ -6210,6 +6212,7 @@ components:
           <li>SE - SECURITIES ORDER OR PROCEEDING</li>
           <li>WL - LIEN FOR UNPAID WAGES</li>
           <li>CT - CROWN CHARGE FILED PURSUANT TO CARBON TAX ACT</li>
+          <li>EH - CROWN CHARGE FILED PURSUANT TO EMPLOYEE HEALTH TAX ACT</li>
           <li>ET - CROWN CHARGE FILED PURSUANT TO EXCISE TAX ACT</li>
           <li>FO - CROWN CHARGE FILED PURSUANT TO FOREST ACT</li>
           <li>FT - CROWN CHARGE FILED PURSUANT TO MOTOR FUEL TAX ACT</li>
@@ -6222,6 +6225,7 @@ components:
           <li>PS - CROWN CHARGE FILED PURSUANT TO PROVINCIAL SALES TAX ACT</li>
           <li>PT - CROWN CHARGE FILED PURSUANT TO PROPERTY TRANSFER TAX ACT</li>
           <li>RA - CROWN CHARGE FILED PURSUANT TO TAXATION (RURAL AREA) ACT</li>
+          <li>RP - CROWN CHARGE FILED PURSUANT TO RESIDENTIAL PROPERTY PROFIT TAX ACT</li>
           <li>SC - CROWN CHARGE FILED PURSUANT TO SCHOOL ACT</li>
           <li>SV - CROWN CHARGE FILED PURSUANT TO SPECULATION AND VACANCY TAX ACT</li>
           <li>TO - CROWN CHARGE FILED PURSUANT TO TOBACCO TAX ACT</li>

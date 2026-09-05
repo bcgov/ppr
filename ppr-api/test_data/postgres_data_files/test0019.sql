@@ -1,16 +1,16 @@
 -- TEST0019 user account extra registration test data. Financing statements created with a different account id.
 INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
                   registration_number, update_ts, draft)
-  VALUES(200000031, 'D-T-0019', 'PS00001', timestamp with time zone '2021-09-03 12:00:00-07' at time zone 'utc', 
+  VALUES(200000031, 'D-T-0019', 'PS00001', timestamp with time zone '2025-09-03 12:00:00-07' at time zone 'utc', 
          'PPSALIEN', 'SA', 'TEST0019', null, '{}');
 INSERT INTO financing_statements(id, state_type, expire_date, life, discharged, renewed)
-  VALUES(200000013, 'ACT', timestamp with time zone '2026-09-03 23:59:59-07' at time zone 'utc', 5, 'N' , null)
+  VALUES(200000013, 'ACT', timestamp with time zone '2031-09-03 23:59:59-07' at time zone 'utc', 5, 'N' , null)
 ;
 INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)
     VALUES(200000028, 200000013, 'TEST0019', null, 'SA', 'PPSALIEN', 
-           timestamp with time zone '2021-09-03 12:00:00-07' at time zone 'utc', 200000031, 5,
+           timestamp with time zone '2025-09-03 12:00:00-07' at time zone 'utc', 200000031, 5,
            null, null, 'PS00001', 'TEST-SA-0019', null, null)
 ;
 INSERT INTO trust_indentures(id, registration_id, financing_id, trust_indenture, registration_id_end)
@@ -53,16 +53,16 @@ INSERT INTO user_extra_registrations(id, account_id, registration_number, remove
 -- one that can be added
 INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
                   registration_number, update_ts, draft)
-  VALUES(200000032, 'D-T-0019A', 'PS00001', timestamp with time zone '2021-09-03 11:00:00-07' at time zone 'utc', 
+  VALUES(200000032, 'D-T-0019A', 'PS00001', timestamp with time zone '2025-09-03 11:00:00-07' at time zone 'utc', 
          'PPSALIEN', 'SA', 'TEST0019A', null, '{}');
 INSERT INTO financing_statements(id, state_type, expire_date, life, discharged, renewed)
-  VALUES(200000014, 'ACT', timestamp with time zone '2026-09-03 23:59:59-07' at time zone 'utc', 5, 'N' , null)
+  VALUES(200000014, 'ACT', timestamp with time zone '2031-09-03 23:59:59-07' at time zone 'utc', 5, 'N' , null)
 ;
 INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)
     VALUES(200000029, 200000014, 'TEST0019A', null, 'SA', 'PPSALIEN', 
-           timestamp with time zone '2021-09-03 11:00:00-07' at time zone 'utc', 200000032, 5,
+           timestamp with time zone '2025-09-03 11:00:00-07' at time zone 'utc', 200000032, 5,
            null, null, 'PS00001', 'TEST-SA-0019A', null, null)
 ;
 INSERT INTO trust_indentures(id, registration_id, financing_id, trust_indenture, registration_id_end)
@@ -93,13 +93,13 @@ INSERT INTO general_collateral(id, registration_id, financing_id, registration_i
 -- Add an amendment for registration access testing
 INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
                   registration_number, update_ts, draft)
-  VALUES(200000033, 'D-T-0019AM', 'PS00001', timestamp with time zone '2021-09-03 14:00:00-07' at time zone 'utc', 
+  VALUES(200000033, 'D-T-0019AM', 'PS00001', timestamp with time zone '2025-09-03 14:00:00-07' at time zone 'utc', 
          'PPSALIEN', 'SA', 'TEST0019', null, '{}');
 INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)
     VALUES(200000030, 200000013, 'TEST0019AM', 'TEST0019', 'AM', 'AMENDMENT',
-           timestamp with time zone '2021-09-03 14:00:00-07' at time zone 'utc', 200000033, null,
+           timestamp with time zone '2025-09-03 14:00:00-07' at time zone 'utc', 200000033, null,
            null, null, 'PS00001', 'TEST-AM1-0019', null, null)
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)

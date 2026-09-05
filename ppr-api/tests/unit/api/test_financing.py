@@ -317,7 +317,9 @@ TEST_CREATE_DATA = [
     ('Valid Security Agreement', FINANCING_VALID, [PPR_ROLE], HTTPStatus.CREATED, True),
     ('SBC Valid Security Agreement', FINANCING_VALID, [PPR_ROLE, GOV_ACCOUNT_ROLE], HTTPStatus.CREATED, True),
     ('Valid Securities Act', FINANCING_VALID, [PPR_ROLE], HTTPStatus.CREATED, True),
-    ('Valid Commercial Lien', FINANCING_VALID, [PPR_ROLE], HTTPStatus.CREATED, True)
+    ('Valid Commercial Lien', FINANCING_VALID, [PPR_ROLE], HTTPStatus.CREATED, True),
+    ('Valid CC EH', FINANCING_VALID, [PPR_ROLE], HTTPStatus.CREATED, True),
+    ('Valid CC RP', FINANCING_VALID, [PPR_ROLE], HTTPStatus.CREATED, True),
 ]
 # testdata pattern is ({role}, {routingSlip}, {bcolNumber}, {datNUmber}, {status})
 TEST_STAFF_CREATE_DATA = [
@@ -435,6 +437,7 @@ TEST_PAY_TYPE_FINANCING = [
     ('CT', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
     ('DP', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
     ('ET', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('EH', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
     ('FO', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
     ('FT', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
     ('HR', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
@@ -447,6 +450,7 @@ TEST_PAY_TYPE_FINANCING = [
     ('PG', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
     ('PS', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
     ('RA', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
+    ('RP', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
     ('SS', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
     ('TL', 99, 1, TransactionTypes.FINANCING_NO_FEE.value),
     ('CL', 5, 5, TransactionTypes.FINANCING_CL.value),
@@ -488,6 +492,11 @@ def test_create(session, client, jwt, desc, request_data, roles, status, has_acc
         del json_data['trustIndenture']
         json_data['lifeInfinite'] = False
         json_data['lifeYears'] = 3
+    elif desc in ('Valid CC EH', 'Valid CC RP'):
+        json_data['type'] = RegistrationTypes.EH.value if desc == 'Valid CC EH' else RegistrationTypes.RP.value
+        del json_data['trustIndenture']
+        json_data['lifeInfinite'] = True
+        del json_data['lifeYears']
     if has_account and BCOL_HELP in roles:
         headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
     elif has_account and GOV_ACCOUNT_ROLE in roles:
