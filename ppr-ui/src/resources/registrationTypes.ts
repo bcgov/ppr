@@ -31,6 +31,15 @@ export const RegistrationTypesMiscellaneousCC: Array<RegistrationTypeIF> = [
     disabled: false,
     divider: false,
     group: 1,
+    registrationTypeUI: UIRegistrationTypes.EMPLOYEE_HEALTH_TAX,
+    registrationTypeAPI: APIRegistrationTypes.EMPLOYEE_HEALTH_TAX,
+    text: `${UIRegistrationTypes.EMPLOYEE_HEALTH_TAX}`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 1,
     registrationTypeUI: UIRegistrationTypes.EXCISE_TAX,
     registrationTypeAPI: APIRegistrationTypes.EXCISE_TAX,
     text: `${UIRegistrationTypes.EXCISE_TAX}`
@@ -115,6 +124,15 @@ export const RegistrationTypesMiscellaneousCC: Array<RegistrationTypeIF> = [
     registrationTypeUI: UIRegistrationTypes.PROVINCIAL_SALES_TAX,
     registrationTypeAPI: APIRegistrationTypes.PROVINCIAL_SALES_TAX,
     text: `${UIRegistrationTypes.PROVINCIAL_SALES_TAX}`
+  },
+  {
+    class: 'registration-list-item',
+    disabled: false,
+    divider: false,
+    group: 1,
+    registrationTypeUI: UIRegistrationTypes.RESIDENTIAL_PROPERTY_PROFIT_TAX,
+    registrationTypeAPI: APIRegistrationTypes.RESIDENTIAL_PROPERTY_PROFIT_TAX,
+    text: `${UIRegistrationTypes.RESIDENTIAL_PROPERTY_PROFIT_TAX}`
   },
   {
     class: 'registration-list-item',

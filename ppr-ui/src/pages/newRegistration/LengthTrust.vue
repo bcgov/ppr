@@ -202,6 +202,8 @@ export default defineComponent({
           case APIRegistrationTypes.TOBACCO_TAX:
           case APIRegistrationTypes.SPECULATION_VACANCY_TAX:
           case APIRegistrationTypes.SECURITY_ACT_NOTICE:
+          case APIRegistrationTypes.EMPLOYEE_HEALTH_TAX:
+          case APIRegistrationTypes.RESIDENTIAL_PROPERTY_PROFIT_TAX:
             return (
               'The registration length for this registration is automatically set to infinite. ' +
               'There is no fee for this registration.'
