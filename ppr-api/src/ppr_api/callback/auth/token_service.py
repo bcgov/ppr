@@ -19,6 +19,7 @@ from abc import ABC, abstractmethod
 import google.auth.transport.requests
 import google.oauth2.id_token
 from flask import current_app
+from google.auth.jwt import Credentials
 from google.oauth2 import service_account
 
 from ppr_api.utils.logging import logger
@@ -98,10 +99,16 @@ class GoogleStorageTokenService(TokenService):  # pylint: disable=too-few-public
         """Generate an OAuth access token with IAM configured auth mhr api container to report api container."""
         audience: str = rs_url if rs_url else current_app.config.get("REPORT_API_AUDIENCE")
         if rs_url:
-            logger.info(f"Getting report service token for {rs_url}")
+            logger.debug(f"Getting report service token for {rs_url}")
         if not audience:
             return None
+
         auth_req = google.auth.transport.requests.Request()
+        if cls.gcp_auth_key and cls.service_account_info:
+            report_credentials = Credentials.from_service_account_info(cls.service_account_info, audience=audience)
+            report_credentials.refresh(auth_req)
+            return report_credentials.token
+
         token = google.oauth2.id_token.fetch_id_token(auth_req, audience)
         logger.debug("Call successful: obtained token.")
         return token

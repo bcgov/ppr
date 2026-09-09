@@ -22,10 +22,16 @@ def test_get_token(session, client, jwt):
     """Assert that config to get a google storage token works as expected."""
     token = GoogleStorageTokenService.get_token()
     if current_app.config.get("GOOGLE_DEFAULT_SA"):
-        logger.debug(token)
         assert token
     else:
         assert not token
+
+
+def test_get_report_token(session, client, jwt):
+    """Assert that config to get a report service token works as expected."""
+    if current_app.config.get("GOOGLE_DEFAULT_SA"):
+        token = GoogleStorageTokenService.get_report_api_token()
+        assert token
 
 
 def test_get_credentials(session, client, jwt):

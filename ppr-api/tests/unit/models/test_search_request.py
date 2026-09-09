@@ -22,7 +22,7 @@ import copy
 import pytest
 
 from ppr_api.models import SearchRequest, search_utils
-from ppr_api.models.search_request import CHARACTER_SET_UNSUPPORTED
+from ppr_api.models.search_request import CHARACTER_SET_UNSUPPORTED, replace_french_characters
 from ppr_api.models.search_utils import AccountSearchParams
 from ppr_api.models.utils import now_ts_offset, format_ts
 from ppr_api.exceptions import BusinessException
@@ -307,12 +307,23 @@ IS_INVALID_NAME_JSON = {
     'type': 'INDIVIDUAL_DEBTOR',
     'criteria': {
         'debtorName': {
-            'first': 'FN répertoire',
-            'middle': 'MN répertoire',
-            'last': 'LN répertoire'
+            'first': 'FN Winston\u2019s',
+            'middle': 'MN Winston\u2019s',
+            'last': 'LN Winston\u2019s'
         }
     },
     'clientReferenceId': 'T-SQ-IS-3'
+}
+IS_VALID_NAME_FRENCH_JSON = {
+    'type': 'INDIVIDUAL_DEBTOR',
+    'criteria': {
+        'debtorName': {
+            'first': 'àâäéèêëîïôöùûüçÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ',
+            'second': 'àâäéèêëîïôöùûüçÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ',
+            'last': 'àâäéèêëîïôöùûüçÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ'
+        }
+    },
+    'clientReferenceId': 'T-SQ-IS-4'
 }
 BS_INVALID_NAME_JSON = {
     'type': 'BUSINESS_DEBTOR',
@@ -322,6 +333,15 @@ BS_INVALID_NAME_JSON = {
         }
     },
     'clientReferenceId': 'T-SQ-DB-4'
+}
+BS_VALID_NAME_FRENCH_JSON = {
+    'type': 'BUSINESS_DEBTOR',
+    'criteria': {
+        'debtorName': {
+            'business': 'àâäéèêëîïôöùûüçÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ'
+        }
+    },
+    'clientReferenceId': 'T-SQ-DB-5'
 }
 
 # testdata pattern is ({search type}, {JSON data})
@@ -406,14 +426,16 @@ TEST_REGISTRATION_TYPES = [
 TEST_DEBTOR_NAME_DATA = [
     ('Valid ind names', IS_NONE_JSON, True, None),
     ('Valid bus name', BS_NONE_JSON, True, None),
+    ('Valid French ind names', IS_VALID_NAME_FRENCH_JSON, True, None),
+    ('Valid French bus name', BS_VALID_NAME_FRENCH_JSON, True, None),
     ('Invalid bus name', BS_INVALID_NAME_JSON, False,
      CHARACTER_SET_UNSUPPORTED.format('\U0001d5c4\U0001d5c6/\U0001d5c1')),
     ('Invalid ind first name', IS_INVALID_NAME_JSON, False,
-     CHARACTER_SET_UNSUPPORTED.format('FN répertoire')),
+     CHARACTER_SET_UNSUPPORTED.format('FN Winston\u2019s')),
     ('Invalid ind middle name', IS_INVALID_NAME_JSON, False,
-     CHARACTER_SET_UNSUPPORTED.format('MN répertoire')),
+     CHARACTER_SET_UNSUPPORTED.format('MN Winston\u2019s')),
     ('Invalid ind last name', IS_INVALID_NAME_JSON, False,
-     CHARACTER_SET_UNSUPPORTED.format('LN répertoire'))
+     CHARACTER_SET_UNSUPPORTED.format('LN Winston\u2019s'))
 ]
 # testdata pattern is ({mhr_number}, {expected_num})
 TEST_MHR_NUMBER_DATA = [
@@ -430,6 +452,27 @@ TEST_ACCOUNT_DATA = [
     ('PS12345', True, 2, False),
     ('PSXXXXX', True, 1, False)
 ]
+# testdata pattern is ({original}, {expected})
+TEST_FRENCH_NAME_DATA = [
+    ("test", "test"),
+    ("Éléphant", "Elephant"),
+    ("garçon", "garcon"),
+    ("Noël", "Noel"),
+    ("à", "a"),
+    ("où", "ou"),
+    ("croûte", "croute"),
+    ("àâäéèêëîïôöùûüçÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ", "aaaeeeeiioouuucAAAEEEEIIOOUUUC"),
+    ("\u00e9\u00e0\u00e8\u00f9\u00e7\u00e2\u00ea\u00ee\u00f4\u00fb\u00eb\u00ef", "eaeucaeiouei"),
+    ("\u00c0\u00c2\u00c7\u00c9\u00c8\u00ca\u00cb\u00ce\u00cf\u00d4\u00d9\u00db", "AACEEEEIIOUU"),
+    ("\U0001d5c4\U0001d5c6/\U0001d5c1", "\U0001d5c4\U0001d5c6/\U0001d5c1"),
+]
+
+
+@pytest.mark.parametrize("original,expected", TEST_FRENCH_NAME_DATA)
+def test_french_names(session, original, expected):
+    """Assert that removing French characters from a search name works as expected."""
+    test_name = replace_french_characters(original)
+    assert test_name == expected
 
 
 def test_search_no_account(session):

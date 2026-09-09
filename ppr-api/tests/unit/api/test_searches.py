@@ -83,6 +83,26 @@ BUSINESS_DEBTOR_JSON = {
     },
     'clientReferenceId': 'T-SQ-DB-1'
 }
+IS_VALID_NAME_FRENCH_JSON = {
+    'type': 'INDIVIDUAL_DEBTOR',
+    'criteria': {
+        'debtorName': {
+            'first': 'àâäéèêëîïôöùûüçÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ',
+            'second': 'àâäéèêëîïôöùûüçÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ',
+            'last': 'àâäéèêëîïôöùûüçÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ'
+        }
+    },
+    'clientReferenceId': 'T-SQ-IS-4'
+}
+BS_VALID_NAME_FRENCH_JSON = {
+    'type': 'BUSINESS_DEBTOR',
+    'criteria': {
+        'debtorName': {
+            'business': 'àâäéèêëîïôöùûüçÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ'
+        }
+    },
+    'clientReferenceId': 'T-SQ-DB-5'
+}
 
 # testdata pattern is ({search type}, {JSON data})
 TEST_VALID_DATA = [
@@ -91,7 +111,9 @@ TEST_VALID_DATA = [
     ('MH', MHR_NUMBER_JSON),
     ('SS', SERIAL_NUMBER_JSON),
     ('IS', INDIVIDUAL_DEBTOR_JSON),
-    ('BS', BUSINESS_DEBTOR_JSON)
+    ('BS', BUSINESS_DEBTOR_JSON),
+    ('IS', IS_VALID_NAME_FRENCH_JSON),
+    ('BS', BS_VALID_NAME_FRENCH_JSON),
 ]
 # testdata pattern is ({role}, {routingSlip}, {bcolNumber}, {datNUmber}, {certified}, {status})
 TEST_STAFF_SEARCH_DATA = [

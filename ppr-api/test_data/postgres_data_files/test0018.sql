@@ -1,16 +1,16 @@
 -- TEST0018 legacy general collateral with legacy amendments.
 INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
                   registration_number, update_ts, draft)
-  VALUES(200000027, 'D-T-0018', 'PS12345', timestamp with time zone '2021-09-03 12:00:00-07' at time zone 'utc', 
+  VALUES(200000027, 'D-T-0018', 'PS12345', timestamp with time zone '2026-09-03 12:00:00-07' at time zone 'utc', 
          'PPSALIEN', 'SA', 'TEST0018', null, '{}');
 INSERT INTO financing_statements(id, state_type, expire_date, life, discharged, renewed)
-  VALUES(200000012, 'ACT', timestamp with time zone '2026-09-03 23:59:59-07' at time zone 'utc', 5, 'N' , null)
+  VALUES(200000012, 'ACT', timestamp with time zone '2031-09-03 23:59:59-07' at time zone 'utc', 5, 'N' , null)
 ;
 INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path)
     VALUES(200000024, 200000012, 'TEST0018', null, 'SA', 'PPSALIEN', 
-           timestamp with time zone '2021-09-03 12:00:00-07' at time zone 'utc', 200000027, 5,
+           timestamp with time zone '2026-09-03 12:00:00-07' at time zone 'utc', 200000027, 5,
            null, null, 'PS12345', 'TEST-SA-0018', null, null)
 ;
 INSERT INTO trust_indentures(id, registration_id, financing_id, trust_indenture, registration_id_end)
@@ -48,13 +48,13 @@ INSERT INTO general_collateral_legacy(id, registration_id, financing_id, registr
 -- Legacy Amendment add gc
 INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
                   registration_number, update_ts, draft)
-  VALUES(200000028, 'D-T-0018A1', 'PS12345', timestamp with time zone '2021-09-03 13:00:00-07' at time zone 'utc', 
+  VALUES(200000028, 'D-T-0018A1', 'PS12345', timestamp with time zone '2026-09-03 13:00:00-07' at time zone 'utc', 
          'AMENDMENT', 'AM', 'TEST0018A1', null, '{}');
 INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path, detail_description)
     VALUES(200000025, 200000012, 'TEST0018A1', 'TEST0018', 'AM', 'AMENDMENT', 
-           timestamp with time zone '2021-09-03 13:00:00-07' at time zone 'utc', 200000028, null,
+           timestamp with time zone '2026-09-03 13:00:00-07' at time zone 'utc', 200000028, null,
            null, null, 'PS12345', 'TEST-AM-0018-1', null, null, 'TEST add gc legacy')
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
@@ -73,13 +73,13 @@ INSERT INTO general_collateral_legacy(id, registration_id, financing_id, registr
 -- Legacy Amendment remove gc
 INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
                   registration_number, update_ts, draft)
-  VALUES(200000029, 'D-T-0018A2', 'PS12345', timestamp with time zone '2021-09-03 14:00:00-07' at time zone 'utc', 
+  VALUES(200000029, 'D-T-0018A2', 'PS12345', timestamp with time zone '2026-09-03 14:00:00-07' at time zone 'utc', 
          'AMENDMENT', 'AM', 'TEST0018A2', null, '{}');
 INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path, detail_description)
     VALUES(200000026, 200000012, 'TEST0018A2', 'TEST0018', 'AM', 'AMENDMENT', 
-           timestamp with time zone '2021-09-03 14:00:00-07' at time zone 'utc', 200000029, null,
+           timestamp with time zone '2026-09-03 14:00:00-07' at time zone 'utc', 200000029, null,
            null, null, 'PS12345', 'TEST-AM-0018-2', null, null, 'TEST remove gc legacy')
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
@@ -97,13 +97,13 @@ INSERT INTO general_collateral_legacy(id, registration_id, financing_id, registr
 -- New amendment remove legacy gc 2 by description , add gc 5
 INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type_cl, registration_type,
                   registration_number, update_ts, draft)
-  VALUES(200000030, 'D-T-0018A3', 'PS12345', timestamp with time zone '2021-09-03 15:00:00-07' at time zone 'utc', 
+  VALUES(200000030, 'D-T-0018A3', 'PS12345', timestamp with time zone '2026-09-03 15:00:00-07' at time zone 'utc', 
          'AMENDMENT', 'AM', 'TEST0018A3', null, '{}');
 INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
                          surrender_date, account_id, client_reference_id, pay_invoice_id, pay_path, detail_description)
     VALUES(200000027, 200000012, 'TEST0018A3', 'TEST0018', 'AM', 'AMENDMENT', 
-           timestamp with time zone '2021-09-03 15:00:00-07' at time zone 'utc', 200000030, null,
+           timestamp with time zone '2026-09-03 15:00:00-07' at time zone 'utc', 200000030, null,
            null, null, 'PS12345', 'TEST-AM-0018-3', null, null, 'TEST remove gc legacy 2, add gc 5')
 ;
 INSERT INTO addresses(id, street, street_additional, city, region, postal_code, country)
