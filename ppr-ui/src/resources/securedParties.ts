@@ -28,5 +28,7 @@ export const SecuredPartyRestrictedList = [
   APIRegistrationTypes.CROWN_SOCIAL_SERVICE_TAX,
   APIRegistrationTypes.TRANSITION_TAX_LIEN,
   APIRegistrationTypes.TOBACCO_TAX,
-  APIRegistrationTypes.SPECULATION_VACANCY_TAX
+  APIRegistrationTypes.SPECULATION_VACANCY_TAX,
+  APIRegistrationTypes.EMPLOYEE_HEALTH_TAX,
+  APIRegistrationTypes.RESIDENTIAL_PROPERTY_PROFIT_TAX
 ]

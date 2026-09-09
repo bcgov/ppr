@@ -152,7 +152,9 @@ describe('Length and Trust Indenture new registration component', () => {
         APIRegistrationTypes.PROPERTY_TRANSFER_TAX,
         APIRegistrationTypes.MINERAL_LAND_TAX,
         APIRegistrationTypes.TOBACCO_TAX,
-        APIRegistrationTypes.SPECULATION_VACANCY_TAX
+        APIRegistrationTypes.SPECULATION_VACANCY_TAX,
+        APIRegistrationTypes.EMPLOYEE_HEALTH_TAX,
+        APIRegistrationTypes.RESIDENTIAL_PROPERTY_PROFIT_TAX
       ]
       if (RegistrationTypes[i].registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN) {
         expect(wrapper.find(titleInfo).text()).toContain('Enter the amount of the Lien and the date the vehicle')

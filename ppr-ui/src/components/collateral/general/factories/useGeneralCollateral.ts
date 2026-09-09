@@ -41,7 +41,9 @@ export const useGeneralCollateral = () => {
       APIRegistrationTypes.TRANSITION_MH,
       APIRegistrationTypes.TOBACCO_TAX,
       APIRegistrationTypes.SPECULATION_VACANCY_TAX,
-      APIRegistrationTypes.REPAIRERS_LIEN
+      APIRegistrationTypes.REPAIRERS_LIEN,
+      APIRegistrationTypes.EMPLOYEE_HEALTH_TAX,
+      APIRegistrationTypes.RESIDENTIAL_PROPERTY_PROFIT_TAX
     ]
 
     return ghArray.includes(registrationType)

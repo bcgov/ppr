@@ -13,6 +13,7 @@ export enum APIRegistrationTypes {
   FORESTRY_SUBCONTRACTOR_LIEN = 'FS',
   // miscellaneous registration cc
   CARBON_TAX = 'CT',
+  EMPLOYEE_HEALTH_TAX = 'EH',
   EXCISE_TAX = 'ET',
   FOREST = 'FO',
   INCOME_TAX = 'IT',
@@ -23,6 +24,7 @@ export enum APIRegistrationTypes {
   PETROLEUM_NATURAL_GAS_TAX = 'PG',
   PROPERTY_TRANSFER_TAX = 'PT',
   PROVINCIAL_SALES_TAX = 'PS',
+  RESIDENTIAL_PROPERTY_PROFIT_TAX = 'RP',
   RURAL_PROPERTY_TAX = 'RA',
   SCHOOL_ACT = 'SC',
   SPECULATION_VACANCY_TAX = 'SV',
@@ -85,6 +87,7 @@ export enum UIRegistrationTypes {
   FORESTRY_SUBCONTRACTOR_LIEN = 'Forestry - Sub-contractor Charge',
   // miscellaneous registration cc
   CARBON_TAX = 'Crown Charge - Carbon Tax Act',
+  EMPLOYEE_HEALTH_TAX = 'Crown Charge - Employee Health Tax Act',
   EXCISE_TAX = 'Crown Charge - Excise Tax Act',
   FOREST = 'Crown Charge - Forest Act',
   INCOME_TAX = 'Crown Charge - Income Tax Act',
@@ -95,6 +98,7 @@ export enum UIRegistrationTypes {
   PROPERTY_TRANSFER_TAX = 'Crown Charge - Property Transfer Tax Act',
   PETROLEUM_NATURAL_GAS_TAX = 'Crown Charge - Petroleum and Natural Gas Act',
   PROVINCIAL_SALES_TAX = 'Crown Charge - Provincial Sales Tax Act',
+  RESIDENTIAL_PROPERTY_PROFIT_TAX = 'Crown Charge - Residential Property Profit Tax Act',
   RURAL_PROPERTY_TAX = 'Crown Charge - Taxation (Rural Area) Act',
   SCHOOL_ACT = 'Crown Charge - School Act',
   SPECULATION_VACANCY_TAX = 'Crown Charge - Speculation and Vacancy Tax Act',
