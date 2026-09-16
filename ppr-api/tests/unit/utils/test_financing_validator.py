@@ -536,8 +536,11 @@ def test_validate_crown(session, desc, valid, message_content):
             del json_data['generalCollateral']
         if desc != DESC_INCLUDES_VC:
             del json_data['vehicleCollateral']
+        if not valid:
+            extra_sp: dict = copy.deepcopy(json_data["securedParties"][0])
+            extra_sp["businessName"] = "TEST INVALID CC EXTRA SP"
+            json_data["securedParties"].append(extra_sp)
 
-        # print('REG TYPE: ' + str(json_data['type']))
         error_msg = validator.validate(json_data, 'PS12345')
         if valid:
             assert error_msg == ''
@@ -545,6 +548,7 @@ def test_validate_crown(session, desc, valid, message_content):
             # print(error_msg)
             assert error_msg != ''
             assert error_msg.find(message_content) != -1
+            assert error_msg.find(validator.CC_SP_MULTIPLE_INVALID) != -1
 
 
 @pytest.mark.parametrize('desc,valid,reg_type,message_content', TEST_FL_FA_FS_HN_WL_DATA)
