@@ -4,7 +4,7 @@ INSERT INTO drafts(id, document_number, account_id, create_ts, registration_type
   VALUES(200000027, 'D-T-0018', 'PS12345', timestamp with time zone '2021-09-03 12:00:00-07' at time zone 'utc', 
          'PPSALIEN', 'SA', 'TEST0018', null, '{}');
 INSERT INTO financing_statements(id, state_type, expire_date, life, discharged, renewed)
-  VALUES(200000012, 'ACT', timestamp with time zone '2026-09-03 23:59:59-07' at time zone 'utc', 5, 'N' , null)
+  VALUES(200000012, 'ACT', timestamp with time zone '2036-09-03 23:59:59-07' at time zone 'utc', 5, 'N' , null)
 ;
 INSERT INTO registrations(id, financing_id, registration_number, base_reg_number, registration_type,
                          registration_type_cl, registration_ts, draft_id, life, lien_value,
