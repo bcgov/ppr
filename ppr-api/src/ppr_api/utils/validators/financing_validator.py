@@ -55,6 +55,7 @@ SE_RP_INVALID_CODE = "The client party code for Registering Party in SE registra
 SE_SP_INVALID_CODE = "The client party code for Secured Party in SE registration type is invalid. "
 RL_NOT_ALLOWED = "The RL lien type is not permitted; use CL Commercial Lien type instead. "
 CL_NOT_ALLOWED = "The Commercial Lien CL type is not allowed: use the RL Repairer's Lien type instead. "
+CC_SP_MULTIPLE_INVALID = "Exactly 1 Secured Party can be submitted with crown charge registrations. "
 
 GC_NOT_ALLOWED_LIST = [
     MiscellaneousTypes.MH_NOTICE.value,
@@ -104,6 +105,9 @@ def validate(json_data: dict, account_id: str) -> str:
 
         if "authorizationReceived" not in json_data or not json_data["authorizationReceived"]:
             error_msg += AUTHORIZATION_INVALID
+        if reg_class == model_utils.REG_CLASS_CROWN and len(json_data.get("securedParties", 0)) > 1:
+            error_msg += CC_SP_MULTIPLE_INVALID
+
         error_msg += validate_life(json_data, reg_type, reg_class)
         error_msg += validate_vehicle_collateral(json_data, reg_type)
         error_msg += validate_general_collateral(json_data, reg_type, reg_class)

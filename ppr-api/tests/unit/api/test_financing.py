@@ -311,6 +311,7 @@ TEST_CREATE_DATA = [
     ('Invalid type schema validation', FINANCING_INVALID_TYPE, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True),
     ('Invalid party code extra validation', FINANCING_INVALID_CODE, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True),
     ('Invalid party address extra validation', FINANCING_INVALID_ADDRESS, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True),
+    ('Invalid CC 2 SPs extra validation', FINANCING_VALID, [PPR_ROLE], HTTPStatus.BAD_REQUEST, True),
     ('Missing account', FINANCING_VALID, [PPR_ROLE], HTTPStatus.BAD_REQUEST, False),
     ('Invalid role', FINANCING_VALID, [COLIN_ROLE], HTTPStatus.UNAUTHORIZED, True),
     ('BCOL helpdesk account', FINANCING_VALID, [PPR_ROLE, BCOL_HELP], HTTPStatus.UNAUTHORIZED, True),
@@ -497,6 +498,15 @@ def test_create(session, client, jwt, desc, request_data, roles, status, has_acc
         del json_data['trustIndenture']
         json_data['lifeInfinite'] = True
         del json_data['lifeYears']
+    elif desc == 'Invalid CC 2 SPs extra validation':
+        extra_sp: dict = copy.deepcopy(json_data["securedParties"][0])
+        extra_sp["businessName"] = "TEST INVALID CC EXTRA SP"
+        json_data["securedParties"].append(extra_sp)
+        json_data['type'] = RegistrationTypes.EH.value
+        del json_data['trustIndenture']
+        json_data['lifeInfinite'] = True
+        del json_data['lifeYears']
+
     if has_account and BCOL_HELP in roles:
         headers = create_header_account(jwt, roles, 'test-user', BCOL_HELP)
     elif has_account and GOV_ACCOUNT_ROLE in roles:
@@ -512,7 +522,7 @@ def test_create(session, client, jwt, desc, request_data, roles, status, has_acc
                            content_type='application/json')
 
     # check
-    current_app.logger.info(response.json)
+    # current_app.logger.info(response.json)
     assert response.status_code == status
     if response.status_code == HTTPStatus.CREATED:
         registration: Registration = Registration.find_by_registration_number(response.json['baseRegistrationNumber'],

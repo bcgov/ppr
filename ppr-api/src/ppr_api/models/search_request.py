@@ -214,8 +214,14 @@ class SearchRequest(db.Model):  # pylint: disable=too-many-instance-attributes
         search_value = self.request_json["criteria"]["debtorName"]["business"]
         rows = None
         try:
+            query: str = search_utils.BUSINESS_NAME_QUERY
+            if not current_app.config.get("CLOUD_SQL_PROXY_SIDECAR") and current_app.config.get(
+                "CLOUDSQL_INSTANCE_CONNECTION_NAME", ""
+            ):
+                # PG8000 does not correctly parse the PG_TRIGRAM extension similarity operator.
+                query = query.replace("search_key <% p.business_srch_key", "search_key <%% p.business_srch_key")
             result = db.session.execute(
-                text(search_utils.BUSINESS_NAME_QUERY),
+                text(query),
                 {
                     "query_bus_name": search_value.strip().upper(),
                     "query_bus_quotient": current_app.config.get("SIMILARITY_QUOTIENT_BUSINESS_NAME"),
