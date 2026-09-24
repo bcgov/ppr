@@ -87,7 +87,7 @@ export enum UIRegistrationTypes {
   FORESTRY_SUBCONTRACTOR_LIEN = 'Forestry - Sub-contractor Charge',
   // miscellaneous registration cc
   CARBON_TAX = 'Crown Charge - Carbon Tax Act',
-  EMPLOYEE_HEALTH_TAX = 'Crown Charge - Employee Health Tax Act',
+  EMPLOYER_HEALTH_TAX = 'Crown Charge - Employer Health Tax Act',
   EXCISE_TAX = 'Crown Charge - Excise Tax Act',
   FOREST = 'Crown Charge - Forest Act',
   INCOME_TAX = 'Crown Charge - Income Tax Act',

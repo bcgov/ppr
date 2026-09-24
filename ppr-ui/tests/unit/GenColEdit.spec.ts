@@ -1,8 +1,9 @@
 import { nextTick } from 'vue'
 import { GenColEdit } from '@/components/collateral/general'
-import { RegistrationFlowType } from '@/enums'
+import { APIRegistrationTypes, RegistrationFlowType } from '@/enums'
 import { mockedOtherCarbon } from './test-data'
 import { useStore } from '@/store/store'
+import { RegistrationTypesMiscellaneousCC } from '@/resources'
 import { createComponent } from './utils'
 
 const store = useStore()
@@ -58,6 +59,22 @@ describe('GenColEdit tests', () => {
     await nextTick()
 
     // General COllateral should be pre-filled with custom default text value
+    expect(store.getGeneralCollateral[0].description)
+      .toContain('All the debtor’s present and after acquired personal property')
+  })
+
+  it.each([
+    APIRegistrationTypes.EMPLOYEE_HEALTH_TAX,
+    APIRegistrationTypes.RESIDENTIAL_PROPERTY_PROFIT_TAX
+  ])('should pre-fill General Collateral with the default value for %s', async (regTypeAPI) => {
+    await store.setRegistrationFlowType(RegistrationFlowType.NEW)
+    await store.setRegistrationType(
+      RegistrationTypesMiscellaneousCC.find(obj => obj.registrationTypeAPI === regTypeAPI)
+    )
+    await store.setGeneralCollateral([])
+    wrapper = await createComponent(GenColEdit, { showInvalid: false })
+    await nextTick()
+
     expect(store.getGeneralCollateral[0].description)
       .toContain('All the debtor’s present and after acquired personal property')
   })

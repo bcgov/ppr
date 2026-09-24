@@ -22,7 +22,7 @@ const newRegStandard = [
 const newRegMisc = [
   // miscelaneous registration cc
   UIRegistrationTypes.CARBON_TAX,
-  UIRegistrationTypes.EMPLOYEE_HEALTH_TAX,
+  UIRegistrationTypes.EMPLOYER_HEALTH_TAX,
   UIRegistrationTypes.EXCISE_TAX,
   UIRegistrationTypes.FOREST,
   UIRegistrationTypes.INCOME_TAX,

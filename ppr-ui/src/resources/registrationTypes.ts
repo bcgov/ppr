@@ -31,9 +31,9 @@ export const RegistrationTypesMiscellaneousCC: Array<RegistrationTypeIF> = [
     disabled: false,
     divider: false,
     group: 1,
-    registrationTypeUI: UIRegistrationTypes.EMPLOYEE_HEALTH_TAX,
+    registrationTypeUI: UIRegistrationTypes.EMPLOYER_HEALTH_TAX,
     registrationTypeAPI: APIRegistrationTypes.EMPLOYEE_HEALTH_TAX,
-    text: `${UIRegistrationTypes.EMPLOYEE_HEALTH_TAX}`
+    text: `${UIRegistrationTypes.EMPLOYER_HEALTH_TAX}`
   },
   {
     class: 'registration-list-item',
