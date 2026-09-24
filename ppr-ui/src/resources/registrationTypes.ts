@@ -32,7 +32,7 @@ export const RegistrationTypesMiscellaneousCC: Array<RegistrationTypeIF> = [
     divider: false,
     group: 1,
     registrationTypeUI: UIRegistrationTypes.EMPLOYER_HEALTH_TAX,
-    registrationTypeAPI: APIRegistrationTypes.EMPLOYEE_HEALTH_TAX,
+    registrationTypeAPI: APIRegistrationTypes.EMPLOYER_HEALTH_TAX,
     text: `${UIRegistrationTypes.EMPLOYER_HEALTH_TAX}`
   },
   {

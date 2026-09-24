@@ -84,7 +84,7 @@ export default defineComponent({
         case APIRegistrationTypes.PROVINCIAL_SALES_TAX:
         case APIRegistrationTypes.TOBACCO_TAX:
         case APIRegistrationTypes.SPECULATION_VACANCY_TAX:
-        case APIRegistrationTypes.EMPLOYEE_HEALTH_TAX:
+        case APIRegistrationTypes.EMPLOYER_HEALTH_TAX:
         case APIRegistrationTypes.RESIDENTIAL_PROPERTY_PROFIT_TAX:
             return 'All the debtor’s present and after acquired personal property, including but not restricted to machinery, equipment, furniture, fixtures and receivables.' // eslint-disable-line
         case APIRegistrationTypes.LIEN_UNPAID_WAGES:

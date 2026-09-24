@@ -146,7 +146,7 @@ export const useVehicle = (props, context) => {
   const hasOptionalVehicleCollateral = (): boolean => {
     const vhArray = [
       APIRegistrationTypes.CARBON_TAX,
-      APIRegistrationTypes.EMPLOYEE_HEALTH_TAX,
+      APIRegistrationTypes.EMPLOYER_HEALTH_TAX,
       APIRegistrationTypes.RESIDENTIAL_PROPERTY_PROFIT_TAX,
       APIRegistrationTypes.EXCISE_TAX,
       APIRegistrationTypes.FOREST,

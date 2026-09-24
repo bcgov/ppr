@@ -314,7 +314,7 @@ export default defineComponent({
         APIRegistrationTypes.TOBACCO_TAX,
         APIRegistrationTypes.SPECULATION_VACANCY_TAX,
         APIRegistrationTypes.SECURITY_ACT_NOTICE,
-        APIRegistrationTypes.EMPLOYEE_HEALTH_TAX,
+        APIRegistrationTypes.EMPLOYER_HEALTH_TAX,
         APIRegistrationTypes.RESIDENTIAL_PROPERTY_PROFIT_TAX
       ]
       return ipArray.includes(registrationType)

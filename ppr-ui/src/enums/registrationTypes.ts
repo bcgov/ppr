@@ -13,7 +13,7 @@ export enum APIRegistrationTypes {
   FORESTRY_SUBCONTRACTOR_LIEN = 'FS',
   // miscellaneous registration cc
   CARBON_TAX = 'CT',
-  EMPLOYEE_HEALTH_TAX = 'EH',
+  EMPLOYER_HEALTH_TAX = 'EH',
   EXCISE_TAX = 'ET',
   FOREST = 'FO',
   INCOME_TAX = 'IT',

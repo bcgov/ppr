@@ -64,7 +64,7 @@ describe('GenColEdit tests', () => {
   })
 
   it.each([
-    APIRegistrationTypes.EMPLOYEE_HEALTH_TAX,
+    APIRegistrationTypes.EMPLOYER_HEALTH_TAX,
     APIRegistrationTypes.RESIDENTIAL_PROPERTY_PROFIT_TAX
   ])('should pre-fill General Collateral with the default value for %s', async (regTypeAPI) => {
     await store.setRegistrationFlowType(RegistrationFlowType.NEW)
