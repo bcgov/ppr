@@ -33,7 +33,7 @@ export default {
         FA: 'Forestry - Contractor Charge',
         FS: 'Forestry - Sub-contractor Charge',
         CT: 'Crown Charge - Carbon Tax Act',
-        EH: 'Crown Charge - Employee Health Tax Act',
+        EH: 'Crown Charge - Employer Health Tax Act',
         ET: 'Crown Charge - Excise Tax Act',
         FO: 'Crown Charge - Forest Act',
         IT: 'Crown Charge - Income Tax Act',

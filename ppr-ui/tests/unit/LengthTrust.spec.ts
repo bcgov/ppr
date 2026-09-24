@@ -153,7 +153,7 @@ describe('Length and Trust Indenture new registration component', () => {
         APIRegistrationTypes.MINERAL_LAND_TAX,
         APIRegistrationTypes.TOBACCO_TAX,
         APIRegistrationTypes.SPECULATION_VACANCY_TAX,
-        APIRegistrationTypes.EMPLOYEE_HEALTH_TAX,
+        APIRegistrationTypes.EMPLOYER_HEALTH_TAX,
         APIRegistrationTypes.RESIDENTIAL_PROPERTY_PROFIT_TAX
       ]
       if (RegistrationTypes[i].registrationTypeAPI === APIRegistrationTypes.REPAIRERS_LIEN) {
