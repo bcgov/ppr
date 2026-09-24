@@ -75,8 +75,10 @@ describe('GenColEdit tests', () => {
     wrapper = await createComponent(GenColEdit, { showInvalid: false })
     await nextTick()
 
-    expect(store.getGeneralCollateral[0].description)
-      .toContain('All the debtor’s present and after acquired personal property')
+    expect(store.getGeneralCollateral[0].description).toContain(
+      'All the debtor’s present and after acquired personal property, including but not restricted to ' +
+      'machinery, equipment, furniture, fixtures, inventory and receivables.'
+    )
   })
 
   it('shows error bar when set', async () => {
