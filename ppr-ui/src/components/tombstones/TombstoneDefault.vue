@@ -17,7 +17,7 @@
                   <template #activator="{ props }">
                     <a
                       :href="'https://www2.gov.bc.ca/gov/content/employment-business/business/managing-a-business/'
-                      +'permits-licences/news-updates/modernization-updates/modernization-resources#userguideacct'"
+                      +'permits-licences/news-updates/modernization-updates/bc-registry-resources'"
                       class="text-decoration-none"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -75,7 +75,7 @@
                       <template #activator="{ props }">
                         <a
                           :href="'https://www2.gov.bc.ca/gov/content/employment-business/business/managing-a-business/'
-                      +'permits-licences/news-updates/modernization-updates/modernization-resources#userguideacct'"
+                      +'permits-licences/news-updates/modernization-updates/bc-registry-resources'"
                           class="text-decoration-none"
                           target="_blank"
                           rel="noopener noreferrer"
