@@ -31,7 +31,7 @@ serialPipeline:
       service-name: "ppr-api-dev"
       container-name: "ppr-api-dev"
       container-concurrency: "7"
-      cloudsql-instances: "eogruh-dev:northamerica-northeast1:ppr-dev-cloudsql"
+      cloudsql-instances: "eogruh-dev:northamerica-northeast1:ppr-dev"
       service-account: "sa-api@eogruh-dev.iam.gserviceaccount.com"
       timeout-seconds: "1800"
  - targetId: eogruh-test
@@ -47,7 +47,7 @@ serialPipeline:
       container-name: "ppr-api-test"
       app-env: "test"
       container-concurrency: "7"
-      cloudsql-instances: "eogruh-test:northamerica-northeast1:ppr-test-cloudsql"
+      cloudsql-instances: "eogruh-test:northamerica-northeast1:ppr-test"
       service-account: "sa-api@eogruh-test.iam.gserviceaccount.com"
       timeout-seconds: "1800"
  - targetId: eogruh-sandbox

@@ -30,7 +30,7 @@ serialPipeline:
       deploy-project-id: "eogruh-dev"
       service-name: "mhr-api-dev"
       container-name: "mhr-api-dev"
-      cloudsql-instances: "eogruh-dev:northamerica-northeast1:ppr-dev-cloudsql"
+      cloudsql-instances: "eogruh-dev:northamerica-northeast1:ppr-dev"
       service-account: "sa-api@eogruh-dev.iam.gserviceaccount.com"
       container-concurrency: "7"
  - targetId: eogruh-test
@@ -45,7 +45,7 @@ serialPipeline:
       service-name: "mhr-api-test"
       container-name: "mhr-api-test"
       app-env: "test"
-      cloudsql-instances: "eogruh-test:northamerica-northeast1:ppr-test-cloudsql"
+      cloudsql-instances: "eogruh-test:northamerica-northeast1:ppr-test"
       service-account: "sa-api@eogruh-test.iam.gserviceaccount.com"
       container-concurrency: "7"
  - targetId: eogruh-sandbox

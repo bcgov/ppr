@@ -29,7 +29,7 @@ serialPipeline:
       deploy-project-id: "eogruh-dev"
       job-name: "ppr-secured-party-dev"
       run-command: "/opt/app-root/run.sh"
-      cloudsql-instances: "eogruh-dev:northamerica-northeast1:ppr-dev-cloudsql"
+      cloudsql-instances: "eogruh-dev:northamerica-northeast1:ppr-dev"
       service-account: "sa-job@eogruh-dev.iam.gserviceaccount.com"
  - targetId: eogruh-test
    profiles: [test]
@@ -43,7 +43,7 @@ serialPipeline:
       job-name: "ppr-secured-party-test"
       run-command: "/opt/app-root/run.sh"
       app-env: "test"
-      cloudsql-instances: "eogruh-test:northamerica-northeast1:ppr-test-cloudsql"
+      cloudsql-instances: "eogruh-test:northamerica-northeast1:ppr-test"
       service-account: "sa-job@eogruh-test.iam.gserviceaccount.com"
  - targetId: eogruh-sandbox
    profiles: [sandbox]
