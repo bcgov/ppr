@@ -33,8 +33,10 @@ from mhr_api.models.type_tables import (
 )
 from mhr_api.utils.logging import logger
 
-# Local timzone
-LOCAL_TZ = pytz.timezone("America/Los_Angeles")
+# Local timezone with daylight savings support:
+# LOCAL_TZ = pytz.timezone("America/Los_Angeles")
+# Local timezone without daylight savings as offset in minutes: -7 * 60.
+LOCAL_TZ = pytz.FixedOffset(-420)
 
 # Map from API search type to DB search type
 TO_DB_SEARCH_TYPE = {"OWNER_NAME": "MI", "ORGANIZATION_NAME": "MO", "MHR_NUMBER": "MM", "SERIAL_NUMBER": "MS"}
@@ -247,7 +249,7 @@ def format_local_ts(time_stamp):
     formatted_ts: str = None
     if time_stamp:
         try:
-            local_ts = LOCAL_TZ.localize(time_stamp, is_dst=True)
+            local_ts = LOCAL_TZ.localize(time_stamp)
             formatted_ts: str = local_ts.replace(microsecond=0).isoformat()
             if formatted_ts.endswith("-07:53"):  # Correct DB2 conversion idiosyncrasy.
                 formatted_ts.replace("-07:53", "-08:00")
@@ -296,7 +298,7 @@ def ts_from_iso_format_no_tz(timestamp_iso: str):
     if len(timestamp_iso) > 19:
         return ts_from_iso_format(timestamp_iso)
     ts: _datetime = _datetime.fromisoformat(timestamp_iso)
-    local_ts = LOCAL_TZ.localize(ts, is_dst=True)
+    local_ts = LOCAL_TZ.localize(ts)
     # Return as UTC
     return local_ts.astimezone(timezone.utc)
 
