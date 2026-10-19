@@ -26,8 +26,10 @@ from flask import current_app
 
 from .type_tables import RegistrationType, RegistrationTypes
 
-# Local timzone
-LOCAL_TZ = pytz.timezone("America/Los_Angeles")
+# Local timezone with daylight savings support:
+# LOCAL_TZ = pytz.timezone("America/Vancouver")
+# Local timezone without daylight savings as offset in minutes: -7 * 60.
+LOCAL_TZ = pytz.FixedOffset(-420)
 
 # API draft types
 DRAFT_TYPE_AMENDMENT = "AMENDMENT_STATEMENT"
@@ -472,27 +474,6 @@ def today_ts_offset(offset_days: int = 1, add: bool = False):
         return today_ts + timedelta(days=offset_days)
 
     return today_ts - timedelta(days=offset_days)
-
-
-def expiry_dt_from_years_last(life_years: int, iso_date: str = None):
-    """Create a date representing the date at 23:59:59 local time as UTC.
-
-    Adjusted by the life_years number of years in the future. Current date if no iso_date
-    """
-    # Naive date
-    today = None
-    if iso_date:
-        today = date.fromisoformat(iso_date[:10])
-    else:
-        today = now_ts().astimezone(LOCAL_TZ)
-    # Add years
-    future_date = date((today.year + life_years), today.month, today.day)
-    # Naive time
-    expiry_time = time(23, 59, 59, tzinfo=None)
-    # Explicitly set to local timezone which will adjust for daylight savings.
-    local_ts = LOCAL_TZ.localize(_datetime.combine(future_date, expiry_time))
-    # Return as UTC
-    return _datetime.utcfromtimestamp(local_ts.timestamp()).replace(tzinfo=timezone.utc)
 
 
 def expiry_dt_from_years(life_years: int, iso_date: str = None):
