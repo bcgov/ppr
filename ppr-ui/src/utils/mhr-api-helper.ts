@@ -386,7 +386,8 @@ export async function mhrRegistrationHistory(
 // Get pdf for a registration
 export async function mhRegistrationPDF (pdfPath: string): Promise<any> {
   const url = sessionStorage.getItem('MHR_API_URL')
-  pdfPath = pdfPath.replace('/mhr/api/v1', '')
+  // Strip the API root from the relative path; the API returns /mhr-dev/api/v1/... in DEV, /mhr/api/v1/... otherwise
+  pdfPath = pdfPath.replace(/^\/mhr(-dev)?\/api\/v1/, '')
   const config = {
     baseURL: url,
     headers: { Accept: 'application/pdf' },
