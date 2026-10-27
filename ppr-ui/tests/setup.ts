@@ -1,14 +1,10 @@
 // Setup file for Vitest tests
 import { vi } from 'vitest'
-import { config, enableAutoUnmount } from '@vue/test-utils'
+import { config } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 
 // Setup Pinia
 setActivePinia(createPinia())
-
-// Unmount wrappers after each test so overlays (dialogs, menus, tooltips) are cleaned up
-// before the test environment is torn down, otherwise vuetify throws 'window is not defined'
-enableAutoUnmount(afterEach)
 
 // FeeWidget, no-props stub
 config.global.stubs = {
