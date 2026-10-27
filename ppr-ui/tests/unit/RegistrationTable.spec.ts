@@ -25,6 +25,32 @@ const tableFilter = '.reg-filter-row'
 const tableRow = '.registration-row'
 const dateFilter = '.date-filter'
 
+const emptySortOptions = {
+  documentId: '',
+  endDate: null,
+  folNum: '',
+  manufacturerName: '',
+  orderBy: '',
+  orderVal: '',
+  regBy: '',
+  regNum: '',
+  regParty: '',
+  regType: null,
+  secParty: '',
+  startDate: null,
+  status: null
+}
+
+// the sort is emitted after a 500ms debounce
+const waitForSortDebounce = () => new Promise(resolve => setTimeout(resolve, 600))
+
+// the table emits its filters in a sort event, the parent uses them for the api request
+const expectLastSort = (wrapper, sorting: boolean, filters = {}) =>
+  expect(getLastEvent(wrapper, 'sort')).toEqual({
+    sortOptions: { ...emptySortOptions, ...filters },
+    sorting
+  })
+
 describe('Test registration table with results', () => {
   let wrapper
   const registrationHistory: RegistrationSummaryIF[] = [mockedRegistration1]
@@ -195,43 +221,17 @@ describe('Test registration table with results', () => {
     await flushPromises()
     // clear filters btn shows
     expect(wrapper.findAll('.v-btn.registration-action').length).toBe(1)
-    // wait - sort will wait at least 1 second for debounce
-    setTimeout(async () => {
-      // emitted the new sort
-      expect(getLastEvent(wrapper, 'sort')).toEqual({
-        endDate: null,
-        folNum: '',
-        orderBy: '',
-        orderVal: '',
-        regBy: '',
-        regNum: '23',
-        regParty: '',
-        regType: '',
-        secParty: '',
-        startDate: null,
-        status: ''
-      })
-      // clear filters btn clears the filter
-      await wrapper.find('.v-btn.registration-action').trigger('click')
-      expect(wrapper.vm.registrationNumber).toBe('')
-      // need to wait 1 secs due to debounce
-      setTimeout(() => {
-        expect(getLastEvent(wrapper, 'sort')).toEqual({
-          endDate: null,
-          folNum: '',
-          orderBy: '',
-          orderVal: '',
-          regBy: '',
-          regNum: '',
-          regParty: '',
-          regType: '',
-          secParty: '',
-          startDate: null,
-          status: ''
-        })
-      }, 3000)
-      expect(wrapper.findAll('.v-btn.registration-action').length).toBe(0)
-    }, 3000)
+    // wait for the sort debounce
+    await waitForSortDebounce()
+    // emitted the new sort with the filter
+    expectLastSort(wrapper, true, { regNum: parentRegNumMatch })
+    // clear filters btn clears the filter
+    await wrapper.find('.v-btn.registration-action').trigger('click')
+    expect(wrapper.vm.registrationNumber).toBe('')
+    await waitForSortDebounce()
+    // emitted the new sort without filters
+    expectLastSort(wrapper, false)
+    expect(wrapper.findAll('.v-btn.registration-action').length).toBe(0)
   })
 
   it('filters mhr table data properly', async () => {
@@ -256,45 +256,19 @@ describe('Test registration table with results', () => {
     await flushPromises()
     // clear filters btn shows
     expect(wrapper.findAll('.v-btn.registration-action').length).toBe(1)
-    // wait - sort will wait at least 1 second for debounce
-    setTimeout(async () => {
-      // emitted the new sort
-      expect(getLastEvent(wrapper, 'sort')).toEqual({
-        endDate: null,
-        folNum: '12',
-        orderBy: '',
-        orderVal: '',
-        regBy: 'Business',
-        regNum: '23',
-        regParty: 'ABC',
-        regType: 'REGISTER NEW UNIT',
-        secParty: '',
-        startDate: null,
-        status: 'Active'
-      })
-      // clear filters btn clears the filter
-      await wrapper.find('.v-btn.registration-action').trigger('click')
-      expect(wrapper.vm.registrationNumber).toBe('')
-      expect(wrapper.vm.folNum).toBe('')
-      expect(wrapper.vm.Status).toBe('')
-      // need to wait 1 secs due to debounce
-      setTimeout(() => {
-        expect(getLastEvent(wrapper, 'sort')).toEqual({
-          endDate: null,
-          folNum: '',
-          orderBy: '',
-          orderVal: '',
-          regBy: '',
-          regNum: '',
-          regParty: '',
-          regType: '',
-          secParty: '',
-          startDate: null,
-          status: ''
-        })
-      }, 3000)
-      expect(wrapper.findAll('.v-btn.registration-action').length).toBe(0)
-    }, 3000)
+    // wait for the sort debounce
+    await waitForSortDebounce()
+    // emitted the new sort with the filter
+    expectLastSort(wrapper, true, { regNum: parentRegNumMatch })
+    // clear filters btn clears the filter
+    await wrapper.find('.v-btn.registration-action').trigger('click')
+    expect(wrapper.vm.registrationNumber).toBe('')
+    expect(wrapper.vm.folioNumber).toBe('')
+    expect(wrapper.vm.status).toBe(null)
+    await waitForSortDebounce()
+    // emitted the new sort without filters
+    expectLastSort(wrapper, false)
+    expect(wrapper.findAll('.v-btn.registration-action').length).toBe(0)
   })
 
   it('renders and displays the typeahead dropdown', async () => {
@@ -334,15 +308,18 @@ describe('Test registration table with results', () => {
     expect(wrapper.findComponent(RangeDatePicker).isVisible()).toBe(true)
     const startDate = '2021-10-24'
     const endDate = '2021-10-26'
-    wrapper.findComponent(RangeDatePicker).vm.$emit('submit', { endDate: endDate, startDate: startDate })
+    // the date picker emits Date objects (noon UTC is the same day in Pacific time)
+    wrapper.findComponent(RangeDatePicker).vm.$emit('submit', {
+      endDate: new Date(`${endDate}T12:00:00Z`),
+      startDate: new Date(`${startDate}T12:00:00Z`)
+    })
     await flushPromises()
-    // wait for debounce
-    setTimeout(async () => {
-      expect(wrapper.vm.showDatePicker).toBe(false)
-      expect(wrapper.findComponent(RangeDatePicker).isVisible()).toBe(false)
-      expect(wrapper.vm.submittedStartDate).toBe(startDate)
-      expect(wrapper.vm.submittedEndDate).toBe(endDate)
-    }, 2000)
+    // wait for the sort debounce
+    await waitForSortDebounce()
+    expect(wrapper.vm.showDatePicker).toBe(false)
+    expect(wrapper.findComponent(RangeDatePicker).exists()).toBe(false)
+    expect(wrapper.vm.submittedStartDate).toBe(startDate)
+    expect(wrapper.vm.submittedEndDate).toBe(endDate)
   })
 
   it('emits button actions from TableRow', async () => {

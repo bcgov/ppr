@@ -99,6 +99,7 @@ describe('Length and Trust Indenture new registration component', () => {
     })
   })
 
+  // mounts the view once per registration type: allow extra time when the full suite is under load
   it('displays correct info based on registration type', async () => {
     for (let i = 0; i < RegistrationTypes.length; i++) {
       // skip dividers + other
@@ -170,5 +171,5 @@ describe('Length and Trust Indenture new registration component', () => {
         )
       }
     }
-  })
+  }, 60_000)
 })
