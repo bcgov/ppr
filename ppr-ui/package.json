@@ -1,6 +1,6 @@
 {
   "name": "ppr-ui",
-  "version": "6.1.14",
+  "version": "6.1.15",
   "private": true,
   "engines": {
     "node": ">=24"
@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@bcrs-shared-components/input-field-date-picker": "^1.0.0",
+    "@formatjs/intl-datetimeformat": "^7.8.2",
     "@internationalized/date": "^3.10.0",
     "@lemoncode/fonk": "^1.5.1",
     "@lemoncode/fonk-range-number-validator": "^1.1.0",

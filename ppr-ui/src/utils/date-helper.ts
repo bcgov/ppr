@@ -99,19 +99,25 @@ export function shortPacificDate (date: Date | string): string {
 // Converts date to string and pacific time
 // Example Output: August 11, 2023 at 10:38 AM
 export function pacificDate (date: Date | string, omitSeconds = false): string {
-  let pacificDate = new Intl.DateTimeFormat('en-US', {
-    dateStyle: 'long',
-    timeStyle: omitSeconds ? 'short' : 'medium',
+  // Build from parts: the date/time separator (' at ' vs ', ') differs between browsers and the Intl polyfill
+  const parts = new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    second: omitSeconds ? undefined : '2-digit',
     timeZone: 'America/Vancouver',
     hour12: true
-  })
-    .format(new Date(date))
+  }).formatToParts(new Date(date))
+  const part = (type: Intl.DateTimeFormatPartTypes) => parts.find(p => p.type === type)?.value
+
+  const time = omitSeconds
+    ? `${part('hour')}:${part('minute')}`
+    : `${part('hour')}:${part('minute')}:${part('second')}`
 
   // Convert AM/PM to lowercase
-  pacificDate = pacificDate.replace('AM', 'am')
-  pacificDate = pacificDate.replace('PM', 'pm')
-
-  return `${pacificDate} Pacific time`
+  return `${part('month')} ${part('day')}, ${part('year')} at ${time} ${part('dayPeriod')?.toLowerCase()} Pacific time`
 }
 
 export function tzOffsetMinutes (date: Date): number {
