@@ -431,6 +431,8 @@ describe('Mhr TableRow tests', () => {
   ]
 
   beforeEach(async () => {
+    // Fix today's date: the expiry days text ('1 year 135 days') depends on leap days within the year
+    vi.useFakeTimers({ toFake: ['Date'], now: new Date('2026-08-01T12:00:00Z') })
     pinia = createPinia()
     setActivePinia(pinia)
     store = useStore()
@@ -455,6 +457,7 @@ describe('Mhr TableRow tests', () => {
   })
 
   afterEach(() => {
+    vi.useRealTimers()
     // Remove specific elements added during tests
     const appendedElements = document.querySelectorAll('.v-overlay__content')
     appendedElements.forEach((el) => el.remove())
