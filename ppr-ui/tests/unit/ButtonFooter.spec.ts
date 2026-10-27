@@ -1,5 +1,4 @@
 import { nextTick } from 'vue'
-import { enableAutoUnmount } from '@vue/test-utils'
 import { createComponent, getLastEvent, setupMockStaffUser } from './utils'
 import { useStore } from '@/store/store'
 import { RouteNames } from '@/enums'
@@ -15,9 +14,6 @@ import { mockedManufacturerAuthRoles, mockedModelAmendmdmentAdd } from './test-d
 import type { ButtonConfigIF } from '@/interfaces'
 import { MhrRegistrationType } from '@/resources'
 import { createPinia, setActivePinia } from 'pinia'
-
-// Unmount after each test so the dialog overlays are cleaned up before the test environment is torn down
-enableAutoUnmount(afterEach)
 
 // Input field selectors / buttons
 const cancelBtn: string = '#reg-cancel-btn'
