@@ -2,6 +2,7 @@ import type { APIRegistrationTypes} from '@/enums';
 import { ActionTypes } from '@/enums'
 import type { PartyIF, AddPartiesIF } from '@/interfaces'
 import { SecuredPartyRestrictedList } from '@/resources'
+import { formatBirthdate, getBirthdateParts, getMonthName } from '@/utils/birthdate-helper'
 
 export const useParty = () => {
   const getName = (party: PartyIF): string => {
@@ -14,45 +15,26 @@ export const useParty = () => {
     return !!party?.businessName
   }
 
+  // Birthdates are calendar dates: use the YYYY-MM-DD part as-is, no time zone conversion.
   const getFormattedBirthdate = (party: PartyIF): string => {
-    if (party.birthDate) {
-      const date = new Date(party.birthDate)
-      return (
-        date.toLocaleString('default', { month: 'long' }) +
-        ' ' +
-        date.getDate() +
-        ', ' +
-        date.getFullYear()
-      )
-    }
+    return formatBirthdate(party?.birthDate)
   }
 
   const getMonth = (party: PartyIF): number => {
-    if (party.birthDate) {
-      const date = new Date(party.birthDate)
-      return date.getMonth() + 1
-    }
+    return getBirthdateParts(party?.birthDate)?.month
   }
 
   const getMonthFull = (party: PartyIF): string => {
-    if (party.birthDate) {
-      const date = new Date(party.birthDate)
-      return date.toLocaleString('default', { month: 'long' })
-    }
+    const month = getBirthdateParts(party?.birthDate)?.month
+    return month ? getMonthName(month) : undefined
   }
 
   const getDay = (party: PartyIF): string => {
-    if (party.birthDate) {
-      const date = new Date(party.birthDate)
-      return date.getDate().toString()
-    }
+    return getBirthdateParts(party?.birthDate)?.day.toString()
   }
 
   const getYear = (party: PartyIF): string => {
-    if (party.birthDate) {
-      const date = new Date(party.birthDate)
-      return date.getFullYear().toString()
-    }
+    return getBirthdateParts(party?.birthDate)?.year.toString()
   }
 
   const isPartiesValid = (parties: AddPartiesIF, regType: APIRegistrationTypes): boolean => {

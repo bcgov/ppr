@@ -180,8 +180,6 @@
                   "
                   persistent-hint
                   return-object
-                  @keyup="validateBirthdateIfAlreadyValidated"
-                  @blur="validateBirthdateIfAlreadyValidated"
                 />
               </v-col>
               <v-col
@@ -196,7 +194,6 @@
                   label="Day"
                   :error-messages="errors.day.message ? errors.day.message : ''"
                   persistent-hint
-                  @keyup="validateBirthdateIfAlreadyValidated"
                 />
               </v-col>
               <v-col cols="4">
@@ -210,7 +207,7 @@
                     errors.year.message ? errors.year.message : ''
                   "
                   persistent-hint
-                  @keyup="validateBirthdateIfAlreadyValidated"
+                  @blur="onBirthdateChange(true)"
                 />
               </v-col>
             </v-row>
@@ -350,6 +347,7 @@ export default defineComponent({
       updateValidity,
       validateDebtorForm,
       validateBirthdate,
+      validateBirthdateLive,
       validateEmail
     } = useDebtorValidation()
 
@@ -368,6 +366,7 @@ export default defineComponent({
       showClear: false,
       month: null,
       showAllAddressErrors: false,
+      birthdateSubmitted: false, // true once Done has been clicked
       currentIndex: computed((): number => {
         return props.activeIndex
       }),
@@ -377,6 +376,7 @@ export default defineComponent({
     })
 
     const onSubmitForm = async () => {
+      localState.birthdateSubmitted = true
       currentDebtor.value.address = formatAddress(currentDebtor.value.address)
       if (
         validateDebtorForm(
@@ -409,13 +409,15 @@ export default defineComponent({
       }
     }
 
-    const validateBirthdateIfAlreadyValidated = () => {
-      if (
-        !errors.value.year.succeeded ||
-        !errors.value.month.succeeded ||
-        !errors.value.day.succeeded
-      ) {
+    /**
+     * Validate the birthdate as the user changes month, day or year.
+     * Before Done is clicked, fields not filled in yet are not flagged; after, run the full check.
+     */
+    const onBirthdateChange = (yearDone = false) => {
+      if (localState.birthdateSubmitted) {
         validateBirthdate(year.value, monthValue.value, day.value)
+      } else {
+        validateBirthdateLive(year.value, monthValue.value, day.value, yearDone)
       }
     }
 
@@ -458,6 +460,8 @@ export default defineComponent({
       }
     )
 
+    watch([year, monthValue, day], () => onBirthdateChange())
+
     return {
       currentDebtor,
       year,
@@ -467,7 +471,7 @@ export default defineComponent({
       resetFormAndData,
       removeDebtor,
       onSubmitForm,
-      validateBirthdateIfAlreadyValidated,
+      onBirthdateChange,
       setSearchValue,
       setCloseAutoComplete,
       addressSchema,
