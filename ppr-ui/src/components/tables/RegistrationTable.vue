@@ -37,7 +37,7 @@ import {
   MHRegistrationTypesOrg
 } from '@/resources'
 import { storeToRefs } from 'pinia'
-import { dateToYyyyMmDd, yyyyMmDdToPacificDate, localTodayDate } from '@/utils'
+import { dateToYyyyMmDd, formatCalendarDate, localTodayDate } from '@/utils'
 import TableObserver from '@/components/tables/common/TableObserver.vue'
 
 export default defineComponent({
@@ -385,7 +385,7 @@ export default defineComponent({
       if(timeZoneRegex.test(date)) {
         return new Date(date)
       }
-      return new Date(yyyyMmDdToPacificDate(date))
+      return new Date(formatCalendarDate(date))
     }
     watch(() => dateTxt.value, (val) => {
       if (!val) {
@@ -508,7 +508,7 @@ export default defineComponent({
       isMiscTransfersEnabled,
       getNext,
       localTodayDate,
-      yyyyMmDdToPacificDate,
+      formatCalendarDate,
       dateSortHandler,
       datePicker,
       dateTxt,

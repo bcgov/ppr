@@ -620,8 +620,8 @@
               </p>
               <span v-else>
                 {{ isExtendChangeLocationActive
-                  ? convertDateToLongFormat(getMhrTransportPermit.newLocation.taxExpiryDate)
-                  : convertDateToLongFormat(homeLocationInfo.taxExpiryDate)
+                  ? formatCalendarDate(getMhrTransportPermit.newLocation.taxExpiryDate, true)
+                  : formatCalendarDate(homeLocationInfo.taxExpiryDate, true)
                 }}
               </span>
             </v-col>
@@ -648,7 +648,7 @@ useUpdatedBadges
 import { storeToRefs } from 'pinia'
 import { useCountriesProvinces } from '@/composables/address/factories'
 import type { FormIF, MhrRegistrationHomeLocationIF } from '@/interfaces'
-import { convertDateToLongFormat } from '@/utils/date-helper'
+import { formatCalendarDate } from '@/utils/date-helper'
 import { TransportPermitDetails } from '@/components/mhrTransportPermits'
 import { InfoChip, UpdatedBadge } from '@/components/common'
 
@@ -874,7 +874,7 @@ export default defineComponent({
       MhrSectVal,
       getStepValidation,
       isMhrManufacturerRegistration,
-      convertDateToLongFormat,
+      formatCalendarDate,
       getMhrRegistrationLocation,
       ...countryProvincesHelpers,
       hasActiveTransportPermit,

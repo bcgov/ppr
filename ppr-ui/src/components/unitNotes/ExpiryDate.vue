@@ -73,7 +73,7 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { EffectiveDateTypes } from '@/enums/'
-import { createDateFromPacificTime, localTodayDate } from '@/utils'
+import { localTodayDate, addTimestampToDate } from '@/utils'
 import type { ContentIF, FormIF } from '@/interfaces'
 import { useInputRules } from '@/composables'
 import InputFieldDatePicker from '@/components/common/InputFieldDatePicker.vue'
@@ -125,15 +125,6 @@ export default defineComponent({
       )
     })
 
-    // build a full UTC date based on selected future date
-    const buildFullDate = (): Date => {
-      const YearMonthDay = localState.selectedFutureDate.split('-')
-      const year = parseInt(YearMonthDay[0])
-      const month = parseInt(YearMonthDay[1]) - 1
-      const day = parseInt(YearMonthDay[2])
-      return createDateFromPacificTime(year, month, day)
-    }
-
     watch(
       () => props.validate,
       async val => {
@@ -153,7 +144,7 @@ export default defineComponent({
           expiryDatePicker.value?.validate()
         } else if (localState.selectedFutureDate !== '') {
           // future date radio selected
-          localState.expiryDateTime = buildFullDate().toISOString()
+          localState.expiryDateTime = addTimestampToDate(localState.selectedFutureDate)
         }
       }
     )
@@ -162,7 +153,7 @@ export default defineComponent({
       () => [localState.selectedFutureDate],
       () => {
         if (localState.selectedFutureDate !== '') {
-          localState.expiryDateTime = buildFullDate().toISOString()
+          localState.expiryDateTime = addTimestampToDate(localState.selectedFutureDate)
         }
       }
     )

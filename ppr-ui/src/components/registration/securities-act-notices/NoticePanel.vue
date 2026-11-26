@@ -60,7 +60,7 @@
               :class="{'removed-item': notice.action === ActionTypes.REMOVED}"
             >
               Effective Date:
-              {{ yyyyMmDdToPacificDate(notice.effectiveDateTime?.split('T')[0], true) || '(Not Entered)' }}
+              {{ formatCalendarDate(notice.effectiveDateTime?.split('T')[0], true) || '(Not Entered)' }}
             </p>
           </v-col>
         </v-row>
@@ -359,7 +359,7 @@
 import { computed, nextTick, ref, watch } from 'vue'
 import type { AddEditSaNoticeIF, CourtOrderIF } from '@/interfaces'
 import { ActionTypes, saNoticeTypeMapping } from '@/enums'
-import { yyyyMmDdToPacificDate } from '@/utils/date-helper'
+import { formatCalendarDate } from '@/utils/date-helper'
 import {
   AddEditCommissionOrder,
   AddEditCourtOrder,

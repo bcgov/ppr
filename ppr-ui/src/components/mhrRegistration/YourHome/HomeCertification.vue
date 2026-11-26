@@ -190,7 +190,7 @@
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { HomeCertificationOptions } from '@/enums'
 import { useStore } from '@/store/store'
-import { createDateFromPacificTime, localTodayDate } from '@/utils/date-helper'
+import { localTodayDate } from '@/utils/date-helper'
 import { storeToRefs } from 'pinia'
 import type { FormIF } from '@/interfaces'
 
@@ -264,8 +264,8 @@ export default defineComponent({
       today: computed(() => localTodayDate(new Date(), true)),
       minDate: computed(() => {
         // Determined by YEAR value in Manufacturers, Make, Model Section
-        const ptDate = createDateFromPacificTime(getMhrRegistrationHomeDescription.value?.baseInformation.year, 0, 1)
-        return localTodayDate(ptDate)
+        const year = getMhrRegistrationHomeDescription.value?.baseInformation.year
+        return year ? `${year}-01-01` : null
       }),
       hasNoCertification: getMhrRegistrationHomeDescription.value?.hasNoCertification || false
     })

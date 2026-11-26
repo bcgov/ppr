@@ -1,7 +1,7 @@
 import { beforeEach, expect } from 'vitest'
 import { nextTick } from 'vue'
 import { createComponent, getTestId, setupActiveTransportPermit, setupMockStaffUser } from './utils'
-import { calendarDates, convertDateToLongFormat } from '@/utils'
+import { calendarDates, formatCalendarDate } from '@/utils'
 import { mockTransportPermitNewLocation, mockTransportPermitPreviousLocation, mockedMhRegistration } from './test-data'
 
 import { useStore } from '@/store/store'
@@ -459,7 +459,7 @@ describe.skip('Mhr Information Transport Permit', async () => {
 
     expect(homeLocationReviewText).toContain('The manufactured home is located on land')
     expect(homeLocationReviewText).toContain('Tax Certificate Expiry Date')
-    expect(homeLocationReviewText).toContain(convertDateToLongFormat(calendarDates.tomorrow))
+    expect(homeLocationReviewText).toContain(formatCalendarDate(calendarDates.tomorrow, true))
 
     // staff should see PPR Party Search
     expect(wrapper.findComponent(ContactInformation).findComponent(PartySearch)).toBeTruthy()
@@ -537,7 +537,7 @@ describe.skip('Mhr Information Transport Permit', async () => {
 
     expect(homeLocationReviewText).toContain('The manufactured home is not located on land')
     expect(homeLocationReviewText).toContain('Tax Certificate Expiry Date')
-    expect(homeLocationReviewText).toContain(convertDateToLongFormat('2024-05-05'))
+    expect(homeLocationReviewText).toContain(formatCalendarDate('2024-05-05', true))
 
     const confirmCompletionReviewText = wrapper.findComponent(ConfirmCompletion).text()
 

@@ -9,7 +9,7 @@ import { checkAddress, formatAddress } from '@/composables/address/factories/add
 import { cloneDeep, isEqual } from 'lodash'
 import { storeToRefs } from 'pinia'
 import { hasTruthyValue } from '@/utils'
-import { buildBirthdate, getBirthdateParts } from '@/utils/birthdate-helper'
+import { buildBirthdate, getBirthdateParts } from '@/utils/date-helper'
 
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {

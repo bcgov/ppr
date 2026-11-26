@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { createDefaultValidationResult } from '@lemoncode/fonk'
 import { useValidation } from '@/utils/validators/use-validation'
-import { isValidCalendarDate } from '@/utils/birthdate-helper'
+import { isValidCalendarDate } from '@/utils/date-helper'
 
 const createEmptyErrors = () => ({
   businessName: createDefaultValidationResult(),

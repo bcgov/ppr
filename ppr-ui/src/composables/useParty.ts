@@ -2,7 +2,7 @@ import type { APIRegistrationTypes} from '@/enums';
 import { ActionTypes } from '@/enums'
 import type { PartyIF, AddPartiesIF } from '@/interfaces'
 import { SecuredPartyRestrictedList } from '@/resources'
-import { formatBirthdate, getBirthdateParts, getMonthName } from '@/utils/birthdate-helper'
+import { formatBirthdate, getBirthdateParts, getMonthName } from '@/utils/date-helper'
 
 export const useParty = () => {
   const getName = (party: PartyIF): string => {

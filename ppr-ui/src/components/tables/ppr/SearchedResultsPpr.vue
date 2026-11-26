@@ -311,7 +311,7 @@ import { useStore } from '@/store/store'
 import { searchTableHeaders, VehicleTypes } from '@/resources'
 import type { BaseHeaderIF, SearchResponseIF, SearchResultIF, TableHeadersIF } from '@/interfaces'
 import { APISearchTypes, MatchTypes } from '@/enums'
-import { formatBirthdate } from '@/utils/birthdate-helper'
+import { formatBirthdate } from '@/utils/date-helper'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({
