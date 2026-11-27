@@ -314,7 +314,7 @@
 import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { useStore } from '@/store/store'
 import { HomeCertificationOptions, RouteNames } from '@/enums'
-import { yyyyMmDdToPacificDate, formatAsHtml, hasTruthyValue } from '@/utils'
+import { formatCalendarDate, formatAsHtml, hasTruthyValue } from '@/utils'
 import { HomeSections } from '@/components/mhrRegistration'
 import { useMhrCorrections, useMhrValidations, useUpdatedBadges } from '@/composables'
 import { storeToRefs } from 'pinia'
@@ -364,7 +364,7 @@ export default defineComponent({
           ? getMhrRegistrationHomeDescription.value?.engineerDate?.split('T')[0]
           : getMhrRegistrationHomeDescription.value?.engineerDate
 
-        return yyyyMmDdToPacificDate(engineersDate, true)
+        return formatCalendarDate(engineersDate, true)
       }),
       showStepError: computed(() => !getStepValidation(MhrSectVal.YOUR_HOME_VALID)),
       hasData: computed(() : boolean => {

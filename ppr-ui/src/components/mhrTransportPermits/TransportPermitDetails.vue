@@ -78,12 +78,12 @@
           v-if="isExtendChangeLocationActive"
           action="EXTENDED"
           :baseline="getMhrInformation.permitDateTime"
-          :current-state="addDaysToDate(convertDate(new Date(), false, false), 30)"
+          :current-state="addDaysToYyyyMmDd(localTodayDate(), 30)"
         />
       </v-col>
       <v-col cols="9 tp-label">
         {{ isExtendChangeLocationActive
-          ? shortPacificDate(addDaysToDate(convertDate(new Date(), false, false), 30))
+          ? formatCalendarDate(addDaysToYyyyMmDd(localTodayDate(), 30), true)
           : shortPacificDate(getMhrInformation.permitExpiryDateTime)
         }}
       </v-col>
@@ -98,8 +98,13 @@
 <script setup lang="ts">
 import { useStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { convertDate } from '@/utils'
-import { addDaysToDate, pacificDate, shortPacificDate } from '@/utils/date-helper'
+import {
+  addDaysToYyyyMmDd,
+  formatCalendarDate,
+  localTodayDate,
+  pacificDate,
+  shortPacificDate
+} from '@/utils/date-helper'
 import { InfoChip, UpdatedBadge } from '@/components/common'
 import { useTransportPermits } from '@/composables'
 const { getMhrInformation } = storeToRefs(useStore())

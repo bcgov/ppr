@@ -311,7 +311,7 @@ import { useStore } from '@/store/store'
 import { searchTableHeaders, VehicleTypes } from '@/resources'
 import type { BaseHeaderIF, SearchResponseIF, SearchResultIF, TableHeadersIF } from '@/interfaces'
 import { APISearchTypes, MatchTypes } from '@/enums'
-import { convertDate } from '@/utils'
+import { formatBirthdate } from '@/utils/date-helper'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({
@@ -396,12 +396,9 @@ export default defineComponent({
         : localState.selected = [...localState.exactMatchResults]
     }
 
+    // birthdates are calendar dates: show the YYYY-MM-DD part as-is, no time zone conversion
     const displayDate = (dateString: string): string => {
-      if (!dateString) {
-        return ''
-      }
-      const date = new Date(dateString)
-      return convertDate(date, false, false)
+      return formatBirthdate(dateString) || ''
     }
 
     const getVehicleDescription = (code: string): string => {

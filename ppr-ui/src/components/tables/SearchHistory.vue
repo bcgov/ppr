@@ -11,7 +11,7 @@ import {
 import { useStore } from '@/store/store'
 import type { SearchCriteriaIF, SearchResponseIF, SearchTypeIF } from '@/interfaces'
 import { MHRSearchTypes, searchHistoryTableHeaders, searchHistoryTableHeadersStaff, SearchTypes } from '@/resources'
-import { convertDate, dateToYyyyMmDd, convertDateToLongFormat } from '@/utils'
+import { convertDate, dateToYyyyMmDd, formatCalendarDate } from '@/utils'
 import { searchPDF, searchHistory, submitSelected, successfulPPRResponses } from '@/utils/ppr-api-helper'
 import { searchMhrPDF, delayActions } from '@/utils/mhr-api-helper'
 import { useSearch } from '@/composables/useSearch'
@@ -245,8 +245,8 @@ export default defineComponent({
     const getTooltipTxt = (header: string): string => {
       if(header === 'searchDateTime'){
         return `
-          ${convertDateToLongFormat(localState.filters['startDate'])}
-           - ${convertDateToLongFormat(localState.filters['endDate'])}
+          ${formatCalendarDate(localState.filters['startDate'], true)}
+           - ${formatCalendarDate(localState.filters['endDate'], true)}
         `
       } else if (header == 'searchQuery.type') {
         return localState.filters[header] ? localState.filters[header].searchTypeUI : ''

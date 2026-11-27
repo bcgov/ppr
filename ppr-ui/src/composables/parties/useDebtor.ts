@@ -7,9 +7,9 @@ import { useParty } from '@/composables/useParty'
 import { ActionTypes, RegistrationFlowType } from '@/enums'
 import { checkAddress, formatAddress } from '@/composables/address/factories/address-factory'
 import { cloneDeep, isEqual } from 'lodash'
-import { localTodayDate } from '@/utils/date-helper'
 import { storeToRefs } from 'pinia'
 import { hasTruthyValue } from '@/utils'
+import { buildBirthdate, getBirthdateParts } from '@/utils/date-helper'
 
 const initPerson = { first: '', middle: '', last: '' }
 const initAddress = {
@@ -96,15 +96,13 @@ export const useDebtor = (props, context) => {
     }
 
     if (!localState.currentIsBusiness) {
-      const dateOfBirth = new Date()
-      // @ts-expect-error - returned by toRef
-      dateOfBirth.setFullYear(
+      const birthDate = buildBirthdate(
         parseInt(localState.year),
-        localState.monthValue - 1,
+        Number(localState.monthValue),
         parseInt(localState.day)
       )
-      if (dateOfBirth instanceof Date && !isNaN(dateOfBirth.valueOf())) {
-        localState.currentDebtor.birthDate = localTodayDate(dateOfBirth) + 'T00:00:00-08:00'
+      if (birthDate) {
+        localState.currentDebtor.birthDate = birthDate
       } else {
         localState.currentDebtor.birthDate = null
         if (localState.originalDebtor && !localState.originalDebtor.birthDate) {
@@ -118,8 +116,10 @@ export const useDebtor = (props, context) => {
     }
     // format the original birthdate the exact same before the compare
     if (localState.originalDebtor.birthDate && localState.originalDebtor.birthDate.length > 10) {
-      const originalDateOfBirth = new Date(localState.originalDebtor.birthDate)
-      localState.originalDebtor.birthDate = localTodayDate(originalDateOfBirth) + 'T00:00:00-08:00'
+      const parts = getBirthdateParts(localState.originalDebtor.birthDate)
+      if (parts) {
+        localState.originalDebtor.birthDate = buildBirthdate(parts.year, parts.month, parts.day)
+      }
     }
     // if they didn't change anything, just exit
     if ((localState.registrationFlowType === RegistrationFlowType.AMENDMENT) &&

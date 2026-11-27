@@ -54,39 +54,6 @@ export function convertDate (date: Date|string, includeTime: boolean, includeTz:
   else return moment(date).format('MMMM D, Y') + ` ${datetime}`
 }
 
-/**
- * Adds a specified number of days to a given date string in ISO 8601 format.
- *
- * @param {string} dateString - The original date string in the format 'YYYY-MM-DDTHH:mm:ssZ'.
- * @param {number} daysToAdd - The number of days to add to the date.
- * @returns {string} - The updated date string in ISO 8601 format.
- */
-export const addDaysToDate = (dateString, daysToAdd) => {
-  // Create a new Date object from the input string
-  const date = new Date(dateString)
-
-  // Add the specified number of days
-  date.setDate(date.getDate() + daysToAdd)
-
-  // Return the updated date in the original format (ISO 8601)
-  return date.toISOString()
-}
-
-/**
- * Converts a date string in 'YYYY-MM-DD' format to a long date format, ignoring the timezone.
- *
- * @example "2024-05-20" -> "May 20, 2024"
- * @param dateString - A string representing a date in 'YYYY-MM-DD' format.
- * @returns A string representing the date in long format.
- */
-export function convertDateToLongFormat (dateString: string): string {
-  if (!dateString) return ''
-  // eslint-disable-next-line no-unsafe-optional-chaining
-  const [year, month, day] = dateString?.split('-').map(Number);
-  const date = new Date(year, month - 1, day);
-  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-}
-
 // Converts date to string and pacific date string
 // Example Output: August 11, 2023
 export function shortPacificDate (date: Date | string): string {
@@ -120,14 +87,6 @@ export function pacificDate (date: Date | string, omitSeconds = false): string {
   return `${part('month')} ${part('day')}, ${part('year')} at ${time} ${part('dayPeriod')?.toLowerCase()} Pacific time`
 }
 
-export function tzOffsetMinutes (date: Date): number {
-  let offset = 8 * 60
-  if (moment(date).isDST()) {
-    offset = 7 * 60
-  }
-  return offset
-}
-
 export function isInt (intValue) {
   if (isNaN(intValue)) {
     return false
@@ -136,51 +95,119 @@ export function isInt (intValue) {
   return (x | 0) === x
 }
 
-/**
- * Takes a pacific time and creates a new date adjusted to user localtime.
- * (This works regardless of user's local clock/timezone.)
+/*
+ * Calendar dates (YYYY-MM-DD): a day, not a moment in time, eg a birthdate or a date entered in a date picker.
+ * They are handled as plain year/month/day and never converted through a time zone, so they show the same
+ * date for every user. When the API needs a date time string, use addTimestampToDate.
  */
-export function createDateFromPacificTime (year: number, month: number, day: number,
-  hours: number = 0, minutes: number = 0): Date {
-  // FUTURE: change this to get the date from the server
-  const currUserTime = new Date()
-  const currPacificTime = new Date(currUserTime.toLocaleString('en-US', { timeZone: 'America/Vancouver' }))
 
-  // Handle extremely rare race condition if minute changed between the two calls above
-  // This interval should be more than sufficient to catch this race condition
-  if (currUserTime.getSeconds() >= 57 && currPacificTime.getSeconds() <= 3) {
-    // Try again condition should not occur again
-    return createDateFromPacificTime(year, month, day, hours, minutes)
-  }
+export interface CalendarDatePartsIF {
+  year: number
+  month: number // 1-12
+  day: number
+}
 
-  // Zero out seconds and milliseconds
-  currUserTime.setSeconds(0, 0)
-  currPacificTime.setSeconds(0, 0)
-
-  // Difference between current time zone to pacific time zone
-  const timeZoneDiff = currUserTime.getTime() - currPacificTime.getTime()
-
-  // Date object is always set to the localtime zone in javascript
-  const adjustedDateObject = new Date(new Date(year, month, day, hours, minutes).getTime() + timeZoneDiff)
-
-  return adjustedDateObject
+/** True if year/month/day form a real calendar date (rejects e.g. Feb 30, Apr 31). */
+export function isValidCalendarDate (year: number, month: number, day: number): boolean {
+  if (!Number.isInteger(year) || !Number.isInteger(month) || !Number.isInteger(day)) return false
+  if (month < 1 || month > 12 || day < 1) return false
+  return day <= new Date(Date.UTC(year, month, 0)).getUTCDate()
 }
 
 /**
- * Converts a date string (YYYY-MM-DD) to a Date object at 12:00:00 am Pacific time.
- * @example 2021-11-22 -> 2021-11-22T00:00:00.00 Pacific Time
+ * Year/month/day of a 'YYYY-MM-DD' date string, or null if it isn't a real date.
+ * Only a date string is accepted: to use the date of an API timestamp, pass its date part explicitly.
+ */
+export function parseYyyyMmDd (dateStr: string): CalendarDatePartsIF {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr || '')
+  if (!match) return null
+  const [year, month, day] = match.slice(1).map(Number)
+  return isValidCalendarDate(year, month, day) ? { year, month, day } : null
+}
+
+/**
+ * Formats a date string (YYYY-MM-DD) for display, or '' if it isn't a real date.
+ * @param longMonth whether to show long month name (eg, December vs Dec)
+ * @param showWeekday whether to show the weekday name (eg, Thursday)
+ * @example "2020-12-31" -> "Dec 31, 2020"
+ * @example "2020-12-31", longMonth -> "December 31, 2020"
+ * @example "2020-12-31", longMonth, showWeekday -> "Thursday, December 31, 2020"
+ */
+export function formatCalendarDate (dateStr: string, longMonth = false, showWeekday = false): string {
+  const parts = parseYyyyMmDd(dateStr)
+  if (!parts) return ''
+  // the date is built and formatted in UTC, so no time zone can move it to another day
+  return new Date(Date.UTC(parts.year, parts.month - 1, parts.day)).toLocaleDateString('en-CA', {
+    timeZone: 'UTC',
+    weekday: showWeekday ? 'long' : undefined, // Thursday or nothing
+    month: longMonth ? 'long' : 'short', // December or Dec
+    day: 'numeric', // 31
+    year: 'numeric' // 2020
+  }).replace('.', '') // remove period after short month (eg, Dec.)
+}
+
+/** Month name for a 1-based month, in en-CA. */
+export function getMonthName (month: number): string {
+  return new Date(Date.UTC(2000, month - 1, 1)).toLocaleString('en-CA', { month: 'long', timeZone: 'UTC' })
+}
+
+/**
+ * Adds days to a date string (YYYY-MM-DD), returning a date string, or null if it isn't a real date.
+ * @example "2026-12-15", 30 -> "2027-01-14"
+ */
+export function addDaysToYyyyMmDd (dateStr: string, daysToAdd: number): string {
+  const parts = parseYyyyMmDd(dateStr)
+  if (!parts) return null
+  // Date.UTC rolls the day over into the next month/year as needed
+  return new Date(Date.UTC(parts.year, parts.month - 1, parts.day + daysToAdd)).toISOString().substring(0, 10)
+}
+
+/**
+ * Adds a start of day time to a date string (YYYY-MM-DD) for the API, eg, for a birthdate or
+ * unit note effective date. The result is on that same date in Pacific time.
+ * Values that are not a date string (eg, already have a time) are returned unchanged.
+ *
+ * Pacific time is always UTC-8 or UTC-7 (PST, PDT, or the permanent UTC-7 since Nov 1, 2026), so
+ * -08:00 is 00:00 (UTC-8) or 01:00 (UTC-7) on that date: the Pacific date is the date that was entered,
+ * for any year, with no offset calculation.
+ * @example "2023-07-01" -> "2023-07-01T00:00:00-08:00"
+ */
+export function addTimestampToDate (dateToConvert: string): string {
+  if (!parseYyyyMmDd(dateToConvert)) return dateToConvert
+  return `${dateToConvert}T00:00:00-08:00`
+}
+
+/*
+ * Birthdates are calendar dates:
+ * - Sending: build the string straight from the entered year/month/day (addTimestampToDate).
+ * - Reading: use the 'YYYY-MM-DD' date part of the string the API returns.
+ * The UI sends 'YYYY-MM-DDT00:00:00-08:00'; the API stores and returns it as
+ * 'YYYY-MM-DDT08:00:00+00:00', so the date part is always the date that was entered.
+ */
+
+/** Build the API birthdate string from the entered date, or null if it isn't a real date. */
+export function buildBirthdate (year: number, month: number, day: number): string {
+  if (!isValidCalendarDate(year, month, day)) return null
+  const pad = (n: number, len = 2) => String(n).padStart(len, '0')
+  return addTimestampToDate(`${pad(year, 4)}-${pad(month)}-${pad(day)}`)
+}
+
+/** Year/month/day of an API birthdate (its 'YYYY-MM-DD' date part), or null. */
+export function getBirthdateParts (birthDate: string): CalendarDatePartsIF {
+  return parseYyyyMmDd(birthDate?.substring(0, 10))
+}
+
+/** e.g. 'March 15, 1980', or undefined if there is no valid birthdate. */
+export function formatBirthdate (birthDate: string): string {
+  return formatCalendarDate(birthDate?.substring(0, 10), true) || undefined
+}
+
+/**
+ * Converts a date string (YYYY-MM-DD) to a Date object on that date in Pacific time (eg, for a date picker).
+ * @example 2021-11-22 -> 2021-11-22T00:00:00-08:00
  */
 export function yyyyMmDdToDate (dateStr: string): Date {
-  // safety checks
-  if (!dateStr) return null
-  if (dateStr.length !== 10) return null
-
-  const split = dateStr.split('-')
-  const year = +split[0]
-  const month = +split[1]
-  const day = +split[2]
-
-  return createDateFromPacificTime(year, (month - 1), day)
+  return parseYyyyMmDd(dateStr) ? new Date(addTimestampToDate(dateStr)) : null
 }
 
 /**
@@ -199,41 +226,6 @@ export function dateToYyyyMmDd (date: Date): string {
   })
 
   return convertDateFormat(localDate)
-}
-
-/**
- * Converts a date string (YYYY-MM-DD) to a date string (Month Day, Year) in Pacific timezone.
- * @param longMonth whether to show long month name (eg, December vs Dec)
- * @param showWeekday whether to show the weekday name (eg, Thursday)
- * @example "2021-01-01" -> "Thursday, December 31, 2020"
- */
-export function yyyyMmDdToPacificDate (dateStr: string, longMonth = false, showWeekday = false): string {
-  return dateToPacificDate(yyyyMmDdToDate(dateStr), longMonth, showWeekday)
-}
-
-/**
- * Converts a Date object to a date string (Month Day, Year) in Pacific timezone.
- * @param longMonth whether to show long month name (eg, December vs Dec)
- * @param showWeekday whether to show the weekday name (eg, Thursday)
- * @example "2021-01-01 07:00:00 GMT" -> "Dec 31, 2020"
- * @example "2021-01-01 08:00:00 GMT" -> "Jan 1, 2021"
- */
-export function dateToPacificDate (date: Date, longMonth = false, showWeekday = false): string {
-  // safety check
-  if (!(date instanceof Date) || isNaN(date.getTime())) return null
-
-  let dateStr = date.toLocaleDateString('en-CA', {
-    timeZone: 'America/Vancouver',
-    weekday: showWeekday ? 'long' : undefined, // Thursday or nothing
-    month: longMonth ? 'long' : 'short', // December or Dec
-    day: 'numeric', // 31
-    year: 'numeric' // 2020
-  })
-
-  // remove period after month
-  dateStr = dateStr.replace('.', '')
-
-  return dateStr
 }
 
 /**

@@ -82,11 +82,12 @@ declare global {
   const UnitNoteDocTypes: typeof import('../enums/unitNoteDocTypes').UnitNoteDocTypes
   const UnitNoteStatusTypes: typeof import('../enums/unitNoteDocTypes').UnitNoteStatusTypes
   const acceptHMRUpdate: typeof import('pinia').acceptHMRUpdate
-  const addDaysToDate: typeof import('../utils/date-helper').addDaysToDate
+  const addDaysToYyyyMmDd: typeof import('../utils/date-helper').addDaysToYyyyMmDd
   const addMHRegistrationSummary: typeof import('../utils/mhr-api-helper').addMHRegistrationSummary
   const addRegistrationSummary: typeof import('../utils/ppr-api-helper').addRegistrationSummary
-  const addTimestampToDate: typeof import('../utils/utilities').addTimestampToDate
+  const addTimestampToDate: typeof import('../utils/date-helper').addTimestampToDate
   const axios: typeof import('../utils/axios-auth').axios
+  const buildBirthdate: typeof import('../utils/date-helper').buildBirthdate
   const calculatePreviousDate: typeof import('../utils/date-helper').calculatePreviousDate
   const calendarDates: typeof import('../utils/date-helper').calendarDates
   const cancelMhrDraft: typeof import('../utils/mhr-api-helper').cancelMhrDraft
@@ -96,11 +97,9 @@ declare global {
   const computed: typeof import('vue').computed
   const convertDate: typeof import('../utils/date-helper').convertDate
   const convertDateFormat: typeof import('../utils/date-helper').convertDateFormat
-  const convertDateToLongFormat: typeof import('../utils/date-helper').convertDateToLongFormat
   const convertToISO8601LastMinute: typeof import('../utils/date-helper').convertToISO8601LastMinute
   const createAmendmentStatement: typeof import('../utils/ppr-api-helper').createAmendmentStatement
   const createApp: typeof import('vue').createApp
-  const createDateFromPacificTime: typeof import('../utils/date-helper').createDateFromPacificTime
   const createDischarge: typeof import('../utils/ppr-api-helper').createDischarge
   const createDraft: typeof import('../utils/ppr-api-helper').createDraft
   const createExemption: typeof import('../utils/mhr-api-helper').createExemption
@@ -111,7 +110,6 @@ declare global {
   const createQualifiedSupplier: typeof import('../utils/mhr-api-helper').createQualifiedSupplier
   const createRenewal: typeof import('../utils/ppr-api-helper').createRenewal
   const customRef: typeof import('vue').customRef
-  const dateToPacificDate: typeof import('../utils/date-helper').dateToPacificDate
   const dateToYyyyMmDd: typeof import('../utils/date-helper').dateToYyyyMmDd
   const debtorNames: typeof import('../utils/ppr-api-helper').debtorNames
   const deepChangesComparison: typeof import('../utils/utilities').deepChangesComparison
@@ -136,12 +134,15 @@ declare global {
   const format12HourTime: typeof import('../utils/date-helper').format12HourTime
   const format12HourTimeMoment: typeof import('../utils/date-helper').format12HourTimeMoment
   const formatAsHtml: typeof import('../utils/format-helper').formatAsHtml
+  const formatBirthdate: typeof import('../utils/date-helper').formatBirthdate
+  const formatCalendarDate: typeof import('../utils/date-helper').formatCalendarDate
   const formatCurrency: typeof import('../utils/format-helper').formatCurrency
   const formatExpiryDate: typeof import('../utils/date-helper').formatExpiryDate
   const fromDisplayPhone: typeof import('../utils/format-helper').fromDisplayPhone
   const getAccountInfoFromAuth: typeof import('../utils/auth-helper').getAccountInfoFromAuth
   const getAccountMembers: typeof import('../utils/auth-helper').getAccountMembers
   const getActivePinia: typeof import('pinia').getActivePinia
+  const getBirthdateParts: typeof import('../utils/date-helper').getBirthdateParts
   const getCurrentInstance: typeof import('vue').getCurrentInstance
   const getCurrentScope: typeof import('vue').getCurrentScope
   const getCurrentWatcher: typeof import('vue').getCurrentWatcher
@@ -156,6 +157,7 @@ declare global {
   const getMhrDrafts: typeof import('../utils/mhr-api-helper').getMhrDrafts
   const getMhrHistory: typeof import('../utils/mhr-api-helper').getMhrHistory
   const getMhrManufacturerInfo: typeof import('../utils/mhr-api-helper').getMhrManufacturerInfo
+  const getMonthName: typeof import('../utils/date-helper').getMonthName
   const getPPRUserSettings: typeof import('../utils/ppr-api-helper').getPPRUserSettings
   const getPaymentInformation: typeof import('../utils/pay-api-helper').getPaymentInformation
   const getPprSearchHistoryById: typeof import('../utils/ppr-api-helper').getPprSearchHistoryById
@@ -183,6 +185,7 @@ declare global {
   const isShallow: typeof import('vue').isShallow
   const isSigningIn: typeof import('../utils/utilities').isSigningIn
   const isSigningOut: typeof import('../utils/utilities').isSigningOut
+  const isValidCalendarDate: typeof import('../utils/date-helper').isValidCalendarDate
   const isWithinMinutes: typeof import('../utils/date-helper').isWithinMinutes
   const localTodayDate: typeof import('../utils/date-helper').localTodayDate
   const ltsaDetails: typeof import('../utils/ltsa-api-helper').ltsaDetails
@@ -218,6 +221,7 @@ declare global {
   const parseAccountToSubmittingParty: typeof import('../utils/submitting-party-helper').parseAccountToSubmittingParty
   const parsePayDetail: typeof import('../utils/format-helper').parsePayDetail
   const parseSubmittingPartyToAccountInfo: typeof import('../utils/submitting-party-helper').parseSubmittingPartyToAccountInfo
+  const parseYyyyMmDd: typeof import('../utils/date-helper').parseYyyyMmDd
   const partyCodeAccount: typeof import('../utils/ppr-api-helper').partyCodeAccount
   const partyCodeSearch: typeof import('../utils/ppr-api-helper').partyCodeSearch
   const provide: typeof import('vue').provide
@@ -280,7 +284,6 @@ declare global {
   const toTitleCase: typeof import('../utils/format-helper').toTitleCase
   const toValue: typeof import('vue').toValue
   const triggerRef: typeof import('vue').triggerRef
-  const tzOffsetMinutes: typeof import('../utils/date-helper').tzOffsetMinutes
   const unref: typeof import('vue').unref
   const updateDraft: typeof import('../utils/ppr-api-helper').updateDraft
   const updateLdUser: typeof import('../utils/feature-flags').updateLdUser
@@ -340,7 +343,6 @@ declare global {
   const watchPostEffect: typeof import('vue').watchPostEffect
   const watchSyncEffect: typeof import('vue').watchSyncEffect
   const yyyyMmDdToDate: typeof import('../utils/date-helper').yyyyMmDdToDate
-  const yyyyMmDdToPacificDate: typeof import('../utils/date-helper').yyyyMmDdToPacificDate
 }
 // for type re-export
 declare global {

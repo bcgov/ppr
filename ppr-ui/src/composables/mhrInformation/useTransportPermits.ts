@@ -1,7 +1,7 @@
 import type { ComputedRef, Ref } from 'vue';
 import { computed, nextTick, ref } from 'vue'
 import {
-  createDateFromPacificTime,
+  addTimestampToDate,
   fromDisplayPhone,
 } from '@/utils'
 import {
@@ -254,14 +254,7 @@ export const useTransportPermits = () => {
     if (getMhrTransportPermit.value.locationChangeType === LocationChangeTypes.TRANSPORT_PERMIT) {
       // in certain scenarios there is no tax expiry date
       if (payloadData.newLocation.taxExpiryDate) {
-        const yearMonthDay = payloadData.newLocation.taxExpiryDate.split('-')
-        const year = parseInt(yearMonthDay[0])
-        const month = parseInt(yearMonthDay[1]) - 1
-        const day = parseInt(yearMonthDay[2])
-
-        payloadData.newLocation.taxExpiryDate = createDateFromPacificTime(year, month, day, 0, 1)
-          .toISOString()
-          .replace('.000Z', '+00:00')
+        payloadData.newLocation.taxExpiryDate = addTimestampToDate(payloadData.newLocation.taxExpiryDate)
       }
     }
 

@@ -25,7 +25,6 @@ import type { APIMhrTypes, ApiTransferTypes} from '@/enums'
 import { ErrorCategories, ErrorCodes, ErrorRootCauses, StaffPaymentOptions } from '@/enums'
 import { useSearch } from '@/composables/useSearch'
 import { SessionStorageKeys } from 'sbc-common-components/src/util/constants'
-import { addTimestampToDate } from '@/utils'
 import { trim } from 'lodash'
 import type { AxiosError } from 'axios'
 import type {
@@ -860,11 +859,7 @@ function addSortParams (url: string, sortOptions: RegistrationSortIF): string {
     if (sortOptions[sortKeys[i]] === 'ownerNames') sortOptions[sortKeys[i]] = 'ownerName'
     if (sortOptions[sortKeys[i]] === 'registrationDescription') sortOptions[sortKeys[i]] = 'registrationType'
     if (sortOptions[sortKeys[i]] === 'registeringName') sortOptions[sortKeys[i]] = 'username'
-    // add timestamp onto datetime param values
-    if (sortOptions[sortKeys[i]] && ['startDateTime', 'endDateTime'].includes(UIFilterToApiFilter[sortKeys[i]])) {
-      sortOptions[sortKeys[i]] =
-      addTimestampToDate(sortOptions[sortKeys[i]], sortOptions[sortKeys[i]] === 'endDateTime')
-    }
+    // startDateTime/endDateTime are sent as dates (YYYY-MM-DD): the api sets the start/end of day time
     if (sortOptions[sortKeys[i]]) {
       url += `&${UIFilterToApiFilter[sortKeys[i]]}=${sortOptions[sortKeys[i]]}`
     }

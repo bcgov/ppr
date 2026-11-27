@@ -224,7 +224,7 @@ import {
   StaffPayment
 } from '@/components/common'
 import { useExemptions, usePayment } from '@/composables'
-import { parseSubmittingPartyToAccountInfo, yyyyMmDdToPacificDate } from '@/utils'
+import { parseSubmittingPartyToAccountInfo, formatCalendarDate } from '@/utils'
 import { TransportPermitDetails } from '@/components/mhrTransportPermits'
 import CautionBox from '@/components/common/CautionBox.vue'
 import PartySelectMethod from '@/components/parties/PartySelectMethod.vue'
@@ -290,7 +290,7 @@ export default defineComponent({
           getMhrExemptionNote.value?.nonResidentialOption
             ? {
                 label: `Date Home was ${getMhrExemptionNote.value?.nonResidentialOption}`,
-                property: yyyyMmDdToPacificDate(getMhrExemptionNote.value?.expiryDateTime, true)
+                property: formatCalendarDate(getMhrExemptionNote.value?.expiryDateTime, true)
               }
             : null,
           getMhrExemptionNote.value?.documentId

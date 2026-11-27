@@ -74,7 +74,7 @@
       cols="9"
       class="pt-1 pb-0 mb-0"
     >
-      <p>{{ yyyyMmDdToPacificDate((order.orderDate.split('T')[0]), true) }}</p>
+      <p>{{ formatCalendarDate((order.orderDate.split('T')[0]), true) }}</p>
     </v-col>
     <v-col
       cols="3"
@@ -96,7 +96,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { CourtOrderIF } from '@/interfaces'
-import { yyyyMmDdToPacificDate } from '@/utils'
+import { formatCalendarDate } from '@/utils'
 import { InfoChip } from '@/components/common'
 import { ActionTypes } from '@/enums'
 

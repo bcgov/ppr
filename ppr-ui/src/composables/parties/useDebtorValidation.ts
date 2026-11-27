@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import { createDefaultValidationResult } from '@lemoncode/fonk'
 import { useValidation } from '@/utils/validators/use-validation'
+import { isValidCalendarDate } from '@/utils/date-helper'
 
 const createEmptyErrors = () => ({
   businessName: createDefaultValidationResult(),
@@ -43,7 +44,13 @@ export const useDebtorValidation = () => {
         }
       }
 
-      if ((!day) || !validBirthdateNumber('' + day) || day < 1 || day > 31) {
+      if (
+        (!day) || !validBirthdateNumber('' + day) || day < 1 || day > 31 ||
+        // day must exist in the month (e.g. no Feb 30 or Apr 31);
+        // without a valid year, check against a leap year: Feb 30 is never valid, Feb 29 might be
+        (errors.value.month.succeeded &&
+          !isValidCalendarDate(errors.value.year.succeeded ? Number(year) : 2000, Number(month), Number(day)))
+      ) {
         errors.value.day = {
           type: 'DAY',
           succeeded: false,
@@ -51,6 +58,19 @@ export const useDebtorValidation = () => {
         }
       }
     }
+  }
+
+  /**
+   * Validate the birthdate while the user is still entering it.
+   * Same rules as validateBirthdate, but a field the user hasn't filled in yet is not flagged.
+   * A year is treated as unfinished until it has 4 characters, unless yearDone is set (e.g. on blur).
+   */
+  const validateBirthdateLive = (year, month, day, yearDone = false) => {
+    validateBirthdate(year, month, day)
+    const yearStr = year ? String(year) : ''
+    if (!yearStr || (!yearDone && yearStr.length < 4)) resetError('year')
+    if (!month) resetError('month')
+    if (!day) resetError('day')
   }
 
   const validateEmail = (email: string) => {
@@ -136,6 +156,7 @@ export const useDebtorValidation = () => {
     updateValidity,
     validateName,
     validateBirthdate,
+    validateBirthdateLive,
     validateEmail,
     validateDebtorForm
   }

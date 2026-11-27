@@ -82,7 +82,7 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue'
 import { EffectiveDateTypes } from '@/enums/'
-import { createDateFromPacificTime, localTodayDate, shortPacificDate } from '@/utils'
+import { localTodayDate, shortPacificDate, addTimestampToDate } from '@/utils'
 import type { ContentIF, FormIF } from '@/interfaces'
 import { useInputRules } from '@/composables'
 import InputFieldDatePicker from '@/components/common/InputFieldDatePicker.vue'
@@ -136,15 +136,6 @@ export default defineComponent({
 
     })
 
-    const buildFullDate = (): Date => {
-      const YearMonthDay = localState.selectedPastDate.split('-')
-      const year = parseInt(YearMonthDay[0])
-      const month = parseInt(YearMonthDay[1]) - 1
-      const day = parseInt(YearMonthDay[2])
-
-      return createDateFromPacificTime(year, month, day)
-    }
-
     watch(() => props.validate, async (val) => {
       if (val && !localState.isImmediateDateSelected) {
         effectiveDatePicker.value?.validate()
@@ -163,7 +154,7 @@ export default defineComponent({
           effectiveDateForm.value.validate()
         } else if (localState.selectedPastDate) {
           // past date radio selected
-          localState.effectiveDate = buildFullDate().toISOString()
+          localState.effectiveDate = addTimestampToDate(localState.selectedPastDate)
         }
       }
     )
@@ -172,7 +163,7 @@ export default defineComponent({
       () => localState.selectedPastDate,
       () => {
         if (localState.selectedPastDate) {
-          localState.effectiveDate = buildFullDate().toISOString()
+          localState.effectiveDate = addTimestampToDate(localState.selectedPastDate)
         }
       }
     )

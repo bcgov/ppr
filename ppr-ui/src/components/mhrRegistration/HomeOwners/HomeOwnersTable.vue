@@ -694,7 +694,9 @@
                       </p>
                       <p class="generic-label">
                         <span class="fs-14">Date of Dissolution or Cancellation:</span>
-                        <span class="font-light mx-1">{{ yyyyMmDdToPacificDate(item.deathDateTime, true) }}</span>
+                        <span class="font-light mx-1">
+                          {{ formatCalendarDate(item.deathDateTime?.substring(0, 10), true) }}
+                        </span>
                       </p>
                     </v-col>
                   </v-row>
@@ -726,7 +728,9 @@
                         </p>
                         <p class="generic-label">
                           <span class="fs-14">Date of Death:</span>
-                          <span class="font-light mx-1">{{ yyyyMmDdToPacificDate(item.deathDateTime, true) }}</span>
+                          <span class="font-light mx-1">
+                            {{ formatCalendarDate(item.deathDateTime?.substring(0, 10), true) }}
+                          </span>
                         </p>
                       </div>
                       <div
@@ -752,7 +756,9 @@
                           <span class="fs-14">
                             Date of {{ item.deathCorpNumber ? 'Dissolution or Cancellation' : 'Death' }}:
                           </span>
-                          <span class="font-light mx-1">{{ yyyyMmDdToPacificDate(item.deathDateTime, true) }}</span>
+                          <span class="font-light mx-1">
+                            {{ formatCalendarDate(item.deathDateTime?.substring(0, 10), true) }}
+                          </span>
                         </p>
                       </div>
                       <div
@@ -878,7 +884,7 @@ import {
 } from '@/components/mhrTransfers'
 import TableGroupHeader from '@/components/mhrRegistration/HomeOwners/TableGroupHeader.vue'
 import { mhrDeceasedOwnerChanges } from '@/resources/dialogOptions'
-import { yyyyMmDdToPacificDate } from '@/utils/date-helper'
+import { formatCalendarDate } from '@/utils/date-helper'
 import { InfoChip } from '@/components/common'
 import type { MhrRegistrationHomeOwnerGroupIF, MhrRegistrationHomeOwnerIF } from '@/interfaces'
 import { ActionTypes, HomeOwnerPartyTypes, HomeTenancyTypes, SupportingDocumentsOptions } from '@/enums'
@@ -1361,7 +1367,7 @@ export default defineComponent({
       removeChangeOwnerHandler,
       handleOwnerChangesDialogResp,
       hideRowBottomBorder,
-      yyyyMmDdToPacificDate,
+      formatCalendarDate,
       isInvalidOwnerGroup,
       HomeOwnerPartyTypes,
       SupportingDocumentsOptions,
