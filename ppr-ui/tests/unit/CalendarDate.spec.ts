@@ -126,8 +126,21 @@ describe('date strings for the API', () => {
   })
 
   it('adds the start and end of day to a date range filter date', () => {
-    expect(addFilterTimestampToDate('2026-11-20')).toBe('2026-11-20T00:00:00-07:00')
-    expect(addFilterTimestampToDate('2026-11-20', true)).toBe('2026-11-20T23:59:59-07:00')
+    // Jan 2026 - Apr 2026: start is PST, end is PDT
+    expect(addFilterTimestampToDate('2026-01-15')).toBe('2026-01-15T00:00:00-08:00')
+    expect(addFilterTimestampToDate('2026-04-15', true)).toBe('2026-04-15T23:59:59-07:00')
+    // Jul 2026 - Aug 2026: both PDT
+    expect(addFilterTimestampToDate('2026-07-01')).toBe('2026-07-01T00:00:00-07:00')
+    expect(addFilterTimestampToDate('2026-08-31', true)).toBe('2026-08-31T23:59:59-07:00')
+    // days the clocks changed: start and end of the day have different offsets
+    expect(addFilterTimestampToDate('2026-03-08')).toBe('2026-03-08T00:00:00-08:00')
+    expect(addFilterTimestampToDate('2026-03-08', true)).toBe('2026-03-08T23:59:59-07:00')
+    expect(addFilterTimestampToDate('2025-11-02')).toBe('2025-11-02T00:00:00-07:00')
+    expect(addFilterTimestampToDate('2025-11-02', true)).toBe('2025-11-02T23:59:59-08:00')
+    // permanent UTC-7 from Nov 1, 2026
+    expect(addFilterTimestampToDate('2026-12-15')).toBe('2026-12-15T00:00:00-07:00')
+    expect(addFilterTimestampToDate('2026-12-15', true)).toBe('2026-12-15T23:59:59-07:00')
+    // not a date string: unchanged
     expect(addFilterTimestampToDate('2026-11-20T23:59:59-07:00', true)).toBe('2026-11-20T23:59:59-07:00')
   })
 

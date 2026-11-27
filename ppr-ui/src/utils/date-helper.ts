@@ -178,15 +178,34 @@ export function addTimestampToDate (dateToConvert: string): string {
 }
 
 /**
- * Adds the start or end of day time to a date string (YYYY-MM-DD) for a registration date range filter.
- * The APIs treat Pacific time as a fixed UTC-7, so -07:00 gives their exact 00:00:00 or 23:59:59 on that date.
+ * Pacific time UTC offset (eg, '-08:00' or '-07:00') at a moment, from the America/Vancouver time zone,
+ * eg, -08:00 in Jan 2026 (PST), -07:00 in Jul 2026 (PDT) and from Nov 1, 2026 (permanent UTC-7).
+ * Returns '' if the browser can't provide it.
+ */
+export function pacificOffsetAt (isoInstant: string): string {
+  const name = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Vancouver', timeZoneName: 'longOffset' })
+    .formatToParts(new Date(isoInstant))
+    .find(p => p.type === 'timeZoneName')?.value
+  // browsers return eg, 'GMT-08:00', the timezone polyfill returns eg, 'GMT-8'
+  const match = /^GMT([+-])(\d{1,2})(?::(\d{2}))?$/.exec(name || '')
+  return match ? `${match[1]}${match[2].padStart(2, '0')}:${match[3] || '00'}` : ''
+}
+
+/**
+ * Adds the start or end of day time to a date string (YYYY-MM-DD) for a registration date range filter,
+ * with the Pacific time offset of that date (see pacificOffsetAt), so the range is the whole Pacific day.
  * Values that are not a date string (eg, already have a time) are returned unchanged.
- * @example "2026-11-20" -> "2026-11-20T00:00:00-07:00"
- * @example "2026-11-20", end of day -> "2026-11-20T23:59:59-07:00"
+ * @example "2026-01-15" -> "2026-01-15T00:00:00-08:00"
+ * @example "2026-04-15", end of day -> "2026-04-15T23:59:59-07:00"
  */
 export function addFilterTimestampToDate (dateToConvert: string, isEndDate = false): string {
   if (!parseYyyyMmDd(dateToConvert)) return dateToConvert
-  return `${dateToConvert}${isEndDate ? 'T23:59:59' : 'T00:00:00'}-07:00`
+  if (isEndDate) {
+    // 07:00 UTC the next day is just after this Pacific day ends (after any 2 am clock change on this date)
+    return `${dateToConvert}T23:59:59${pacificOffsetAt(`${addDaysToYyyyMmDd(dateToConvert, 1)}T07:00:00Z`)}`
+  }
+  // 08:00 UTC is 00:00 or 01:00 Pacific on this date (before any 2 am clock change)
+  return `${dateToConvert}T00:00:00${pacificOffsetAt(`${dateToConvert}T08:00:00Z`)}`
 }
 
 /*
