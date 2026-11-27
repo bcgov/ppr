@@ -3,6 +3,7 @@ import '@/composables' // load the barrel first so its import cycle resolves as 
 import { useParty } from '@/composables/useParty'
 import type { PartyIF } from '@/interfaces'
 import {
+  addFilterTimestampToDate,
   addDaysToYyyyMmDd,
   addTimestampToDate,
   buildBirthdate,
@@ -122,6 +123,25 @@ describe('date strings for the API', () => {
   it('returns values that are not a date string unchanged', () => {
     expect(addTimestampToDate('2026-11-25T00:00:00-07:00')).toBe('2026-11-25T00:00:00-07:00')
     expect(addTimestampToDate('')).toBe('')
+  })
+
+  it('adds the start and end of day to a date range filter date', () => {
+    // Jan 2026 - Apr 2026: start is PST, end is PDT
+    expect(addFilterTimestampToDate('2026-01-15')).toBe('2026-01-15T00:00:00-08:00')
+    expect(addFilterTimestampToDate('2026-04-15', true)).toBe('2026-04-15T23:59:59-07:00')
+    // Jul 2026 - Aug 2026: both PDT
+    expect(addFilterTimestampToDate('2026-07-01')).toBe('2026-07-01T00:00:00-07:00')
+    expect(addFilterTimestampToDate('2026-08-31', true)).toBe('2026-08-31T23:59:59-07:00')
+    // days the clocks changed: start and end of the day have different offsets
+    expect(addFilterTimestampToDate('2026-03-08')).toBe('2026-03-08T00:00:00-08:00')
+    expect(addFilterTimestampToDate('2026-03-08', true)).toBe('2026-03-08T23:59:59-07:00')
+    expect(addFilterTimestampToDate('2025-11-02')).toBe('2025-11-02T00:00:00-07:00')
+    expect(addFilterTimestampToDate('2025-11-02', true)).toBe('2025-11-02T23:59:59-08:00')
+    // permanent UTC-7 from Nov 1, 2026
+    expect(addFilterTimestampToDate('2026-12-15')).toBe('2026-12-15T00:00:00-07:00')
+    expect(addFilterTimestampToDate('2026-12-15', true)).toBe('2026-12-15T23:59:59-07:00')
+    // not a date string: unchanged
+    expect(addFilterTimestampToDate('2026-11-20T23:59:59-07:00', true)).toBe('2026-11-20T23:59:59-07:00')
   })
 
   it.each([
