@@ -1,5 +1,6 @@
 // Libraries
 import { axiosAssets } from '@/utils/axios-ppr'
+import { addFilterTimestampToDate } from '@/utils/date-helper'
 import { StatusCodes } from 'http-status-codes'
 import type { ErrorCodes, SettingOptions } from '@/enums';
 import { StaffPaymentOptions , ErrorCategories } from '@/enums'
@@ -69,9 +70,13 @@ function addSortParams (url: string, sortOptions: RegistrationSortIF): string {
       // sortKeys[i] === orderBy (only case this will happen)
       sortOptions[sortKeys[i]] = 'startDateTime'
     }
-    // startDateTime/endDateTime are sent as dates (YYYY-MM-DD): the api sets the start/end of day time
-    if (sortOptions[sortKeys[i]]) {
-      url += `&${UIFilterToApiFilter[sortKeys[i]]}=${sortOptions[sortKeys[i]]}`
+    let value = sortOptions[sortKeys[i]]
+    // add the start/end of day time to the date range values
+    if (value && ['startDateTime', 'endDateTime'].includes(UIFilterToApiFilter[sortKeys[i]])) {
+      value = addFilterTimestampToDate(value, UIFilterToApiFilter[sortKeys[i]] === 'endDateTime')
+    }
+    if (value) {
+      url += `&${UIFilterToApiFilter[sortKeys[i]]}=${value}`
     }
   }
   return url

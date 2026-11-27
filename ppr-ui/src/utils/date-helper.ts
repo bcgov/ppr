@@ -177,6 +177,18 @@ export function addTimestampToDate (dateToConvert: string): string {
   return `${dateToConvert}T00:00:00-08:00`
 }
 
+/**
+ * Adds the start or end of day time to a date string (YYYY-MM-DD) for a registration date range filter.
+ * The APIs treat Pacific time as a fixed UTC-7, so -07:00 gives their exact 00:00:00 or 23:59:59 on that date.
+ * Values that are not a date string (eg, already have a time) are returned unchanged.
+ * @example "2026-11-20" -> "2026-11-20T00:00:00-07:00"
+ * @example "2026-11-20", end of day -> "2026-11-20T23:59:59-07:00"
+ */
+export function addFilterTimestampToDate (dateToConvert: string, isEndDate = false): string {
+  if (!parseYyyyMmDd(dateToConvert)) return dateToConvert
+  return `${dateToConvert}${isEndDate ? 'T23:59:59' : 'T00:00:00'}-07:00`
+}
+
 /*
  * Birthdates are calendar dates:
  * - Sending: build the string straight from the entered year/month/day (addTimestampToDate).

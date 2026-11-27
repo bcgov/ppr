@@ -3,6 +3,7 @@ import '@/composables' // load the barrel first so its import cycle resolves as 
 import { useParty } from '@/composables/useParty'
 import type { PartyIF } from '@/interfaces'
 import {
+  addFilterTimestampToDate,
   addDaysToYyyyMmDd,
   addTimestampToDate,
   buildBirthdate,
@@ -122,6 +123,12 @@ describe('date strings for the API', () => {
   it('returns values that are not a date string unchanged', () => {
     expect(addTimestampToDate('2026-11-25T00:00:00-07:00')).toBe('2026-11-25T00:00:00-07:00')
     expect(addTimestampToDate('')).toBe('')
+  })
+
+  it('adds the start and end of day to a date range filter date', () => {
+    expect(addFilterTimestampToDate('2026-11-20')).toBe('2026-11-20T00:00:00-07:00')
+    expect(addFilterTimestampToDate('2026-11-20', true)).toBe('2026-11-20T23:59:59-07:00')
+    expect(addFilterTimestampToDate('2026-11-20T23:59:59-07:00', true)).toBe('2026-11-20T23:59:59-07:00')
   })
 
   it.each([

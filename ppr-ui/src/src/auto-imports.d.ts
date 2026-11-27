@@ -85,6 +85,7 @@ declare global {
   const addDaysToYyyyMmDd: typeof import('../utils/date-helper').addDaysToYyyyMmDd
   const addMHRegistrationSummary: typeof import('../utils/mhr-api-helper').addMHRegistrationSummary
   const addRegistrationSummary: typeof import('../utils/ppr-api-helper').addRegistrationSummary
+  const addFilterTimestampToDate: typeof import('../utils/date-helper').addFilterTimestampToDate
   const addTimestampToDate: typeof import('../utils/date-helper').addTimestampToDate
   const axios: typeof import('../utils/axios-auth').axios
   const buildBirthdate: typeof import('../utils/date-helper').buildBirthdate

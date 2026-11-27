@@ -1,6 +1,6 @@
 {
   "name": "ppr-ui",
-  "version": "6.1.16",
+  "version": "6.1.17",
   "private": true,
   "engines": {
     "node": ">=24"
