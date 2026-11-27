@@ -24,22 +24,6 @@ import json
 import os
 import sys
 
-import requests
-
-
-def get_mock_auth() -> str:
-    """For CI unit tests get mock auth value."""
-    try:
-        url: str = "https://test.api.connect.gov.bc.ca/mockTarget/auth/api/v1/testing/mock-sa-ppr"
-        headers = {"Content-Type": "application/json"}
-        response = requests.get(url, headers=headers, timeout=10.0)
-        if response and response.text:
-            resp_json = json.loads(response.text)
-            return resp_json.get("response", "")
-        return ""
-    except Exception:
-        return ""
-
 
 def get_named_config(config_name: str = "production"):
     """Return the configuration object based on the name.
@@ -189,8 +173,6 @@ class Config:  # pylint: disable=too-few-public-methods
     NOTIFY_REVIEW_CONFIG = os.getenv("NOTIFY_REVIEW_CONFIG", "")
 
     DEPLOYMENT_ENV = os.getenv("DEPLOYMENT_ENV", "development")
-    if not GOOGLE_DEFAULT_SA and DEPLOYMENT_ENV in ("unitTesting", "testing"):
-        GOOGLE_DEFAULT_SA = get_mock_auth()
 
     DOC_SERVICE_URL = None
     DOC_SERVICE_KEY = None

@@ -20,29 +20,13 @@ Flask config, rather than reading environment variables directly
 or by accessing this configuration directly.
 """
 
-import json
 import os
 import sys
 
 from dotenv import find_dotenv, load_dotenv
-import requests
 
 # Load environment variables from .env file
 load_dotenv(find_dotenv())
-
-
-def get_mock_auth() -> str:
-    """For CI unit tests get mock auth value."""
-    try:
-        url: str = "https://test.api.connect.gov.bc.ca/mockTarget/auth/api/v1/testing/mock-sa-ppr"
-        headers = {"Content-Type": "application/json"}
-        response = requests.get(url, headers=headers, timeout=10.0)
-        if response and response.text:
-            resp_json = json.loads(response.text)
-            return resp_json.get("response", "")
-        return ""
-    except Exception:
-        return ""
 
 
 def get_named_config(config_name: str = "production"):
@@ -212,8 +196,6 @@ class Config:  # pylint: disable=too-few-public-methods
     REPORT_SEARCH_LIGHT: int = int(os.getenv("REPORT_SEARCH_LIGHT", "700"))
 
     DEPLOYMENT_ENV = os.getenv("DEPLOYMENT_ENV", "development")
-    if not GOOGLE_DEFAULT_SA and DEPLOYMENT_ENV in ("unitTesting", "testing"):
-        GOOGLE_DEFAULT_SA = get_mock_auth()
 
 
 class DevConfig(Config):  # pylint: disable=too-few-public-methods

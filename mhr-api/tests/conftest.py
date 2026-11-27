@@ -13,15 +13,32 @@
 # limitations under the License.
 """Common setup and fixtures for the pytest suite used by this service."""
 import datetime
+import os
 from contextlib import contextmanager
 
+import google.auth
 import pytest
+from google.auth.credentials import AnonymousCredentials
 
 from mhr_api import create_app
 from mhr_api import jwt as _jwt
 from mhr_api.models import db as _db
 
 from . import FROZEN_DATETIME
+
+
+@pytest.fixture(scope="session", autouse=True)
+def offline_gcp():
+    """Without a GOOGLE_DEFAULT_SA key (CI is keyless), use placeholder application default credentials.
+
+    Session scoped so it is in place before the app (and its Pub/Sub publisher) is created.
+    """
+    if os.getenv("GOOGLE_DEFAULT_SA"):
+        yield
+        return
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr(google.auth, "default", lambda *args, **kwargs: (AnonymousCredentials(), None))
+        yield
 
 
 @contextmanager
